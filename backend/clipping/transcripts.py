@@ -3,14 +3,21 @@
 A transcript row is one provider's reading of one source. Each save (the first reading, then every correction)
 adds a row to transcript_versions with its own word file; `load` always returns the newest version.
 Word file shape (a plain JSON list, as before): [{text, start, end, confidence, speaker}]. Older files without
-confidence or speaker still load."""
+confidence or speaker still load.
+
+The correction screen's logic lives here too: applying the owner's edits, the "fix what matters first" queue, the
+word error rate behind the accuracy report, and the campaign's key terms. Owner edits are external input and are
+validated before anything is saved."""
 from __future__ import annotations
 
+import difflib
 import json
 import math
 import re
 import tempfile
+import unicodedata
 from pathlib import Path
+from typing import Callable
 
 from psycopg.types.json import Jsonb
 
@@ -20,14 +27,38 @@ from .alerts import registry
 from .core import AppError, audit
 
 MAX_SPEAKER_NAME = 60
+MAX_EDITS = 500            # edits in one save
+MAX_TEXT = 200             # characters in one typed word, phrase or replacement
+BULK_WORDS = 100           # a replace touching more words than this needs the owner's confirmation
+LOW_CONFIDENCE = 0.8       # words the provider was less sure of than this go to the fix queue
+KEY_TERM_SIMILARITY = 0.75
+MAX_QUEUE = 200
+MAX_KEY_TERMS = 200
+MAX_TERM_CHARS = 100
+
+
+class NotFound(AppError):
+    """Missing, or hidden by row-level security: the caller cannot tell which, so another owner's id is a 404."""
+    status = 404
 
 
 class StaleTranscript(AppError):
     """The transcript changed since the caller loaded it. `version` is the current one."""
+    status = 409
 
     def __init__(self, version: int):
         super().__init__("This transcript was changed somewhere else. Reload it and apply your edit again.", "stale")
         self.version = version
+        self.extra = {"version": version}
+
+
+class BulkReplace(AppError):
+    """A replace would touch more than BULK_WORDS words and the caller has not confirmed."""
+    status = 409
+
+    def __init__(self, words: int):
+        super().__init__(f"This would change {words} words. Confirm to go ahead.", "confirm_bulk")
+        self.extra = {"words": words}
 
 
 # ------------------------------------------------------------------ validation (vendor output and owner edits are external input)
@@ -159,6 +190,22 @@ def create(conn, source: dict, result: dict) -> dict:
     return transcript
 
 
+def _read_words(conn, key: str) -> list[dict]:
+    raw = json.loads(registry.get(conn, "storage").path(key).read_text(encoding="utf-8"))
+    return [{"text": w["text"], "start": w["start"], "end": w["end"], "confidence": w.get("confidence"),
+             "speaker": w.get("speaker")} for w in raw]
+
+
+def _read_version(conn, transcript_id, version_no: int) -> tuple[list[dict], dict]:
+    """The words and speaker names of one saved version."""
+    row = conn.execute("select word_json_path, speakers from transcript_versions where transcript_id = %s and version_no = %s",
+                       (transcript_id, version_no)).fetchone()
+    if row is None:
+        raise AppError("That version of the transcript does not exist.", "no_version")
+    words = _read_words(conn, row["word_json_path"])
+    return words, dict(row["speakers"] or speaker_map(words))
+
+
 def load(conn, source_id) -> dict:
     """The newest version of the transcript for a source (found by this source, else by the same file and language)."""
     row = conn.execute(
@@ -172,10 +219,8 @@ def load(conn, source_id) -> dict:
         (source_id,),
     ).fetchone()
     if row is None:
-        raise AppError("No transcript for this source.", "no_transcript")
-    raw = json.loads(registry.get(conn, "storage").path(row["words_key"]).read_text(encoding="utf-8"))
-    words = [{"text": w["text"], "start": w["start"], "end": w["end"], "confidence": w.get("confidence"),
-              "speaker": w.get("speaker")} for w in raw]
+        raise NotFound("No transcript for this source.", "no_transcript")
+    words = _read_words(conn, row["words_key"])
     return {"id": str(row["id"]), "version": row["version_no"], "provider": row["provider"],
             "dialect": row["language_code"] or row["dialect"] or row["language"], "words": words,
             "utterances": row["utterances"] or utterances_from_words(words),
@@ -187,7 +232,7 @@ def save_version(conn, actor, transcript_id, words: list[dict], speakers: dict |
     if someone saved in between, StaleTranscript tells the caller which version is current."""
     transcript = conn.execute("select * from transcripts where id = %s for update", (transcript_id,)).fetchone()
     if transcript is None:
-        raise AppError("Transcript not found.", "not_found")
+        raise NotFound("Transcript not found.", "not_found")
     if base_version != transcript["current_version"]:
         raise StaleTranscript(transcript["current_version"])
     cleaned = clean_words(words)
@@ -196,6 +241,308 @@ def save_version(conn, actor, transcript_id, words: list[dict], speakers: dict |
     version_no = transcript["current_version"] + 1
     _write_version(conn, transcript, version_no, cleaned, utterances_from_words(cleaned), speaker_map(cleaned, speakers),
                    actor.operator_id)
-    conn.execute("update transcripts set current_version = %s where id = %s", (version_no, transcript["id"]))
+    original = _read_version(conn, transcript["id"], 1)[0]
+    errors, total = wer_counts([w["text"] for w in cleaned], [w["text"] for w in original])
+    conn.execute("update transcripts set current_version = %s, wer_errors = %s, wer_words = %s where id = %s",
+                 (version_no, errors, total, transcript["id"]))
     audit(conn, "transcript.edit", "transcripts", transcript["id"], {"version": version_no, "words": len(cleaned)})
     return version_no
+
+
+def update(conn, actor, source_id, base_version: int, edits, confirm_bulk: bool = False) -> int:
+    """Apply the owner's edits to the version they were looking at and save the result as the next version.
+    A different current version is refused as stale; a big replace is refused until confirmed."""
+    current = load(conn, source_id)
+    if base_version != current["version"]:
+        raise StaleTranscript(current["version"])
+    words, speakers = apply_edits(current["words"], current["speakers"], edits, confirm_bulk,
+                                  lambda number: _read_version(conn, current["id"], number))
+    return save_version(conn, actor, current["id"], words, speakers, base_version)
+
+
+# ------------------------------------------------------------------ text matching and word error rate
+
+_ARABIC_FOLD = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي"})   # alef and ya variants
+_CONTROL = re.compile(r"[\x00-\x1f\x7f]")
+
+
+def _is_mark_or_punct(char: str) -> bool:
+    category = unicodedata.category(char)
+    return category[0] in "PS" or category in ("Mn", "Cf", "Cc") or char == "ـ"   # ـ: tatweel
+
+
+def normalise(text: str, fold_arabic: bool = False, keep_case: bool = False) -> str:
+    """The comparable form of a word: no case, punctuation or Arabic vowel marks. With fold_arabic the alef and ya
+    variants match each other too (for finding words, not for counting errors)."""
+    text = unicodedata.normalize("NFKC", str(text))
+    text = text if keep_case else text.casefold()
+    if fold_arabic:
+        text = text.translate(_ARABIC_FOLD)
+    return "".join(c for c in text if not c.isspace() and not _is_mark_or_punct(c))
+
+
+def _tokens(texts) -> list[str]:
+    return [token for text in texts for piece in str(text).split() if (token := normalise(piece))]
+
+
+def _levenshtein(a: list, b: list) -> int:
+    if not a or not b:
+        return max(len(a), len(b))
+    if len(a) * len(b) > 250_000:   # a huge unanchored stretch: count it as all wrong rather than stall the save
+        return max(len(a), len(b))
+    previous = list(range(len(b) + 1))
+    for i, x in enumerate(a, start=1):
+        current = [i]
+        for j, y in enumerate(b, start=1):
+            current.append(min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + (x != y)))
+        previous = current
+    return previous[-1]
+
+
+def wer_counts(corrected: list[str], heard: list[str]) -> tuple[int, int]:
+    """(errors, words): the edits that turn what the provider heard into the owner's corrected text, and the number of
+    words in the corrected text. Case, punctuation and Arabic vowel marks do not count. Matching runs of words anchor
+    the comparison, so a long transcript with a few fixes stays fast."""
+    truth, got = _tokens(corrected), _tokens(heard)
+    errors, i, j = 0, 0, 0
+    for a, b, size in difflib.SequenceMatcher(None, got, truth).get_matching_blocks():
+        errors += _levenshtein(got[i:a], truth[j:b])
+        i, j = a + size, b + size
+    return errors, len(truth)
+
+
+def accuracy(conn) -> list[dict]:
+    """Word error rate per provider and dialect, from the transcripts the owner has corrected (or confirmed)."""
+    rows = conn.execute(
+        """select provider, coalesce(nullif(language_code, ''), nullif(dialect, ''), language) as dialect,
+                  sum(wer_errors)::int as errors, sum(wer_words)::int as words
+           from transcripts where current_version > 1 and wer_words > 0 group by 1, 2 order by 2, 1""").fetchall()
+    return [{"provider": r["provider"], "dialect": r["dialect"], "wer": round(r["errors"] / r["words"], 4), "words": r["words"]}
+            for r in rows]
+
+
+# ------------------------------------------------------------------ edits (the owner's input)
+
+def _bad_edit(message: str) -> AppError:
+    return AppError(message, "bad_edit")
+
+
+def _typed(value, what: str, limit: int = MAX_TEXT) -> str:
+    """Free text from the owner: control characters become spaces, spaces collapse, and it must fit."""
+    if not isinstance(value, str):
+        raise _bad_edit(f"{what} must be text.")
+    text = " ".join(_CONTROL.sub(" ", value).split())
+    if len(text) > limit:
+        raise _bad_edit(f"{what} can be at most {limit} characters.")
+    return text
+
+
+def _index(value, size: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value < size:
+        raise _bad_edit("That word is no longer in the transcript.")
+    return value
+
+
+def _spread(tokens: list[str], start: float, end: float, speaker) -> list[dict]:
+    """New words from typed text, sharing the time of the words they replace. The owner vouches for them: confidence 1."""
+    step = (end - start) / len(tokens)
+    return [{"text": t, "start": round(start + n * step, 3), "end": round(start + (n + 1) * step, 3),
+             "confidence": 1.0, "speaker": speaker} for n, t in enumerate(tokens)]
+
+
+def _edges(text: str) -> tuple[str, str]:
+    """The punctuation before and after a word ("“Acme," gives ("“", ","))."""
+    start = 0
+    while start < len(text) and unicodedata.category(text[start])[0] in "PS":
+        start += 1
+    end = len(text)
+    while end > start and unicodedata.category(text[end - 1])[0] in "PS":
+        end -= 1
+    return text[:start], text[end:]
+
+
+def _edit_word(words: list[dict], edit: dict) -> None:
+    i = _index(edit.get("index"), len(words))
+    tokens = _typed(edit.get("text"), "The word").split()
+    word = words[i]
+    if tokens == [word["text"]]:   # the same text: the owner confirms the word is right
+        words[i] = {**word, "confidence": 1.0}
+    else:                          # blank deletes the word; several words share its time
+        words[i:i + 1] = _spread(tokens, word["start"], word["end"], word["speaker"]) if tokens else []
+
+
+def _edit_replace(words: list[dict], edit: dict, confirm_bulk: bool) -> None:
+    find = _typed(edit.get("find"), "The text to find")
+    new = _typed(edit.get("replace", ""), "The replacement")
+    keep_case = edit.get("match_case") is True
+    needle = [normalise(t, True, keep_case) for t in find.split()]
+    if not needle or not all(needle):
+        raise _bad_edit("Enter the words to find.")
+    keys = [normalise(w["text"], True, keep_case) for w in words]
+    spans, i = [], 0
+    while i <= len(words) - len(needle):
+        if keys[i:i + len(needle)] == needle:
+            spans.append((i, i + len(needle)))
+            i += len(needle)
+        else:
+            i += 1
+    touched = sum(b - a for a, b in spans)
+    if touched > BULK_WORDS and not confirm_bulk:
+        raise BulkReplace(touched)
+    for a, b in reversed(spans):                       # from the end, so earlier positions stay valid
+        first, last = words[a], words[b - 1]
+        tokens = new.split()
+        if tokens:                                     # keep the punctuation that stood around the old words
+            tokens[0] = _edges(first["text"])[0] + tokens[0]
+            tokens[-1] += _edges(last["text"])[1]
+        if len(tokens) == b - a:                       # same count: every word keeps its own time and speaker
+            words[a:b] = [{**old, "text": t, "confidence": 1.0} for old, t in zip(words[a:b], tokens)]
+        else:
+            words[a:b] = _spread(tokens, first["start"], last["end"], first["speaker"]) if tokens else []
+
+
+def _edit_speaker(words: list[dict], speakers: dict, edit: dict) -> None:
+    speaker = edit.get("speaker")
+    if not isinstance(speaker, str) or speaker not in {w["speaker"] for w in words if w.get("speaker") is not None}:
+        raise _bad_edit("That speaker is not in this transcript.")
+    speakers[speaker] = _typed(edit.get("name", ""), "The name", MAX_SPEAKER_NAME)   # blank goes back to "Speaker N"
+
+
+def apply_edits(words: list[dict], speakers: dict, edits, confirm_bulk: bool = False,
+                read_version: Callable[[int], tuple[list[dict], dict]] | None = None) -> tuple[list[dict], dict]:
+    """Apply edits in order to copies of the words and speaker names; the arguments are never changed.
+    Ops: word {index, text}, replace {find, replace, match_case}, speaker {speaker, name}, revert {to_version}.
+    An index means a position in the list as the previous edit left it."""
+    if not isinstance(edits, list) or not edits:
+        raise _bad_edit("There is nothing to save.")
+    if len(edits) > MAX_EDITS:
+        raise _bad_edit(f"Save at most {MAX_EDITS} edits at once.")
+    words, speakers = [dict(w) for w in words], dict(speakers)
+    for edit in edits:
+        op = edit.get("op") if isinstance(edit, dict) else None
+        if op == "word":
+            _edit_word(words, edit)
+        elif op == "replace":
+            _edit_replace(words, edit, confirm_bulk)
+        elif op == "speaker":
+            _edit_speaker(words, speakers, edit)
+        elif op == "revert" and read_version is not None:
+            number = edit.get("to_version")
+            if isinstance(number, bool) or not isinstance(number, int) or number < 1:
+                raise _bad_edit("Pick a version to go back to.")
+            words, speakers = read_version(number)
+        else:
+            raise _bad_edit("That kind of edit is not supported.")
+    return words, speakers
+
+
+# ------------------------------------------------------------------ the fix queue
+
+def _near_key_terms(keys: list[str], key_terms) -> list[tuple[float, int, int, str]]:
+    """(similarity, first word, word count, term) for stretches of words that nearly spell a key term, best first,
+    none overlapping. A stretch of the same words as the term (any letter case) is right and is never listed; the same
+    letters split differently ("acmecola" for "Acme Cola") are listed."""
+    terms, seen = [], set()
+    for term in key_terms:
+        parts = [k for k in (normalise(p, True) for p in str(term).split()) if k]
+        joined = "".join(parts)
+        if len(joined) >= 4 and joined not in seen:   # shorter terms would flag ordinary words
+            seen.add(joined)
+            terms.append((str(term), parts, joined))
+    ratios: dict[tuple[str, str], float] = {}
+    found = []
+    for term, parts, joined in terms:
+        count = len(parts)
+        exact = {i + n for i in range(len(keys) - count + 1) if keys[i:i + count] == parts for n in range(count)}
+        for size in sorted({max(1, count - 1), count, count + 1}):
+            for i in range(len(keys) - size + 1):
+                candidate = "".join(keys[i:i + size])
+                if (not candidate or abs(len(candidate) - len(joined)) > max(2, len(joined) // 4)
+                        or any(n in exact for n in range(i, i + size))):
+                    continue
+                ratio = ratios.get((candidate, joined))
+                if ratio is None:
+                    ratio = ratios[(candidate, joined)] = difflib.SequenceMatcher(None, candidate, joined).ratio()
+                if ratio >= KEY_TERM_SIMILARITY:
+                    found.append((ratio, i, size, term))
+    taken, chosen = set(), []
+    for ratio, i, size, term in sorted(found, key=lambda f: (-f[0], f[1])):
+        if taken.isdisjoint(range(i, i + size)):
+            taken.update(range(i, i + size))
+            chosen.append((ratio, i, size, term))
+    return chosen
+
+
+def review_queue(words: list[dict], key_terms=(), ranges=None, threshold: float = LOW_CONFIDENCE,
+                 limit: int = MAX_QUEUE) -> list[dict]:
+    """The words worth the owner's time, most important first: [{word_index, text, confidence, reason}].
+    reason is "key_term" (nearly spells one of the campaign's words; the row also has `term` and `span`) or
+    "low_confidence". Words inside any of `ranges` ((start_s, end_s) pairs, for example candidate clips) come
+    before the rest; then key terms before low confidence; then the least sure first."""
+    spans = []   # (word_index, word_count, reason, term)
+    for _, i, size, term in _near_key_terms([normalise(w["text"], True) for w in words], key_terms):
+        spans.append((i, size, "key_term", term))
+    covered = {n for i, size, _, _ in spans for n in range(i, i + size)}
+    spans += [(i, 1, "low_confidence", None) for i, w in enumerate(words)
+              if i not in covered and w.get("confidence") is not None and w["confidence"] < threshold]
+
+    def inside(i: int, size: int) -> bool:
+        return any(words[n]["start"] < end and words[n]["end"] > start for n in range(i, i + size) for start, end in ranges or ())
+
+    rows = []
+    for i, size, reason, term in spans:
+        known = [w["confidence"] for w in words[i:i + size] if w.get("confidence") is not None]
+        row = {"word_index": i, "text": " ".join(w["text"] for w in words[i:i + size]), "confidence": min(known, default=None),
+               "reason": reason}
+        if term is not None:
+            row.update(term=term, span=size)
+        rows.append((not inside(i, size), reason != "key_term", 1.0 if row["confidence"] is None else row["confidence"], i, row))
+    return [row for *_, row in sorted(rows, key=lambda r: r[:4])[:max(0, limit)]]
+
+
+# ------------------------------------------------------------------ key terms and the screen's data
+
+def add_key_term(conn, campaign_id, term) -> list[str]:
+    """Add a word or name the campaign cares about (sent to the provider next time, used by the fix queue now).
+    A repeat in any letter case changes nothing."""
+    text = _typed(term, "The key term", MAX_TERM_CHARS) if isinstance(term, str) else ""
+    if not text:
+        raise AppError("Enter the word or name to add.", "bad_term")
+    row = conn.execute("select key_terms from campaigns where id = %s for update", (campaign_id,)).fetchone()
+    if row is None:
+        raise NotFound("Campaign not found.", "not_found")
+    terms = list(row["key_terms"] or [])
+    if any(t.casefold() == text.casefold() for t in terms):
+        return terms
+    if len(terms) >= MAX_KEY_TERMS:
+        raise AppError(f"A campaign can have at most {MAX_KEY_TERMS} key terms.", "too_many_terms")
+    terms.append(text)
+    conn.execute("update campaigns set key_terms = %s where id = %s", (terms, campaign_id))
+    return terms
+
+
+def _source_context(conn, source_id) -> tuple[dict, dict, dict]:
+    """(source row with its campaign, the campaign as key_terms_for wants it, the campaign's current rules version)."""
+    row = conn.execute(
+        """select s.stored_path, s.language, s.campaign_id, c.name, c.key_terms, c.current_version_id
+           from source_assets s join campaigns c on c.id = s.campaign_id where s.id = %s""", (source_id,)).fetchone()
+    if row is None:
+        raise NotFound("No transcript for this source.", "no_transcript")
+    version = conn.execute("select rules_json from campaign_versions where id = %s", (row["current_version_id"],)).fetchone()
+    return row, {"name": row["name"], "key_terms": row["key_terms"]}, version or {}
+
+
+def detail(conn, source_id) -> dict:
+    """What the correction screen opens with: the transcript plus the source's media, campaign and key terms."""
+    data = load(conn, source_id)
+    row, _, _ = _source_context(conn, source_id)
+    return {**data, "source_id": str(source_id), "campaign_id": str(row["campaign_id"]), "campaign_name": row["name"],
+            "language": row["language"], "media_url": registry.get(conn, "storage").get_signed_url(row["stored_path"], 3600),
+            "key_terms": list(row["key_terms"] or [])}
+
+
+def queue_for(conn, source_id, limit: int = MAX_QUEUE, ranges=None) -> list[dict]:
+    """The fix queue for one source, judged against the campaign's key terms (its own, its name and its required tags)."""
+    words = load(conn, source_id)["words"]
+    _, campaign, version = _source_context(conn, source_id)
+    return review_queue(words, key_terms_for(campaign, version), ranges, limit=limit)

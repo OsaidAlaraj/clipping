@@ -2,7 +2,7 @@
 **Created:** 2026-11-17
 **Status:** in-progress
 **Started:** 2026-11-17 19:40
-**Current Phase:** 2
+**Current Phase:** 2P
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -147,11 +147,45 @@ Each rule is a default the learning loop may adjust per profile once real result
 **Difficulty:** MEDIUM
 **Uncertainty:** None
 
+### Phase 2P: Pilot slice (owner priority, 2026-11-17)
+**Skills:** code-foundations:aposd-designing-deep-modules, code-foundations:cc-defensive-programming, impeccable:impeccable
+**Model:** sonnet
+**Gate:** Standard
+**Depends on:** Phase 1, Phase 2 | **Unlocks:** Phase 3
+**File scope:** backend/clipping/campaigns.py, backend/clipping/pipeline.py, backend/clipping/publish.py, backend/clipping/ledger.py, backend/clipping/moments_pilot.py (new), backend/clipping/adapters/vendors.py, backend/clipping/api.py, backend/migrations/010b_pilot.sql, backend/tests/test_10b_pilot.py, web/components/**, web/app/**, web/tests/**
+**Security-sensitive:** yes (LLM output parsing; uploads)
+
+**Goal:** The owner can run a no-money, no-posting pilot from the phone as soon as possible: upload a video to a practice
+campaign and get real, reviewable clips.
+
+**Scope:**
+- IN: practice campaigns (one tap, no marketplace, clearly labelled; posting, scheduling, payouts and ledger entries
+  are refused for them in code and in the UI); real transcription (phase 1); an interim LLM moment picker
+  (gpt-5-mini on the transcript, sentence-snapped, profile length range, reasons; the full engine in phase 4 replaces
+  it behind the same interface; the fake stays for tests); render, captions, disclosure and cover as they exist;
+  review in the existing feed; a run on the three sample videos in `.data/samples` (English podcast, Arabic interview,
+  Arabic lecture) with a short report of what broke and what was fixed.
+- OUT: the full moment engine, signals, templates (later phases).
+
+**Edge cases:** an upload larger than the phone allows (clear message, resumable where possible); an LLM answer that is
+not valid JSON or points outside the video; a practice campaign asked to post (refused); Arabic and English captions.
+
+**Produces:** `campaigns.create_practice(conn, actor, name, niche, language) -> campaign`; `moments_pilot.propose(conn,
+source, version, profile_hint) -> list[Candidate]` with the phase 4 Candidate shape.
+
+**Done when:**
+- [ ] DW-2P.1: A practice campaign is created in one step, runs the whole pipeline, and any attempt to post, schedule or
+  record a payout for it is refused by the API.
+- [ ] DW-2P.2: With the LLM active, moments come from the transcript (sentence-snapped, inside the length range, with
+  reasons); bad LLM output falls back to the existing fallback with an alert.
+- [ ] DW-2P.3: The three sample videos go through end to end on this laptop with real transcription, and each yields
+  reviewable clips with captions, disclosure and a cover; the report lists timings and cost.
+
 ### Phase 3: Signals
 **Skills:** code-foundations:performance-optimization, code-foundations:aposd-designing-deep-modules
 **Model:** sonnet
 **Gate:** Standard
-**Depends on:** Phase 1 | **Unlocks:** Phase 4
+**Depends on:** Phase 1, Phase 2P | **Unlocks:** Phase 4
 **File scope:** backend/clipping/signals.py (new), backend/clipping/ffmpeg.py, backend/clipping/sources.py, backend/clipping/adapters/heatmap.py (new), backend/fixtures/ytdlp/** (new), backend/migrations/010_*.sql, backend/tests/test_11_signals.py
 **Security-sensitive:** yes (yt-dlp metadata is untrusted; FFmpeg parses uploaded media)
 **Rollback:** migration 010 is additive; signals are optional inputs, so removing them returns ranking to text only.
@@ -486,6 +520,7 @@ very smooth, like social media sites").
 | Three-layer filter with relative threshold and rescue | fixed score cut-off | strong but not dumb: hard gates only for deal-breakers, nothing hidden silently | 4 |
 | Social-media smoothness as its own phase | fold into phase 6 | owner asked for it explicitly; it touches every screen | 7 |
 | Creative library and hook patterns as versioned, learned data | fixed templates and prompts | owner wants accounts and hooks to keep up; no release needed for new looks | 4, 5, F |
+| Pilot slice before signals and the full engine | finish all phases first | owner wants to test with real videos as soon as possible, without money or posting | 2P |
 | Moment router over several engines with learned per-profile routes | one fixed engine; one merged mega-repo | owner asked for routes, not one fixed thing; engines stay swappable; licences respected | 4 |
 
 Research cited for this plan:
@@ -522,6 +557,11 @@ Research cited for this plan:
 | 4 | 1 | Migration 009b_transcripts.sql: campaigns.key_terms, transcripts.current_version and language_code, transcript_versions (RLS), providers faster_whisper and deepgram_basic, Deepgram falls back to faster_whisper | build agent | assumed |
 | 5 | 1 | Phase 2 writes campaign key terms to campaigns.key_terms | build agent | assumed |
 | 6 | 1 | Local Whisper model: large-v3-turbo int8 on CUDA (peak 1089 MiB of 6144) | build agent | assumed |
+| 7 | 2 | Transcript routes take the SOURCE id; load()["id"] stays the transcript id | build agent | assumed |
+| 8 | 2 | Undo is an extra edit op {"op":"revert","to_version":n} over append-only versions | build agent | assumed |
+| 9 | 2 | 409 stale body {"error","code":"stale","version"} via an optional extra dict on the error handler | build agent | assumed |
+| 10 | 2 | Migration 010 keeps running WER counts on transcripts (wer_errors, wer_words vs version 1), no new table | build agent | assumed |
+| 11 | 2 | GET transcript adds source_id, campaign_id, campaign_name, language, media_url, key_terms; CLIP_VIEW gains source_id | build agent | assumed |
 ---
 ## Execution Log
 _To be filled during /code-foundations:build_
@@ -532,4 +572,11 @@ _To be filled during /code-foundations:build_
 - [x] Committed
 Commit: (see git log, phase 1/7)
 Summary: Transcripts now come from Deepgram Nova-3 with dialect code, speakers, utterances, word confidence and campaign key terms (cut to 50), versioned in transcript_versions via transcripts.load/save_version; local faster-whisper large-v3-turbo int8 on CUDA (CPU fallback with alert) is the declared fallback, and no key reaches the database or job errors.
+
+### Phase 2: Correction screen and accuracy by provider and dialect (Gate: Standard, security-sensitive)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: Verification passed
+- [x] Committed
+Commit: (see git log, phase 2)
+Summary: A correction screen at /transcript (reached from the campaign page and Review) shows key-term mismatches and low-confidence words first, applies edits instantly with background save, undo (revert op) and stale-merge (409), handles Arabic RTL with English, and keeps running WER per provider and dialect shown in Settings; routes take the source id.
 

@@ -28,12 +28,14 @@ export type Clip = {
   render_meta: Record<string, unknown>;
   start_s: number;
   end_s: number;
+  source_id?: string | null;
 };
 
 export type Review = { id: string; clip_id: string; decision: string; queued?: boolean };
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public code?: string) {
+  /** `data` is the whole JSON body of the refusal (for example the current version of a transcript that went stale). */
+  constructor(message: string, public status: number, public code?: string, public data?: any) {
     super(message);
   }
 }
@@ -72,14 +74,15 @@ export async function api<T = any>(path: string, init?: { method?: string; body?
   if (!response.ok) {
     let message = `Request failed (${response.status}).`;
     let code: string | undefined;
+    let data: any;
     try {
-      const data = await response.json();
-      message = data.error ?? data.detail ?? message;
+      data = await response.json();
+      message = data.error ?? (typeof data.detail === "string" ? data.detail : message);
       code = data.code;
     } catch {
       /* not JSON */
     }
-    throw new ApiError(message, response.status, code);
+    throw new ApiError(message, response.status, code, data);
   }
   const type = response.headers.get("content-type") ?? "";
   return (type.includes("json") ? await response.json() : await response.text()) as T;

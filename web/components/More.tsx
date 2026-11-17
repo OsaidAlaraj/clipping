@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ApiError, Clip, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
 import { useLang } from "@/lib/i18n";
+import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
 import { RejectSheet } from "./Feed";
 
 function useLoad<T>(path: string) {
@@ -168,6 +169,32 @@ export function bookmarkletCode(origin: string): string {
     + `window.open('${origin}/new?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'&text='+encodeURIComponent(t),'_blank')})()`;
 }
 
+type AccuracyRow = { provider: string; dialect: string; wer: number; words: number };
+
+/** How often each transcription provider got the words wrong, per dialect, measured from the owner's own corrections. */
+export function AccuracySection() {
+  const { data, error } = useLoad<AccuracyRow[]>("/api/transcripts/accuracy");
+  return (
+    <section className="card stack" aria-label="Transcript accuracy" aria-busy={data === null && !error}>
+      <h2>Transcript accuracy</h2>
+      <p className="small muted">Measured from the transcripts you fix: the share of words you had to change. Lower is better.</p>
+      {data === null && !error && [0, 1].map((n) => <div key={n} className="row between"><i className="sk" style={{ width: "55%", height: 16 }} /><i className="sk" style={{ width: 64, height: 16 }} /></div>)}
+      {error && <p className="small muted">Accuracy could not be loaded. {error}</p>}
+      {data?.length === 0 && <p className="small muted">Fix a transcript and its accuracy appears here.</p>}
+      {data?.map((row) => (
+        <div key={`${row.provider}:${row.dialect}`} className="stack" style={{ gap: 6 }} data-testid="accuracy-row">
+          <div className="row between">
+            <span><strong>{providerLabel(row.provider)}</strong> <span className="muted" dir="auto">{dialectLabel(row.dialect)}</span></span>
+            <strong>{percent(row.wer)}</strong>
+          </div>
+          <div className="bar" aria-hidden="true"><i className={row.wer > 0.15 ? "low" : undefined} style={{ width: `${Math.min(100, Math.round(row.wer * 100))}%` }} /></div>
+          <span className="small muted">{row.words.toLocaleString()} words checked</span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function SaveButtonSection() {
   const ref = useRef<HTMLAnchorElement>(null);
   useEffect(() => { ref.current?.setAttribute("href", bookmarkletCode(window.location.origin)); }, []);
@@ -261,6 +288,7 @@ export function Settings() {
       )}
       <DeviceSection />
       <SaveButtonSection />
+      <AccuracySection />
       <section className="card stack">
         <span className="label">Interface language</span>
         <div className="row">
@@ -410,6 +438,20 @@ export function CampaignDetail({ id }: { id: string }) {
             {rule.quote ? <blockquote dir="auto">{rule.quote}</blockquote> : <p className="small muted">No source sentence: stored as unclear.</p>}</div>
         ))}
       </section>
+      {data.sources.length > 0 && (
+        <section className="card stack" aria-label="Footage">
+          <h2>Footage</h2>
+          {data.sources.map((source: any, n: number) => (
+            <div key={source.id} className="row between wrap">
+              <span className="stack" style={{ gap: 0, minWidth: 0 }}>
+                <strong>Footage {n + 1}</strong>
+                <span className="small muted">{source.language === "ar" ? "Arabic" : "English"}{source.duration_s ? ` · ${clock(Number(source.duration_s))}` : ""}</span>
+              </span>
+              <Link className="btn" href={`/transcript?id=${source.id}`}>Fix transcript</Link>
+            </div>
+          ))}
+        </section>
+      )}
       <p className="small muted">This is a draft extracted by Agent A. The system flags and records; it does not certify legal compliance. You decide.</p>
       {error && <p className="error" role="alert">{error}</p>}
       {note && <p className="small" role="status">{note}</p>}

@@ -80,6 +80,7 @@ CLIP_VIEW = """
            cl.language, cl.dialect, cl.compliance_status, cl.compliance_report, cl.file_path, cl.file_hash, cl.platform,
            cl.hook_score, cl.park_reason, cl.due_at, cl.render_meta, cl.campaign_id, cl.account_id, cl.start_s, cl.end_s,
            cl.candidate_id, cl.approved_file_hash, cl.campaign_version_id,
+           (select source_id from candidates where id = cl.candidate_id) as source_id,
            c.name as campaign_name, c.deadline, c.status as campaign_status,
            v.budget_total, v.budget_remaining, v.rate_per_1k, v.fee_pct, v.max_payout_per_clip,
            a.handle as account_handle, a.daily_cap as account_daily_cap,

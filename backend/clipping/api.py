@@ -12,9 +12,9 @@ from typing import Any
 import psycopg
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from . import alerts, auth, campaigns, config, discovery, ledger, ops, pipeline, publish, ranking, review, sources
+from . import alerts, auth, campaigns, config, discovery, ledger, ops, pipeline, publish, ranking, review, sources, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -76,7 +76,7 @@ def current_actor(request: Request) -> Actor:
 
 @app.exception_handler(AppError)
 async def app_error(_: Request, exc: AppError):
-    return JSONResponse({"error": str(exc), "code": exc.code}, status_code=exc.status)
+    return JSONResponse({"error": str(exc), "code": exc.code, **getattr(exc, "extra", {})}, status_code=exc.status)
 
 
 @app.exception_handler(psycopg.errors.RaiseException)
@@ -244,6 +244,16 @@ class SnoozeIn(BaseModel):
     hours: float = 4
 
 
+class TranscriptEditIn(BaseModel):
+    base_version: int = Field(strict=True, ge=1)
+    edits: list[dict]
+    confirm_bulk: bool = False
+
+
+class KeyTermIn(BaseModel):
+    term: str
+
+
 # ------------------------------------------------------------------ home, campaigns
 
 @app.get("/api/health")
@@ -318,6 +328,33 @@ def recheck(campaign_id: str, body: RecheckIn, actor: Actor = Depends(current_ac
 def add_source(campaign_id: str, body: SourceIn, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.register_source, actor, campaign_id, body.file_path, body.language, body.dialect,
                body.licence_ref, body.permission_ref, body.origin_url, body.expected_hash)
+
+
+@app.post("/api/campaigns/{campaign_id}/key-terms")
+def add_key_term(campaign_id: str, body: KeyTermIn, actor: Actor = Depends(current_actor)):
+    return {"key_terms": run(actor, transcripts.add_key_term, campaign_id, body.term)}
+
+
+# ------------------------------------------------------------------ the correction screen (the id is the SOURCE id)
+
+@app.get("/api/transcripts/accuracy")
+def transcript_accuracy(actor: Actor = Depends(current_actor)):
+    return run(actor, transcripts.accuracy)
+
+
+@app.get("/api/transcripts/{source_id}")
+def get_transcript(source_id: str, actor: Actor = Depends(current_actor)):
+    return run(actor, transcripts.detail, source_id)
+
+
+@app.put("/api/transcripts/{source_id}")
+def put_transcript(source_id: str, body: TranscriptEditIn, actor: Actor = Depends(current_actor)):
+    return {"version": run(actor, transcripts.update, actor, source_id, body.base_version, body.edits, body.confirm_bulk)}
+
+
+@app.get("/api/transcripts/{source_id}/review-queue")
+def transcript_review_queue(source_id: str, limit: int = transcripts.MAX_QUEUE, actor: Actor = Depends(current_actor)):
+    return run(actor, transcripts.queue_for, source_id, max(1, min(limit, 1000)))
 
 
 @app.post("/api/sources/{source_id}/moments")

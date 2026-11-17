@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api, ApiError, Clip, money, PLATFORM_LABEL, Review, reviewAction, undoReview } from "@/lib/api";
@@ -115,6 +116,7 @@ function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Recor
         </div>
       </div>
       <button className="btn primary block" onClick={save}>Save as new version</button>
+      {clip.source_id && <Link className="btn block" href={`/transcript?id=${clip.source_id}`}>Fix transcript</Link>}
     </SheetFrame>
   );
 }
