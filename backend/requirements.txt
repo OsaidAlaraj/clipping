@@ -7,3 +7,4 @@ pixeltable-pgserver>=0.7
 pytest>=8
 python-multipart>=0.0.20
 webauthn>=2.5
+faster-whisper>=1.1

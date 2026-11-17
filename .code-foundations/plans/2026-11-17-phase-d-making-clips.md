@@ -1,6 +1,8 @@
 # Plan: Phase D: making clips (transcription, moment engine, render)
 **Created:** 2026-11-17
-**Status:** ready
+**Status:** in-progress
+**Started:** 2026-11-17 19:40
+**Current Phase:** 2
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -44,6 +46,26 @@ This is best with an Azure key and still works without one (the research behind 
 ## Rejected Approaches
 - **A: LLM first:** costly on long episodes and dead without an Azure key, which may arrive late.
 - **B: signals only:** blind to meaning; it picks loud but empty moments.
+
+## Research rules (peer-reviewed, 2026-11-17)
+Each rule is a default the learning loop may adjust per profile once real results exist. Phases 4 and 5 implement them.
+- R1 Emotion: high-arousal emotions (awe, amusement, excitement, surprise, being moved) score above low-arousal ones
+  (sadness, calm information); discrete emotions are scored separately, not just positive vs negative (Berger &
+  Milkman 2011; Nelson-Field 2013; Paletz 2023). Anger/outrage is not boosted for brand campaigns (brand safety).
+- R2 Brand and information: purely informational moments score lower unless the brief asks for information; for brand
+  campaigns the brand is not forced into the first seconds unless the brief requires it (Tellis 2019).
+- R3 First seconds and length: most viewers skip early and length is the strongest predictor of finishing, so the
+  `tight` variant is the default when it keeps the payoff, and the hook must land in the first 3 s (Zhao 2025; Vieira 2026).
+- R4 Hook wording: hooks with "just the right amount" of information beat both vague teasers and spoilers; every hook
+  is rated on a concreteness scale and must be paid off inside the clip (Aubin Le Quere 2025; Qiu 2024).
+- R5 Laughter: real laughter makes moments funnier to viewers, so cuts end after the laugh, not on the punchline, and
+  moments with genuine (group) laughter rank higher (Cai 2019, 2026; Cacciatore 2020).
+- R6 Captions: social-style captions (light punctuation, selective emoji, key words emphasised) for TikTok/Reels,
+  always accurate (Duraj 2025; Gernsbacher 2015).
+- R7 Covers: an expressive face frame plus a short positive hook line; strong sentiment belongs in the image, not in
+  long cover text (Cui 2024; Oh 2025).
+- R8 Fit beats formula: audience-by-content fit explains most of what lands, so weights are learned per profile and per
+  account audience, never one global formula (Rosenbusch 2022).
 
 ---
 ## Implementation Phases
@@ -141,6 +163,10 @@ This is best with an Azure key and still works without one (the research behind 
   - loudness (FFmpeg ebur128);
   - speech rate, pauses and speaker turns from the transcript;
   - scene changes (FFmpeg), and face presence (used for crop, cover and the score);
+  - laughter and applause from a small local audio-tagging model (sherpa-onnx), with a loudness-burst
+    heuristic as the fallback when the model is not installed;
+  - reaction words per language (English and Arabic lists, e.g. "no way", "والله", "مستحيل") and fast talk;
+  - stream chat replay when available (YouTube live chat through yt-dlp), as chat-burst counts per second;
   - YouTube "most replayed" through yt-dlp metadata only, captured where links are handled (`sources.py`), when the brief permits;
   - topic segmentation from the transcript.
 - OUT: scoring.
@@ -151,12 +177,14 @@ This is best with an Azure key and still works without one (the research behind 
 - Silent or music-only stretches → the speech signals are zero there.
 - A corrupted media file → AppError, job failed with an alert.
 
-**Produces:** `signals.load(conn, source_id) -> {"step_s":1.0, "series":{"loudness":[float], "speech_rate":[float], "turns":[int], "scene":[float], "face":[float], "replay":[float]|None}, "topics":[{"start","end","title"}]}`.
+**Produces:** `signals.load(conn, source_id) -> {"step_s":1.0, "series":{"loudness":[float], "speech_rate":[float], "turns":[int], "scene":[float], "face":[float], "laughter":[float], "reaction":[float], "chat":[float]|None, "replay":[float]|None}, "topics":[{"start","end","title"}]}`.
 
 **Done when:**
 - [ ] DW-3.1: Signals for the 60 s fixture are stored once and reused (a second run does no FFmpeg work).
 - [ ] DW-3.2: The heatmap is read from a saved yt-dlp metadata fixture, stored as `replay`, and None when missing; malformed metadata is ignored safely.
 - [ ] DW-3.3: The 2-hour timing target holds on a synthetic long file, or the measured shortfall is reported.
+- [ ] DW-3.4: Laughter, reaction words and chat bursts are detected on fixtures (a laugh clip, an Arabic and an English
+  reaction line, a saved chat replay), and each falls back to "absent" when its input or model is missing.
 
 **Difficulty:** MEDIUM
 **Uncertainty:** FFmpeg face detection quality; a light model may follow later.
@@ -170,18 +198,58 @@ This is best with an Azure key and still works without one (the research behind 
 **Security-sensitive:** yes (LLM output parsing; prompt injection through transcript text or brief rules)
 **Rollback:** `stage_moments` keeps the vendor path as a declared provider (`moments` stage `vizard`/`klap`/`fake`); migration 011 is additive.
 
-**Goal:** Pick the best moments with signals, episode and campaign context, pairwise LLM ranking and learned weights.
+**Goal:** Pick the best moments with a workflow per content type and a strong but forgiving filter: signals,
+episode and campaign context, pairwise LLM ranking and learned weights.
 
 **Scope:**
-- **Candidates:** sentence-snapped windows of 15 to 60 s (campaign length rules win).
+- **Workflows by content type** (owner, 2026-11-17: "podcast is completely different from lifestyle"), one profile each
+  for podcast/interview, streams/gaming, sports, film & TV, music, brand ads/UGC/promo and lifestyle/vlog/behind the
+  scenes. Each profile sets: clip count and length (e.g. podcast 6 x 30-60 s, stream 5 x 20-45 s, promo 4 x 15-30 s),
+  signal weights, what counts as a moment (podcast: standalone opinions, surprising facts, stories with a payoff,
+  confessions, banter; stream: clutch plays, fails, loud reactions, chat explosions; promo: main benefit, demo, strong
+  claim, testimonial in hook -> proof -> CTA; lifestyle: transformations, reveals, relatable moments), the crop style
+  (follow speaker / facecam over game / centre), audio (speech-tuned / natural) and edit style (dead air out / quiet
+  parts kept). Picked from the campaign's niche, changeable per video. Profiles live in data, not code, so new ones
+  need no release.
+- **Map -> pool -> rank** for long episodes: chunks cut at long pauses with 20% overlap so nothing is lost in the middle;
+  standalone moments are collected per chunk, then pooled and ranked together.
+- **Candidates:** sentence-snapped windows inside the profile's length range (campaign length rules win), with start and
+  end allowed to move a few seconds to include the setup or the payoff.
 - **Signal score:** with weights.
-- **Top 12 go to the LLM for:**
-  - absolute scores (hook, self-contained, payoff, emotion), judged with the episode outline and the brief's wants and avoid list;
-  - pairwise comparisons in both orders, aggregated with Bradley-Terry.
+- **A three-layer filter, strong but never dumb:**
+  1. Hard gates, only for real deal-breakers: the brief's avoid list, length outside the campaign rules, starts
+     mid-sentence or leans on earlier context ("as I said"), the same moment already published (podcli), silence or
+     broken audio.
+  2. Soft score per profile with auditable subscores (hook in the first 3 s, standalone, payoff, emotion, value,
+     visual energy, signal peaks) and the evidence behind each. Cross-modal corroboration (publikclip): an LLM "funny"
+     with no laughter in the audio, or "hype" with no loudness or chat burst, is discounted.
+  3. Top candidates go to the LLM for pairwise comparisons in both orders, aggregated with Bradley-Terry.
+  The threshold is relative to the episode (top share by percentile, with a floor), so a quiet episode still yields its
+  best few moments and a strong one is not capped too early; every profile keeps a minimum clip count unless a hard
+  gate removed everything.
+- **Nothing is hidden silently:** filtered moments keep their reason and show under "Filtered" in review; the owner
+  can rescue one, and rescues and rejections teach the profile.
 - **Cut variants:** `hook_first`, `with_setup` and `tight` per winner.
 - **Duplicates:** removed by overlap and by topic.
-- **Vendor second opinion:** Vizard or Klap, as extra candidates when active.
-- **Learning:** the weights refit from approvals, rejections and 48 h views once there are 30 labelled clips. The labels are read (not changed) from the `reviews` and `metrics` tables.
+- **Moment router (owner, 2026-11-17: "a gateway that picks the best one, with defined routes, not one fixed thing"):**
+  moment finding is a set of interchangeable engines behind one interface, and a router picks the route per content
+  type. Engines: our own engine (the default), a topic-segmentation engine (TextTiling, the approach ClipsAI uses), a
+  hype-map engine for streams and sports (loudness, laughter, reaction words, chat, as in sharkyclips), and the vendor
+  APIs (Vizard, Klap) when their keys exist. Each profile names its route (which engines run and how their candidates
+  are merged); all candidates go through the same three-layer filter, so engines only propose and never decide. The
+  router keeps per-profile win rates (which engine's picks the owner approves and which earn views) and shifts weight
+  toward the winners over time, while still trying the others now and then (a simple bandit), so no single engine
+  becomes the fixed answer. Code is borrowed from other repositories only under MIT, BSD or Apache licences, with the
+  licence and source recorded; anything GPL or AGPL is re-implemented from the idea, not copied.
+- **Hook pattern library (owner, 2026-11-17: "hooks and accounts should keep up, not just cut right"):** hooks are
+  written in named patterns (question, shocking number, "nobody tells you...", bold opinion, story opening, ...) per
+  language and profile; each pattern tracks how often it was used, approved and how its clips did at 48 h; winners
+  are used more and weak ones less, never to zero, so new patterns keep being tried. Patterns are data, so new ones
+  are added without a release.
+- **Research rules R1 to R5 and R8** (see "Research rules") are the profile defaults for emotion, information, length,
+  hook wording and laughter.
+- **Learning:** each profile's weights refit from approvals, rejections, rescues and 48 h views once it has 30 labelled
+  clips (before that, the profile's defaults). The labels are read (not changed) from the `reviews` and `metrics` tables.
 - **Fallback:** signals only.
 - OUT: rendering.
 
@@ -194,7 +262,10 @@ This is best with an Azure key and still works without one (the research behind 
 
 **Produces:**
 - `Candidate = {"start_s":float, "end_s":float, "variant":"hook_first"|"with_setup"|"tight", "score":float, "rank":int, "reasons":[str], "features":{name:float}, "source":"engine"|"vizard"|"klap"}`;
-- `moments.find(conn, source_id, campaign_version) -> list[Candidate]`, stored in `candidates` (columns added: variant, features, reasons, origin);
+- `moments.find(conn, source_id, campaign_version, profile=None) -> {"kept": list[Candidate], "filtered": list[{"candidate": Candidate, "reason": str, "layer": 1|2|3}]}`, stored in `candidates` (columns added: variant, features, reasons, origin, profile, filtered_reason);
+- `profiles.get(conn, niche_or_name) -> Profile` and a `content_profiles` table seeded with the seven profiles;
+- `router.route(conn, profile) -> [engine names]` and `router.record(conn, profile, engine, outcome)`; engines implement
+  `propose(source_ctx, profile) -> list[Candidate]` and register like adapters (fakes for tests);
 - `moments.learn(conn, owner_id) -> {"weights":{...}, "labelled":int}`.
 
 **Done when:**
@@ -203,6 +274,16 @@ This is best with an Azure key and still works without one (the research behind 
 - [ ] DW-4.3: Synthetic approvals, rejections and 48 h views change the weights after 30 labels and not before.
 - [ ] DW-4.4: An avoid-list hit removes the candidate, and a must-include hit raises it.
 - [ ] DW-4.5: Each winner has three cut variants. When a vendor adapter is active, its picks join as candidates marked with their origin.
+- [ ] DW-4.6: The same fixture episode run under the podcast and the stream profile gives different picks, lengths and
+  crop styles, as the profiles define.
+- [ ] DW-4.9: Hooks carry their pattern; recorded approvals and 48 h views shift pattern weights per language and
+  profile, and every pattern keeps a minimum share; a new pattern added as data is used without a code change.
+- [ ] DW-4.8: Two profiles take different routes; candidates from every engine on the route pass through the same
+  filter and carry their engine as origin; recorded wins shift a profile's engine weights while every engine keeps a
+  minimum share of tries.
+- [ ] DW-4.7: A quiet fixture episode still yields its profile's minimum number of clips; a hard-gate hit is filtered with
+  its reason; a rescued filtered moment is stored as a label for learning; an LLM "funny" with no laughter scores lower
+  than the same moment with laughter.
 
 **Difficulty:** HIGH
 **Uncertainty:** the real quality depends on the Azure key; measured only after it arrives.
@@ -224,7 +305,14 @@ This is best with an Azure key and still works without one (the research behind 
   - the originality layer: the account template's caption style, title card, progress bar and emphasis zooms;
   - the Arabic #ad label top right;
   - per-account templates editable on Profile;
-  - a cover: a sharp face frame plus the hook text;
+  - a living creative library (owner, 2026-11-17): templates (caption style, fonts and colours, title card, progress
+    bar, zooms, cover style) are versioned data that can be added or edited without a release; each account rotates
+    through its own set so clips never look identical (Instagram demotes repetitive aggregators), while keeping a
+    recognisable look;
+  - an account persona per account: its look, suggested posts per week and best posting hours (from its own results
+    once they exist), shown on Profile;
+  - a cover: a sharp, expressive face frame plus a short hook line (rule R7);
+  - caption style per platform (rule R6);
   - NVENC when free, x264 otherwise;
   - the old render and captions stages folded into one.
 - OUT: new caption languages.
@@ -248,6 +336,9 @@ This is best with an Azure key and still works without one (the research behind 
 - [ ] DW-5.3: Two accounts with different templates give measurably different frames.
 - [ ] DW-5.4: Each clip has a cover PNG with the hook text.
 - [ ] DW-5.5: The owner edits an account's template on Profile and the next clip uses it.
+- [ ] DW-5.6: Templates are versioned data: a new template added through the API is used by the next render with no
+  code change; an account with several templates rotates them across consecutive clips; reverting a template
+  version restores the previous look.
 
 **Difficulty:** MEDIUM
 **Uncertainty:** None
@@ -293,6 +384,37 @@ This is best with an Azure key and still works without one (the research behind 
 **Difficulty:** MEDIUM
 **Uncertainty:** None
 
+### Phase 7: Social-media smoothness
+**Skills:** impeccable:impeccable, web-design-guidelines, code-foundations:performance-optimization
+**Model:** sonnet
+**Gate:** Standard
+**Depends on:** Phase 6 | **Unlocks:** none
+**File scope:** web/**, backend/clipping/api.py
+**Security-sensitive:** no
+
+**Goal:** The whole app feels as smooth as a social-media app on the phone and the laptop (owner, 2026-11-17: "very,
+very smooth, like social media sites").
+
+**Scope:**
+- IN: instant tab and screen changes (prefetch and cached data, no blank screens: skeletons that match the layout);
+  optimistic actions with undo (approve, reject, save, dismiss) that never wait on the network; the review feed preloads
+  the next clips and swipes at 60 fps; images and covers sized and lazy; no layout shift; fewer and smaller API calls
+  (batched endpoints where screens need several); offline-tolerant retries with a quiet "saved" state.
+- OUT: new features.
+
+**Edge cases:** slow 4G (throttled), a failed optimistic action (rolls back with a clear note), a very long feed.
+
+**Produces:** no new interfaces; measured numbers in the phase report.
+
+**Done when:**
+- [ ] DW-7.1: On the phone size with 4G throttling, every main screen shows content or a matching skeleton within
+  200 ms of a tap, and interaction to next paint stays under 200 ms (measured in the browser).
+- [ ] DW-7.2: Approve, reject, save and dismiss update the screen at once and roll back cleanly when the server refuses.
+- [ ] DW-7.3: The review feed plays the next clip with no visible load after a swipe, and layout shift stays under 0.05.
+
+**Difficulty:** MEDIUM
+**Uncertainty:** None
+
 ---
 ## Test Coverage
 **Level:** 100%: a unit test for every new or changed routine in the phase's implementation files, plus the integration and manual items below.
@@ -334,6 +456,9 @@ This is best with an Azure key and still works without one (the research behind 
   - exactly N key terms;
   - 29 and 30 labels for learning.
 - [ ] Integration: a fixture episode through every stage to a review item, with fakes and with no keys.
+- [ ] Dirty, phase 4 workflows: an unknown niche falls back to a general profile; a profile with missing fields uses
+  defaults; every candidate filtered by hard gates returns an empty kept list with reasons and an alert.
+- [ ] Dirty, phase 7: an optimistic approve refused by the server rolls back; the feed on throttled 4G.
 - [ ] Manual:
   - the correction screen and the review feed on the phone and desktop sizes;
   - one real Whisper run on the GPU;
@@ -357,8 +482,17 @@ This is best with an Azure key and still works without one (the research behind 
 | Correction queue by confidence now, by moments in phase 6 | move phase 2 after phase 4 | corrections early improve moment choice | 2, 6 |
 | Laughter and applause cues left out | include | no success criterion needs them yet | 3 |
 | Skeleton and confirm merged into one check-in | two separate stops | the owner asked to keep going | all |
+| Content-type workflows as data profiles | one engine for all | owner: podcast and lifestyle differ completely; clippy shows per-type presets work | 4 |
+| Three-layer filter with relative threshold and rescue | fixed score cut-off | strong but not dumb: hard gates only for deal-breakers, nothing hidden silently | 4 |
+| Social-media smoothness as its own phase | fold into phase 6 | owner asked for it explicitly; it touches every screen | 7 |
+| Creative library and hook patterns as versioned, learned data | fixed templates and prompts | owner wants accounts and hooks to keep up; no release needed for new looks | 4, 5, F |
+| Moment router over several engines with learned per-profile routes | one fixed engine; one merged mega-repo | owner asked for routes, not one fixed thing; engines stay swappable; licences respected | 4 |
 
 Research cited for this plan:
+- Open-source clippers read on 2026-11-17: clippy (per-type presets), publikclip (auditable scores, laughter
+  corroboration), reelsaw (map -> pool -> rank with overlap, decision log), sharkyclips (hype map: loudness, laughter,
+  reaction words, chat), podcli (no re-suggesting published moments), video-podcast-clipper (8-dimension rubric,
+  adaptive threshold).
 - Rhapsody (2025): podcast highlights benefit from audio plus transcript, and YouTube "most replayed" as labels.
 - TF-SELECTOR (2026): segment-based LLM scoring with transcripts and audio volume works on long video.
 - PRP (2024), Best-of-N (2026), Coin Flip Judge (2026), Pairwise or Pointwise (2025): pairwise ranking wins for picking the best, but has position bias and is vulnerable to distractors.
@@ -371,9 +505,31 @@ Research cited for this plan:
   - nothing blocks while saving.
 - Whisper and model downloads go to `L:\Projects\Clipping\.data\cache` (HF_HOME).
 - Each phase report names the older code it brought up to the standards (C7).
+- Phase F (learning) carries the weekly creative refresh: re-rank templates, hook patterns and posting hours from real
+  results, with a short "what changed and why" report and a one-tap revert; trends from allowed sources only (YouTube
+  Data API, ClippingAlpha market data, the owner's own results, trends the owner adds by hand; no scraping where terms
+  forbid it).
+- Smoothness is the owner's top priority (2026-11-17: "most important, a smooooth system"). Every UI phase (2, 5, 6)
+  follows phase 7's bar from the start: instant feedback, no blank screens, optimistic actions, no layout shift;
+  phase 7 then measures and tunes the whole app.
 ---
 ## Decided During Build
 | # | Phase | Decision or question | Source | Status |
+|---|---|---|---|---|
+| 1 | 1 | Whisper gets the decoded 16 kHz wav as an array (PyAV 19 breaks faster-whisper 1.2.1 path decoding) | build agent | assumed |
+| 2 | 1 | No pin on `av`; the array path avoids the PyAV issue | build agent | assumed |
+| 3 | 1 | DW-1.4 scans every table and the job error (a failed job rolls back its own audit rows, existing behaviour) | build agent | assumed |
+| 4 | 1 | Migration 009b_transcripts.sql: campaigns.key_terms, transcripts.current_version and language_code, transcript_versions (RLS), providers faster_whisper and deepgram_basic, Deepgram falls back to faster_whisper | build agent | assumed |
+| 5 | 1 | Phase 2 writes campaign key terms to campaigns.key_terms | build agent | assumed |
+| 6 | 1 | Local Whisper model: large-v3-turbo int8 on CUDA (peak 1089 MiB of 6144) | build agent | assumed |
 ---
 ## Execution Log
 _To be filled during /code-foundations:build_
+
+### Phase 1: Transcription upgrade (Gate: Standard, security-sensitive)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: Verification passed
+- [x] Committed
+Commit: (see git log, phase 1/7)
+Summary: Transcripts now come from Deepgram Nova-3 with dialect code, speakers, utterances, word confidence and campaign key terms (cut to 50), versioned in transcript_versions via transcripts.load/save_version; local faster-whisper large-v3-turbo int8 on CUDA (CPU fallback with alert) is the declared fallback, and no key reaches the database or job errors.
+

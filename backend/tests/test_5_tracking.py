@@ -277,7 +277,7 @@ def test_telegram_adapter_never_leaks_the_token(monkeypatch):
         def __exit__(self, *a): return False
         def post(self, url, **_): raise RuntimeError(f"cannot reach {url}")
 
-    monkeypatch.setattr(vendors, "_http", lambda: Boom())
+    monkeypatch.setattr(vendors, "http_client", lambda *a, **k: Boom())
     with pytest.raises(vendors.AdapterError) as err:
         vendors.TelegramAlerts({"config_json": {}}).send(alert={"message": "x"}, severity="block")
     assert "SECRET-TOKEN-VALUE" not in str(err.value) and err.value.__cause__ is None

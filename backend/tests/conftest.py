@@ -86,6 +86,9 @@ def _reset_fakes() -> None:
     from clipping.adapters import discovery as _discovery
 
     _discovery.FAKE_DISCOVERY.update(campaigns=None, fail=False, calls=[], briefs={})
+    from clipping.adapters import transcription as _transcription
+
+    _transcription.FAKE_TRANSCRIPTION.update(calls=[])
     from clipping.adapters import audience as _audience
 
     _audience.FAKE_AUDIENCE.update(countries={"US": 40, "GB": 10, "SA": 30, "EG": 20}, fail=False, calls=[])

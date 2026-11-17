@@ -3,14 +3,15 @@ compliance, package. Each stage is an idempotent job that records its cost and q
 The worker can run every stage, but it cannot pass a human gate (database triggers)."""
 from __future__ import annotations
 
-import json
+import tempfile
 import time
 from decimal import Decimal
 from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import ffmpeg
+from . import config, ffmpeg, transcripts
+from .adapters.base import AdapterPaused
 from .agents import compliance as agent_c
 from .agents import hooks as agent_b
 from .alerts import raise_alert, registry
@@ -18,6 +19,7 @@ from .core import AppError, KillSwitchOn, audit, claim_job, enqueue, fail_job, f
 from .db import Actor, Database
 
 SENTENCE_END = ".?!؟"
+LOCAL_TRANSCRIBER = "faster_whisper"   # the declared fallback of every paid transcription provider
 
 
 # ------------------------------------------------------------------ boundary snapping (FR-13)
@@ -76,25 +78,7 @@ def _source_ctx(conn, source_id) -> tuple[dict, dict, dict]:
 
 
 def _words(conn, source: dict) -> list[dict]:
-    row = conn.execute(
-        "select word_json_path from transcripts where source_hash = %s and language = %s order by created_at desc limit 1",
-        (source["file_hash"], source["language"]),
-    ).fetchone()
-    if row is None:
-        raise AppError("No transcript for this source.", "no_transcript")
-    return json.loads(registry.get(conn, "storage").path(row["word_json_path"]).read_text(encoding="utf-8"))
-
-
-def _srt(words: list[dict]) -> str:
-    def ts(t: float) -> str:
-        ms = int(round(t * 1000))
-        return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
-
-    lines, i = [], 0
-    for n, start in enumerate(range(0, len(words), 7), start=1):
-        chunk = words[start:start + 7]
-        lines += [str(n), f"{ts(chunk[0]['start'])} --> {ts(chunk[-1]['end'])}", " ".join(w["text"] for w in chunk), ""]
-    return "\n".join(lines)
+    return transcripts.load(conn, source["id"])["words"]
 
 
 def build_caption(disclosure: str, hook_text: str, rules: dict) -> tuple[str, list[str], list[str]]:
@@ -115,42 +99,37 @@ def build_caption(disclosure: str, hook_text: str, rules: dict) -> tuple[str, li
 
 # ------------------------------------------------------------------ stage handlers. Each returns its cost in USD.
 
+def _transcribe(conn, source: dict, campaign: dict, version: dict, video: Path) -> tuple[dict, Decimal]:
+    """Extract the audio and send it to the active transcription provider. When that provider is paused (cost cap,
+    no price) the local Whisper takes over; three failed calls fall back inside the registry."""
+    owner = source["owner_operator_id"]
+    tmp_root = config.data_dir() / "tmp"
+    tmp_root.mkdir(parents=True, exist_ok=True)
+    request = {"language": source["language"], "dialect_hint": source["dialect"],
+               "duration_s": float(source["duration_s"] or 0), "keyterms": transcripts.key_terms_for(campaign, version)}
+    with tempfile.TemporaryDirectory(dir=tmp_root) as folder:
+        audio = ffmpeg.extract_audio(video, Path(folder) / "audio.wav")
+        request["audio_path"] = str(audio)
+        try:
+            return registry.call(conn, "transcription", "transcribe", request, owner)
+        except AdapterPaused as exc:
+            raise_alert(conn, owner, "transcription_paused", "warn", "source_assets", source["id"],
+                        f"{campaign['name']}: {exc} The local Whisper transcribes this video instead.")
+            return registry.call(conn, "transcription", "transcribe", request, owner, provider=LOCAL_TRANSCRIBER)
+
+
 def stage_transcribe(conn, job: dict) -> Decimal:
     source, campaign, version = _source_ctx(conn, job["payload"]["source_id"])
-    storage = registry.get(conn, "storage")
-    path = storage.path(source["stored_path"])
+    path = registry.get(conn, "storage").path(source["stored_path"])
     if not path.exists() or ffmpeg.sha256_file(path) != source["file_hash"]:
         raise AppError("Source file hash mismatch. The job is stopped.", "hash_mismatch")   # S3
-    cached = conn.execute(
-        "select * from transcripts where source_hash = %s and language = %s and dialect is not distinct from %s limit 1",
-        (source["file_hash"], source["language"], source["dialect"]),
-    ).fetchone()
     cost = Decimal("0")
-    if cached is None:
-        audio = path.with_suffix(".wav")
-        ffmpeg.extract_audio(path, audio)
-        try:
-            result, cost = registry.call(conn, "transcription", "transcribe", {
-                "audio_path": str(audio), "language": source["language"], "dialect_hint": source["dialect"],
-                "duration_s": float(source["duration_s"] or 0)}, source["owner_operator_id"])
-        finally:
-            audio.unlink(missing_ok=True)
-        words = result["words"]
-        if not words:
-            raise AppError("The transcript is empty.", "empty_transcript")
-        base = f"transcripts/{source['file_hash']}_{source['language']}_{source['dialect'] or 'default'}"
-        tmp = path.parent / "transcript.tmp"
-        tmp.write_text(json.dumps(words, ensure_ascii=False), encoding="utf-8")
-        storage.put(base + ".json", str(tmp))
-        tmp.write_text(_srt(words), encoding="utf-8")
-        storage.put(base + ".srt", str(tmp))
-        tmp.unlink(missing_ok=True)
-        conn.execute(
-            """insert into transcripts (source_id, owner_operator_id, source_hash, language, dialect, provider, model, word_json_path, srt_path)
-               values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (source["id"], source["owner_operator_id"], source["file_hash"], source["language"], source["dialect"],
-             result["provider"], result.get("model"), base + ".json", base + ".srt"),
-        )
+    if transcripts.find(conn, source) is None:
+        result, cost = _transcribe(conn, source, campaign, version, path)
+        transcripts.create(conn, source, result)
+        if result.get("degraded"):
+            raise_alert(conn, source["owner_operator_id"], "transcription_degraded", "warn", "source_assets", source["id"],
+                        f"{campaign['name']}: {result['degraded']}. It works, but slowly.")
     enqueue(conn, "moments", {"source_id": str(source["id"])}, source["owner_operator_id"],
             source_id=source["id"], campaign_version_id=version["id"])
     return cost

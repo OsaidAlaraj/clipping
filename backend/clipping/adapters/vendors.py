@@ -1,4 +1,4 @@
-"""Vendor adapters and their fakes: source (A1), LLM (A2), transcription (A3), moment finding (A4),
+"""Vendor adapters and their fakes: source (A1), LLM (A2), moment finding (A4),
 scheduler (A7), storage (A8), alerts (A10), metrics and payout records (A11, A12).
 
 Live vendor adapters need keys (docs/open-items.md). None has been run against a live service in this
@@ -9,31 +9,14 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
-import logging
 import shutil
 import time
 from decimal import Decimal
 from pathlib import Path
 
 from .. import config, ffmpeg
-from .base import Adapter, AdapterError, register
-
-# httpx logs request URLs at INFO. The Telegram URL contains the bot token, so keep it quiet.
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore").setLevel(logging.WARNING)
-
-
-def _http():
-    import httpx
-
-    return httpx.Client(timeout=60)
-
-
-def _check(response) -> dict:
-    if response.status_code >= 400:
-        # Status only: a response body or URL could echo a token.
-        raise AdapterError(f"HTTP {response.status_code}")
-    return response.json()
+from .base import Adapter, AdapterError, check_response, http_client, register
+from .transcription import FAKE_SENTENCES, fake_words  # noqa: F401  (registers the A3 providers; re-exported for older imports)
 
 
 # ====================================================================== A1 campaign source
@@ -76,7 +59,7 @@ class ScraperSource(Adapter):
 
     def _fetch(self, url: str) -> str:
         time.sleep(float(self.cfg.get("min_seconds_between_requests", 10)) if self.cfg.get("throttle", True) else 0)
-        with _http() as client:
+        with http_client() as client:
             response = client.get(url, headers={"User-Agent": "clipping-campaign-reader/1.0"}, follow_redirects=True)
         if response.status_code >= 400:
             raise AdapterError(f"HTTP {response.status_code}")
@@ -170,12 +153,12 @@ class AzureOpenAILLM(Adapter):
                 "response_format": {"type": "json_object"}}
         if not _reasoning_model(deployment):
             body["temperature"] = 0   # reasoning models (gpt-5 family, o-series) accept only their default
-        with _http() as client:
+        with http_client() as client:
             response = client.post(
                 f"{endpoint}/openai/deployments/{deployment}/chat/completions", params={"api-version": version},
                 headers={"api-key": config.env("AZURE_OPENAI_API_KEY", "")}, json=body,
             )
-        data = _check(response)
+        data = check_response(response)
         return json.loads(data["choices"][0]["message"]["content"])
 
 
@@ -196,12 +179,12 @@ def _azure_read_image(image_b64: str, mime: str) -> dict:
             "response_format": {"type": "json_object"}}
     if not _reasoning_model(deployment):
         body["temperature"] = 0
-    with _http() as client:
+    with http_client() as client:
         response = client.post(
             f"{endpoint}/openai/deployments/{deployment}/chat/completions", params={"api-version": "2024-10-21"},
             headers={"api-key": config.env("AZURE_OPENAI_API_KEY", "")}, json=body,
         )
-    return json.loads(_check(response)["choices"][0]["message"]["content"])
+    return json.loads(check_response(response)["choices"][0]["message"]["content"])
 
 
 AzureOpenAILLM.read_image = lambda self, image_b64, mime: _azure_read_image(image_b64, mime)  # type: ignore[attr-defined]
@@ -226,95 +209,7 @@ class FakeLLM(Adapter):
         return {"text": fake_llm.FAKE_IMAGE_TEXT}
 
 
-# ====================================================================== A3 transcription
-
-@register
-class DeepgramTranscription(Adapter):
-    stage, provider = "transcription", "deepgram"
-    requires_env = ("DEEPGRAM_API_KEY",)
-
-    def cost(self, request: dict) -> Decimal | None:
-        price = self.cfg.get("price_per_min_usd")
-        if price is None:
-            return None
-        return (Decimal(str(price)) * Decimal(str(request.get("duration_s", 0))) / 60).quantize(Decimal("0.0001"))
-
-    def units(self, request: dict) -> Decimal:
-        return (Decimal(str(request.get("duration_s", 0))) / 60).quantize(Decimal("0.01"))
-
-    def transcribe(self, audio_path: str, language: str, dialect_hint: str | None = None, duration_s: float = 0) -> dict:
-        if language not in ("en", "ar"):
-            raise ValueError("language must be en or ar")
-        code = dialect_hint if (dialect_hint and dialect_hint.lower().startswith(language)) else language
-        with _http() as client, open(audio_path, "rb") as fh:
-            response = client.post(
-                "https://api.deepgram.com/v1/listen",
-                params={"model": self.cfg.get("model", "nova-3"), "language": code, "punctuate": "true", "smart_format": "true"},
-                headers={"Authorization": f"Token {config.env('DEEPGRAM_API_KEY', '')}", "Content-Type": "audio/wav"},
-                content=fh.read(), timeout=600,
-            )
-        data = _check(response)
-        alt = data["results"]["channels"][0]["alternatives"][0]
-        words = [{"text": w.get("punctuated_word") or w["word"], "start": float(w["start"]), "end": float(w["end"])}
-                 for w in alt.get("words", [])]
-        return {"words": words, "provider": "deepgram", "model": self.cfg.get("model", "nova-3")}
-
-
-FAKE_SENTENCES = {
-    "en": [
-        "Most people think success comes from talent.",
-        "That is completely wrong.",
-        "I lost fifty thousand dollars in my first year.",
-        "Here is what nobody tells you about starting out.",
-        "You only need three habits and nothing else.",
-        "Why do we keep making the same mistake?",
-        "The day I quit my job changed everything.",
-        "If you ignore this you will pay for it later.",
-        "Seven out of ten founders never learn this lesson.",
-        "So I picked up the phone and made one call.",
-        "Everyone told me the idea would fail.",
-        "What would you do with one more hour a day?",
-    ],
-    "ar": [
-        "معظم الناس يعتقدون أن النجاح يأتي من الموهبة.",
-        "هذا غير صحيح تماماً.",
-        "خسرت خمسين ألف دولار في سنتي الأولى.",
-        "إليكم ما لا يخبركم به أحد عن البداية.",
-        "تحتاج إلى ثلاث عادات فقط ولا شيء غيرها.",
-        "لماذا نكرر الخطأ نفسه دائماً؟",
-        "اليوم الذي تركت فيه وظيفتي غيّر كل شيء.",
-        "إذا تجاهلت هذا فسوف تدفع الثمن لاحقاً.",
-        "سبعة من كل عشرة مؤسسين لا يتعلمون هذا الدرس.",
-        "فأمسكت الهاتف وأجريت مكالمة واحدة.",
-        "قال لي الجميع إن الفكرة ستفشل.",
-        "ماذا ستفعل لو كان لديك ساعة إضافية كل يوم؟",
-    ],
-}
-
-
-def fake_words(language: str, duration_s: float) -> list[dict]:
-    """A sentence every five seconds: 4.2 s of speech, 0.8 s of silence (matches the fixture's tone)."""
-    words: list[dict] = []
-    sentences = FAKE_SENTENCES[language]
-    slot = 0
-    while (slot + 1) * 5 <= duration_s + 0.01:
-        tokens = sentences[slot % len(sentences)].split()
-        step = 4.2 / len(tokens)
-        for i, token in enumerate(tokens):
-            start = slot * 5 + i * step
-            words.append({"text": token, "start": round(start, 3), "end": round(start + step * 0.92, 3)})
-        slot += 1
-    return words
-
-
-@register
-class FakeTranscription(Adapter):
-    stage, provider = "transcription", "fake"
-
-    def transcribe(self, audio_path: str, language: str, dialect_hint: str | None = None, duration_s: float = 0) -> dict:
-        if language not in ("en", "ar"):
-            raise ValueError("language must be en or ar")
-        return {"words": fake_words(language, duration_s), "provider": "fake", "model": "fake-1"}
+# A3 transcription lives in transcription.py (Deepgram, local Whisper, fake); the names below keep older imports working.
 
 
 # ====================================================================== A4 moment finding
@@ -338,8 +233,8 @@ class VizardMoments(Adapter):
     def submit(self, source: dict, options: dict) -> dict:
         if not str(source.get("url", "")).startswith("https://"):
             raise AdapterError("Vizard needs a public https source URL (use R2 storage)")
-        with _http() as client:
-            data = _check(client.post(f"{self.cfg.get('base_url', self.BASE)}/project/create", headers=self._headers(),
+        with http_client() as client:
+            data = check_response(client.post(f"{self.cfg.get('base_url', self.BASE)}/project/create", headers=self._headers(),
                                       json={"lang": options.get("language", "en"), "videoUrl": source["url"],
                                             "videoType": 1, "ext": "mp4", "preferLength": [0]}))
         if "projectId" not in data:
@@ -347,8 +242,8 @@ class VizardMoments(Adapter):
         return {"job_id": str(data["projectId"])}
 
     def status(self, job_id: str) -> dict:
-        with _http() as client:
-            data = _check(client.get(f"{self.cfg.get('base_url', self.BASE)}/project/query/{job_id}", headers=self._headers()))
+        with http_client() as client:
+            data = check_response(client.get(f"{self.cfg.get('base_url', self.BASE)}/project/query/{job_id}", headers=self._headers()))
         return {"done": bool(data.get("videos")), "raw": data}
 
     def clips(self, job_id: str) -> list[dict]:
@@ -385,22 +280,22 @@ class KlapMoments(Adapter):
         return {"Authorization": f"Bearer {config.env('KLAP_API_KEY', '')}"}
 
     def submit(self, source: dict, options: dict) -> dict:
-        with _http() as client:
-            data = _check(client.post(f"{self.cfg.get('base_url', 'https://api.klap.app/v2')}/tasks/video-to-shorts",
+        with http_client() as client:
+            data = check_response(client.post(f"{self.cfg.get('base_url', 'https://api.klap.app/v2')}/tasks/video-to-shorts",
                                       headers=self._headers(),
                                       json={"source_video_url": source.get("url"), "language": options.get("language", "en"),
                                             "max_clip_count": options.get("max_clips", 3)}))
         return {"job_id": str(data.get("id"))}
 
     def status(self, job_id: str) -> dict:
-        with _http() as client:
-            data = _check(client.get(f"{self.cfg.get('base_url', 'https://api.klap.app/v2')}/tasks/{job_id}", headers=self._headers()))
+        with http_client() as client:
+            data = check_response(client.get(f"{self.cfg.get('base_url', 'https://api.klap.app/v2')}/tasks/{job_id}", headers=self._headers()))
         return {"done": data.get("status") == "ready", "raw": data}
 
     def clips(self, job_id: str) -> list[dict]:
         raw = self.status(job_id)["raw"]
-        with _http() as client:
-            items = _check(client.get(f"{self.cfg.get('base_url', 'https://api.klap.app/v2')}/projects/{raw.get('output_id')}",
+        with http_client() as client:
+            items = check_response(client.get(f"{self.cfg.get('base_url', 'https://api.klap.app/v2')}/projects/{raw.get('output_id')}",
                                       headers=self._headers()))
         out = []
         for item in items if isinstance(items, list) else []:
@@ -478,8 +373,8 @@ class BufferScheduler(Adapter):
         return Decimal(0)
 
     def schedule(self, post: dict) -> dict:
-        with _http() as client:
-            data = _check(client.post(f"{self.cfg.get('base_url', 'https://api.bufferapp.com/1')}/updates/create.json",
+        with http_client() as client:
+            data = check_response(client.post(f"{self.cfg.get('base_url', 'https://api.bufferapp.com/1')}/updates/create.json",
                                       headers={"Authorization": f"Bearer {config.env('BUFFER_ACCESS_TOKEN', '')}"},
                                       data={"profile_ids[]": post["channel_id"], "text": post["caption"],
                                             "media[video]": post["video_url"], "scheduled_at": post["scheduled_at"]}))
@@ -487,14 +382,14 @@ class BufferScheduler(Adapter):
         return {"ref": str(updates[0].get("id")), "manual": False}
 
     def cancel(self, id: str) -> dict:
-        with _http() as client:
-            _check(client.post(f"{self.cfg.get('base_url', 'https://api.bufferapp.com/1')}/updates/{id}/destroy.json",
+        with http_client() as client:
+            check_response(client.post(f"{self.cfg.get('base_url', 'https://api.bufferapp.com/1')}/updates/{id}/destroy.json",
                                headers={"Authorization": f"Bearer {config.env('BUFFER_ACCESS_TOKEN', '')}"}))
         return {"cancelled": True}
 
     def status(self, id: str) -> dict:
-        with _http() as client:
-            data = _check(client.get(f"{self.cfg.get('base_url', 'https://api.bufferapp.com/1')}/updates/{id}.json",
+        with http_client() as client:
+            data = check_response(client.get(f"{self.cfg.get('base_url', 'https://api.bufferapp.com/1')}/updates/{id}.json",
                                      headers={"Authorization": f"Bearer {config.env('BUFFER_ACCESS_TOKEN', '')}"}))
         return {"status": data.get("status")}
 
@@ -663,7 +558,7 @@ class TelegramAlerts(Adapter):
         text = f"[{severity.upper()}] {alert['message']}"
         times = 2 if severity == "block" else 1   # block alerts are sent twice (spec 10.3)
         try:
-            with _http() as client:
+            with http_client() as client:
                 for _ in range(times):
                     response = client.post(f"https://api.telegram.org/bot{token}/sendMessage",
                                            json={"chat_id": chat, "text": text})

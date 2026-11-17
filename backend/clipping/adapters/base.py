@@ -7,6 +7,7 @@ Plans, prices and limits are rows in the `adapters` table; keys are environment 
 from __future__ import annotations
 
 import datetime as dt
+import logging
 from decimal import Decimal
 from typing import Any, Callable
 
@@ -16,6 +17,24 @@ from ..core import AppError, audit, get_setting
 
 class AdapterError(Exception):
     """A vendor call failed."""
+
+
+# httpx logs request URLs at INFO. The Telegram URL contains the bot token, so keep it quiet.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+
+
+def http_client(timeout: float = 60):
+    import httpx
+
+    return httpx.Client(timeout=timeout)
+
+
+def check_response(response) -> dict:
+    if response.status_code >= 400:
+        # Status only: a response body or URL could echo a token.
+        raise AdapterError(f"HTTP {response.status_code}")
+    return response.json()
 
 
 class AdapterPaused(AppError):

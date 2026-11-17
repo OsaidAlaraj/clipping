@@ -9,7 +9,7 @@ from psycopg.types.json import Jsonb
 
 from . import config
 from .adapters import base
-from .adapters import audience as _audience, media, vendors  # noqa: F401  (registers providers)
+from .adapters import audience as _audience, media, transcription, vendors  # noqa: F401  (registers providers)
 from .core import audit, get_setting
 
 
