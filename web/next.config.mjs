@@ -4,7 +4,9 @@ const api = process.env.CLIPPING_API_URL || "http://127.0.0.1:8787";
 export default {
   reactStrictMode: true,
   // The phone reaches the laptop through Tailscale (https://<laptop>.<tailnet>.ts.net).
-  allowedDevOrigins: ["*.ts.net"],
+  allowedDevOrigins: ["*.ts.net", "*.trycloudflare.com"],
+  // Phone uploads are proxied through /api when the app is opened through Tailscale or a tunnel.
+  experimental: { proxyClientMaxBodySize: "2gb" },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${api}/api/:path*` }];
   },
