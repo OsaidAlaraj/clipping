@@ -46,7 +46,8 @@ def pg():
 
 
 def _dsn(admin: str, name: str) -> str:
-    return admin.rsplit("/", 1)[0] + "/" + name
+    # The admin URI is TCP on Windows but a Unix socket (host=/path) on Linux; rebuild it rather than cut strings.
+    return psycopg.conninfo.make_conninfo(admin, dbname=name)
 
 
 def _admin(admin: str, sql: str) -> None:
