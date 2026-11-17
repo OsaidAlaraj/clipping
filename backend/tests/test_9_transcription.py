@@ -433,6 +433,7 @@ def test_cuda_dll_folders_come_from_the_nvidia_wheels(monkeypatch, tmp_path):
     assert [p.parent.name for p in transcription._cuda_library_dirs()] == ["cublas", "cudnn"]
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="DLL folders are a Windows-only mechanism; faking os.name breaks pathlib elsewhere")
 def test_prepare_cuda_dlls_registers_each_folder_once(monkeypatch, tmp_path):
     folder = tmp_path / "nvidia" / "cublas" / "bin"
     folder.mkdir(parents=True)
