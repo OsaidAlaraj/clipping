@@ -1,0 +1,343 @@
+{
+ "campaign": {
+  "campaignId": "2158",
+  "ref": "call-of-duty/mw4-dmz-intel-briefing",
+  "title": "Call of Duty, MW4 DMZ Intel Briefing Clipping",
+  "brand": "Call of Duty",
+  "round": 1,
+  "state": "live",
+  "type": "clipping",
+  "board": "Content Rewards",
+  "membersOnly": false,
+  "ageRestricted": false,
+  "labels": [],
+  "election": false,
+  "electionLabel": null,
+  "electionNote": null,
+  "audienceLabel": null,
+  "audienceNote": null,
+  "region": null,
+  "pageUrl": "https://clippingalpha.com/campaigns/call-of-duty/mw4-dmz-intel-briefing?via=mcp",
+  "joinUrl": "https://clippingalpha.com/go/11045701?via=mcp"
+ },
+ "alpha": {
+  "score": 98,
+  "tier": "alpha",
+  "confidence": "medium",
+  "beatsPct": 99,
+  "verdicts": [
+   {
+    "key": "pay",
+    "label": "Pay",
+    "verdict": "High",
+    "tone": "good",
+    "fact": "$2.00 per 1K",
+    "value": 0.7830820770519263
+   },
+   {
+    "key": "budget",
+    "label": "Budget",
+    "verdict": "Big",
+    "tone": "good",
+    "fact": "$21.3K left, about 11M views",
+    "value": 0.9928
+   },
+   {
+    "key": "fill",
+    "label": "Fill",
+    "verdict": "Too early",
+    "tone": "none",
+    "fact": "29% spent in 8 days",
+    "value": 16.601
+   },
+   {
+    "key": "confidence",
+    "label": "Confidence",
+    "verdict": "Medium",
+    "tone": "ok",
+    "fact": "New, proven organizer",
+    "value": null
+   },
+   {
+    "key": "rules",
+    "label": "Payout rules",
+    "verdict": "OK",
+    "tone": "ok",
+    "fact": "Est. 5 in 10 clips qualify",
+    "value": 0.5268
+   },
+   {
+    "key": "approval",
+    "label": "Approval",
+    "verdict": "No data yet",
+    "tone": "none",
+    "fact": null,
+    "value": null
+   },
+   {
+    "key": "content",
+    "label": "Content",
+    "verdict": "OK",
+    "tone": "ok",
+    "fact": "No famous face or big audience",
+    "value": 64
+   },
+   {
+    "key": "moments",
+    "label": "Moments",
+    "verdict": "Some",
+    "tone": "ok",
+    "fact": "1 high-intensity moment",
+    "value": 1
+   }
+  ],
+  "adjustments": [],
+  "contentQuality": {
+   "score": 64,
+   "verdict": "OK",
+   "lines": [
+    "Known brand: Call of Duty",
+    "1 high-intensity moment",
+    "Clip Potential 78"
+   ],
+   "famousGuests": [],
+   "featuring": [],
+   "highIntensityMoments": 1,
+   "momentKinds": [],
+   "flaggedMoments": 0,
+   "clipPotential": 78
+  },
+  "qualify": {
+   "share": 0.5268,
+   "line": "Est. 5 in 10 clips qualify"
+  }
+ },
+ "pay": {
+  "model": "cpm",
+  "platform": "tiktok",
+  "ratePer1kUsd": 2,
+  "flatPerPostUsd": null,
+  "boardFeePct": 0.1,
+  "minViews": null,
+  "minPayoutUsd": 6,
+  "maxPayoutUsd": 1200,
+  "perClip": [
+   {
+    "views": 10000,
+    "usd": 18,
+    "capped": false,
+    "underMin": false
+   },
+   {
+    "views": 50000,
+    "usd": 90,
+    "capped": false,
+    "underMin": false
+   },
+   {
+    "views": 100000,
+    "usd": 180,
+    "capped": false,
+    "underMin": false
+   }
+  ]
+ },
+ "runway": {
+  "budgetLeftUsd": 21259.39,
+  "budgetTotalUsd": 30000,
+  "leftShare": 0.71,
+  "forecast": {
+   "p10": "2026-11-23T23:55:06.887Z",
+   "p50": "2026-12-04T16:15:22.381Z",
+   "p90": null,
+   "confidence": "medium"
+  },
+  "stalled": false,
+  "spentPerDayUsd": 1289.11,
+  "paidOutUsd": null
+ },
+ "market": {
+  "peers": 512,
+  "medianRatePer1kUsd": 1,
+  "medianAlpha": 36,
+  "similar": [
+   {
+    "campaignId": "1953",
+    "title": "PopDarts x Target [Clipping Campaign]",
+    "brand": "PopDarts",
+    "brandSlug": "popdarts",
+    "seriesSlug": "target",
+    "board": "Content Rewards",
+    "boardSlug": "content-rewards",
+    "agency": "ClipHouse",
+    "agencySlug": "cliphouse",
+    "state": "live",
+    "campaignType": "clipping",
+    "payModel": "cpm",
+    "platforms": [
+     "instagram",
+     "tiktok",
+     "youtube"
+    ],
+    "ratePer1kUsd": 1,
+    "netPer1kUsd": 0.9,
+    "budgetLeftUsd": 328.29,
+    "budgetTotalUsd": 1000,
+    "alphaScore": 48,
+    "tier": "fair",
+    "notScored": null,
+    "drainP50": "2026-11-20T10:35:00.766Z",
+    "openJoin": true,
+    "exclusive": false,
+    "access": null,
+    "niche": "gaming",
+    "membersOnly": false,
+    "ageRestricted": false,
+    "labels": [],
+    "election": false,
+    "electionLabel": null,
+    "electionNote": null,
+    "audience": {
+     "countries": [
+      "US"
+     ],
+     "minSharePct": 50,
+     "language": null
+    },
+    "audienceLabel": "US",
+    "audienceNote": "At least 50% of viewers in US",
+    "region": null,
+    "firstSeenAt": "2026-11-03T17:23:18.840Z",
+    "launchedAt": "2026-11-03T17:22:01.000Z",
+    "newAt": "2026-11-03T17:22:01.000Z",
+    "pageUrl": "https://clippingalpha.com/campaigns/popdarts/target?via=mcp",
+    "joinUrl": "https://clippingalpha.com/go/9178129?via=mcp",
+    "picture": {
+     "src": "https://clippingalpha.com/media/pictures/1953/737cfd71beff-656.webp",
+     "src2x": "https://clippingalpha.com/media/pictures/1953/737cfd71beff-1312.webp",
+     "square": "https://clippingalpha.com/media/pictures/1953/737cfd71beff-160.webp",
+     "alt": "PopDarts x Target [Clipping Campaign]",
+     "width": 656,
+     "height": 352,
+     "fit": "cover"
+    }
+   },
+   {
+    "campaignId": "499",
+    "title": "MoorHouse Media Network",
+    "brand": "MoorHouse",
+    "brandSlug": "moorhouse",
+    "seriesSlug": "media-network",
+    "board": "Content Rewards",
+    "boardSlug": "content-rewards",
+    "agency": null,
+    "agencySlug": null,
+    "state": "live",
+    "campaignType": "clipping",
+    "payModel": "cpm",
+    "platforms": [
+     "instagram",
+     "tiktok",
+     "youtube"
+    ],
+    "ratePer1kUsd": 2.5,
+    "netPer1kUsd": 2.25,
+    "budgetLeftUsd": 383.4,
+    "budgetTotalUsd": 1718.77,
+    "alphaScore": 61,
+    "tier": "solid",
+    "notScored": null,
+    "drainP50": "2026-11-26T15:28:23.692Z",
+    "openJoin": true,
+    "exclusive": false,
+    "access": null,
+    "niche": "podcast",
+    "membersOnly": false,
+    "ageRestricted": false,
+    "labels": [],
+    "election": false,
+    "electionLabel": null,
+    "electionNote": null,
+    "audience": null,
+    "audienceLabel": null,
+    "audienceNote": null,
+    "region": null,
+    "firstSeenAt": "2026-10-03T05:04:17.517Z",
+    "launchedAt": "2026-08-26T23:09:45.000Z",
+    "newAt": null,
+    "pageUrl": "https://clippingalpha.com/campaigns/moorhouse/media-network?via=mcp",
+    "joinUrl": "https://clippingalpha.com/go/192409?via=mcp",
+    "picture": {
+     "src": "https://clippingalpha.com/media/pictures/499/291ad41a71b1-656.webp",
+     "src2x": "https://clippingalpha.com/media/pictures/499/291ad41a71b1-1312.webp",
+     "square": "https://clippingalpha.com/media/pictures/499/291ad41a71b1-160.webp",
+     "alt": "MoorHouse Media Network",
+     "width": 656,
+     "height": 352,
+     "fit": "cover"
+    }
+   },
+   {
+    "campaignId": "1452",
+    "title": "Mini Brands, Ulta Beauty Clipping",
+    "brand": "Mini Brands",
+    "brandSlug": "mini-brands",
+    "seriesSlug": "ulta-beauty",
+    "board": "Content Rewards",
+    "boardSlug": "content-rewards",
+    "agency": "Clip Influence",
+    "agencySlug": "clip-influence",
+    "state": "live",
+    "campaignType": "clipping",
+    "payModel": "cpm",
+    "platforms": [
+     "instagram",
+     "tiktok"
+    ],
+    "ratePer1kUsd": 1.75,
+    "netPer1kUsd": 1.35,
+    "budgetLeftUsd": 6302.82,
+    "budgetTotalUsd": 10000,
+    "alphaScore": 74,
+    "tier": "solid",
+    "notScored": null,
+    "drainP50": "2027-01-04T19:31:17.818Z",
+    "openJoin": true,
+    "exclusive": false,
+    "access": null,
+    "niche": "brand-ads",
+    "membersOnly": false,
+    "ageRestricted": false,
+    "labels": [],
+    "election": false,
+    "electionLabel": null,
+    "electionNote": null,
+    "audience": {
+     "countries": [
+      "US"
+     ],
+     "minSharePct": 30,
+     "language": null
+    },
+    "audienceLabel": "US",
+    "audienceNote": "At least 30% of viewers in US",
+    "region": null,
+    "firstSeenAt": "2026-10-20T20:17:20.327Z",
+    "launchedAt": "2026-10-20T20:12:54.000Z",
+    "newAt": "2026-10-20T20:12:54.000Z",
+    "pageUrl": "https://clippingalpha.com/campaigns/mini-brands/ulta-beauty?via=mcp",
+    "joinUrl": "https://clippingalpha.com/go/5271224?via=mcp",
+    "picture": {
+     "src": "https://clippingalpha.com/media/pictures/1452/0e4c17dc08f2-656.webp",
+     "src2x": "https://clippingalpha.com/media/pictures/1452/0e4c17dc08f2-1312.webp",
+     "square": "https://clippingalpha.com/media/pictures/1452/0e4c17dc08f2-160.webp",
+     "alt": "Mini Brands, Ulta Beauty Clipping",
+     "width": 656,
+     "height": 352,
+     "fit": "cover"
+    }
+   }
+  ]
+ },
+ "asOf": "2026-11-17T15:44:02.001Z"
+}

@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "clipping", "runtimeExecutable": "python", "runtimeArgs": ["run.py"], "port": 3000 },
+    { "name": "clipping-nosignin", "runtimeExecutable": "cmd", "runtimeArgs": ["/c", "set AUTH_MODE=local&& python run.py"], "port": 3000 }
+  ]
+}

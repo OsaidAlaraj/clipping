@@ -1,0 +1,120 @@
+{
+ "campaign": {
+  "campaignId": "2158",
+  "ref": "call-of-duty/mw4-dmz-intel-briefing",
+  "title": "Call of Duty, MW4 DMZ Intel Briefing Clipping",
+  "brand": "Call of Duty",
+  "round": 1,
+  "state": "live",
+  "type": "clipping",
+  "board": "Content Rewards",
+  "membersOnly": false,
+  "ageRestricted": false,
+  "labels": [],
+  "election": false,
+  "electionLabel": null,
+  "electionNote": null,
+  "audienceLabel": null,
+  "audienceNote": null,
+  "region": null,
+  "pageUrl": "https://clippingalpha.com/campaigns/call-of-duty/mw4-dmz-intel-briefing?via=mcp",
+  "joinUrl": "https://clippingalpha.com/go/11045701?via=mcp"
+ },
+ "videos": [],
+ "brandAssets": [],
+ "brandAssetCount": 0,
+ "library": null,
+ "exampleClips": [
+  {
+   "kind": "approved_post",
+   "rank": 1,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DfwBZ5zOku8/",
+   "handle": null,
+   "views": 63636,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 2,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DfioucJuo5m/",
+   "handle": "exitosobillonario",
+   "views": 60355,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 3,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DflFjz7uSYW/",
+   "handle": "exitosobillonario",
+   "views": 59469,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 4,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/Dfln8qTONQO/",
+   "handle": "exitosobillonario",
+   "views": 58710,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 5,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DfqDro5uKIK/",
+   "handle": null,
+   "views": 57117,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 6,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DflhW2FOCV1/",
+   "handle": null,
+   "views": 57083,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 7,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DflOWTIOhzb/",
+   "handle": "exitosobillonario",
+   "views": 56335,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 8,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DfkuNfHShKe/",
+   "handle": "boyzhumor",
+   "views": 55169,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 9,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DfjCI0nONMG/",
+   "handle": "exitosobillonario",
+   "views": 51894,
+   "board": "Content Rewards"
+  },
+  {
+   "kind": "approved_post",
+   "rank": 10,
+   "platform": "instagram",
+   "url": "https://www.instagram.com/reel/DfnnVGVuI1k/",
+   "handle": null,
+   "views": 50103,
+   "board": "Content Rewards"
+  }
+ ],
+ "memberFootage": 1
+}

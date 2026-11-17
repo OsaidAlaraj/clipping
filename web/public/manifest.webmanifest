@@ -1,0 +1,16 @@
+{
+  "name": "Clipping Review",
+  "short_name": "Clipping",
+  "description": "Review, queue and track clips for paid clipping campaigns.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3F3EF",
+  "theme_color": "#F3F3EF",
+  "share_target": { "action": "/new", "method": "GET", "params": { "title": "title", "text": "text", "url": "url" } },
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

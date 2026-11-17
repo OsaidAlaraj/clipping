@@ -1,0 +1,586 @@
+{
+ "campaign": {
+  "campaignId": "2158",
+  "ref": "call-of-duty/mw4-dmz-intel-briefing",
+  "title": "Call of Duty, MW4 DMZ Intel Briefing Clipping",
+  "brand": "Call of Duty",
+  "round": 1,
+  "state": "live",
+  "type": "clipping",
+  "board": "Content Rewards",
+  "membersOnly": false,
+  "ageRestricted": false,
+  "labels": [],
+  "election": false,
+  "electionLabel": null,
+  "electionNote": null,
+  "audienceLabel": null,
+  "audienceNote": null,
+  "region": null,
+  "pageUrl": "https://clippingalpha.com/campaigns/call-of-duty/mw4-dmz-intel-briefing?via=mcp",
+  "joinUrl": "https://clippingalpha.com/go/11045701?via=mcp"
+ },
+ "wants": {
+  "format": [],
+  "mustInclude": [],
+  "avoid": [],
+  "footage": "Brand footage only",
+  "platforms": [
+   "TikTok",
+   "Instagram"
+  ],
+  "languages": [],
+  "audienceCountries": [],
+  "account": [],
+  "deadline": null
+ },
+ "checklist": [
+  {
+   "kind": "caption",
+   "text": "Tag @callofduty on TikTok and Instagram"
+  },
+  {
+   "kind": "caption",
+   "text": "Keep it genuine, like a real fan would write"
+  },
+  {
+   "kind": "caption",
+   "text": "No made-up facts, stats, or dates"
+  },
+  {
+   "kind": "disclosure",
+   "text": "Add #Ad or #Advertisement to every post"
+  },
+  {
+   "kind": "format",
+   "text": "Keep clips over 10 seconds"
+  },
+  {
+   "kind": "custom",
+   "text": "Make your post FTC compliant"
+  },
+  {
+   "kind": "page",
+   "text": "Any page size can join"
+  },
+  {
+   "kind": "account",
+   "text": "Post in English"
+  },
+  {
+   "kind": "posting",
+   "text": "Do not post the same video more than 5 times"
+  },
+  {
+   "kind": "do",
+   "text": "Use only the brand's footage"
+  },
+  {
+   "kind": "brand_safety",
+   "text": "No nudity or sexual content"
+  },
+  {
+   "kind": "brand_safety",
+   "text": "No violence"
+  }
+ ],
+ "rulesHidden": false,
+ "quality": {
+  "grade": "B",
+  "flags": [
+   "Keep posts live",
+   "Missing essentials",
+   "No deadline"
+  ]
+ },
+ "join": {
+  "how": "Open to join",
+  "open": true,
+  "payoutWindowDays": 10,
+  "boardFeePct": 0.1,
+  "minViews": null,
+  "minPayoutUsd": 6,
+  "maxPayoutUsd": 1200
+ },
+ "briefUrl": "https://contentrewards.com/c/campaigns/a1cefc3b-4533-438f-8e70-a7299550f1cf",
+ "briefDocs": [],
+ "rules": {
+  "groups": [
+   {
+    "key": "make",
+    "title": "WHAT TO MAKE",
+    "items": [
+     {
+      "text": "At least 10 seconds long",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Captions on screen",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "In English",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Use only the brand's footage",
+      "source": "Platform"
+     },
+     {
+      "text": "Niche: The new DMZ content in Modern Warfare 4 Season 1, one narrow niche",
+      "source": "Platform"
+     },
+     {
+      "text": "Niches",
+      "source": "Platform",
+      "chips": [
+       {
+        "text": "Entertainment",
+        "platforms": []
+       }
+      ]
+     },
+     {
+      "text": "High effort, polished edits",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "do",
+    "title": "DO",
+    "items": [
+     {
+      "text": "Clip the DMZ Intel Briefing video from the official content folder",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Tag @callofduty on TikTok and Instagram",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Include one FTC disclosure hashtag in the caption",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Mention the DMZ Free Trial in caption or on-screen text",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Keep the caption genuine, like a real fan",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Keep it true, no made-up facts, stats, or dates",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Write your own caption, do not copy other clippers",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Post high-quality content only",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Keep the post live for at least 30 days",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Keep likes visible on the post",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "dont",
+    "title": "DON'T",
+    "items": [
+     {
+      "text": "Do not use footage outside the official content folder",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No posts without a free trial mention",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No low-quality or lazy uploads",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No NSFW, violent, or controversial content",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No racist, homophobic, or sexual content",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Do not repost another creator's video as your own",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No exaggerated hooks, rage bait, or hate bait",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No false or made-up claims, stats, or dates",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Do not mislabel content, a trailer is not gameplay",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No added music of any kind",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No AI voiceovers or AI-generated voices",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No bait posting with unrelated viral content",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No spam posting the same video on multiple accounts",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Story views do not count",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No paid promotion or ads of any kind",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Do not post the same video more than 5 times",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Do not remove the post before 30 days",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No hidden likes",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No background music, use only official asset audio",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No AI voices, narration, or cloned voices",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No outside footage",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No low effort reuploads",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No reposts of other clips",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No misleading claims",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No bought views, likes or bots",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "caption",
+    "title": "CAPTION",
+    "items": [
+     {
+      "text": "Tag the brand, per platform",
+      "source": "Platform",
+      "chips": [
+       {
+        "text": "@callofduty",
+        "platforms": [
+         "tiktok",
+         "instagram"
+        ]
+       }
+      ],
+      "member": true
+     },
+     {
+      "text": "Write in the caption",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Keep it genuine, like a real fan would write",
+      "source": "Platform",
+      "platforms": [],
+      "member": true
+     },
+     {
+      "text": "No made-up facts, stats, or dates",
+      "source": "Platform",
+      "platforms": [],
+      "member": true
+     },
+     {
+      "text": "Write your own, do not copy other clippers' captions",
+      "source": "Platform",
+      "platforms": [],
+      "member": true
+     },
+     {
+      "text": "Up to 3 extra hashtags allowed, must relate to content",
+      "source": "Platform",
+      "platforms": [],
+      "member": true
+     },
+     {
+      "text": "On-screen text optional unless it carries the free trial line",
+      "source": "Platform",
+      "platforms": [],
+      "member": true
+     },
+     {
+      "text": "On-screen text must match what is on screen",
+      "source": "Platform",
+      "platforms": [],
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "disclosure",
+    "title": "FTC DISCLOSURE",
+    "items": [
+     {
+      "text": "Disclose the ad on every post",
+      "source": "Platform",
+      "chips": [
+       {
+        "text": "#Ad",
+        "platforms": []
+       },
+       {
+        "text": "#Advertisement",
+        "platforms": []
+       },
+       {
+        "text": "#Sponsored",
+        "platforms": []
+       }
+      ],
+      "member": true
+     },
+     {
+      "text": "In the caption",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "brand_safety",
+    "title": "BRAND SAFETY",
+    "items": [
+     {
+      "text": "No NSFW content",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No violent content",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No controversial content",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No racist, homophobic, or sexual content",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "audience",
+    "title": "AUDIENCE",
+    "items": [
+     {
+      "text": "Mostly Tier 1-2 countries audience",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "If it fails: Posts with 30%+ Tier 3 audience may be removed",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "page",
+    "title": "YOUR PAGE",
+    "items": [
+     {
+      "text": "Any page size can join",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "posting",
+    "title": "POSTING RULES",
+    "items": [
+     {
+      "text": "Do not post the same video more than 5 times",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "No paid promotion or ads of any kind, permanent ban",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Likes must stay visible, hidden likes mean rejection",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Post must stay live at least 30 days",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Story views do not count for pay",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Keep posts up 30 days",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   },
+   {
+    "key": "other",
+    "title": "OTHER REQUIREMENTS",
+    "items": [
+     {
+      "text": "Keep likes visible, hidden likes mean rejection",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Do not mislabel content, a trailer is not gameplay",
+      "source": "Platform",
+      "member": true
+     },
+     {
+      "text": "Make your post FTC compliant",
+      "source": "Platform",
+      "member": true
+     }
+    ]
+   }
+  ],
+  "thresholds": [
+   {
+    "key": "min_engagement",
+    "label": "MIN ENGAGEMENT",
+    "value": "0.5%",
+    "word": "engagement a post",
+    "source": "Platform",
+    "member": true
+   },
+   {
+    "key": "max_clip",
+    "label": "MAX A CLIP",
+    "value": "$1.2K",
+    "word": "pay stops there",
+    "source": "Platform"
+   },
+   {
+    "key": "min_payout",
+    "label": "MIN PAYOUT",
+    "value": "$6",
+    "word": "before a payout",
+    "source": "Platform"
+   },
+   {
+    "key": "payout_window",
+    "label": "PAID IN",
+    "value": "10",
+    "word": "days",
+    "source": "Platform"
+   },
+   {
+    "key": "fee",
+    "label": "PLATFORM FEE",
+    "value": "10%",
+    "word": "of each payout",
+    "source": "Platform"
+   }
+  ],
+  "materials": {
+   "docs": [],
+   "sounds": [],
+   "examples": []
+  }
+ }
+}

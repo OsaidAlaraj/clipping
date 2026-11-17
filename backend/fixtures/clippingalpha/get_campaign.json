@@ -1,0 +1,153 @@
+{
+ "campaign": {
+  "campaignId": "2158",
+  "title": "Call of Duty, MW4 DMZ Intel Briefing Clipping",
+  "brand": "Call of Duty",
+  "brandSlug": "call-of-duty",
+  "seriesSlug": "mw4-dmz-intel-briefing",
+  "round": 1,
+  "state": "live",
+  "payModel": "cpm",
+  "platforms": [
+   "instagram",
+   "tiktok"
+  ],
+  "niche": "gaming",
+  "about": "Clip the DMZ Intel Briefing video and show the new DMZ content in Modern Warfare 4 Season 1. Cut short moments from the briefing and post them to TikTok and Instagram.",
+  "membersOnly": false,
+  "ageRestricted": false,
+  "labels": [],
+  "election": false,
+  "electionLabel": null,
+  "electionNote": null,
+  "audience": null,
+  "audienceLabel": null,
+  "audienceNote": null,
+  "region": null,
+  "alpha": {
+   "score": 98,
+   "tier": "alpha",
+   "confidence": "medium",
+   "netPer1kUsd": 1.8,
+   "notScoredReason": null,
+   "notScored": null,
+   "contentCap": null,
+   "why": []
+  },
+  "drain": {
+   "p10": "2026-11-23T23:55:06.887Z",
+   "p50": "2026-12-04T16:15:22.381Z",
+   "p90": null,
+   "stalled": false,
+   "boardQuietDays": null,
+   "confidence": "medium"
+  },
+  "stalled": null,
+  "tooGood": null,
+  "rules": {
+   "visibility": "visible",
+   "hidden": false,
+   "checklist": [
+    {
+     "kind": "caption",
+     "text": "Tag @callofduty on TikTok and Instagram"
+    },
+    {
+     "kind": "caption",
+     "text": "Keep it genuine, like a real fan would write"
+    },
+    {
+     "kind": "caption",
+     "text": "No made-up facts, stats, or dates"
+    },
+    {
+     "kind": "disclosure",
+     "text": "Add #Ad or #Advertisement to every post"
+    },
+    {
+     "kind": "format",
+     "text": "Keep clips over 10 seconds"
+    },
+    {
+     "kind": "custom",
+     "text": "Make your post FTC compliant"
+    },
+    {
+     "kind": "page",
+     "text": "Any page size can join"
+    },
+    {
+     "kind": "account",
+     "text": "Post in English"
+    },
+    {
+     "kind": "posting",
+     "text": "Do not post the same video more than 5 times"
+    },
+    {
+     "kind": "do",
+     "text": "Use only the brand's footage"
+    },
+    {
+     "kind": "brand_safety",
+     "text": "No nudity or sexual content"
+    },
+    {
+     "kind": "brand_safety",
+     "text": "No violence"
+    }
+   ],
+   "briefGrade": "B",
+   "flags": [
+    "Keep posts live",
+    "Missing essentials",
+    "No deadline"
+   ]
+  },
+  "criteria": [],
+  "requirements": {
+   "minEngagementPct": null,
+   "minFollowers": null,
+   "minViewsToSubmit": null,
+   "minDurationSec": null,
+   "maxPerCreator": null,
+   "maxPostsPerAccount": null,
+   "maxPostsPerDay": null,
+   "niches": [
+    "entertainment"
+   ],
+   "nichesRestricted": null,
+   "mustUseSound": null,
+   "sounds": [],
+   "examples": [],
+   "dos": [],
+   "donts": [],
+   "creatorProfile": [],
+   "requiredTags": [],
+   "geo": null,
+   "contentFormat": null,
+   "briefChangedAt": null
+  },
+  "organizerVerified": true,
+  "whereToJoin": [
+   {
+    "board": "Content Rewards",
+    "boardSlug": "content-rewards",
+    "payModel": "cpm",
+    "ratePer1kUsd": 2,
+    "budgetLeftUsd": 21259.39,
+    "budgetTotalUsd": 30000,
+    "boardFee": 0.1,
+    "payoutWindowDays": 10,
+    "openJoin": true,
+    "gateType": "none",
+    "lastCheckedAt": "2026-11-17T15:44:02.001Z",
+    "joinUrl": "https://clippingalpha.com/go/11045701?via=mcp"
+   }
+  ],
+  "firstSeenAt": "2026-11-09T18:03:18.501Z",
+  "launchedAt": "2026-11-09T17:59:40.000Z",
+  "newAt": "2026-11-09T17:59:40.000Z",
+  "pageUrl": "https://clippingalpha.com/campaigns/call-of-duty/mw4-dmz-intel-briefing?via=mcp"
+ }
+}

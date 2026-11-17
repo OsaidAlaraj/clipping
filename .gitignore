@@ -1,0 +1,13 @@
+.env
+.venv/
+.data/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+.next/
+web/public/sw.js.map
+.scratch/
+.claude/worktrees/
+.code-foundations/wave-worktrees/
+*.tsbuildinfo
