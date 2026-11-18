@@ -1,0 +1,110 @@
+{
+ "id": "fixture0001",
+ "title": "Fixture talk",
+ "duration": 60,
+ "is_live": false,
+ "was_live": true,
+ "heatmap": [
+  {
+   "start_time": 0.0,
+   "end_time": 3.0,
+   "value": 0.12
+  },
+  {
+   "start_time": 3.0,
+   "end_time": 6.0,
+   "value": 0.15
+  },
+  {
+   "start_time": 6.0,
+   "end_time": 9.0,
+   "value": 0.2
+  },
+  {
+   "start_time": 9.0,
+   "end_time": 12.0,
+   "value": 0.18
+  },
+  {
+   "start_time": 12.0,
+   "end_time": 15.0,
+   "value": 0.25
+  },
+  {
+   "start_time": 15.0,
+   "end_time": 18.0,
+   "value": 0.3
+  },
+  {
+   "start_time": 18.0,
+   "end_time": 21.0,
+   "value": 0.28
+  },
+  {
+   "start_time": 21.0,
+   "end_time": 24.0,
+   "value": 0.4
+  },
+  {
+   "start_time": 24.0,
+   "end_time": 27.0,
+   "value": 0.55
+  },
+  {
+   "start_time": 27.0,
+   "end_time": 30.0,
+   "value": 0.9
+  },
+  {
+   "start_time": 30.0,
+   "end_time": 33.0,
+   "value": 1.0
+  },
+  {
+   "start_time": 33.0,
+   "end_time": 36.0,
+   "value": 0.8
+  },
+  {
+   "start_time": 36.0,
+   "end_time": 39.0,
+   "value": 0.5
+  },
+  {
+   "start_time": 39.0,
+   "end_time": 42.0,
+   "value": 0.35
+  },
+  {
+   "start_time": 42.0,
+   "end_time": 45.0,
+   "value": 0.3
+  },
+  {
+   "start_time": 45.0,
+   "end_time": 48.0,
+   "value": 0.25
+  },
+  {
+   "start_time": 48.0,
+   "end_time": 51.0,
+   "value": 0.2
+  },
+  {
+   "start_time": 51.0,
+   "end_time": 54.0,
+   "value": 0.18
+  },
+  {
+   "start_time": 54.0,
+   "end_time": 57.0,
+   "value": 0.15
+  },
+  {
+   "start_time": 57.0,
+   "end_time": 60.0,
+   "value": 0.1
+  }
+ ],
+ "view_count": 1234
+}

@@ -1,0 +1,15 @@
+{"replayChatItemAction": {"videoOffsetTimeMsec": "2000", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "9000", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "15000", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "31000", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "31400", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "31800", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "32200", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "32500", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "32900", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "33100", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "33500", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "48000", "actions": [{"addChatItemAction": {"item": {"liveChatTextMessageRenderer": {"message": {"runs": [{"text": "lol"}]}}}}}]}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "-5000", "actions": []}}
+{"replayChatItemAction": {"videoOffsetTimeMsec": "not a number"}}
+{"unrelated": true}

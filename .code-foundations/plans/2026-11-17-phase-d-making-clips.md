@@ -2,7 +2,7 @@
 **Created:** 2026-11-17
 **Status:** in-progress
 **Started:** 2026-11-17 19:40
-**Current Phase:** 3
+**Current Phase:** 4
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -563,6 +563,10 @@ Research cited for this plan:
 | 9 | 2 | 409 stale body {"error","code":"stale","version"} via an optional extra dict on the error handler | build agent | assumed |
 | 10 | 2 | Migration 010 keeps running WER counts on transcripts (wer_errors, wer_words vs version 1), no new table | build agent | assumed |
 | 11 | 2 | GET transcript adds source_id, campaign_id, campaign_name, language, media_url, key_terms; CLIP_VIEW gains source_id | build agent | assumed |
+| 12 | 3 | Signals stored as jsonb in source_signals (migration 011); signals.compute is get-or-compute, load returns None when absent | build agent | assumed |
+| 13 | 3 | Videos over 20 min decode keyframes only (2 h measured at 83 s) | build agent | assumed |
+| 14 | 3 | sherpa-onnx optional (no Python 3.14 wheel); loudness-burst fallback for laughter; face is a skin-tone stand-in for now | build agent | assumed |
+| 15 | 3 | Signals failure (other than bad media) alerts and still enqueues moments | build agent | assumed |
 ---
 ## Execution Log
 _To be filled during /code-foundations:build_
@@ -587,4 +591,11 @@ Summary: A correction screen at /transcript (reached from the campaign page and 
 - [x] Committed
 Commit: (see git log, phase 2P)
 Summary: One-tap practice campaigns (owner gate kept, posting and payouts refused in the API and by DB triggers) run the full pipeline with an interim gpt-5-mini moment picker (chunked, sentence-snapped, niche length ranges, strict JSON, manual-selection fallback) and a cover frame; a real run on an 8-minute Arabic interview and 10 minutes of an English podcast gave 3 clips each in about 3 minutes for about 6 cents; cached fake transcripts are discarded when a real provider is active.
+
+### Phase 3: Signals (Gate: Standard)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: DEFERRED — batch pending (tests green at commit)
+- [x] Committed
+Commit: (see git log, phase 3)
+Summary: signals.compute stores per-second loudness, speech rate, turns, scene, face (stand-in), laughter (burst fallback), reaction words (en/ar), chat bursts and YouTube most-replayed, plus TextTiling-style topics, once per source after transcription (new signals job before moments); a 2-hour file measures in about 83 s.
 

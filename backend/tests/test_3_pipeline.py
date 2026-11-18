@@ -145,7 +145,7 @@ def test_pipeline_produces_packaged_compliant_clips(produced):
         storage = alerts.registry.get(conn, "storage")
         words = vendors.fake_words("en", 60)
     assert len(clips) == 3 and len(candidates) == 3
-    assert sorted(j["type"] for j in jobs) == sorted(["transcribe", "moments"] + ["hooks", "render", "captions", "compliance", "package"] * 3)
+    assert sorted(j["type"] for j in jobs) == sorted(["transcribe", "signals", "moments"] + ["hooks", "render", "captions", "compliance", "package"] * 3)
     assert all(j["status"] == "done" and j["cost_usd"] is not None for j in jobs)
     assert [float(c["score"]) for c in candidates] == [0.91, 0.78, 0.66]
     starts, _ = pipeline.sentence_bounds(words)

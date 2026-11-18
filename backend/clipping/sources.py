@@ -10,7 +10,8 @@ from decimal import Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import campaigns, config, ffmpeg
+from . import campaigns, config, ffmpeg, signals
+from .adapters import heatmap
 from .core import AppError, GateError, audit, enqueue
 from .db import Actor
 
@@ -129,26 +130,42 @@ def download_to(url: str, dest: Path) -> Path:
     return dest
 
 
-def download_youtube(url: str, folder: Path) -> Path:
+def download_youtube(url: str, folder: Path, info_out: dict | None = None) -> Path:
+    """Download one YouTube video. yt-dlp's metadata (the "most replayed" heatmap) is copied into `info_out` and the
+    stream's live chat replay is saved beside the video when there is one; neither is needed for the download to work."""
     import yt_dlp
 
     folder.mkdir(parents=True, exist_ok=True)
-    with yt_dlp.YoutubeDL({"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": "mp4/best", "quiet": True}) as ydl:
+    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": "mp4/best", "quiet": True,
+               "writesubtitles": True, "subtitleslangs": ["live_chat"]}
+    with yt_dlp.YoutubeDL(options) as ydl:
         info = ydl.extract_info(url, download=True)
+        if info_out is not None and isinstance(info, dict):
+            info_out.update({"heatmap": info.get("heatmap")})
         return Path(ydl.prepare_filename(info))
+
+
+def youtube_signal_inputs(info: dict, folder: Path) -> tuple[list | None, list | None]:
+    """(heatmap, chat counts) from a fetch: each None when absent or malformed."""
+    chat_files = sorted(folder.glob("*.live_chat.json"))[:1]
+    return heatmap.heatmap_from_info(info), (heatmap.read_live_chat(chat_files[0]) if chat_files else None)
 
 
 def stage_fetch_source(conn, job: dict) -> Decimal:
     payload = job["payload"]
     folder = config.data_dir() / "incoming" / str(uuid.uuid4())
     try:
-        path = download_youtube(payload["url"], folder) if payload["kind"] == "youtube" else download_to(payload["url"], folder / "source.mp4")
+        info: dict = {}
+        path = (download_youtube(payload["url"], folder, info) if payload["kind"] == "youtube"
+                else download_to(payload["url"], folder / "source.mp4"))
         try:
             ffmpeg.probe(path)
         except Exception:
             raise AppError("The downloaded file is not a video the system can read.", "not_a_video") from None
-        campaigns.register_source(conn, Actor.worker(), payload["campaign_id"], str(path), payload["language"],
-                                  permission_ref=payload["permission_ref"], origin_url=payload["url"])
+        source = campaigns.register_source(conn, Actor.worker(), payload["campaign_id"], str(path), payload["language"],
+                                           permission_ref=payload["permission_ref"], origin_url=payload["url"])
+        if payload["kind"] == "youtube":   # reached only after the owner confirmed the brief permits this video
+            signals.record_inputs(conn, source, *youtube_signal_inputs(info, folder))
     finally:
         shutil.rmtree(folder, ignore_errors=True)
     return Decimal("0")

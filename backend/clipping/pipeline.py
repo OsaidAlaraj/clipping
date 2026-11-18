@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import config, ffmpeg, transcripts
+from . import config, ffmpeg, signals, transcripts
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -143,9 +143,28 @@ def stage_transcribe(conn, job: dict) -> Decimal:
         if result.get("degraded"):
             raise_alert(conn, source["owner_operator_id"], "transcription_degraded", "warn", "source_assets", source["id"],
                         f"{campaign['name']}: {result['degraded']}. It works, but slowly.")
-    enqueue(conn, "moments", {"source_id": str(source["id"])}, source["owner_operator_id"],
+    enqueue(conn, "signals", {"source_id": str(source["id"])}, source["owner_operator_id"],
             source_id=source["id"], campaign_version_id=version["id"])
     return cost
+
+
+def stage_signals(conn, job: dict) -> Decimal:
+    """Measure the per-second signals once, then queue moment finding. Signals only help the moment engine, so an
+    unexpected failure raises an alert and the pipeline goes on without them; an unreadable video (AppError) stops the job."""
+    source, campaign, version = _source_ctx(conn, job["payload"]["source_id"])
+    path = registry.get(conn, "storage").path(source["stored_path"])
+    if not path.exists() or ffmpeg.sha256_file(path) != source["file_hash"]:
+        raise AppError("Source file hash mismatch. The job is stopped.", "hash_mismatch")
+    try:
+        signals.compute(conn, source["id"])
+    except AppError:
+        raise
+    except Exception as exc:
+        raise_alert(conn, source["owner_operator_id"], "signals_unavailable", "warn", "source_assets", source["id"],
+                    f"{campaign['name']}: the video signals could not be measured ({type(exc).__name__}). Moments are found without them.")
+    enqueue(conn, "moments", {"source_id": str(source["id"])}, source["owner_operator_id"],
+            source_id=source["id"], campaign_version_id=version["id"])
+    return Decimal("0")
 
 
 def _manual_selection_alert(conn, owner, campaign: dict, source: dict, why: str) -> None:
@@ -459,7 +478,7 @@ def stage_discover(conn, job: dict) -> Decimal:
     return Decimal("0")
 
 
-HANDLERS = {"discover": stage_discover, "fetch_source": stage_fetch_source, "transcribe": stage_transcribe, "moments": stage_moments, "hooks": stage_hooks, "render": stage_render,
+HANDLERS = {"discover": stage_discover, "fetch_source": stage_fetch_source, "transcribe": stage_transcribe, "signals": stage_signals, "moments": stage_moments, "hooks": stage_hooks, "render": stage_render,
             "captions": stage_captions, "compliance": stage_compliance, "package": stage_package}
 
 

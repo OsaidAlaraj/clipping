@@ -5,8 +5,10 @@ import hashlib
 import re
 import shutil
 import subprocess
+import tempfile
 from functools import lru_cache
 from pathlib import Path
+from typing import Callable, Iterator
 
 from . import config
 
@@ -81,6 +83,62 @@ def silences(src: Path, noise_db: int = -35, min_s: float = 0.3) -> list[tuple[f
 def frame_png(src: Path, at_s: float, out: Path) -> Path:
     run(["-ss", f"{at_s:.3f}", "-i", str(src), "-frames:v", "1", str(out)])
     return out
+
+
+# ------------------------------------------------------------------ one-pass analysis (signals)
+
+PCM_RATE = 16000
+PCM_SECOND = PCM_RATE * 2                # bytes in one second of 16 kHz mono s16le
+THUMB_W, THUMB_H = 64, 36                # frames are measured at this size: tiny, so decoding is the only cost
+THUMB_BYTES = THUMB_W * THUMB_H * 3
+SILENCE_LUFS = -70.0
+FULL_DECODE_MAX_S = 1200                 # longer videos are sampled from keyframes only (about 2.4x faster)
+
+
+def _stream(args: list[str], chunk: int, cwd: Path | None = None) -> Iterator[bytes]:
+    """Run ffmpeg and yield its stdout in `chunk`-byte pieces (the last may be shorter). Raises FFmpegError when ffmpeg
+    fails or produces nothing, which is what an unreadable or corrupted file looks like."""
+    with tempfile.TemporaryFile() as err:   # a file, not a pipe: a corrupted video can print more than a pipe holds
+        proc = subprocess.Popen([exe(), "-hide_banner", "-nostdin", "-v", "error", *args, "-"], cwd=cwd,
+                                stdout=subprocess.PIPE, stderr=err)
+        produced = 0
+        try:
+            while piece := proc.stdout.read(chunk):
+                produced += 1
+                yield piece
+            if proc.wait() != 0 or not produced:
+                err.seek(max(err.seek(0, 2) - 400, 0))
+                raise FFmpegError(err.read().decode("utf-8", "replace") or "ffmpeg produced no data")
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+            proc.stdout.close()
+
+
+def audio_pass(src: Path, on_second: Callable[[bytes], None]) -> list[float]:
+    """Decode the audio once. `on_second` gets each second as 16 kHz mono s16le bytes; the return value is the EBU R128
+    momentary loudness (LUFS, the loudest 100 ms reading) of each second, floored at -70."""
+    scratch = config.data_dir() / "tmp"
+    scratch.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=scratch) as folder:
+        log = Path(folder) / "m.txt"   # relative name in the filter: a Windows drive letter would need escaping
+        chain = f"ebur128=metadata=1,ametadata=mode=print:key=lavfi.r128.M:file={log.name},aresample={PCM_RATE}"
+        for piece in _stream(["-i", str(src.resolve()), "-vn", "-af", chain, "-ac", "1", "-f", "s16le"], PCM_SECOND, cwd=Path(folder)):
+            on_second(piece)
+        text = log.read_text(encoding="utf-8", errors="replace") if log.exists() else ""
+    loudness: dict[int, float] = {}
+    for at, level in re.findall(r"pts_time:(\d+(?:\.\d+)?)\s+lavfi\.r128\.M=(-?[\d.]+|-?inf)", text):
+        value = SILENCE_LUFS if "inf" in level else max(float(level), SILENCE_LUFS)
+        second = int(float(at))
+        loudness[second] = max(loudness.get(second, SILENCE_LUFS), value)
+    return [round(loudness.get(i, SILENCE_LUFS), 1) for i in range(max(loudness, default=-1) + 1)]
+
+
+def video_thumbs(src: Path, duration_s: float) -> Iterator[bytes]:
+    """One tiny RGB frame (64x36, THUMB_BYTES bytes) per second. Long videos decode keyframes only."""
+    fast = ["-skip_frame", "nokey"] if duration_s > FULL_DECODE_MAX_S else []
+    yield from _stream([*fast, "-i", str(src), "-an", "-vf", f"fps=1,scale={THUMB_W}:{THUMB_H}:flags=fast_bilinear,format=rgb24",
+                        "-f", "rawvideo"], THUMB_BYTES)
 
 
 def make_fixture(out: Path, seconds: int = 60, size: str = "640x360") -> Path:
