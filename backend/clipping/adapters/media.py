@@ -1,11 +1,71 @@
-"""A5 rendering and A6 captions and overlay. Own code on FFmpeg (spec 10.2)."""
+"""A5 rendering. One FFmpeg encode per clip: reframe, captions, the disclosure label and the originality layer (title card,
+progress bar, emphasis zooms), plus the cover image. Own code on FFmpeg (spec 10.2).
+
+The layers that sit on top of the picture (captions, label, title card, progress bar) are one ASS subtitle file, so the
+whole clip is a single filter graph and a single encode. User text never enters the filter graph: only the fixed ASS file
+name does, and every piece of text that goes into the ASS file is escaped."""
 from __future__ import annotations
 
+import math
+import re
 from pathlib import Path
 
 from .. import ffmpeg
+from ..core import AppError
 from .base import Adapter, register
 
+# ------------------------------------------------------------------ the template: what makes an account's clips look like its own
+
+TEMPLATE_DEFAULTS: dict = {"font": "Arial", "primary": "#FFFFFF", "accent": "#FFC400", "caption_position": "lower",
+                           "title_card": True, "progress_bar": True, "zooms": True, "font_size": 4.2, "cover": "band"}
+CAPTION_POSITIONS = ("lower", "middle")
+COVER_STYLES = ("band", "outline")
+FLAGS = ("title_card", "progress_bar", "zooms")
+FONT_SIZE_RANGE = (2.5, 6.5)          # caption size as a percentage of the frame height
+_FONT = re.compile(r"^\w[\w .\-]{0,59}$")
+_COLOUR = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def _bad(message: str) -> AppError:
+    return AppError(message, "bad_template")
+
+
+def _checked(key: str, value):
+    """The value when it is valid for this template field, else raises the refusal that names the field."""
+    if key == "font" and not (isinstance(value, str) and _FONT.match(value.strip())):
+        raise _bad("The font name can use letters, numbers, spaces, dots and dashes, up to 60 characters.")
+    if key in ("primary", "accent") and not (isinstance(value, str) and _COLOUR.match(value)):
+        raise _bad(f"The {key} colour must look like #FFC400.")
+    if key == "caption_position" and value not in CAPTION_POSITIONS:
+        raise _bad("The caption position must be lower or middle.")
+    if key == "cover" and value not in COVER_STYLES:
+        raise _bad("The cover style must be band or outline.")
+    if key in FLAGS and not isinstance(value, bool):
+        raise _bad(f"{key.replace('_', ' ').capitalize()} must be on or off.")
+    if key == "font_size":
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not FONT_SIZE_RANGE[0] <= value <= FONT_SIZE_RANGE[1]:
+            raise _bad(f"The caption size must be between {FONT_SIZE_RANGE[0]} and {FONT_SIZE_RANGE[1]} percent of the frame height.")
+        return float(value)
+    return value.strip() if isinstance(value, str) else value
+
+
+def normalize_template(spec, strict: bool = False) -> dict:
+    """A complete template. A missing or invalid field takes its default (a render must never fail on a bad template);
+    with `strict` an invalid field is refused instead (an owner edit). Unknown fields are dropped."""
+    spec = spec if isinstance(spec, dict) else {}
+    out = dict(TEMPLATE_DEFAULTS)
+    for key in TEMPLATE_DEFAULTS:
+        if key not in spec:
+            continue
+        try:
+            out[key] = _checked(key, spec[key])
+        except AppError:
+            if strict:
+                raise
+    return out
+
+
+# ------------------------------------------------------------------ framing
 
 def crop_filter(src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None = None) -> str:
     """Crop to 9:16. focus_x (0..1) is the speaker's horizontal position when a face was found;
@@ -22,63 +82,66 @@ def crop_filter(src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float |
     return f"{crop},scale={out_w}:{out_h},setsar=1"
 
 
-def detect_face_x(src: Path, at_s: float) -> float | None:
-    """Horizontal position of the largest face, if OpenCV is installed. Optional: without it the
-    render uses the centre crop fallback."""
-    try:
-        import cv2  # type: ignore
-    except Exception:
-        return None
-    try:
-        frame_path = src.with_suffix(".face.png")
-        ffmpeg.frame_png(src, at_s, frame_path)
-        image = cv2.imread(str(frame_path))
-        frame_path.unlink(missing_ok=True)
-        cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        faces = cascade.detectMultiScale(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), 1.1, 5)
-        if len(faces) == 0:
-            return None
-        x, _, w, _ = max(faces, key=lambda f: f[2] * f[3])
-        return float((x + w / 2) / image.shape[1])
-    except Exception:
-        return None
+FOLLOW_STYLES = ("follow_speaker", "follow_action")
+FACE_MIN_SHARE = 0.02          # skin-toned share of the frame below which nobody is taken to be there
 
 
-@register
-class FFmpegRender(Adapter):
-    stage, provider = "render", "ffmpeg"
-
-    def health(self) -> dict:
-        try:
-            return {"ok": True, "provider": self.provider, "binary": Path(ffmpeg.exe()).name}
-        except Exception as exc:
-            return {"ok": False, "provider": self.provider, "error": str(exc)}
-
-    def render(self, src: str, start_s: float, end_s: float, out: str, centre_only: bool = False) -> dict:
-        """Cut [start, end], reframe to 9:16 and normalise loudness."""
-        src_path, out_path = Path(src), Path(out)
-        info = ffmpeg.probe(src_path)
-        w, h = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
-        focus = None if centre_only else detect_face_x(src_path, (start_s + end_s) / 2)
-        vf = crop_filter(info["width"], info["height"], w, h, focus)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        args = ["-ss", f"{start_s:.3f}", "-i", str(src_path), "-t", f"{end_s - start_s:.3f}", "-vf", vf]
-        if info["has_audio"]:
-            args += ["-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-ar", "44100"]
-        args += ["-c:v", "libx264", "-preset", str(self.cfg.get("preset", "veryfast")), "-crf", str(self.cfg.get("crf", 23)),
-                 "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_path)]
-        ffmpeg.run(args)
-        return {"path": str(out_path), "reframe": "face" if focus is not None else "centre_crop",
-                "loudness_normalised": bool(info["has_audio"]), "width": w, "height": h}
+def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay") -> str:
+    """The reframing part of the filter graph, ending at the pad `[label]`. `facecam_over_game` keeps the whole picture (the
+    facecam stays in it) fitted to the width over a blurred fill; every other style is a 9:16 crop."""
+    if style == "facecam_over_game" and src_w / src_h > out_w / out_h:
+        return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
+                f"boxblur=luma_radius=24:luma_power=2[bg];[fga]scale={out_w}:-2[fg];"
+                f"[bg][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,setsar=1[{label}]")
+    return f"[0:v]{crop_filter(src_w, src_h, out_w, out_h, focus_x if style in FOLLOW_STYLES else None)}[{label}]"
 
 
-@register
-class CentreCropRender(FFmpegRender):
-    """Declared fallback for A5."""
-    stage, provider = "render", "centre_crop"
+def _samples(clip: dict, count: int = 3) -> list[float]:
+    """Absolute times worth looking at for a face: the seconds of the clip where the face signal is strongest, else the middle."""
+    start, end = float(clip["start_s"]), float(clip["end_s"])
+    sig = clip.get("signals") or {}
+    face = sig.get("face") or []
+    first = int(sig.get("first_s", start))
+    ranked = sorted((i for i, v in enumerate(face) if first + i + 0.5 < end and first + i >= start - 1 and v >= 0.3), key=lambda i: -face[i])
+    return [first + i + 0.5 for i in ranked[:count]] or [(start + end) / 2]
 
-    def render(self, src: str, start_s: float, end_s: float, out: str, centre_only: bool = True) -> dict:
-        return super().render(src, start_s, end_s, out, centre_only=True)
+
+def face_focus(src: Path, clip: dict) -> float | None:
+    """Horizontal position (0..1) of the person in the clip: the median centre of the skin-toned pixels over a few frames.
+    None when no frame shows anybody, which gives the centre crop. A stand-in until a face detector is installed."""
+    import numpy as np
+
+    width, height, found = 96, 54, []
+    for at in _samples(clip):
+        raw = ffmpeg.frame_raw(src, at, width, height)
+        if raw is None:
+            continue
+        mask = ffmpeg.skin_mask(np.frombuffer(raw, dtype=np.uint8).reshape(height, width, 3).astype(np.int16))
+        if mask.mean() >= FACE_MIN_SHARE:
+            found.append(float((mask.sum(axis=0) * np.arange(width)).sum() / mask.sum() + 0.5) / width)
+    return float(np.median(found)) if found else None
+
+
+# ------------------------------------------------------------------ emphasis zooms
+
+ZOOM_DEPTH, ZOOM_HALF_S, ZOOM_GAP_S, ZOOM_MAX = 0.07, 0.35, 4.0, 6
+
+
+def zoom_times(emphasis: list[float], clip_start: float, duration: float) -> list[float]:
+    """Where in the clip (seconds from its start) the picture pushes in: loud moments, at least ZOOM_GAP_S apart, none in the
+    first or last second, at most ZOOM_MAX."""
+    picked: list[float] = []
+    for at in sorted(float(e) - clip_start for e in emphasis):
+        if 1.0 <= at <= duration - 1.0 and (not picked or at - picked[-1] >= ZOOM_GAP_S):
+            picked.append(round(at, 2))
+    return picked[:ZOOM_MAX]
+
+
+def zoom_graph(times: list[float], out_w: int, out_h: int, source: str = "lay", label: str = "zm") -> str:
+    """Scale up by a few percent around each time and crop back to the frame (before the subtitles, so text never zooms)."""
+    bumps = "+".join(f"max(0,1-abs(t-{t:.2f})/{ZOOM_HALF_S})" for t in times)
+    z = f"(1+{ZOOM_DEPTH}*({bumps}))"
+    return (f"[{source}]scale=w='trunc({out_w}*{z}/2)*2':h='trunc({out_h}*{z}/2)*2':eval=frame,crop={out_w}:{out_h}[{label}]")
 
 
 # ------------------------------------------------------------------ captions and overlay (ASS subtitles)
@@ -90,92 +153,296 @@ def _ts(seconds: float) -> str:
     return f"{int(h)}:{int(m):02d}:{s:05.2f}"
 
 
+_CONTROL = re.compile(r"[\x00-\x1f\x7f  ]+")
+
+
 def _esc(text: str) -> str:
-    return text.replace("\\", "").replace("{", "(").replace("}", ")").replace("\n", " ")
+    """Text that is safe inside an ASS dialogue line: no override blocks, no escapes, no line breaks."""
+    return _CONTROL.sub(" ", str(text)).replace("\\", "").replace("{", "(").replace("}", ")").strip()
+
+
+def _ass_colour(colour: str, alpha: int = 0) -> str:
+    r, g, b = colour[1:3], colour[3:5], colour[5:7]
+    return f"&H{alpha:02X}{b}{g}{r}".upper()
+
+
+def _contrast(colour: str) -> str:
+    """Black or white, whichever reads better on this colour."""
+    r, g, b = (int(colour[i:i + 2], 16) for i in (1, 3, 5))
+    return "#101010" if 0.299 * r + 0.587 * g + 0.114 * b > 140 else "#FFFFFF"
+
+
+def fit_size(text: str, avail_w: float, base: int, max_lines: int = 3, floor: float = 0.55) -> int:
+    """The largest font size up to `base` at which the text fits in `max_lines` lines of `avail_w` pixels (a character is about
+    0.55 em wide), never below `floor` of the base size. A long Arabic hook is wrapped by the renderer and shrunk by this."""
+    size = base
+    while size > base * floor and math.ceil(max(len(text), 1) * 0.55 * size / avail_w) > max_lines:
+        size -= 1
+    return int(max(size, base * floor))
+
+
+SOCIAL_PLATFORMS = ("tiktok", "instagram_reels")   # R6: social-style captions; the words themselves are never changed
+_LIGHT = str.maketrans("", "", ".,;:،؛")
+_EMPH_WINDOW_S = 0.5
 
 
 def caption_chunks(words: list[dict], clip_start: float, clip_end: float, max_words: int = 4, max_s: float = 1.8) -> list[dict]:
-    """Group words into short caption lines, timed relative to the clip."""
-    chunks: list[dict] = []
+    """Group words into short caption lines, timed relative to the clip. Each chunk keeps its words."""
+    groups: list[list[dict]] = []
     current: list[dict] = []
     for word in words:
         if word["end"] <= clip_start or word["start"] >= clip_end:
             continue
         if current and (len(current) >= max_words or word["end"] - current[0]["start"] > max_s
                         or current[-1]["text"].rstrip()[-1:] in ".?!؟"):
-            chunks.append(current)
+            groups.append(current)
             current = []
         current.append(word)
     if current:
-        chunks.append(current)
+        groups.append(current)
     duration = clip_end - clip_start
-    return [{"start": max(c[0]["start"] - clip_start, 0), "end": min(c[-1]["end"] - clip_start, duration),
-             "text": " ".join(w["text"] for w in c)} for c in chunks]
+    return [{"start": max(g[0]["start"] - clip_start, 0), "end": min(g[-1]["end"] - clip_start, duration),
+             "text": " ".join(w["text"] for w in g), "words": g} for g in groups]
 
 
-def build_ass(width: int, height: int, duration: float, chunks: list[dict], label: str | None,
-              label_timing: tuple[float, float] | None, hook: str | None, font: str = "Arial") -> str:
-    cap_size, label_size, hook_size = int(height * 0.042), int(height * 0.026), int(height * 0.036)
+def caption_events(words: list[dict], clip_start: float, clip_end: float, social: bool, emphasis: list[float],
+                   accent: str = TEMPLATE_DEFAULTS["accent"]) -> list[dict]:
+    """The caption lines as ASS-ready events. Social style (TikTok, Reels) drops light punctuation and puts the one loudest or
+    numeric word of a line in the accent colour; the standard style keeps the text as spoken. Words are never changed."""
+    events = []
+    for chunk in caption_chunks(words, clip_start, clip_end):
+        mids = [(w["start"] + w["end"]) / 2 for w in chunk["words"]]
+        near = [(min((abs(m - e) for e in emphasis), default=99.0), i) for i, m in enumerate(mids)]
+        loud = min(near)[1] if near and min(near)[0] <= _EMPH_WINDOW_S else None
+        parts = []
+        for i, word in enumerate(chunk["words"]):
+            text = _esc(word["text"].translate(_LIGHT) if social else word["text"])
+            if not text:
+                continue
+            if social and (i == loud or (loud is None and any(c.isdigit() for c in text))):
+                text = f"{{\\1c{_ass_colour(accent)}&}}{text}{{\\r}}"
+            parts.append(text)
+        if parts:
+            events.append({"start": chunk["start"], "end": chunk["end"], "text": " ".join(parts)})
+    return events
+
+
+def _box(size: int) -> int:
+    """Padding of an opaque text box for a font size."""
+    return max(size // 5, 2)
+
+
+def build_ass(width: int, height: int, duration: float, events: list[dict], label: str | None, rtl: bool, template: dict,
+              hook: str | None = None) -> str:
+    """One subtitle script for the whole clip: captions, the disclosure label (top right for Arabic, top left otherwise, the
+    whole clip), the title card with the hook and the progress bar."""
+    t = normalize_template(template)
+    cap = int(height * t["font_size"] / 100)
+    label_size, bar = int(height * 0.026), max(int(height * 0.006), 3)
+    title_size = fit_size(_esc(hook or ""), width * 0.8, int(height * 0.036))
+    primary, accent = _ass_colour(t["primary"]), _ass_colour(t["accent"])
+    lower = t["caption_position"] == "lower"
+    font = t["font"]
     lines = [
-        "[Script Info]", "ScriptType: v4.00+", f"PlayResX: {width}", f"PlayResY: {height}", "WrapStyle: 0", "",
+        "[Script Info]", "ScriptType: v4.00+", f"PlayResX: {width}", f"PlayResY: {height}", "WrapStyle: 0", "ScaledBorderAndShadow: yes", "",
         "[V4+ Styles]",
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, "
         "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
-        f"Style: Caption,{font},{cap_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,{max(cap_size // 12, 2)},0,2,{width // 12},{width // 12},{int(height * 0.16)},1",
-        f"Style: Label,{font},{label_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,{max(label_size // 5, 2)},0,7,{width // 24},{width // 24},{int(height * 0.035)},1",
-        f"Style: Hook,{font},{hook_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&HA0000000,1,0,0,0,100,100,0,0,3,{max(hook_size // 5, 2)},0,8,{width // 10},{width // 10},{int(height * 0.12)},1",
+        f"Style: Caption,{font},{cap},{primary},{primary},&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,{max(cap // 12, 2)},0,"
+        f"{2 if lower else 5},{width // 12},{width // 12},{int(height * 0.16) if lower else 0},1",
+        f"Style: Label,{font},{label_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,{_box(label_size)},0,"
+        f"{9 if rtl else 7},{width // 24},{width // 24},{int(height * 0.035)},1",
+        f"Style: Title,{font},{title_size},{_ass_colour(_contrast(t['accent']))},&H00FFFFFF,{accent},{accent},1,0,0,0,100,100,0,0,3,"
+        f"{_box(title_size)},0,8,{width // 10},{width // 10},{int(height * 0.1)},1",
+        f"Style: Bar,{font},20,{accent},{accent},{accent},{accent},0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1",
         "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
     ]
-    if label and label_timing:
-        lines.append(f"Dialogue: 2,{_ts(label_timing[0])},{_ts(label_timing[1])},Label,,0,0,0,,{_esc(label)}")
-    if hook:
-        lines.append(f"Dialogue: 1,{_ts(0)},{_ts(min(3.0, duration))},Hook,,0,0,0,,{_esc(hook)}")
-    for chunk in chunks:
-        lines.append(f"Dialogue: 0,{_ts(chunk['start'])},{_ts(chunk['end'])},Caption,,0,0,0,,{_esc(chunk['text'])}")
+    if label:
+        lines.append(f"Dialogue: 5,{_ts(0)},{_ts(duration + 1.0)},Label,,0,0,0,,{_esc(label)}")   # runs past the last frame: the full clip
+    if hook and t["title_card"]:
+        lines.append(f"Dialogue: 3,{_ts(0)},{_ts(min(3.0, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
+    if t["progress_bar"]:
+        lines.append(f"Dialogue: 4,{_ts(0)},{_ts(duration + 1.0)},Bar,,0,0,0,,{{\\an7\\pos(0,{height - bar})\\fscx0.1"
+                     f"\\t(0,{int(duration * 1000)},\\fscx100)\\p1}}m 0 0 l {width} 0 {width} {bar} 0 {bar}")
+    for event in events:
+        lines.append(f"Dialogue: 0,{_ts(event['start'])},{_ts(event['end'])},Caption,,0,0,0,,{event['text']}")
     return "\n".join(lines) + "\n"
+
+
+COVER_HOOK_MAX = 60
+
+
+def short_hook(text: str, limit: int = COVER_HOOK_MAX) -> str:
+    """The cover carries a short line: the hook cut at a word before `limit` characters (R7)."""
+    text = " ".join(str(text).split())
+    if len(text) <= limit:
+        return text
+    return (text[:limit].rsplit(" ", 1)[0] or text[:limit]).rstrip(" ,;:-") + "…"
+
+
+def build_cover_ass(width: int, height: int, hook: str | None, template: dict) -> str:
+    """The cover's text: the short hook line low in the frame, in the template's cover style (accent band or outlined text)."""
+    t = normalize_template(template)
+    text = _esc(short_hook(hook)) if hook else ""
+    size = fit_size(text, width * 0.84, int(height * 0.062))
+    band = t["cover"] == "band"
+    colour = _ass_colour(_contrast(t["accent"]) if band else t["primary"])
+    fill = _ass_colour(t["accent"] if band else "#000000")
+    lines = [
+        "[Script Info]", "ScriptType: v4.00+", f"PlayResX: {width}", f"PlayResY: {height}", "WrapStyle: 0", "ScaledBorderAndShadow: yes", "",
+        "[V4+ Styles]",
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, "
+        "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
+        f"Style: Cover,{t['font']},{size},{colour},{colour},{fill},{fill},1,0,0,0,100,100,0,0,{3 if band else 1},"
+        f"{max(size // 5, 2) if band else max(size // 10, 3)},0,2,{width // 12},{width // 12},{int(height * 0.18)},1",
+        "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
+    ]
+    if text:
+        lines.append(f"Dialogue: 0,{_ts(0)},{_ts(30)},Cover,,0,0,0,,{text}")
+    return "\n".join(lines) + "\n"
+
+
+# ------------------------------------------------------------------ the cover frame
+
+COVER_SIZE = (160, 284)
+
+
+def cover_times(clip: dict, count: int = 3) -> list[float]:
+    """Absolute times worth a cover: seconds in the middle of the clip with a face on screen, laughter or a loud voice and
+    no scene change (a cut is blurred or half of another shot). Without signals, a few spread-out times."""
+    start, end = float(clip["start_s"]), float(clip["end_s"])
+    sig = clip.get("signals") or {}
+    first, length = int(sig.get("first_s", start)), end - start
+    face, laugh, scene, loud = (sig.get(k) or [] for k in ("face", "laughter", "scene", "loudness"))
+    scored = []
+    for i in range(len(face)):
+        at = first + i + 0.5
+        if not start + 0.1 * length <= at <= end - 0.1 * length:
+            continue
+        loudness = ((loud[i] + 50) / 40 if i < len(loud) else 0.0)
+        score = (0.6 * face[i] + 0.25 * (laugh[i] if i < len(laugh) else 0.0) + 0.15 * min(max(loudness, 0), 1)
+                 - 0.4 * (scene[i] if i < len(scene) else 0.0))
+        scored.append((score, at))
+    if not scored:
+        return [start + length * f for f in (0.35, 0.5, 0.65)][:count]
+    return [at for _, at in sorted(scored, reverse=True)[:count]]
+
+
+def sharpness(gray: bytes, width: int, height: int) -> float:
+    """Variance of the Laplacian of a grey frame: higher is sharper."""
+    import numpy as np
+
+    g = np.frombuffer(gray, dtype=np.uint8).reshape(height, width).astype(np.float32)
+    lap = 4 * g[1:-1, 1:-1] - g[:-2, 1:-1] - g[2:, 1:-1] - g[1:-1, :-2] - g[1:-1, 2:]
+    return float(lap.var())
+
+
+def sharpest_time(src: Path, times: list[float]) -> float:
+    """The candidate time whose frame is the sharpest (the first one when none can be read)."""
+    width, height = COVER_SIZE
+    best, best_score = times[0], -1.0
+    for at in times:
+        gray = ffmpeg.frame_raw(src, at, width, height, "gray")
+        score = sharpness(gray, width, height) if gray else -1.0
+        if score > best_score:
+            best, best_score = at, score
+    return best
+
+
+# ------------------------------------------------------------------ the render adapter
+
+@register
+class FFmpegRender(Adapter):
+    stage, provider = "render", "ffmpeg"
+    force_crop: str | None = None    # the declared fallback reframes by a plain centre crop
+
+    def health(self) -> dict:
+        try:
+            return {"ok": True, "provider": self.provider, "binary": Path(ffmpeg.exe()).name}
+        except Exception as exc:
+            return {"ok": False, "provider": self.provider, "error": str(exc)}
+
+    def _encode(self, args_for, folder: Path) -> str:
+        """Run the one encode with the configured encoder; when NVENC cannot take it (busy, missing) the same encode runs with x264."""
+        encoder = ffmpeg.video_encoder(str(self.cfg.get("encoder", "auto")))
+        try:
+            ffmpeg.run(args_for(encoder), cwd=folder)
+        except ffmpeg.FFmpegError:
+            if encoder == "libx264":
+                raise
+            encoder = "libx264"
+            ffmpeg.run(args_for(encoder), cwd=folder)
+        return "nvenc" if encoder == "h264_nvenc" else "x264"
+
+    def render_clip(self, src: str, clip: dict, words: list[dict], template: dict, label: str, out: str) -> dict:
+        """Cut [start_s, end_s] of `src` and make the finished clip in one encode, then its cover.
+        `clip`: start_s, end_s, language, platform, crop, audio, hook_text, emphasis (loud moments, source seconds) and
+        signals (per-second series from `first_s`). Returns {"encodes", "encoder", "cover_path", ...}."""
+        if not label or not label.strip():
+            raise ValueError("disclosure label is missing")
+        tpl = normalize_template(template)
+        src_path, out_path = Path(src).resolve(), Path(out).resolve()
+        info = ffmpeg.probe(src_path)
+        width, height = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
+        start, end = float(clip["start_s"]), float(clip["end_s"])
+        duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
+        focus = face_focus(src_path, clip) if style in FOLLOW_STYLES else None
+        events = caption_events(words, start, end, clip.get("platform") in SOCIAL_PLATFORMS, clip.get("emphasis") or [], tpl["accent"])
+        ass = build_ass(width, height, duration, events, label, clip.get("language") == "ar", tpl, clip.get("hook_text"))
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        ass_path = out_path.with_suffix(".ass")
+        ass_path.write_text(ass, encoding="utf-8-sig")
+        zooms = zoom_times(clip.get("emphasis") or [], start, duration) if tpl["zooms"] and self.force_crop is None else []
+        graph = layout_graph(style, info["width"], info["height"], width, height, focus)
+        graph += (";" + zoom_graph(zooms, width, height)) if zooms else ""
+        graph += f";[{'zm' if zooms else 'lay'}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
+        loudness = "loudnorm=I=-14:TP=-1.5:LRA=" + ("18" if clip.get("audio") == "natural" else "11")
+
+        def args_for(encoder: str) -> list[str]:
+            args = ["-ss", f"{start:.3f}", "-i", str(src_path), "-t", f"{duration:.3f}", "-filter_complex", graph, "-map", "[v]"]
+            if info["has_audio"]:
+                args += ["-map", "0:a:0", "-af", loudness, "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
+            return [*args, *ffmpeg.encoder_args(encoder, str(self.cfg.get("preset", "veryfast")), int(self.cfg.get("crf", 23))),
+                    "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_path)]
+
+        encoder = self._encode(args_for, out_path.parent)
+        finished = ffmpeg.probe(out_path)
+        cover = self._cover(src_path, clip, tpl, style, info, (width, height), focus, out_path.with_name("cover.png"))
+        return {"path": str(out_path), "ass_path": str(ass_path), "encodes": 1, "encoder": encoder, "cover_path": cover,
+                "duration_s": finished["duration_s"], "captions": len(events), "zooms": len(zooms),
+                "reframe": "face" if focus is not None else "centre_crop", "loudness_normalised": bool(info["has_audio"]),
+                "overlay": {"text": label, "start_s": 0.0, "end_s": finished["duration_s"]}, "width": width, "height": height}
+
+    def _cover(self, src: Path, clip: dict, tpl: dict, style: str, info: dict, size: tuple[int, int], focus, out: Path) -> str | None:
+        """The cover PNG: the sharpest of the best candidate frames, reframed like the clip, with the short hook line. A cover is a
+        nicety, so any failure leaves the clip without one and never blocks it."""
+        width, height = size
+        try:
+            at = sharpest_time(src, cover_times(clip))
+            ass_path = out.with_suffix(".ass")
+            ass_path.write_text(build_cover_ass(width, height, clip.get("hook_text"), tpl), encoding="utf-8-sig")
+            graph = layout_graph(style, info["width"], info["height"], width, height, focus) + f";[lay]ass={ass_path.name}[v]"
+            ffmpeg.run(["-ss", f"{at:.3f}", "-i", str(src), "-filter_complex", graph, "-map", "[v]", "-frames:v", "1", str(out)], cwd=out.parent)
+        except Exception:
+            return None
+        return str(out)
+
+
+@register
+class CentreCropRender(FFmpegRender):
+    """Declared fallback for A5: a plain centre crop, no emphasis zooms."""
+    stage, provider = "render", "centre_crop"
+    force_crop = "centre"
 
 
 @register
 class FFmpegCaptions(Adapter):
+    """Still registered because the adapters table lists the stage and queued `captions` jobs name it. Captions are burned in by
+    the render adapter in the clip's one encode, so this adapter does no work of its own."""
     stage, provider = "captions", "ffmpeg"
-
-    def _burn(self, video: str, out: str, chunks: list[dict], label: str | None, hook: str | None) -> dict:
-        video_path, out_path = Path(video), Path(out)
-        info = ffmpeg.probe(video_path)
-        duration = info["duration_s"]
-        timing = (0.0, duration + 1.0) if label else None  # runs past the last frame: full clip duration
-        ass = build_ass(info["width"], info["height"], duration, chunks, label, timing, hook, self.cfg.get("font", "Arial"))
-        ass_path = out_path.with_suffix(".ass")
-        ass_path.write_text(ass, encoding="utf-8-sig")
-        # Run from the file's folder so the filter needs no Windows drive-letter escaping.
-        ffmpeg.run(["-i", str(video_path.resolve()), "-vf", f"ass={ass_path.name}", "-c:v", "libx264", "-preset",
-                    str(self.cfg.get("preset", "veryfast")), "-crf", str(self.cfg.get("crf", 23)), "-pix_fmt", "yuv420p",
-                    "-c:a", "copy", "-movflags", "+faststart", str(out_path.resolve())], cwd=ass_path.parent)
-        return {"path": str(out_path), "ass_path": str(ass_path), "duration_s": duration,
-                "overlay": {"text": label, "start_s": 0.0, "end_s": duration} if label else None,
-                "captions": len(chunks)}
-
-    def burn_captions(self, video: str, words: list[dict], style: dict, out: str) -> dict:
-        chunks = caption_chunks(words, style.get("clip_start", 0.0), style.get("clip_end", 1e9))
-        return self._burn(video, out, chunks, None, style.get("hook"))
-
-    def burn_overlay(self, video: str, label: str, timing: dict, out: str) -> dict:
-        return self._burn(video, out, [], label, None)
-
-    def burn_all(self, video: str, words: list[dict], style: dict, label: str, out: str) -> dict:
-        """Captions, hook title and the full-duration disclosure label in one encode."""
-        if not label or not label.strip():
-            raise ValueError("disclosure label is missing")
-        chunks = caption_chunks(words, style.get("clip_start", 0.0), style.get("clip_end", 1e9))
-        return self._burn(video, out, chunks, label, style.get("hook"))
 
 
 @register
 class PlainTextCaptions(FFmpegCaptions):
-    """Declared fallback for A6: the disclosure label only, no word captions."""
+    """Declared fallback of the retired captions stage."""
     stage, provider = "captions", "plain_text"
-
-    def burn_all(self, video: str, words: list[dict], style: dict, label: str, out: str) -> dict:
-        if not label or not label.strip():
-            raise ValueError("disclosure label is missing")
-        return self._burn(video, out, [], label, None)

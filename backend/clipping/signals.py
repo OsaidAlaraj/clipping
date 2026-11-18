@@ -77,10 +77,7 @@ def _measure_video(path, duration_s: float) -> tuple[list[float], list[float]]:
         frame = np.frombuffer(raw, dtype=np.uint8).reshape(ffmpeg.THUMB_H, ffmpeg.THUMB_W, 3).astype(np.int16)
         scene.append(0.0 if previous is None else min(float(np.abs(frame - previous).mean()) / SCENE_FULL, 1.0))
         previous = frame
-        r, g, b = frame[..., 0], frame[..., 1], frame[..., 2]
-        spread = frame.max(axis=2) - frame.min(axis=2)
-        skin = (r > 95) & (g > 40) & (b > 20) & (spread > 15) & (abs(r - g) > 15) & (r > g) & (r > b)
-        face.append(min(float(skin.mean()) / FACE_FULL, 1.0))
+        face.append(min(float(ffmpeg.skin_mask(frame).mean()) / FACE_FULL, 1.0))
     return scene, face
 
 

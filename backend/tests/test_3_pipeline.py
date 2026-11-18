@@ -146,7 +146,7 @@ def test_pipeline_produces_packaged_compliant_clips(produced):
         storage = alerts.registry.get(conn, "storage")
         words = vendors.fake_words("en", 60)
     assert len(clips) == 3 and len(candidates) == 3
-    assert sorted(j["type"] for j in jobs) == sorted(["transcribe", "signals", "moments"] + ["hooks", "render", "captions", "compliance", "package"] * 3)
+    assert sorted(j["type"] for j in jobs) == sorted(["transcribe", "signals", "moments"] + ["hooks", "render", "compliance", "package"] * 3)   # one render job: captions are burned in by its one encode
     assert all(j["status"] == "done" and j["cost_usd"] is not None for j in jobs)
     scores = [float(c["score"]) for c in candidates]   # the moment engine's own scores (phase 4), best first
     assert scores == sorted(scores, reverse=True) and all(0 < x <= 1 for x in scores)
@@ -174,25 +174,28 @@ def test_pipeline_produces_packaged_compliant_clips(produced):
 
 
 def test_disclosure_overlay_is_really_burned_in_for_the_full_duration(produced, tmp_path):
-    """Pixel check: the label region differs from the un-captioned render at the start, middle and end."""
+    """Pixel check on the finished clip: the label region differs from the same frame of the source reframed without any
+    overlay at the start, middle and end."""
     with produced.db.session(produced.owner) as conn:
         clip = conn.execute("select * from clips order by start_s limit 1").fetchone()
         storage = alerts.registry.get(conn, "storage")
-    final, render = storage.path(clip["file_path"]), storage.path(clip["render_meta"]["render_key"])
-    duration = float(clip["duration_s"])
+        source = storage.path(conn.execute("select stored_path from source_assets").fetchone()["stored_path"])
+    final, duration = storage.path(clip["file_path"]), float(clip["duration_s"])
 
-    def label_region(src: Path, at: float, name: str) -> bytes:
+    def label_region(src: Path, at: float, name: str, crop: str = "") -> bytes:
         out = tmp_path / name
-        ffmpeg.run(["-ss", f"{at:.2f}", "-i", str(src), "-frames:v", "1", "-vf", "crop=iw/2:ih/12:0:0,format=gray",
+        ffmpeg.run(["-ss", f"{at:.2f}", "-i", str(src), "-frames:v", "1", "-vf", f"{crop}scale=270:480,crop=iw/2:ih/12:0:0,format=gray",
                     "-f", "rawvideo", str(out)])
         return out.read_bytes()
 
+    plain = media.crop_filter(640, 360, 270, 480) + ","
     for i, at in enumerate((0.1, duration / 2, duration - 0.3)):
-        with_label, without = label_region(final, at, f"a{i}.raw"), label_region(render, at, f"b{i}.raw")
+        with_label = label_region(final, at, f"a{i}.raw")
+        without = label_region(source, float(clip["start_s"]) + at, f"b{i}.raw", plain)
         differing = sum(1 for x, y in zip(with_label, without) if abs(x - y) > 40)
         assert differing > 40, f"no overlay found at {at:.1f} s"
     ass = final.with_suffix(".ass").read_text(encoding="utf-8-sig")
-    assert "Label,,0,0,0,,#ad" in ass and "Dialogue: 2,0:00:00.00" in ass
+    assert "Label,,0,0,0,,#ad" in ass and "Dialogue: 5,0:00:00.00" in ass
 
 
 def test_arabic_source_gets_arabic_captions_and_disclosure(db, owner, footage):
@@ -260,10 +263,10 @@ def test_missing_disclosure_text_blocks_the_clip(db, owner, footage):
     with db.session(owner) as conn:
         clip = conn.execute("select status, file_path from clips").fetchone()
         assert clip["status"] == "rendering" and clip["file_path"] is None
-        assert conn.execute("select status from jobs where type = 'captions'").fetchone()["status"] == "failed"
+        assert conn.execute("select status from jobs where type = 'render'").fetchone()["status"] == "failed"
         assert conn.execute("select severity from alerts where type = 'job_failed'").fetchone() is not None
     with pytest.raises(ValueError):
-        media.FFmpegCaptions({"config_json": {}}).burn_all(video="x", words=[], style={}, label=" ", out="y")
+        media.FFmpegRender({"config_json": {}}).render_clip(src="x", clip={}, words=[], template={}, label=" ", out="y")
 
 
 def test_a_clip_that_fails_compliance_never_reaches_the_feed(db, owner, footage):

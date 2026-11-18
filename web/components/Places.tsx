@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, money, PLATFORM_LABEL, uploadBase } from "@/lib/api";
 import { useLang } from "@/lib/i18n";
 import { Card } from "./Home";
+import { AccountLook } from "./Look";
 import { AddCampaign } from "./More";
 
 // ---------------------------------------------------------------- New: add a campaign or a video
@@ -371,6 +372,7 @@ export function Profile() {
                   <span className="row small"><span className="muted">{PLATFORM_LABEL[a.platform] ?? a.platform}</span><span className={`badge ${a.status === "active" ? "pass" : "review"}`}>{a.status}</span></span>
                 </div>
                 <AudienceField account={a} onSaved={load} />
+                <AccountLook accountId={a.id} />
               </div>
             ))}
           </div>

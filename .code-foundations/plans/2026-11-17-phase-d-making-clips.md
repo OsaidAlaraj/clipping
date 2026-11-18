@@ -2,7 +2,7 @@
 **Created:** 2026-11-17
 **Status:** in-progress
 **Started:** 2026-11-17 19:40
-**Current Phase:** 5
+**Current Phase:** 6
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -606,4 +606,11 @@ Summary: signals.compute stores per-second loudness, speech rate, turns, scene, 
 - [x] Committed
 Commit: (see git log, phase 4)
 Summary: moments.find runs a per-profile route of engines (own, topic, hype, pilot, vendor) behind one interface, filters in three layers (hard gates, auditable soft score with cross-modal discounts, both-order pairwise with Bradley-Terry), keeps a percentile cut with a profile minimum, stores filtered moments with reasons (rescue in Review), gives three cut variants, and learns engine, hook-pattern and feature weights from labels; real Arabic and English runs cost about 2 cents each.
+
+### Phase 5: One encode, originality layer, covers (Gate: Standard)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: DEFERRED — batch pending (tests green at commit)
+- [x] Committed
+Commit: (see git log, phase 5)
+Summary: stage_render makes each clip in one encode (NVENC with x264 fallback, about 7 s per clip) with the account's versioned template (rotation, revert, starter set), platform caption style, emphasis zooms, progress bar and title card, the Arabic label top right, a face-aware crop per profile and a PNG cover with the hook line; Profile has a look editor and a posting plan; account is chosen at render.
 

@@ -1,15 +1,16 @@
-"""Production pipeline (spec 12.1): transcribe, moments, hooks, render, captions and overlay,
-compliance, package. Each stage is an idempotent job that records its cost and queues the next stage.
+"""Production pipeline (spec 12.1): transcribe, signals, moments, hooks, render (one encode: reframe, captions,
+disclosure, template), compliance, package. Each stage is an idempotent job that records its cost and queues the next stage.
 The worker can run every stage, but it cannot pass a human gate (database triggers)."""
 from __future__ import annotations
 
+import math
 import tempfile
 from decimal import Decimal
 from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import config, ffmpeg, signals, transcripts
+from . import config, ffmpeg, signals, templates, transcripts
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -331,73 +332,87 @@ def _clip_ctx(conn, clip_id) -> tuple[dict, dict, dict, dict]:
     return clip, source, campaign, version
 
 
+def _assign_account(conn, clip: dict, campaign: dict, version: dict) -> tuple:
+    """The account this clip is for, chosen now (not at packaging) because its template and its platform's caption style
+    shape the render. A clip that already has one (an edited version) keeps it."""
+    if clip["account_id"] is not None:
+        return clip["account_id"], clip["platform"]
+    niche = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone()
+    account = pick_account(conn, clip["owner_operator_id"], version["rules_json"].get("platforms_allowed") or [], niche["name"] if niche else None)
+    if account is None:
+        return None, None
+    conn.execute("update clips set account_id = %s, platform = %s where id = %s", (account["id"], account["platform"], clip["id"]))
+    return account["id"], account["platform"]
+
+
+def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_text: str | None) -> dict:
+    """What the render needs to know about the clip: its window, language, platform, the profile's crop and audio style, and
+    from the signals the loud moments (zooms, highlighted words) and the face, laughter, scene and loudness around it."""
+    candidate = conn.execute("select style from candidates where id = %s", (clip["candidate_id"],)).fetchone()
+    style = (candidate or {}).get("style") or {}
+    start, end = float(clip["start_s"]), float(clip["end_s"])
+    request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
+               "audio": style.get("audio"), "hook_text": hook_text, "emphasis": []}
+    measured = signals.load(conn, source["id"])
+    if measured:
+        first, last = int(start), math.ceil(end)
+        series = measured["series"]
+        request["emphasis"] = templates.emphasis_times(series.get("loudness") or [], start, end)
+        request["signals"] = {"first_s": first, **{k: (series.get(k) or [])[first:last] for k in ("face", "laughter", "scene", "loudness")}}
+    return request
+
+
 def stage_render(conn, job: dict) -> Decimal:
-    clip, source, campaign, version = _clip_ctx(conn, job["payload"]["clip_id"])
-    storage = registry.get(conn, "storage")
-    key = f"clips/{clip['id']}/render.mp4"
-    out = storage.path(key)
-    result, cost = registry.call(conn, "render", "render", {
-        "src": str(storage.path(source["stored_path"])), "start_s": float(clip["start_s"]), "end_s": float(clip["end_s"]),
-        "out": str(out)}, clip["owner_operator_id"])
-    storage.put(key, str(out))
-    meta = dict(clip["render_meta"] or {}, render_key=key, reframe=result["reframe"],
-                loudness_normalised=result["loudness_normalised"], render_hash=ffmpeg.sha256_file(out))
-    conn.execute("update clips set render_meta = %s where id = %s", (Jsonb(meta), clip["id"]))
-    conn.execute("update candidates set status = 'rendered' where id = %s", (clip["candidate_id"],))
-    enqueue(conn, "captions", {"clip_id": str(clip["id"])}, clip["owner_operator_id"],
-            source_id=source["id"], campaign_version_id=version["id"])
-    return cost
-
-
-def _make_cover(storage, clip_id, video: Path, duration_s) -> str | None:
-    """The pilot cover: one still frame of the finished clip, used as the feed poster. Phase 5 replaces it with the
-    designed cover. A cover is a nicety, so a failure leaves the clip without one and never blocks it."""
-    key = f"clips/{clip_id}/cover.jpg"
-    out = storage.path(key)
-    try:
-        out.parent.mkdir(parents=True, exist_ok=True)
-        ffmpeg.run(["-ss", f"{min(1.2, float(duration_s or 0) / 3):.3f}", "-i", str(video), "-frames:v", "1", "-q:v", "3", str(out)])
-        storage.put(key, str(out))
-    except Exception:
-        return None
-    return key
-
-
-def stage_captions(conn, job: dict) -> Decimal:
+    """The clip in one encode: reframe, captions, the disclosure label and the account's template (title card, progress bar,
+    emphasis zooms), then its cover. The disclosure text is checked first: without it the clip is blocked."""
     clip, source, campaign, version = _clip_ctx(conn, job["payload"]["clip_id"])
     owner = clip["owner_operator_id"]
-    template = disclosure_template(conn, campaign["category_id"], clip["language"])
-    if template is None:
+    disclosure = disclosure_template(conn, campaign["category_id"], clip["language"])
+    if disclosure is None:
         raise_alert(conn, owner, "disclosure_missing", "block", "clips", clip["id"],
                     f"{campaign['name']}: no disclosure template for language {clip['language']}. The clip is blocked.")
         raise AppError("Disclosure text is missing. The clip is blocked.", "disclosure_missing")   # S8
-    storage = registry.get(conn, "storage")
+    account_id, platform = _assign_account(conn, clip, campaign, version)
     meta = dict(clip["render_meta"] or {})
+    template = templates.pick(conn, account_id, meta.get("template_id"))
+    storage = registry.get(conn, "storage")
     key = f"clips/{clip['id']}/final.mp4"
     out = storage.path(key)
-    result, cost = registry.call(conn, "captions", "burn_all", {
-        "video": str(storage.path(meta["render_key"])), "words": _words(conn, source),
-        "style": {"clip_start": float(clip["start_s"]), "clip_end": float(clip["end_s"]), "hook": meta.get("hook_text")},
-        "label": template["overlay_text"], "out": str(out)}, owner)
+    words = _words(conn, source)
+    result, cost = registry.call(conn, "render", "render_clip", {
+        "src": str(storage.path(source["stored_path"])), "clip": _render_request(conn, clip, source, platform, meta.get("hook_text")),
+        "words": words, "template": template["spec"], "label": disclosure["overlay_text"], "out": str(out)}, owner)
     storage.put(key, str(out))
+    cover_key = None
+    if result.get("cover_path"):
+        cover_key = f"clips/{clip['id']}/cover.png"
+        storage.put(cover_key, result["cover_path"])
     info = ffmpeg.probe(out)
-    caption = clip["caption_text"]
-    hashtags, mentions = clip["hashtags"], clip["mentions"]
+    caption, hashtags, mentions = clip["caption_text"], clip["hashtags"], clip["mentions"]
     if not (meta.get("caption_edited") and caption):
-        caption, hashtags, mentions = build_caption(template["caption_text"], meta.get("hook_text") or "", version["rules_json"])
-    meta.update(overlay_burned=result["overlay"] is not None, captions=result["captions"],
-                caption_language=clip["language"], disclosure_template_id=str(template["id"]))
-    cover_key = _make_cover(storage, clip["id"], out, info["duration_s"])
-    if cover_key:
-        meta["cover_key"] = cover_key
+        caption, hashtags, mentions = build_caption(disclosure["caption_text"], meta.get("hook_text") or "", version["rules_json"])
+    meta.update(template_id=template["id"], template_version=template["version"], encoder=result["encoder"], encodes=result["encodes"],
+                reframe=result["reframe"], loudness_normalised=result["loudness_normalised"], overlay_burned=True,
+                captions=result["captions"], zooms=result.get("zooms", 0), caption_language=clip["language"],
+                disclosure_template_id=str(disclosure["id"]), cover_key=cover_key)
     conn.execute(
         """update clips set file_path = %s, file_hash = %s, duration_s = %s, width = %s, height = %s, overlay_json = %s,
-               caption_text = %s, hashtags = %s, mentions = %s, render_meta = %s where id = %s""",
+               caption_text = %s, hashtags = %s, mentions = %s, render_meta = %s, cover_path = %s where id = %s""",
         (key, ffmpeg.sha256_file(out), info["duration_s"], info["width"], info["height"], Jsonb(result["overlay"]),
-         caption, hashtags, mentions, Jsonb(meta), clip["id"]),
-    )
+         caption, hashtags, mentions, Jsonb(meta), cover_key, clip["id"]))
+    conn.execute("update candidates set status = 'rendered' where id = %s", (clip["candidate_id"],))
     enqueue(conn, "compliance", {"clip_id": str(clip["id"])}, owner, source_id=source["id"], campaign_version_id=version["id"])
     return cost
+
+
+def stage_captions(conn, job: dict) -> Decimal:
+    """Retired: captions are burned in by the render's one encode. The stage stays registered for jobs queued before that. A clip
+    that already has its file needs nothing; one that was cut but not captioned is rendered again in one pass."""
+    clip, source, _, version = _clip_ctx(conn, job["payload"]["clip_id"])
+    if not clip["file_path"]:
+        enqueue(conn, "render", {"clip_id": str(clip["id"]), "retry": "one_encode"}, clip["owner_operator_id"],
+                source_id=source["id"], campaign_version_id=version["id"])
+    return Decimal("0")
 
 
 def run_compliance(conn, clip: dict, campaign: dict, version: dict) -> tuple[dict, Decimal]:

@@ -33,8 +33,8 @@ headers={"Authorization": f"Token {config.env('DEEPGRAM_API_KEY', '')}"}
 # DO (backend/clipping/pipeline.py): one job = one stage, works on its own session, enqueues the next stage
 def stage_render(conn, job: dict) -> Decimal:
     clip, source, campaign, version = _clip_ctx(conn, job["payload"]["clip_id"])
-    result, cost = registry.call(conn, "render", "render", {...}, clip["owner_operator_id"])
-    enqueue(conn, "captions", {"clip_id": str(clip["id"])}, clip["owner_operator_id"],
+    result, cost = registry.call(conn, "render", "render_clip", {...}, clip["owner_operator_id"])   # one encode: crop, captions, disclosure, template
+    enqueue(conn, "compliance", {"clip_id": str(clip["id"])}, clip["owner_operator_id"],
             source_id=source["id"], campaign_version_id=version["id"])
     return cost          # the worker records cost on the job
 # DON'T: loop over several stages in one handler, or swallow errors; the worker retries non-AppError failures

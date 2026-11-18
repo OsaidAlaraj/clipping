@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, campaigns, config, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, transcripts
+from . import alerts, auth, campaigns, config, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -601,6 +601,71 @@ def audience_refresh(account_id: str, actor: Actor = Depends(current_actor)):
         if account is None:
             raise AppError("Account not found.", "not_found")
     return run(actor, audience.from_api, account)
+
+
+# ------------------------------------------------------------------ the creative library: templates and the account persona
+
+def _template_view(conn, template: dict) -> dict:
+    """A template as the Profile shows it: its spec fields at the top level, plus id, name, version and the newest versions."""
+    return {**template["spec"], "template_id": template["id"], "name": template["name"], "active": template["active"],
+            "version": template["version"], "versions": templates.history(conn, template["id"], 5)}
+
+
+def _account_templates(conn, account_id: str) -> dict:
+    return {"templates": [_template_view(conn, t) for t in templates.ensure_set(conn, account_id)], "presets": templates.presets()}
+
+
+@app.get("/api/accounts/{account_id}/template")
+def get_account_template(account_id: str, actor: Actor = Depends(current_actor)):
+    """The account's main template (what the Profile edits)."""
+    with get_db().session(actor) as conn:
+        return _template_view(conn, templates.primary(conn, account_id))
+
+
+@app.put("/api/accounts/{account_id}/template")
+def put_account_template(account_id: str, body: dict[str, Any], actor: Actor = Depends(current_actor)):
+    """Edit the main template: only the fields sent change. The next clip of the account uses the new version."""
+    with get_db().session(actor) as conn:
+        return _template_view(conn, templates.edit_primary(conn, account_id, body))
+
+
+@app.get("/api/accounts/{account_id}/templates")
+def list_account_templates(account_id: str, actor: Actor = Depends(current_actor)):
+    with get_db().session(actor) as conn:
+        return _account_templates(conn, account_id)
+
+
+@app.post("/api/accounts/{account_id}/templates")
+def add_account_template(account_id: str, body: dict[str, Any], actor: Actor = Depends(current_actor)):
+    """Add a template to the account's rotation (`name` plus any spec fields). The next clip uses it."""
+    fields = {k: v for k, v in body.items() if k != "name"}
+    with get_db().session(actor) as conn:
+        return _template_view(conn, templates.add(conn, account_id, body.get("name"), fields))
+
+
+@app.put("/api/templates/{template_id}")
+def put_template(template_id: str, body: dict[str, Any], actor: Actor = Depends(current_actor)):
+    """Change one template: spec fields make a new version; `name` and `active` (switch off or on) are plain edits."""
+    fields = {k: v for k, v in body.items() if k not in ("name", "active")}
+    if "active" in body and not isinstance(body["active"], bool):
+        raise AppError("Active must be on or off.", "bad_template")
+    with get_db().session(actor) as conn:
+        return _template_view(conn, templates.update(conn, template_id, fields, body.get("name"), body.get("active")))
+
+
+@app.post("/api/templates/{template_id}/revert")
+def revert_template(template_id: str, body: dict[str, Any] | None = None, actor: Actor = Depends(current_actor)):
+    """Go back to an earlier version (`version`, default the one before) as a new version."""
+    version = (body or {}).get("version")
+    if version is not None and (isinstance(version, bool) or not isinstance(version, int)):
+        raise AppError("Version must be a whole number.", "bad_template")
+    with get_db().session(actor) as conn:
+        return _template_view(conn, templates.revert(conn, template_id, version))
+
+
+@app.get("/api/accounts/{account_id}/persona")
+def get_persona(account_id: str, actor: Actor = Depends(current_actor)):
+    return run(actor, templates.persona, account_id)
 
 
 # ------------------------------------------------------------------ footage from the phone or a link

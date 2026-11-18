@@ -61,7 +61,7 @@ def base_template(pg):
     db = Database(_dsn(pg, "tpl_base"))
     db.migrate()
     with db.session(Actor.system()) as conn:
-        conn.execute("""update adapters set config_json = config_json || '{"width":270,"height":480,"preset":"ultrafast","crf":30}'
+        conn.execute("""update adapters set config_json = config_json || '{"width":270,"height":480,"preset":"ultrafast","crf":30,"encoder":"x264"}'
                         where stage = 'render'""")
         conn.execute("""update adapters set config_json = config_json || '{"preset":"ultrafast","crf":30}' where stage = 'captions'""")
         activate(conn, "alerts", "fake")

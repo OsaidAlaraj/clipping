@@ -150,7 +150,7 @@ def test_DW_2P_1_practice_footage_runs_the_whole_pipeline_to_reviewable_clips_wi
         assert 8 <= float(clip["duration_s"]) <= 45 and clip["moment_reason"]   # a 60 s video shrinks the 20-45 s range
         assert clip["hook_text"]
         cover = c.get(clip["cover_url"])
-        assert cover.status_code == 200 and cover.content[:2] == b"\xff\xd8"   # a real JPEG
+        assert cover.status_code == 200 and cover.content[:4] == b"\x89PNG"   # a real PNG
         assert c.get(clip["video_url"]).status_code == 200
     with db.session(owner) as conn:
         assert {r["provider"] for r in conn.execute("select provider from candidates").fetchall()} <= {"own", "hype", "topic", "fake"}
@@ -558,16 +558,6 @@ def test_a_transcript_missing_is_a_refusal_not_a_crash(db, owner):
 
 
 # ------------------------------------------------------------------ cover and small pieces
-
-def test_the_pilot_cover_is_a_jpeg_still_and_a_failure_leaves_the_clip_without_one(db, footage, tmp_path):
-    from clipping.alerts import registry
-
-    with db.session(Actor.worker()) as conn:
-        storage = registry.get(conn, "storage")
-        key = pipeline._make_cover(storage, "cover-test", Path(footage), 60)
-        assert key == "clips/cover-test/cover.jpg" and storage.path(key).read_bytes()[:2] == b"\xff\xd8"
-        assert pipeline._make_cover(storage, "cover-bad", tmp_path / "missing.mp4", 10) is None
-
 
 def test_practice_footage_needs_no_permission_text_but_a_real_campaign_still_does(db, owner, footage):
     practice = make_practice(db, owner)

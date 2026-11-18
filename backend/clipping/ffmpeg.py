@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import time
 from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Iterator
@@ -83,6 +84,53 @@ def silences(src: Path, noise_db: int = -35, min_s: float = 0.3) -> list[tuple[f
 def frame_png(src: Path, at_s: float, out: Path) -> Path:
     run(["-ss", f"{at_s:.3f}", "-i", str(src), "-frames:v", "1", str(out)])
     return out
+
+
+def frame_raw(src: Path, at_s: float, width: int, height: int, pix_fmt: str = "rgb24") -> bytes | None:
+    """One frame at `at_s`, scaled to width x height, as raw pixels (None when the video has no frame there)."""
+    proc = subprocess.run([exe(), "-hide_banner", "-nostdin", "-v", "error", "-ss", f"{max(at_s, 0):.3f}", "-i", str(src), "-frames:v", "1",
+                           "-vf", f"scale={width}:{height}:flags=fast_bilinear", "-pix_fmt", pix_fmt, "-f", "rawvideo", "-"],
+                          capture_output=True, timeout=120)
+    size = width * height * (1 if pix_fmt == "gray" else 3)
+    return proc.stdout if proc.returncode == 0 and len(proc.stdout) == size else None
+
+
+def skin_mask(frame):
+    """Boolean mask of skin-toned pixels of an (h, w, 3) int16 RGB frame: the cheap stand-in for "a face" that the signals
+    and the reframing share."""
+    r, g, b = frame[..., 0], frame[..., 1], frame[..., 2]
+    spread = frame.max(axis=2) - frame.min(axis=2)
+    return (r > 95) & (g > 40) & (b > 20) & (spread > 15) & (abs(r - g) > 15) & (r > g) & (r > b)
+
+
+# ------------------------------------------------------------------ video encoder: NVENC when it works, x264 otherwise
+
+NVENC_RECHECK_S = 120
+_nvenc: dict = {"at": 0.0, "ok": False}
+
+
+def nvenc_ready() -> bool:
+    """True when the GPU encoder takes a job right now (cached for two minutes; a busy or missing GPU gives False)."""
+    now = time.monotonic()
+    if now - _nvenc["at"] > NVENC_RECHECK_S or not _nvenc["at"]:
+        try:
+            run(["-f", "lavfi", "-i", "color=c=black:s=256x256:d=0.1", "-c:v", "h264_nvenc", "-f", "null", "-"], timeout=30)
+            _nvenc.update(at=now, ok=True)
+        except Exception:
+            _nvenc.update(at=now, ok=False)
+    return _nvenc["ok"]
+
+
+def video_encoder(choice: str = "auto") -> str:
+    """The encoder to try first for the setting `auto`, `nvenc` or `x264`."""
+    return "h264_nvenc" if choice == "nvenc" or (choice == "auto" and nvenc_ready()) else "libx264"
+
+
+def encoder_args(encoder: str, preset: str = "veryfast", crf: int = 23) -> list[str]:
+    """Output arguments of one video encoder (same quality target on both)."""
+    if encoder == "h264_nvenc":
+        return ["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", str(crf + 1), "-b:v", "0", "-profile:v", "high"]
+    return ["-c:v", "libx264", "-preset", preset, "-crf", str(crf)]
 
 
 # ------------------------------------------------------------------ one-pass analysis (signals)
