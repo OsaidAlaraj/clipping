@@ -145,9 +145,6 @@ Phase E is built and pushed on `feature/phase-e-posting`. Everything was tested 
 
 ## Owner notes (2026-11-19)
 
-From the owner's first testing pass (words paraphrased from the notes):
-- **Home layout** ("not centred, a lot of empty space"). Priority: medium. Size: about 1 h (centre the column, use the wide space on desktop).
-- **Review screen wording** ("so technical I can't understand it"), **scroll problem** (same as the filter sheet), **Practice label with a strange shadow**, and **where the compliance pass shows**. Priority: high. Size: 1–2 h.
-- **Review order** ("I want to scroll without deciding; decided clips never return, skipped ones come back after a few"). Priority: high. Size: 2–3 h, touches the review queue logic.
-- **Profile screen** ("really messed up"; the account rows with "Posts in", audience %, three buttons). Priority: high. Size: 2–3 h redesign.
-- **Review Later** ("not clear how it shows things"). Priority: medium. Size: 1–2 h.
+Done in small commits (see `docs/owner-notes.md`): Home layout, Review wording and chips, Review Later, Profile tidy-up.
+- **Review order** ("scroll without deciding; decided clips never return, skipped ones come back after a few"). Waiting for the owner to confirm the rule. Priority: high. Size: 1–2 h, touches the review queue logic.
+- **Profile full redesign**, if the tidy-up is not enough. Priority: low. Size: 2 h.
