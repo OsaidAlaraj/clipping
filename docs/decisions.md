@@ -134,3 +134,19 @@ Each line is a lesson and what the system does with it, with the build phase.
 - Track and adjust → a weekly "what worked" report: hook type, clip length, opening style, platform, posting hour, with three concrete suggestions.
 - Most people quit between day 10 and day 30, earning under $10/hour in month one → a ramp plan with weekly targets, trends for time per clip and views per clip, and the go/iterate/stop decision only after week 8.
 - Pick a niche you enjoy and go deep before widening → onboarding asks for your niches; Explore defaults to them.
+
+---
+
+# Round E decisions (2026-11-19)
+
+Decided during phase E. These replace earlier lines where they conflict.
+
+- **One tap for all platforms, staggered.** One confirm queues one post per platform. Posts are spaced `post_stagger_min` apart (default 20 minutes, minimum 10). Each post stays inside its own account's posting window. This replaces decision 15, which allowed one platform per clip.
+- **Encrypted tokens in the database.** OAuth tokens are stored as AES-GCM ciphertext. The key is `TOKEN_VAULT_KEY` in `.env`. Tokens are never logged, audited or returned to the web app.
+- **TikTok as inbox draft.** The post lands in the app's drafts. The caption is not sent, so the owner adds it in TikTok, posts, and pastes the link.
+- **YouTube private until audit.** Uploads are private while the Google project is unverified. The owner makes the video public in YouTube Studio and pastes the link.
+- **Instagram publishes publicly.** The paid-partnership flag is not exposed by the API for Instagram Login, so it stays a checklist step.
+- **No auto-retry after an unclear publish.** If the upload started and the outcome is unknown, the post becomes "needs check". The owner checks the platform. A retry could post twice.
+- **Manual target only for unconnected platforms.** A connected platform cannot be posted by hand yet.
+- **Pasted links on the platform's own host.** A pasted link must be on that platform's own site. Other links are refused.
+- **Morning summary at 08:00.** Drafts, private uploads and other "finish in the app" items appear in one daily summary from 08:00.

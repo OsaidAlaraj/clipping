@@ -1,8 +1,9 @@
 # Plan: Phase E: posting (connected accounts, one-tap posting, manual path, post records)
 **Created:** 2026-11-18
-**Status:** in-progress
+**Status:** complete
 **Started:** 2026-11-18 12:00
 **Current Phase:** 5
+**Completed:** 2026-11-19
 **Complexity:** complex
 **Review cadence:** 5
 **Check-ins:** checkpoints
@@ -282,3 +283,13 @@ Summary: One owner tap (`POST /api/clips/{id}/post`) creates staggered per-platf
 - [x] Committed
 Commit: 80738c8
 Summary: Queue sheet now shows PostPanel (platform picker, one combined checklist, one confirm, live per-platform status with Cancel, offline queue), PostManual (share or download file, copy caption and hashtags, paste link), 30-minute `submit_by` countdown, "finish in the app" alert and a daily morning summary; English and Arabic, RTL.
+
+### Phase 5: Docs: Arabic guide, handoff plan, setup steps (Gate: Minimal)
+- [x] BUILD: Docs updated (guide section "النشر", handoff plan with per-platform setup steps, decisions round E, open items phase E)
+- [x] REVIEW: DEFERRED — batch pending (docs only)
+- [x] Committed
+Commit: PENDING
+Summary: The Arabic guide and handoff plan describe posting and the Google, Meta and TikTok app setup; decisions and open items record round E and every live check still owed.
+
+### Pending after this plan
+- Batch review of Phase 4 and Phase 5 runs together with phase F (owner's rule: one combined E+F review).

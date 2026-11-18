@@ -113,3 +113,32 @@ Still open:
 - Under `pytest -n auto` with the app's own worker running, 4 load-sensitive tests (3 render template tests in test_13, the 2-hour signals speed test in test_11) can fail; they pass alone. Make them GPU/time tolerant or mark them serial.
 - DW-6.4 live check of the review and correction screens on a real phone (375 px) is left to the owner's pilot use; component tests and the stylesheet audit passed.
 - Facebook Reels (and later X) as extra posting platforms: not in Phase E's three. Facebook posts through the same Meta app as Instagram, but needs a personal profile plus a Page (extra verification). Add after the first three platforms earn.
+
+---
+
+## Phase E (2026-11-19)
+
+Phase E is built and pushed on `feature/phase-e-posting`. Everything was tested on fakes. Nothing real has been posted yet.
+
+### Live checks not run yet
+- **OAuth redirects on Meta and TikTok.** Both need an HTTPS redirect (Tailscale `ts.net`). Blocks connecting Instagram and TikTok on a real account.
+- **Instagram resumable upload and permalink.** Blocks a real Reels post and reading its link.
+- **YouTube private lock and paid-promotion flag.** Blocks confirming that uploads land private and that the flag is set.
+- **TikTok inbox upload and its caption limit.** Blocks a real TikTok draft and the caption check.
+- **PKCE for TikTok.** Only Google uses PKCE for now. Blocks TikTok sign-in until checked.
+- **First real test.** One real campaign, one post per platform, each result checked by hand. Blocks any claim that posting works.
+
+### Audits and reviews
+- **Google audit.** Until it passes, YouTube uploads stay private.
+- **TikTok audit.** Until it passes, TikTok posts stay drafts.
+- **Meta App Review.** Needed before accounts other than the owner's test accounts can connect.
+- **Combined E+F review.** Phase 4 (the posting screen) has its review deferred. It runs together with phase و.
+
+### Known gaps
+- **Quota ledger can undercount.** If the process dies in the middle of a call, the count can miss that call.
+- **No manual path for connected platforms.** The owner cannot post by hand to a platform that is connected.
+- **Server error messages stay in English in Arabic mode.** The screens are bilingual, but some server messages are not translated yet.
+
+### Owner setup (not a code task)
+- **Developer apps.** Create the Google, Meta and TikTok apps, and add each redirect URL. Steps are in `docs/خطة-المتابعة.md`.
+- **`.env` values.** Add the client ids, secrets, `OAUTH_REDIRECT_BASE` and a new `TOKEN_VAULT_KEY`. Never paste them in chat.
