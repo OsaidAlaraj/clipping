@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import datetime as dt
 
-from . import alerts, campaigns, config, ffmpeg, ledger, ops, pipeline, publish, review
-from .core import kill_switch_on, set_kill_switch
+from . import alerts, brand_checks, campaigns, config, ffmpeg, ledger, moments, ops, pipeline, publish, review, signals
+from .core import AppError, KillSwitchOn, kill_switch_on, set_kill_switch
 from .db import Actor, Database
 
 DEMO_NAME = "The Founders Table (sample)"
@@ -20,7 +20,50 @@ def fixture_video() -> str:
     return str(path)
 
 
+def stage_lines(conn, source_id) -> list[str]:
+    """One line per production stage, from what was stored: the provider that really ran, the numbers it left behind.
+    This is what shows that a no-keys run went through the declared fallbacks and not through a vendor."""
+    lines = []
+    transcript = conn.execute("select provider, model, current_version from transcripts where source_id = %s order by created_at limit 1",
+                              (source_id,)).fetchone()
+    lines.append(f"Transcription: {transcript['provider']}{' ' + transcript['model'] if transcript['model'] else ''}, "
+                 f"version {transcript['current_version']}" if transcript else "Transcription: no transcript was stored")
+    measured = signals.load(conn, source_id)
+    lines.append(f"Signals: {len(measured['series']['loudness'])} seconds measured, {len(measured['topics'])} topic(s)"
+                 if measured else "Signals: not measured (moments were found without them)")
+    kept = conn.execute("select count(*) filter (where status <> 'filtered') as kept, count(*) filter (where status = 'filtered') as aside, "
+                        "string_agg(distinct engine, ', ') as engines, string_agg(distinct profile, ', ') as profile "
+                        "from candidates where source_id = %s", (source_id,)).fetchone()
+    lines.append(f"Moments: {kept['kept']} kept, {kept['aside']} set aside, engines {kept['engines'] or 'none'}, profile {kept['profile'] or 'none'}")
+    renders = conn.execute("select render_meta from clips cl join candidates ca on ca.id = cl.candidate_id where ca.source_id = %s "
+                           "and cl.file_path is not null", (source_id,)).fetchall()
+    encoders = sorted({str((r["render_meta"] or {}).get("encoder")) for r in renders})
+    once = all((r["render_meta"] or {}).get("encodes") == 1 for r in renders)
+    lines.append(f"Render: {len(renders)} clip(s), one encode each: {'yes' if once and renders else 'no'}, encoder {', '.join(encoders) or 'none'}")
+    return lines
+
+
+def signals_only_check(conn, source_id) -> str:
+    """The declared fallback for ranking: with the AI switched off, the moment engine still ranks on the audio and transcript
+    signals. Run on a copy of the work that is rolled back, so the demo's own moments and clips are not touched."""
+    with conn.transaction(force_rollback=True):
+        conn.execute("update adapters set active = false where stage = 'llm'")
+        try:
+            found = moments.find(conn, source_id, None)
+        except AppError as exc:
+            return f"Signals-only ranking: not possible here ({exc.code})"
+        return (f"Signals-only ranking (AI switched off for this check, then restored): {len(found['kept'])} moment(s) kept, "
+                f"AI state {found['llm']}")
+
+
+def _failed_jobs(conn) -> str:
+    rows = conn.execute("select type, error from jobs where status = 'failed' order by created_at limit 3").fetchall()
+    return "; ".join(f"{r['type']}: {config.redact(str(r['error'] or ''))[:160]}" for r in rows)
+
+
 def run(db: Database, log=print, finish_all: bool = True, render_size: tuple[int, int] | None = (540, 960)) -> dict:
+    """Runs the sample campaign end to end. If the kill switch is on (before the run, or switched on during it) the demo stops
+    cleanly where it is: out["stopped"] says so and nothing is half-written."""
     owner = ops.ensure_owner(db)
     out: dict = {"steps": []}
 
@@ -32,6 +75,20 @@ def run(db: Database, log=print, finish_all: bool = True, render_size: tuple[int
         if conn.execute("select 1 from campaigns where name = %s", (DEMO_NAME,)).fetchone():
             log("Demo campaign already exists. Nothing to do.")
             return out
+        if kill_switch_on(conn):
+            out["stopped"] = "kill_switch"
+            step("The kill switch is on, so the demo did not start. Switch it off in Settings and run it again.")
+            return out
+    try:
+        return _run(db, owner, out, step, log, finish_all, render_size)
+    except KillSwitchOn:
+        out["stopped"] = "kill_switch"
+        step("The kill switch was switched on, so the demo stopped here and left the sample campaign as it is. Switch it off in Settings to go on.")
+        return out
+
+
+def _run(db: Database, owner, out: dict, step, log, finish_all: bool, render_size) -> dict:
+    with db.session(owner) as conn:
         if render_size:   # a smaller render keeps the demo quick; a configuration change, not a code change
             conn.execute("update adapters set config_json = config_json || %s where stage = 'render' and provider = 'ffmpeg'",
                          (alerts.Jsonb({"width": render_size[0], "height": render_size[1], "preset": "ultrafast"}),))
@@ -63,10 +120,16 @@ def run(db: Database, log=print, finish_all: bool = True, render_size: tuple[int
         conn.execute("update time_entries set ended_at = now(), minutes = 20 where task_type = 'cutting' and ended_at is null")
         clips = review.feed(conn, owner.operator_id)
         step(f"{jobs} pipeline jobs ran; {len(clips)} packaged clips are in the feed")
+        for line in stage_lines(conn, source["id"]):
+            step(line)
+        step(signals_only_check(conn, source["id"]))
         for clip in clips:
-            step(f"Clip {clip['duration_s']} s, {clip['platform']}, compliance {clip['compliance_status']}: {clip['priority_reason']}")
-    if not clips:
-        raise RuntimeError("the demo produced no clips")
+            step(f"Clip {clip['duration_s']} s, {clip['platform']}, compliance {clip['compliance_status']}: {clip['priority_reason']}. "
+                 f"Quality: {clip['quality']['label']}")
+        if not clips:
+            if kill_switch_on(conn):
+                raise KillSwitchOn()
+            raise RuntimeError(f"the demo produced no clips ({_failed_jobs(conn) or 'no job failed'})")
 
     log("3. Review")
     with db.session(owner) as conn:
@@ -81,6 +144,10 @@ def run(db: Database, log=print, finish_all: bool = True, render_size: tuple[int
         if len(clips) > 2:
             review.park(conn, owner, clips[2]["id"], "Check the cut", session["id"])
             step("Moved the third clip to Review Later")
+        if len(clips) > 1:
+            taught = brand_checks.record_rejection(conn, owner, clips[1]["id"], "Rejected: missing #sampleadtag in the caption")
+            step(f"A marketplace rejection reason was recorded for the brand: it became {len(taught['checks'])} check(s) "
+                 f"({', '.join(c['rule'] for c in taught['checks'])}) for the brand's next clips")
         summary = review.stop_session(conn, owner, session["id"], {"campaign_id": str(campaign_id)})
         conn.execute("update time_entries set minutes = 10 where session_id = %s", (session["id"],))
         step(f"Session summary: {summary['clips_reviewed']} reviewed, {summary['accepted']} accepted, {summary['rejected']} rejected, "

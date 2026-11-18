@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import config, ffmpeg, signals, templates, transcripts
+from . import brand_checks, config, ffmpeg, signals, templates, transcripts
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -421,7 +421,8 @@ def run_compliance(conn, clip: dict, campaign: dict, version: dict) -> tuple[dic
     limits = {"min_s": get_setting(conn, "clip_min_duration_s"), "max_s": get_setting(conn, "clip_max_duration_s")}
     report, cost = agent_c.run(conn, registry, clip, template, limits, (category or {}).get("banned_words") or [],
                                version["rules_json"].get("content_rules") or [],
-                               (clip["render_meta"] or {}).get("hook_text") or "", clip["owner_operator_id"])
+                               (clip["render_meta"] or {}).get("hook_text") or "", clip["owner_operator_id"],
+                               brand_checks.for_campaign(conn, campaign["id"], clip["owner_operator_id"]))
     conn.execute("update clips set compliance_status = %s, compliance_report = %s where id = %s",
                  (report["status"], Jsonb(report), clip["id"]))
     return report, Decimal(str(cost))

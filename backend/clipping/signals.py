@@ -9,7 +9,7 @@ Series (one value per second, `step_s` = 1.0, every list the same length):
   scene        0..1, how much the picture changed since the previous second (a cut is near 1)
   face         0..1, how much of the frame is skin-toned: a cheap stand-in for "a person is on screen"
   laughter     0..1, laughter or applause (sherpa-onnx model when installed, else a loudness-burst heuristic)
-  reaction     reaction phrases ("no way", "والله") said in the second, English and Arabic
+  reaction     reaction phrases ("no way", "والله") said in the second, English and Arabic; 0 in silent seconds
   chat         live chat messages per second, or None when the stream had no chat replay
   replay       YouTube "most replayed" 0..1, or None when the video has no heatmap
 `topics` are TextTiling-style topic segments of the transcript: [{start, end, title}].
@@ -196,7 +196,8 @@ def text_signals(transcript: dict, loudness: list[float], duration_s: float) -> 
     quiet = [level <= SILENT_LUFS for level in loudness]
     speech = [0.0 if q else v for v, q in zip(_speech_rate(words, seconds), quiet)]
     turns = [0 if q else v for v, q in zip(_turns(transcript["utterances"], seconds), quiet)]
-    return {"speech_rate": _round(speech), "turns": turns, "reaction": _round(_reactions(words, seconds)),
+    reaction = [0.0 if q else v for v, q in zip(_reactions(words, seconds), quiet)]
+    return {"speech_rate": _round(speech), "turns": turns, "reaction": _round(reaction),
             "topics": topic_segments(words, duration_s)}
 
 
@@ -220,9 +221,18 @@ def _shape(row: dict) -> dict:
 
 
 def load(conn, source_id) -> dict | None:
-    """The stored signals of a source, or None when they have not been computed (the moment engine then runs without)."""
+    """The stored signals of a source, or None when they have not been computed (the moment engine then runs without).
+    When the owner has corrected the transcript since, the text series and topics are rebuilt first (the media numbers are
+    reused, FFmpeg does not run); a changed file is not re-measured here."""
     row = _row(conn, source_id)
-    return _shape(row) if row and row["series"] else None
+    if not (row and row["series"]):
+        return None
+    current = transcripts.current_version(conn, source_id)
+    if current is not None and row["transcript_version"] != current:
+        file_hash = conn.execute("select file_hash from source_assets where id = %s", (source_id,)).fetchone()
+        if file_hash and file_hash["file_hash"] == row["file_hash"]:
+            return compute(conn, source_id)
+    return _shape(row)
 
 
 def _inputs_series(row: dict | None, seconds: int) -> dict:

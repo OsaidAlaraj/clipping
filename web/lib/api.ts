@@ -2,6 +2,16 @@
 
 export type Hook = { id: string; text: string; hook_type: string; chosen: boolean; rank: number; score: number | null };
 
+/** How likely a clip is to reach the campaign's view minimum. `label` is the server's English sentence; the web builds the Arabic
+ *  one from the numbers (see `qualityText` in i18n). `weak` clips are shown last. */
+export type Quality = {
+  p_clear: number | null; label: string; basis: "your posts" | "assumed"; weak?: boolean; min_views?: number | null;
+  moment_percentile?: number | null; threshold?: number;
+};
+
+/** One compliance check. Brand checks (from a marketplace's rejection) also carry the brand, a readable rule and their severity. */
+export type Check = { check: string; status: string; evidence: string; rule?: string; brand?: string; severity?: "block" | "warn" | "reminder" };
+
 export type Clip = {
   id: string;
   status: string;
@@ -12,7 +22,7 @@ export type Clip = {
   language: string;
   duration_s: number | null;
   compliance_status: "pass" | "review" | "fail" | "pending";
-  compliance_report: { deterministic: { check: string; status: string; evidence: string }[]; rules: { rule: string; status: string; evidence: string }[]; note: string; legal_notice: string } | null;
+  compliance_report: { deterministic: Check[]; rules: { rule: string; status: string; evidence: string }[]; note: string; legal_notice: string } | null;
   priority_reason?: string;
   caption_text: string | null;
   hashtags: string[];
@@ -32,6 +42,7 @@ export type Clip = {
   is_practice?: boolean;
   moment_reason?: string | null;
   cover_url?: string | null;
+  quality?: Quality;
 };
 
 /** A moment the engine set aside (layer 1 hard rule, 2 below the episode's cut-off, 3 not among the top picks). */

@@ -473,21 +473,25 @@ def _near_key_terms(keys: list[str], key_terms) -> list[tuple[float, int, int, s
     return chosen
 
 
-def review_queue(words: list[dict], key_terms=(), ranges=None, threshold: float = LOW_CONFIDENCE,
-                 limit: int = MAX_QUEUE) -> list[dict]:
+def rank_words(words: list[dict], key_terms=(), ranges=None, threshold: float = LOW_CONFIDENCE,
+               limit: int = MAX_QUEUE) -> list[dict]:
     """The words worth the owner's time, most important first: [{word_index, text, confidence, reason}].
     reason is "key_term" (nearly spells one of the campaign's words; the row also has `term` and `span`) or
-    "low_confidence". Words inside any of `ranges` ((start_s, end_s) pairs, for example candidate clips) come
-    before the rest; then key terms before low confidence; then the least sure first."""
+    "low_confidence". `ranges` are the likely clip moments: (start_s, end_s) pairs or (start_s, end_s, weight) triples
+    (a moment's score; a pair weighs 1). Words inside a moment come before the rest, the ones inside the strongest moment
+    first; then key terms before low confidence; then the least sure first."""
     spans = []   # (word_index, word_count, reason, term)
     for _, i, size, term in _near_key_terms([normalise(w["text"], True) for w in words], key_terms):
         spans.append((i, size, "key_term", term))
     covered = {n for i, size, _, _ in spans for n in range(i, i + size)}
     spans += [(i, 1, "low_confidence", None) for i, w in enumerate(words)
               if i not in covered and w.get("confidence") is not None and w["confidence"] < threshold]
+    moments = [(m[0], m[1], 1.0 if len(m) < 3 or m[2] is None else max(float(m[2]), 0.0)) for m in ranges or ()]
 
-    def inside(i: int, size: int) -> bool:
-        return any(words[n]["start"] < end and words[n]["end"] > start for n in range(i, i + size) for start, end in ranges or ())
+    def weight(i: int, size: int) -> float:
+        """The best moment weight over the span's words; 0 when no moment covers it. A moment of weight 0 still counts as inside."""
+        hits = [w for start, end, w in moments if any(words[n]["start"] < end and words[n]["end"] > start for n in range(i, i + size))]
+        return max(hits) + 1.0 if hits else 0.0
 
     rows = []
     for i, size, reason, term in spans:
@@ -496,8 +500,34 @@ def review_queue(words: list[dict], key_terms=(), ranges=None, threshold: float 
                "reason": reason}
         if term is not None:
             row.update(term=term, span=size)
-        rows.append((not inside(i, size), reason != "key_term", 1.0 if row["confidence"] is None else row["confidence"], i, row))
+        rows.append((-weight(i, size), reason != "key_term", 1.0 if row["confidence"] is None else row["confidence"], i, row))
     return [row for *_, row in sorted(rows, key=lambda r: r[:4])[:max(0, limit)]]
+
+
+def review_queue(source, *args, **kwargs) -> list[dict]:
+    """The fix queue, in two call shapes with one meaning:
+      review_queue(words, key_terms=(), ranges=None, threshold=..., limit=...)       rank words already in hand (`rank_words`)
+      review_queue(conn, transcript_id, moments=None, limit=...)                     the stored transcript, judged against its
+          campaign's key terms, with `moments` (candidate dicts with start_s, end_s and optionally score) weighting the order.
+          moments=None reads the kept moments of the transcript's source from the candidates table; [] means no weighting."""
+    if isinstance(source, list):
+        return rank_words(source, *args, **kwargs)
+    return _queue_for_transcript(source, *args, **kwargs)
+
+
+def moment_ranges(moments) -> list[tuple[float, float, float]]:
+    """(start_s, end_s, score) triples from candidate dicts. Anything without usable times is skipped; a missing score weighs 0.5."""
+    out = []
+    for m in moments or ():
+        try:
+            start, end = float(m["start_s"]), float(m["end_s"])
+            score = m.get("score")
+            score = 0.5 if score is None else float(score)
+        except (KeyError, TypeError, ValueError, AttributeError):
+            continue
+        if math.isfinite(start) and math.isfinite(end) and math.isfinite(score) and end > start:
+            out.append((start, end, score))
+    return out
 
 
 # ------------------------------------------------------------------ key terms and the screen's data
@@ -541,8 +571,40 @@ def detail(conn, source_id) -> dict:
             "key_terms": list(row["key_terms"] or [])}
 
 
-def queue_for(conn, source_id, limit: int = MAX_QUEUE, ranges=None) -> list[dict]:
-    """The fix queue for one source, judged against the campaign's key terms (its own, its name and its required tags)."""
+def source_moments(conn, source_id) -> list[dict]:
+    """The moments the engine kept for this source's file (stored candidates that are not set aside or discarded)."""
+    return conn.execute(
+        """select ca.start_s, ca.end_s, ca.score from candidates ca join source_assets s on s.id = ca.source_id
+           join source_assets me on me.file_hash = s.file_hash and me.language = s.language
+           where me.id = %s and ca.status in ('new', 'hooked', 'rendered') order by ca.score desc nulls last""", (source_id,)).fetchall()
+
+
+def queue_for(conn, source_id, limit: int = MAX_QUEUE, ranges=None, moments=None) -> list[dict]:
+    """The fix queue for one source, judged against the campaign's key terms (its own, its name and its required tags).
+    Words inside the source's likely clip moments come first: `moments` (candidate dicts), else `ranges` as given, else the
+    kept candidates stored for the source."""
     words = load(conn, source_id)["words"]
     _, campaign, version = _source_context(conn, source_id)
-    return review_queue(words, key_terms_for(campaign, version), ranges, limit=limit)
+    if moments is None and ranges is None:
+        moments = source_moments(conn, source_id)
+    weighted = moment_ranges(moments) if moments is not None else ranges
+    return rank_words(words, key_terms_for(campaign, version), weighted, limit=limit)
+
+
+def _queue_for_transcript(conn, transcript_id, moments=None, limit: int = MAX_QUEUE) -> list[dict]:
+    row = conn.execute("select source_id from transcripts where id = %s", (transcript_id,)).fetchone()
+    if row is None:
+        raise NotFound("Transcript not found.", "not_found")
+    return queue_for(conn, row["source_id"], limit, moments=moments)
+
+
+def current_version(conn, source_id) -> int | None:
+    """The newest saved version number of the transcript `load` would return for this source, without reading its words;
+    None when the source has no transcript."""
+    row = conn.execute(
+        """select v.version_no from source_assets s
+           join transcripts t on t.source_hash = s.file_hash and t.language = s.language
+           join transcript_versions v on v.transcript_id = t.id
+                and v.version_no = (select max(version_no) from transcript_versions where transcript_id = t.id)
+           where s.id = %s order by (t.source_id = s.id) desc, t.created_at desc limit 1""", (source_id,)).fetchone()
+    return row["version_no"] if row else None

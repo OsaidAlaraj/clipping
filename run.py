@@ -2,7 +2,9 @@
 
     python run.py          install what is missing, then start the API, the worker and the review app
     python run.py test     run the backend and web test suites
-    python run.py demo     run the sample-campaign demo against a fresh throwaway database and print the run log
+    python run.py demo     run the sample-campaign demo (all fakes) against a fresh throwaway database and print the run log
+    python run.py demo --no-keys   the same flow with fakes off and every key blanked: it runs on the declared fallbacks
+                                   (local Whisper, signals-only ranking), whatever is in .env
     python run.py phone    make the app reachable from your phone through Tailscale
     python run.py stop     stop the local Postgres if a killed run left it running
 
@@ -89,6 +91,20 @@ def phone_setup() -> int:
     return 0
 
 
+# Everything that could reach a live service. `demo --no-keys` blanks these in the demo process only; .env is never edited
+# (an empty value in the process environment wins over the file).
+KEY_NAMES = ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_JWT_SECRET",
+             "DATABASE_URL", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_VISION_DEPLOYMENT",
+             "DEEPGRAM_API_KEY", "VIZARD_API_KEY", "KLAP_API_KEY", "OPUSCLIP_API_KEY", "BUFFER_ACCESS_TOKEN", "R2_ACCOUNT_ID",
+             "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET")
+
+
+def demo_env(data_dir: str, no_keys: bool) -> dict:
+    """The demo never uses the owner's real services: all fakes by default, or fakes off with no keys at all."""
+    extra = {"CLIPPING_USE_FAKES": "0", **{name: "" for name in KEY_NAMES}} if no_keys else {"CLIPPING_USE_FAKES": "1"}
+    return {**env(), "CLIPPING_DATA_DIR": data_dir, **extra}
+
+
 def env() -> dict:
     out = dict(os.environ)
     out.setdefault("PYTHONIOENCODING", "utf-8")
@@ -109,7 +125,7 @@ def main() -> int:
         return phone_setup()
     if command == "demo":
         with tempfile.TemporaryDirectory(prefix="clip_demo_", ignore_cleanup_errors=True) as tmp:
-            return subprocess.call([str(PY), "-m", "clipping", "demo"], cwd=BACKEND, env={**env(), "CLIPPING_DATA_DIR": tmp})
+            return subprocess.call([str(PY), "-m", "clipping", "demo"], cwd=BACKEND, env=demo_env(tmp, "--no-keys" in sys.argv[2:]))
     if command == "stop":
         return subprocess.call([str(PY), "-m", "clipping", "stop"], cwd=BACKEND, env=env())
     if command != "start":

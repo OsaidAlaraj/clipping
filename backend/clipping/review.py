@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import datetime as dt
+import math
 from decimal import Decimal
+from statistics import NormalDist
 
 from psycopg.types.json import Jsonb
 
+from . import ranking
 from .alerts import registry
 from .core import AppError, GateError, audit, enqueue, get_setting, kill_switch_on
 
@@ -19,6 +22,8 @@ REASON_CODES = {
 }
 WEIGHT_KEYS = ["net_pay", "deadline", "hook_score", "budget", "account_cap", "compliance"]
 UNDO_GRACE_S = 5   # network allowance on top of the Undo window
+MOMENT_SKILL = 0.35   # share of a clip's view spread that the quality of its moment explains (the rest is the account and luck)
+BASIS_TEXT = {"your posts": "from your own posts", "assumed": "assumed: no view history yet"}
 
 
 # ------------------------------------------------------------------ priority (spec 6.6). Pure functions.
@@ -60,7 +65,7 @@ def top_reason(inputs: dict, weights: dict) -> str:
 
 def rank_feed(clips: list[dict], weights: dict, now: dt.datetime | None = None) -> list[dict]:
     """Order clips for the feed. Hard blocks are removed first and ranking never brings them back.
-    Ties break by creation time, oldest first. Each clip gets its score and one-line top reason."""
+    Clips marked weak by `quality` go last. Ties break by creation time, oldest first. Each clip gets its score and one-line top reason."""
     now = now or dt.datetime.now(dt.timezone.utc)
     eligible = [c for c in clips if c.get("compliance_status") in ("pass", "review")]
     max_rate = max((float(c.get("est_net_per_hour") or 0) for c in eligible), default=0.0)
@@ -68,11 +73,69 @@ def rank_feed(clips: list[dict], weights: dict, now: dt.datetime | None = None) 
         inputs = priority_inputs(clip, now, max_rate)
         clip["priority_score"] = round(sum(inputs[k] * float(weights.get(k, 0)) for k in WEIGHT_KEYS), 6)
         clip["priority_reason"] = top_reason(inputs, weights)
-    return sorted(eligible, key=lambda c: (-c["priority_score"], c["created_at"]))
+    # A clip under the quality threshold sinks below every other clip, whatever it pays; nothing is hidden.
+    return sorted(eligible, key=lambda c: (bool((c.get("quality") or {}).get("weak")), -c["priority_score"], c["created_at"]))
 
 
 def weights_for(conn, operator_id) -> dict:
     return {k: float(get_setting(conn, f"priority_weight_{k}", operator_id)) for k in WEIGHT_KEYS}
+
+
+# ------------------------------------------------------------------ quality: the chance a clip clears the campaign minimum
+
+def moment_percentile(score, scores: list[float]) -> float | None:
+    """Where a moment's score sits among the scores of its source's moments, 0..1 (ties count half). None when unknown."""
+    if score is None or not scores:
+        return None
+    score = float(score)
+    return (sum(s < score for s in scores) + 0.5 * sum(s == score for s in scores)) / len(scores)
+
+
+def chance_to_clear(min_views, percentile: float | None, stats: dict) -> float | None:
+    """P(views >= min_views) for one clip. The account's views are log-normal around its median; a better moment than usual
+    shifts the median up by MOMENT_SKILL of the account's spread per standard deviation of moment quality, a weaker one down.
+    No minimum on the campaign -> None."""
+    if not min_views or float(min_views) <= 0:
+        return None
+    q = min(max(0.5 if percentile is None else percentile, 0.02), 0.98)
+    sigma = max(float(stats["sigma"]), 0.05)
+    mu = math.log(max(float(stats["median"]), 1.0)) + MOMENT_SKILL * sigma * NormalDist().inv_cdf(q)
+    return 1 - NormalDist(mu, sigma * math.sqrt(1 - MOMENT_SKILL ** 2)).cdf(math.log(float(min_views)))
+
+
+def quality_label(p: float | None, min_views, basis: str, weak: bool) -> str:
+    """One plain sentence saying what the chance is and where it comes from (the web builds the Arabic text from the numbers)."""
+    if p is None:
+        return "No view minimum on this campaign"
+    pct = "under 1%" if p < 0.01 else "over 99%" if p > 0.99 else f"{round(p * 100)}%"
+    text = f"About {pct} chance to reach {int(float(min_views)):,} views ({BASIS_TEXT.get(basis, basis)})"
+    return f"Weak: {text[0].lower()}{text[1:]}. Shown last." if weak else text
+
+
+def _annotate_quality(conn, rows: list[dict], operator_id) -> None:
+    """Adds `quality` {p_clear, label, basis, weak, min_views, moment_percentile, threshold} to each clip. Account stats are worked
+    out once per account, the source's moment scores once per source."""
+    threshold = float(get_setting(conn, "quality_min_p_clear", operator_id))
+    sources = list({r["source_id"] for r in rows if r.get("source_id")})
+    scores: dict = {}
+    if sources:
+        for r in conn.execute("select source_id, score from candidates where source_id = any(%s) and status <> 'discarded' and score is not null",
+                              (sources,)).fetchall():
+            scores.setdefault(r["source_id"], []).append(float(r["score"]))
+    ids = list({r["account_id"] for r in rows if r.get("account_id")})
+    accounts = {a["id"]: a for a in conn.execute("select * from accounts where id = any(%s)", (ids,)).fetchall()} if ids else {}
+    stats: dict = {}
+    for row in rows:
+        key = row.get("account_id")
+        if key not in stats:
+            stats[key] = ranking.account_stats(conn, accounts.get(key) or {"id": key})
+        q = moment_percentile(row.pop("moment_score", None), scores.get(row.get("source_id"), []))
+        min_views = row.get("min_views_to_qualify")
+        p = chance_to_clear(min_views, q, stats[key])
+        weak = p is not None and p < threshold
+        row["quality"] = {"p_clear": None if p is None else round(p, 3), "label": quality_label(p, min_views, stats[key]["basis"], weak),
+                          "basis": stats[key]["basis"], "weak": weak, "min_views": int(float(min_views)) if min_views else None,
+                          "moment_percentile": None if q is None else round(q, 3), "threshold": threshold}
 
 
 CLIP_VIEW = """
@@ -83,6 +146,7 @@ CLIP_VIEW = """
            (select source_id from candidates where id = cl.candidate_id) as source_id,
            c.name as campaign_name, c.deadline, c.status as campaign_status, c.is_practice,
            (select reason from candidates where id = cl.candidate_id) as moment_reason,
+           (select score from candidates where id = cl.candidate_id) as moment_score, v.min_views_to_qualify,
            v.budget_total, v.budget_remaining, v.rate_per_1k, v.fee_pct, v.max_payout_per_clip,
            a.handle as account_handle, a.daily_cap as account_daily_cap,
            (select count(*) from posts p where p.account_id = cl.account_id and p.posted_at::date = now()::date) as account_posts_today
@@ -93,7 +157,8 @@ CLIP_VIEW = """
 """
 
 
-def _decorate(conn, rows: list[dict]) -> list[dict]:
+def _decorate(conn, rows: list[dict], operator_id=None) -> list[dict]:
+    _annotate_quality(conn, rows, operator_id)
     storage = registry.get(conn, "storage")
     default_cap = int(get_setting(conn, "posts_per_account_per_day"))
     for row in rows:
@@ -106,6 +171,7 @@ def _decorate(conn, rows: list[dict]) -> list[dict]:
         cover = (row.get("render_meta") or {}).get("cover_key")
         row["cover_url"] = storage.get_signed_url(cover, 900) if cover else None
         row["hook_text"] = (row.get("render_meta") or {}).get("hook_text")
+        row.pop("min_views_to_qualify", None)
         row["hooks"] = conn.execute(
             "select id, text, hook_type, chosen, rank, score from hooks where candidate_id = %s order by rank", (row["candidate_id"],)
         ).fetchall()
@@ -121,7 +187,7 @@ def feed(conn, operator_id, campaign_id=None) -> list[dict]:
             and cl.compliance_status in ('pass', 'review') and (%s::uuid is null or cl.campaign_id = %s)""",
         (campaign_id, campaign_id),
     ).fetchall()
-    return rank_feed(_decorate(conn, rows), weights_for(conn, operator_id))
+    return rank_feed(_decorate(conn, rows, operator_id), weights_for(conn, operator_id))
 
 
 def review_later(conn) -> list[dict]:

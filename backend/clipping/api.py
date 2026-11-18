@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, campaigns, config, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
+from . import alerts, auth, brand_checks, campaigns, config, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -132,6 +132,14 @@ class DecisionIn(BaseModel):
     reason_code: str | None = None
     notes: str | None = None
     reason: str | None = None
+
+
+class RejectionIn(BaseModel):
+    reason: str | None = None
+
+
+class SwitchIn(BaseModel):
+    active: bool = True
 
 
 class UndoIn(BaseModel):
@@ -809,6 +817,22 @@ def accept(clip_id: str, body: DecisionIn, actor: Actor = Depends(current_actor)
 @app.post("/api/clips/{clip_id}/reject")
 def reject(clip_id: str, body: DecisionIn, actor: Actor = Depends(current_actor)):
     return run(actor, review.reject, actor, clip_id, body.reason_code or "", body.notes, body.session_id, body.client_action_id)
+
+
+@app.post("/api/clips/{clip_id}/rejection")
+def marketplace_rejection(clip_id: str, body: RejectionIn, actor: Actor = Depends(current_actor)):
+    """The marketplace rejected this clip: its reason becomes a check on the brand's next clips (a vague one a reminder)."""
+    return run(actor, brand_checks.record_rejection, actor, clip_id, body.reason)
+
+
+@app.get("/api/brand-checks")
+def get_brand_checks(campaign_id: str | None = None, actor: Actor = Depends(current_actor)):
+    return {"checks": run(actor, brand_checks.listing, campaign_id)}
+
+
+@app.post("/api/brand-checks/{check_id}/active")
+def switch_brand_check(check_id: str, body: SwitchIn, actor: Actor = Depends(current_actor)):
+    return run(actor, brand_checks.switch, actor, check_id, body.active)
 
 
 @app.post("/api/clips/{clip_id}/later")

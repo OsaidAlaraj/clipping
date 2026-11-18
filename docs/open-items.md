@@ -94,3 +94,18 @@ Closed in phase C (migration 008, tests in `test_8_phase_c_complete.py`):
 Still needs you or a later phase:
 - **Tokens:** YouTube and Instagram audience reading needs the two tokens above; until then use screenshots. Not tested against the live APIs.
 - **The 1.5-second spacing** between feed calls held for a full live pass (no 429). Watch Alerts for a few days.
+
+## Phase D, step 6: quality gate, brand checks, end to end (2026-11-18)
+
+Built (migration 014, tests in `test_14_quality.py` and `web/tests/quality.test.tsx`):
+- **Chance of clearing the minimum.** Every clip in Review carries `quality` (the chance of reaching the campaign's minimum views, a sentence saying why, and whether the numbers are "your posts" or "assumed"). Clips under `quality_min_p_clear` (default 25%) go to the bottom with a "Weak" label; nothing is hidden. The moment's quality moves the account's typical views by 35% of the account's spread (`MOMENT_SKILL` in `review.py`): a guess that real results will tune in phase F.
+- **Brand checks.** A marketplace's rejection reason (Queue ← a clip ← "The marketplace rejected this clip") is read by plain rules, with no AI. A banned phrase blocks the brand's next clips that use it; a missing tag or phrase sends them to you as "review"; a vague reason is kept as a reminder and blocks nothing. Checks can be switched off (`POST /api/brand-checks/{id}/active`).
+- **Correction queue** puts the words inside likely clip moments first, strongest moment first.
+- **Signals** now follow transcript corrections whenever they are loaded (not only when recomputed), and a reaction phrase said over silence no longer counts.
+- **Demo.** `python run.py demo` always uses the fakes (before, it used whatever `.env` held, which meant live services). Each stage prints the provider that really ran. `python run.py demo --no-keys` runs with fakes off and every key blanked.
+
+Still open:
+- **Live check at 375 px and desktop** of Review and the correction screen is done by the owner's session (the app needs a passkey). The tests cover the components and audit the stylesheet for overflow and tap sizes.
+- **The no-keys demo runs on the seeded stand-ins.** With fakes off and no keys, the adapters that need keys simply stay on their fakes, so `demo --no-keys` completes but does not run local Whisper. Local Whisper (Phase 1) and signals-only ranking (Phase 4, and a rolled-back check in the demo itself) are proven by their own tests. A real Whisper run in the demo would download the 1.6 GB model into every throwaway data directory.
+- **A brand is the listing's brand, else the campaign's name.** Two campaigns of one brand that were added by hand share nothing until they come from the same listing.
+- **Brand rules read English and Arabic cue words only.** A reason in another language becomes a reminder.

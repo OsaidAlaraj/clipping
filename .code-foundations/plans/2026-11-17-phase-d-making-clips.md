@@ -2,7 +2,7 @@
 **Created:** 2026-11-17
 **Status:** in-progress
 **Started:** 2026-11-17 19:40
-**Current Phase:** 6
+**Current Phase:** 7
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -567,6 +567,8 @@ Research cited for this plan:
 | 13 | 3 | Videos over 20 min decode keyframes only (2 h measured at 83 s) | build agent | assumed |
 | 14 | 3 | sherpa-onnx optional (no Python 3.14 wheel); loudness-burst fallback for laughter; face is a skin-tone stand-in for now | build agent | assumed |
 | 15 | 3 | Signals failure (other than bad media) alerts and still enqueues moments | build agent | assumed |
+| 16 | 6 | No-keys demo runs on the seeded stand-in adapters (fakes off, keys blank); local Whisper and signals-only ranking are covered by their own tests; a real no-AI run needs a shared model cache, a speech sample and a hooks fallback (open item) | build agent | assumed |
+| 17 | 6 | Brand check severities: banned phrase = block, missing tag/phrase = warn, vague = reminder | build agent | assumed |
 ---
 ## Execution Log
 _To be filled during /code-foundations:build_
@@ -613,4 +615,11 @@ Summary: moments.find runs a per-profile route of engines (own, topic, hype, pil
 - [x] Committed
 Commit: (see git log, phase 5)
 Summary: stage_render makes each clip in one encode (NVENC with x264 fallback, about 7 s per clip) with the account's versioned template (rotation, revert, starter set), platform caption style, emphasis zooms, progress bar and title card, the Arabic label top right, a face-aware crop per profile and a PNG cover with the hook line; Profile has a look editor and a posting plan; account is chosen at render.
+
+### Phase 6: Quality gate, brand checks, end-to-end (Gate: Standard)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: DEFERRED — batch pending (tests green at commit)
+- [x] Committed
+Commit: (see git log, phase 6)
+Summary: Review shows a chance-to-clear per clip and sinks weak clips with a reason; marketplace rejections become per-brand checks (block, warn or reminder) in compliance; the correction queue favours words inside likely moments; signals refresh text series after transcript edits; the demo runs every stage and stops cleanly on the kill switch; the user guide covers the new features.
 

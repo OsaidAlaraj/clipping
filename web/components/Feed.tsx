@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api, ApiError, Clip, FilteredMoment, money, PLATFORM_LABEL, Review, reviewAction, undoReview } from "@/lib/api";
-import { useLang } from "@/lib/i18n";
+import { qualityText, useLang } from "@/lib/i18n";
 import { useSwipe } from "@/lib/useSwipe";
 import { Icon } from "./Shell";
 
@@ -147,6 +147,7 @@ export function FilteredSheet({ items, onRescue, onClose }: { items: FilteredMom
 }
 
 export function ComplianceSheet({ clip, onClose }: { clip: Clip; onClose: () => void }) {
+  const { t } = useLang();
   const report = clip.compliance_report;
   return (
     <SheetFrame title="Compliance report" onClose={onClose}>
@@ -154,9 +155,12 @@ export function ComplianceSheet({ clip, onClose }: { clip: Clip; onClose: () => 
       {report && (
         <>
           <div className="stack">
-            {report.deterministic.map((check) => (
-              <div key={check.check} className="row between">
-                <span>{check.check.replaceAll("_", " ")}<br /><span className="small muted">{check.evidence}</span></span>
+            {report.deterministic.map((check, index) => (
+              <div key={`${check.check}-${index}`} className="row between" data-testid={check.brand ? "brand-check" : undefined}>
+                <span dir="auto">
+                  {check.brand ? <>{t("brandNote")}: {check.rule}</> : check.check.replaceAll("_", " ")}
+                  <br /><span className="small muted">{check.evidence}</span>
+                </span>
                 <span className={`badge ${check.status}`}>{check.status}</span>
               </div>
             ))}
@@ -221,7 +225,7 @@ export function SessionSummary({ summary, onDone }: { summary: Summary; onDone: 
 function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }: {
   clip: Clip; onAccept: () => void; onReject: () => void; onNext: () => void; onPrev: () => void; onOpen: (sheet: Sheet | "later") => void; showPay: boolean;
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const reduce = useReducedMotion();
   const video = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true); // iOS blocks sound autoplay: clips start muted, a tap turns sound on
@@ -259,6 +263,7 @@ function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }:
         </div>
         <div className="caption" dir="auto">{clip.caption_text}</div>
         {clip.moment_reason && <div className="reason" dir="auto">Why this moment: {clip.moment_reason}</div>}
+        {clip.quality && <div className={`quality${clip.quality.weak ? " weak" : ""}`} data-testid="quality" dir="auto">{qualityText(clip.quality, lang)}</div>}
         <div className="reason">{clip.priority_reason}{showPay && clip.rate_per_1k ? ` · ${money(clip.rate_per_1k)} per 1,000 views` : ""}</div>
       </div>
       <div className="rail" onPointerDown={(event) => event.stopPropagation()}>

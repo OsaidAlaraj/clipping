@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import re
 
+from .. import brand_checks
+
 LEGAL_NOTICE = ("This report flags and records. It does not certify legal compliance, judge copyright "
                 "or verify licences. The owner decides.")
 
@@ -68,17 +70,19 @@ def overall(deterministic: list[dict], rule_results: list[dict]) -> str:
         return "fail"          # no LLM result can change this
     if any(r["status"] == "fail" for r in rule_results):
         return "fail"
-    if any(r["status"] == "review" for r in rule_results):
+    if any(r["status"] == "review" for r in (*deterministic, *rule_results)):   # a brand check that wants a look
         return "review"
-    return "pass"
+    return "pass"              # "note" rows (brand reminders) never change the verdict
 
 
 def run(conn, registry, clip: dict, template: dict, limits: dict, banned_words: list[str], rules: list[dict],
-        hook_text: str, owner_id=None) -> tuple[dict, object]:
+        hook_text: str, owner_id=None, brand_rules: list[dict] | None = None) -> tuple[dict, object]:
+    """`brand_rules` are the brand's checks learned from marketplace rejections (brand_checks); they run with the deterministic ones."""
     from ..core import AppError
 
     texts = [clip.get("caption_text") or "", hook_text or "", (clip.get("overlay_json") or {}).get("text") or ""]
     deterministic = deterministic_checks(clip, template, limits, banned_words, texts)
+    deterministic += brand_checks.evaluate(brand_rules or [], texts)
     cost = 0
     rule_results: list[dict] = []
     if any(c["status"] == "fail" for c in deterministic):

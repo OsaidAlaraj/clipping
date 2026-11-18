@@ -66,6 +66,7 @@ def test_weights_change_the_order_and_every_card_states_its_top_reason():
 
 def test_feed_is_recalculated_on_every_load(produced):
     with produced.db.session(produced.owner) as conn:
+        core.set_setting(conn, "quality_min_p_clear", 0, produced.owner.operator_id)   # this test is about the priority weights; the quality gate has its own tests
         first = [c["id"] for c in review.feed(conn, produced.owner.operator_id)]
         assert len(first) == 3 and all(c["priority_reason"] and c["video_url"].startswith("/api/media/") for c in review.feed(conn, produced.owner.operator_id))
         last = first[-1]

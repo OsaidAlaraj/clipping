@@ -133,6 +133,17 @@ def approved_campaign(db: Database, actor: Actor, name: str = "Founders Table", 
 
 
 _PRODUCED: dict = {}
+_CLIP_FILES: dict[Path, bytes] = {}   # the template's rendered clips as they were, so one test re-rendering them cannot spoil the next
+
+
+def _storage_clips() -> Path:
+    return Path(os.environ["CLIPPING_DATA_DIR"]) / "storage" / "clips"
+
+
+def _restore_clip_files() -> None:
+    for path, data in _CLIP_FILES.items():
+        if not path.exists() or path.read_bytes() != data:
+            path.write_bytes(data)
 
 
 @pytest.fixture(scope="session")
@@ -146,6 +157,7 @@ def produced_template(pg, base_template, footage):
     with database.session(actor) as conn:
         source = campaigns.register_source(conn, actor, campaign_id, footage, "en", permission_ref="TEST-PERMISSION-1")
     _PRODUCED.update(actor=actor, campaign_id=campaign_id, source_id=str(source["id"]), jobs=pipeline.run_until_idle(database))
+    _CLIP_FILES.update({p: p.read_bytes() for p in _storage_clips().rglob("*") if p.is_file()})
     database.close()
     set_db(None)
     return database.name
@@ -166,6 +178,7 @@ def produced(pg, produced_template) -> Produced:
     set_db(database)
     _reset_fakes()
     yield Produced(database)
+    _restore_clip_files()
     database.close()
     set_db(None)
     _admin(pg, f'drop database if exists "{database.name}" with (force)')

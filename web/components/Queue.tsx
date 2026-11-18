@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { api, ApiError, Clip, PLATFORM_LABEL } from "@/lib/api";
+import { useLang } from "@/lib/i18n";
 
 type ChecklistState = {
   clip: Clip;
@@ -20,6 +21,54 @@ const TICK_LABEL: Record<string, string> = {
   caption_pasted: "The caption is pasted, starting with the disclosure",
   hashtags_and_tags_checked: "Hashtags, tags and mentions are checked",
 };
+
+type Taught = { brand: string; kept_as: "checks" | "reminder"; checks: { rule: string }[] };
+
+/** The marketplace rejected a clip: its own words become checks on the brand's next clips (or a reminder when they are too vague).
+ *  The form answers at once ("Saving…"), keeps what was typed if the server refuses, and works at 375 px (one column). */
+export function RejectionForm({ clipId }: { clipId: string }) {
+  const { t } = useLang();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState<Taught | null>(null);
+  const [error, setError] = useState("");
+
+  const save = async () => {
+    if (!reason.trim()) return setError(t("reasonNeeded"));
+    setError("");
+    setBusy(true);
+    try {
+      setDone(await api<Taught>(`/api/clips/${clipId}/rejection`, { body: { reason: reason.trim() } }));
+      setReason("");
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "No connection. Try again when you are online.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!open) return <button className="btn ghost block" onClick={() => setOpen(true)}>{t("marketRejected")}</button>;
+  return (
+    <div className="card stack" data-testid="rejection-form">
+      <div className="field">
+        <label htmlFor={`rejection-${clipId}`}>{t("marketReasonLabel")}</label>
+        <textarea id={`rejection-${clipId}`} className="input" dir="auto" maxLength={500} value={reason} disabled={busy}
+          onChange={(event) => { setReason(event.target.value); setError(""); }} />
+        <span className="small muted">{t("marketReasonHint")}</span>
+      </div>
+      <button className="btn primary block" disabled={busy || !reason.trim()} onClick={save}>{busy ? t("saving") : t("saveReason")}</button>
+      <div aria-live="polite">
+        {done && (
+          <p className="small" dir="auto" data-testid="rejection-result">
+            {done.kept_as === "reminder" ? t("brandReminder") : <>{t("brandSaved")} {done.checks.map((c) => c.rule).join("; ")}</>}
+          </p>
+        )}
+        {error && <p className="error" role="alert">{error}</p>}
+      </div>
+    </div>
+  );
+}
 
 export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onClose: () => void; onChanged: () => void }) {
   const [state, setState] = useState<ChecklistState | null>(null);
@@ -130,6 +179,7 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
             )}
           </div>
         )}
+        {!state.practice && <RejectionForm clipId={clipId} />}
         {error && <p className="error" role="alert">{error}</p>}
       </div>
     </div>
