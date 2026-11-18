@@ -151,6 +151,7 @@ def housekeeping(db: Database) -> None:
     with db.session(Actor.worker()) as conn:
         for row in conn.execute("select id from operators where status = 'active'").fetchall():
             alerts.evaluate(conn, row["id"])
+            alerts.send_morning_summary(conn, row["id"])
         campaigns.purge_expired_sources(conn)
     from . import publish
 

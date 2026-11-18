@@ -2,7 +2,7 @@
 **Created:** 2026-11-18
 **Status:** in-progress
 **Started:** 2026-11-18 12:00
-**Current Phase:** 4
+**Current Phase:** 5
 **Complexity:** complex
 **Review cadence:** 5
 **Check-ins:** checkpoints
@@ -248,6 +248,11 @@
 | 17 | 3 | Worker commits `sending` before any byte; AppError->failed, unknown->needs_check, send-time blocker->cancelled; stuck sending -> needs_check after 10 min via sweep | build agent | assumed |
 | 18 | 3 | post_gate lets the worker record an API publish that already happened even if the kill switch went on meanwhile (fact, not a new post) | build agent | assumed |
 | 19 | 3 | Pasted target links must be on the platform's own host; confirm_post and paste_link are owner-only | build agent | assumed |
+| 20 | 4 | Old one-platform approve and mark-posted block shows only when post options fail to load | build agent | assumed |
+| 21 | 4 | Share sheet only on touch devices; desktop downloads | build agent | assumed |
+| 22 | 4 | Morning summary built from alerts: one info alert per local day from 08:00 (MORNING_HOUR in alerts.py) | build agent | assumed |
+| 23 | 4 | A manual target exists only for unconnected platforms; no way yet to post by hand on a connected one | build agent | open question for owner |
+| 24 | 4 | test_18 sweep tests use the real clock (a pinned 10:00 made them fail when run before ~07:00) | orchestrator | assumed |
 ---
 ## Execution Log
 ### Phase 1: Connected accounts and token vault (Gate: Standard, security-sensitive)
@@ -268,5 +273,12 @@ Summary: `publishing` stage adapters for YouTube (resumable, private while unver
 - [x] BUILD: Discovery + design + implementation complete (paused once for laptop shutdown)
 - [x] REVIEW: Verification passed
 - [x] Committed
-Commit: PENDING
+Commit: 2a5746b
 Summary: One owner tap (`POST /api/clips/{id}/post`) creates staggered per-platform `post_targets` (migration 017, DB guards for human/kill switch/practice/allowed platform/one account per platform); worker stage `publish` sends each once (sending committed first, crash -> needs_check via sweep), `post_status` polls processing, `posts` rows only with a public link; post-options, post-status, cancel and link routes exist.
+
+### Phase 4: Posting screen and manual path (Gate: Standard)
+- [x] BUILD: Discovery + design + implementation complete; also cleared the four Phase 3 review notes (TargetLinkIn rename, unused IN_FLIGHT, housekeeping-sweep test, Instagram finish claim)
+- [x] REVIEW: DEFERRED — batch pending (full backend suite green, 270 web tests, tsc clean at commit)
+- [x] Committed
+Commit: PENDING
+Summary: Queue sheet now shows PostPanel (platform picker, one combined checklist, one confirm, live per-platform status with Cancel, offline queue), PostManual (share or download file, copy caption and hashtags, paste link), 30-minute `submit_by` countdown, "finish in the app" alert and a daily morning summary; English and Arabic, RTL.

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { api, ApiError, Clip, PLATFORM_LABEL } from "@/lib/api";
 import { useData } from "@/lib/data";
+import PostPanel from "./PostPanel";
 import { ListSkeleton } from "./Skeleton";
 import { useLang } from "@/lib/i18n";
 
@@ -80,6 +81,7 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState("");
   const [briefText, setBriefText] = useState("");
+  const [legacy, setLegacy] = useState(false);   // the post screen could not load: fall back to approving and recording one post by hand
 
   const load = useCallback(() => api<ChecklistState>(`/api/clips/${clipId}/checklist`).then(setState).catch((e) => setError(e.message)), [clipId]);
   useEffect(() => { load(); }, [load]);
@@ -107,11 +109,17 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
         <div className="row between"><h1>Publish checklist</h1><button className="btn ghost" onClick={onClose}>Close</button></div>
         <p className="small muted">{clip.campaign_name} · {clip.account_handle ? `@${clip.account_handle}` : "no account"} · {clip.platform ? PLATFORM_LABEL[clip.platform] : "no platform"}</p>
 
-        <div className="card stack">
-          <div className="row between"><span className="label">Caption</span><button className="btn" onClick={() => copy(clip.caption_text ?? "")}>Copy caption</button></div>
-          <p dir="auto">{clip.caption_text}</p>
-          {clip.video_url && <a className="btn" href={clip.video_url} download>Download the approved video</a>}
-        </div>
+        {state.practice || legacy ? (
+          <div className="card stack">
+            <div className="row between"><span className="label">Caption</span><button className="btn" onClick={() => copy(clip.caption_text ?? "")}>Copy caption</button></div>
+            <p dir="auto">{clip.caption_text}</p>
+            {clip.video_url && <a className="btn" href={clip.video_url} download>Download the approved video</a>}
+          </div>
+        ) : (
+          <div className="card stack"><span className="label">Caption</span><p dir="auto">{clip.caption_text}</p></div>
+        )}
+
+        {!state.practice && !legacy && <PostPanel clip={clip} onChanged={onChanged} onUnavailable={() => setLegacy(true)} />}
 
         {state.practice && (
           <>
@@ -120,7 +128,7 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
           </>
         )}
 
-        {!ready && !state.practice && (
+        {!ready && !state.practice && legacy && (
           <>
             <div>
               {Object.entries(state.server).map(([name, item]) => (
@@ -157,7 +165,7 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
           </>
         )}
 
-        {ready && !state.practice && (
+        {ready && !state.practice && legacy && (
           <div className="stack">
             <div className="banner">Approved for publishing. Post it yourself in the platform app, then record the link here. Nothing posts automatically.</div>
             <div className="field">

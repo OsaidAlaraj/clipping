@@ -112,3 +112,4 @@ Still open:
 
 - Under `pytest -n auto` with the app's own worker running, 4 load-sensitive tests (3 render template tests in test_13, the 2-hour signals speed test in test_11) can fail; they pass alone. Make them GPU/time tolerant or mark them serial.
 - DW-6.4 live check of the review and correction screens on a real phone (375 px) is left to the owner's pilot use; component tests and the stylesheet audit passed.
+- Facebook Reels (and later X) as extra posting platforms: not in Phase E's three. Facebook posts through the same Meta app as Instagram, but needs a personal profile plus a Page (extra verification). Add after the first three platforms earn.

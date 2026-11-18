@@ -338,3 +338,22 @@ tr.listing-row { contain-intrinsic-size: auto 52px; }
 .toast .msg { min-width: 0; overflow-wrap: anywhere; }
 img, video { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) { .feed-card.settling { transition: none; } .sk { animation: none; } }
+
+/* ---- posting screens (Queue sheet): logical properties only, so Arabic mirrors without a second stylesheet */
+.post { display: grid; gap: 16px; min-width: 0; }
+.post-pick { display: flex; align-items: flex-start; gap: 12px; min-height: 56px; padding: 12px 14px; border-radius: 18px; background: var(--surface-2); }
+.post-pick.off { opacity: 0.6; }
+.post-pick input { width: 24px; height: 24px; accent-color: #0E0E10; flex: 0 0 auto; margin-top: 2px; }
+.post-pick-main { display: grid; gap: 2px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.post-pick .badge { flex: 0 0 auto; margin-inline-start: auto; }
+.post-target { display: grid; gap: 10px; min-width: 0; padding: 14px; border-radius: 18px; background: var(--surface-2); overflow-wrap: anywhere; animation: post-in 180ms ease-out; }
+.post-target[data-state="published"] { background: var(--ok-fill); }
+.post-target[data-state="cancelled"] { opacity: 0.65; }
+.post-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.post-actions .btn { min-height: 44px; }
+.post-link-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.post-link-row .input { flex: 1 1 200px; min-width: 0; }
+.post-copy .input { min-height: 80px; width: 100%; }
+.post-count { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.05rem; }
+@keyframes post-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .post-target { animation: none; } }

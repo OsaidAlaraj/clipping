@@ -22,11 +22,11 @@ from .db import Database
 
 OWNER_TICKS = ["account_and_platform_correct", "disclosure_toggle_on", "caption_pasted", "hashtags_and_tags_checked"]
 ENDED = ("cancelled", "failed")                       # a target in one of these no longer holds its platform slot
-IN_FLIGHT = ("scheduled", "sending", "processing", "draft", "private", "needs_check")
 LINKABLE = ("scheduled", "processing", "draft", "private", "needs_check")
 HOSTS = {"youtube_shorts": ("youtube.com", "youtu.be"), "instagram_reels": ("instagram.com", "instagr.am"), "tiktok": ("tiktok.com",)}
 STUCK_SENDING_S = 600            # longer than the slowest publish call (Instagram polling is capped near 270 s)
 PROCESSING_GIVE_UP_S = 3 * 3600
+SUBMIT_WITHIN_MIN = 30           # marketplaces want the public link submitted within 30 minutes of posting
 STATUS_EVERY_S = 300
 
 
@@ -252,7 +252,7 @@ def plan_times(conn, actor, accounts: list[dict], now: dt.datetime) -> list[dt.d
 def _view(row: dict) -> dict:
     return {"id": str(row["id"]), "clip_id": str(row["clip_id"]), "platform": row["platform"], "state": row["state"],
             "scheduled_at": row["scheduled_at"], "url": row["url"], "reason": row["reason"], "manual": row["manual"],
-            "account_id": str(row["account_id"]), "privacy": row["privacy"]}
+            "account_id": str(row["account_id"]), "privacy": row["privacy"], "submit_by": row.get("submit_by")}
 
 
 def post_options(conn, actor, clip_id) -> dict:
@@ -283,9 +283,14 @@ def post_options(conn, actor, clip_id) -> dict:
     return {"platforms": platforms}
 
 
+_TARGET_WITH_DEADLINE = """select t.*, p.posted_at + make_interval(mins => %s) as submit_by
+                           from post_targets t left join posts p on p.target_id = t.id"""
+
+
 def _targets_of(conn, clip_id, request_id: str | None = None) -> list[dict]:
-    rows = conn.execute("select * from post_targets where clip_id = %s and (%s::text is null or request_id = %s) order by scheduled_at, created_at",
-                        (clip_id, request_id, request_id)).fetchall()
+    """A clip's targets, oldest first. `submit_by` is set once the public link exists: the end of the marketplace's 30-minute window."""
+    rows = conn.execute(_TARGET_WITH_DEADLINE + " where t.clip_id = %s and (%s::text is null or t.request_id = %s) order by t.scheduled_at, t.created_at",
+                        (SUBMIT_WITHIN_MIN, clip_id, request_id, request_id)).fetchall()
     return [_view(r) for r in rows]
 
 
@@ -398,7 +403,8 @@ def paste_link(conn, actor, target_id, url) -> dict:
     if target["state"] not in LINKABLE:
         raise AppError("That post has no link to add yet.", "not_linkable")
     require_kill_switch_off(conn)
-    return _view(_publish(conn, target, url, target["platform_post_id"]))
+    _publish(conn, target, url, target["platform_post_id"])
+    return _view(conn.execute(_TARGET_WITH_DEADLINE + " where t.id = %s", (SUBMIT_WITHIN_MIN, target["id"])).fetchone())
 
 
 # ------------------------------------------------------------------ recording a public post
@@ -425,6 +431,15 @@ def _publish(conn, target: dict, url: str, post_id: str | None) -> dict:
 
 ZERO = Decimal("0")
 STATES = {"published", "draft", "private", "processing", "needs_check", "failed"}
+
+
+FINISH_ALERT = "finish_in_app"
+
+
+def finish_message(platform: str, state: str) -> str:
+    """The reminder for a draft or private upload: it earns nothing until the owner makes it public and pastes the link."""
+    what = "is saved as a draft" if state == "draft" else "was uploaded privately"
+    return f"Your {PLATFORM_LABEL[platform]} post {what}. Finish it in the app, then paste the public link here."[:300]
 
 
 def _end(conn, target: dict, state: str, reason: str, alert: bool = True) -> None:
@@ -466,6 +481,9 @@ def _apply(conn, target: dict, result) -> None:
     if state in ("needs_check", "failed"):
         raise_alert(conn, target["owner_operator_id"], f"post_{state}", "warn", "post_targets", target["id"],
                     f"{PLATFORM_LABEL[target['platform']]} post: {out['reason'] or 'see the post card'}"[:300])
+    if state in ("draft", "private"):
+        raise_alert(conn, target["owner_operator_id"], FINISH_ALERT, "warn", "post_targets", target["id"],
+                    finish_message(target["platform"], state))
     if state == "processing":
         try:
             enqueue(conn, "post_status", {"target_id": str(target["id"]), "round": 0}, target["owner_operator_id"],
@@ -497,6 +515,7 @@ def _send_blocker(conn, target: dict) -> str | None:
     return None
 
 
+FINISH_CLAIMED = 2        # attempts: 1 for the upload, 2 while one finish_publish is in flight. A third means the second never came back.
 KILLED = "The kill switch was on."
 WORKER_STOPPED = "The worker stopped while sending. Check the platform before trying again."
 
@@ -539,12 +558,16 @@ def stage_publish(conn, job: dict) -> Decimal:
 def stage_post_status(conn, job: dict) -> Decimal:
     """Ask the platform about a target still `processing`. Instagram is also published once its video is ready (finish_publish).
     Single-flight: a claim stamp stops two checks from running the Instagram publish step together."""
-    target = conn.execute("update post_targets set checked_at = now() where id = %s and state = 'processing' "
+    target = conn.execute("update post_targets set checked_at = now(), attempts = attempts + 1 where id = %s and state = 'processing' "
                           "and (checked_at is null or checked_at < now() - make_interval(secs => %s)) returning *",
                           (job["payload"]["target_id"], STUCK_SENDING_S)).fetchone()
     if target is None or not target["platform_post_id"] or target["connection_id"] is None:
         return ZERO
-    Database.checkpoint(conn)
+    if target["platform"] == "instagram_reels" and target["attempts"] > FINISH_CLAIMED:
+        # An earlier finish_publish started and never reported back (the worker died): Instagram may have published it already.
+        _apply(conn, target, {"state": "needs_check", "reason": WORKER_STOPPED})
+        return ZERO
+    Database.checkpoint(conn)       # the claim is durable before the platform is called
     method = "finish_publish" if target["platform"] == "instagram_reels" else "check_status"
     request = {"connection_id": target["connection_id"], "platform": target["platform"], "platform_post_id": target["platform_post_id"]}
     cost = ZERO
@@ -555,7 +578,7 @@ def stage_post_status(conn, job: dict) -> Decimal:
     except Exception as exc:
         result = {"state": "needs_check", "reason": f"Could not check this post ({type(exc).__name__}). Check the platform."}
     if isinstance(result, dict) and result.get("state") == "processing":
-        conn.execute("update post_targets set checked_at = null where id = %s", (target["id"],))     # the sweep asks again later
+        conn.execute("update post_targets set checked_at = null, attempts = %s where id = %s", (FINISH_CLAIMED - 1, target["id"]))   # the sweep asks again later
         return cost
     _apply(conn, target, result)
     return cost

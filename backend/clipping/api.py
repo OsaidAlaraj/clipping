@@ -168,7 +168,7 @@ class PostIn(BaseModel):
     request_id: str
 
 
-class LinkIn(BaseModel):
+class TargetLinkIn(BaseModel):
     url: str
 
 
@@ -968,7 +968,7 @@ def cancel_target(target_id: str, actor: Actor = Depends(current_actor)):
 
 
 @app.post("/api/targets/{target_id}/link")
-def target_link(target_id: str, body: LinkIn, actor: Actor = Depends(current_actor)):
+def target_link(target_id: str, body: TargetLinkIn, actor: Actor = Depends(current_actor)):
     return run(actor, publish.paste_link, actor, target_id, body.url)
 
 

@@ -58,6 +58,20 @@ export type Connection = {
 };
 export type ConnectionsData = { vault_ready: boolean; platforms: { platform: string; label: string }[]; connections: Connection[] };
 
+/** One platform's row on the post screen (from GET /api/clips/{id}/post-options). */
+export type PostOption = {
+  platform: string; label: string; account: { id: string; handle: string } | null;
+  connection_state: "connected" | "expiring" | "needs_reconnect" | "not_connected";
+  allowed: boolean; blocked_reason: string | null; manual_only: boolean; existing_target: string | null;
+  checklist: { server: Record<string, { ok: boolean; label: string }>; owner_ticks: string[] }; warnings: string[];
+};
+export type PostTargetState = "scheduled" | "sending" | "processing" | "published" | "draft" | "private" | "needs_check" | "failed" | "cancelled";
+/** One post going to one platform (GET /api/clips/{id}/post-status). `submit_by` is the end of the marketplace's 30-minute window, once a public link exists. */
+export type PostTarget = {
+  id: string; clip_id: string; platform: string; state: PostTargetState; scheduled_at: string; url: string | null; reason: string | null;
+  manual: boolean; account_id: string; privacy: string | null; submit_by: string | null;
+};
+
 export type Review = { id: string; clip_id: string; decision: string; queued?: boolean };
 
 export class ApiError extends Error {
@@ -177,6 +191,20 @@ export async function undoReview(review: Review): Promise<void> {
   if (review.queued && removeFromOutbox(review.id)) return;
   await api("/api/reviews/undo", { body: { review_id: review.id } });
 }
+
+/** Send an owner action now, or keep it on the device if there is no connection. `id` is also the request id the server uses to
+ *  apply it once, so a retry after a dropped connection cannot post twice. */
+export async function sendOrQueue<T>(path: string, body: Record<string, unknown>, id: string): Promise<T | { queued: true }> {
+  try {
+    return await api<T>(path, { body });
+  } catch (error) {
+    if (!(error instanceof NetworkError)) throw error;
+    writeOutbox([...readOutbox().filter((item) => item.id !== id), { id, path, body }]);
+    return { queued: true };
+  }
+}
+
+export const newActionId = actionId;
 
 export async function flushOutbox(): Promise<number> {
   let sent = 0;

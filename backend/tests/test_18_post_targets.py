@@ -634,6 +634,7 @@ def test_DW_3_4_a_still_processing_post_is_asked_again_later_and_a_failed_check_
     publishing.FAKE_PUBLISHING["mode"]["instagram_reels"] = "processing"
     target = posting.confirm(["instagram_reels"])["targets"][0]
     posting.run_stage(pipeline.stage_publish, target["id"])
+    posting.unpin()                                           # rows are aged by the real clock; a pinned 10:00 is hours later when run early in the day
     posting.run_stage(pipeline.stage_post_status, target["id"])                           # still processing
     row = posting.targets()["instagram_reels"]
     assert row["state"] == "processing" and row["checked_at"] is None
@@ -685,6 +686,7 @@ def test_DW_3_4_the_sweep_stays_quiet_while_the_kill_switch_is_on(posting):
     publishing.FAKE_PUBLISHING["mode"]["instagram_reels"] = "processing"
     target = posting.confirm(["instagram_reels"])["targets"][0]
     posting.run_stage(pipeline.stage_publish, target["id"])
+    posting.unpin()
     with posting.db.session(Actor.system()) as conn:
         conn.execute("update kill_switch set active = true")
     with posting.db.session(Actor.worker()) as conn:

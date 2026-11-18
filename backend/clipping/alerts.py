@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime as dt
 import statistics
+import uuid
 from decimal import Decimal
 
 from psycopg.types.json import Jsonb
@@ -119,8 +120,57 @@ def evaluate(conn, owner_id) -> list[dict]:
                      f"@{account['handle']} ({account['platform']}): median views fell from {int(base_median)} to "
                      f"{int(recent_median)}. The account is paused.")
 
+    from . import publish   # lazy: publish imports this module
+
+    # A draft or private upload earns nothing until the owner finishes it in the app. publish raises the reminder when the post
+    # lands; this catches any older one that never got one (a reminder the owner acknowledged is not raised again).
+    for t in conn.execute(
+        """select t.id, t.platform, t.state from post_targets t where t.owner_operator_id = %s and t.state in ('draft', 'private')
+           and not exists (select 1 from alerts a where a.type = %s and a.entity_id = t.id)""",
+        (owner_id, publish.FINISH_ALERT),
+    ).fetchall():
+        fire(publish.FINISH_ALERT, "warn", "post_targets", t["id"], publish.finish_message(t["platform"], t["state"]))
+
     for a in conn.execute("select id, stage, provider, quota_used, quota_limit from adapters where quota_limit is not null and active").fetchall():
         if a["quota_used"] >= a["quota_limit"] * Decimal("0.8"):
             fire("adapter_quota", "warn", "adapters", a["id"],
                  f"{a['stage']} adapter ({a['provider']}) has used {a['quota_used']} of {a['quota_limit']}.")
     return raised
+
+
+MORNING_HOUR = 8     # local hour from which the day's summary may be sent
+
+
+def morning_summary(conn, owner_id) -> list[str]:
+    """The lines of the morning summary: what is waiting on the owner today. Empty when nothing is."""
+    counts = conn.execute(
+        """select count(*) filter (where t.state in ('draft', 'private')) as unfinished,
+                  count(*) filter (where t.state = 'needs_check') as to_check,
+                  (select count(*) from clips cl join campaigns c on c.id = cl.campaign_id
+                    where cl.status in ('accepted', 'ready_to_post', 'queued') and not c.is_practice and cl.owner_operator_id = %(o)s) as ready
+           from post_targets t where t.owner_operator_id = %(o)s""",
+        {"o": owner_id},
+    ).fetchone()
+    lines = []
+    if counts["unfinished"]:
+        lines.append(f"{counts['unfinished']} post(s) are drafts or private uploads. Finish them in the app, then paste the public link.")
+    if counts["to_check"]:
+        lines.append(f"{counts['to_check']} post(s) need a check on the platform before you try again.")
+    if counts["ready"]:
+        lines.append(f"{counts['ready']} clip(s) are ready to post.")
+    return lines
+
+
+def send_morning_summary(conn, owner_id, now: dt.datetime | None = None) -> dict | None:
+    """Once per local day, from MORNING_HOUR on, send the summary as an info alert (in-app and the alert channel).
+    Yesterday's summary is acknowledged so the inbox holds one. Returns the alert, or None when it is early, empty or already sent today."""
+    now = now or dt.datetime.now().astimezone()
+    if now.hour < MORNING_HOUR:
+        return None
+    lines = morning_summary(conn, owner_id)
+    day_key = uuid.uuid5(uuid.NAMESPACE_URL, f"morning-summary/{owner_id}/{now.date().isoformat()}")
+    if not lines or conn.execute("select 1 from alerts where type = 'morning_summary' and entity_id = %s", (day_key,)).fetchone():
+        return None
+    conn.execute("update alerts set acknowledged_at = now() where owner_operator_id = %s and type = 'morning_summary' and acknowledged_at is null",
+                 (owner_id,))
+    return raise_alert(conn, owner_id, "morning_summary", "info", "morning_summary", day_key, "Good morning. " + " ".join(lines))
