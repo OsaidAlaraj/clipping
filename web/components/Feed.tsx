@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { api, ApiError, Clip, money, PLATFORM_LABEL, Review, reviewAction, undoReview } from "@/lib/api";
+import { api, ApiError, Clip, FilteredMoment, money, PLATFORM_LABEL, Review, reviewAction, undoReview } from "@/lib/api";
 import { useLang } from "@/lib/i18n";
 import { useSwipe } from "@/lib/useSwipe";
 import { Icon } from "./Shell";
@@ -24,7 +24,7 @@ export const REASONS: [string, string][] = [
 ];
 
 type Summary = { clips_reviewed: number; accepted: number; rejected: number; parked: number; posts_due: number; minutes_logged: number; hours_today: number; pay_per_clip?: { name: string; rate_per_1k: number | null; max_payout_per_clip: number | null }[] };
-type Sheet = null | "reject" | "hooks" | "edit" | "report";
+type Sheet = null | "reject" | "hooks" | "edit" | "report" | "filtered";
 type UndoState = { review: Review; clip: Clip; index: number } | null;
 
 // ------------------------------------------------------------------ sheets
@@ -117,6 +117,31 @@ function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Recor
       </div>
       <button className="btn primary block" onClick={save}>Save as new version</button>
       {clip.source_id && <Link className="btn block" href={`/transcript?id=${clip.source_id}`}>Fix transcript</Link>}
+    </SheetFrame>
+  );
+}
+
+const LAYER_LABEL: Record<number, string> = { 1: "Hard rule", 2: "Below this video's cut-off", 3: "Not among the top picks" };
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+/** Moments the engine set aside, each with its reason. Rescuing one removes it at once and cuts it like any other moment. */
+export function FilteredSheet({ items, onRescue, onClose }: { items: FilteredMoment[]; onRescue: (item: FilteredMoment) => void; onClose: () => void }) {
+  const { t } = useLang();
+  return (
+    <SheetFrame title={t("filtered")} onClose={onClose}>
+      <p className="small muted">Nothing is hidden: these moments were set aside, with the reason. Rescue one to cut it anyway; the engine learns from it.</p>
+      {items.length === 0 && <p className="muted">Nothing is set aside.</p>}
+      <div className="stack">
+        {items.map((item) => (
+          <div key={item.id} className="row between" data-testid="filtered-moment">
+            <span dir="auto">
+              {item.campaign_name} · {clock(Number(item.start_s))}–{clock(Number(item.end_s))}<br />
+              <span className="small muted">{LAYER_LABEL[item.layer]}: {item.reason}</span>
+            </span>
+            <button className="btn" onClick={() => onRescue(item)}>{t("rescue")}</button>
+          </div>
+        ))}
+      </div>
     </SheetFrame>
   );
 }
@@ -256,6 +281,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
   const [sheet, setSheet] = useState<Sheet>(null);
   const [undo, setUndo] = useState<UndoState>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [filtered, setFiltered] = useState<FilteredMoment[]>([]);
   const [message, setMessage] = useState("");
   const [config, setConfig] = useState({ undo: 10, length: 25, pay: "summary", killed: false });
   const session = useRef<string | null>(null);
@@ -290,6 +316,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
         const data = await api(`/api/feed${campaignId ? `?campaign_id=${campaignId}` : ""}`);
         if (cancelled) return;
         setClips(data.clips);
+        setFiltered(data.filtered ?? []);
         setConfig({ undo: Number(data.undo_window_s), length: Number(data.session_length_min), pay: data.pay_per_clip_display, killed: data.kill_switch });
         const started = await api("/api/sessions", { body: { campaign_id: campaignId ?? null } });
         if (cancelled) return;
@@ -390,6 +417,18 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
     }
   }, [removeCurrent]);
 
+  // Rescue: the moment leaves the list at once; the server cuts it like any other. A refusal puts it back.
+  const rescue = useCallback(async (item: FilteredMoment) => {
+    setFiltered((list) => list.filter((m) => m.id !== item.id));
+    try {
+      await api(`/api/candidates/${item.id}/rescue`, { body: {} });
+      setMessage("Rescued. It joins the feed when it has been cut.");
+    } catch (error) {
+      setFiltered((list) => [item, ...list]);
+      fail(error);
+    }
+  }, []);
+
   const next = useCallback(() => setIndex((i) => Math.min(i + 1, Math.max(state.current.clips.length - 1, 0))), []);
   const prev = useCallback(() => setIndex((i) => Math.max(i - 1, 0)), []);
 
@@ -426,6 +465,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
             <span className="name">{clip.is_practice && <span className="badge info" style={{ marginInlineEnd: 8 }}>Practice</span>}{clip.campaign_name}</span>
             <span className="row">
               <span className="chip" aria-label="Position in feed">{index + 1} of {clips.length}</span>
+              {filtered.length > 0 && <button className="chip" onClick={() => setSheet("filtered")}>{t("filtered")} {filtered.length}</button>}
               <button className="chip" onClick={() => endSession()}>{t("stopHere")}</button>
             </span>
           </div>
@@ -436,6 +476,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
         <div className="empty">
           <h1>{config.killed ? "The kill switch is on" : "Nothing to review"}</h1>
           <p className="muted">{config.killed ? "The feed is paused until you switch it off in Settings." : "New clips appear here when the pipeline finishes them."}</p>
+          {filtered.length > 0 && <button className="btn" onClick={() => setSheet("filtered")}>{t("filtered")} {filtered.length}</button>}
           <button className="btn" onClick={() => endSession()}>End session</button>
         </div>
       )}
@@ -449,6 +490,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       {sheet === "reject" && <RejectSheet onSubmit={reject} onClose={() => setSheet(null)} />}
       {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} />}
       {sheet === "edit" && clip && <EditSheet clip={clip} onClose={() => setSheet(null)} onSave={saveEdit} />}
+      {sheet === "filtered" && <FilteredSheet items={filtered} onRescue={rescue} onClose={() => setSheet(null)} />}
       {sheet === "report" && clip && <ComplianceSheet clip={clip} onClose={() => setSheet(null)} />}
     </>
   );

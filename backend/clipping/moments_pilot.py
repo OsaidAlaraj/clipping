@@ -155,11 +155,13 @@ def _hook_line(hook: str, words: list[dict], start: float, end: float) -> str:
 
 # ------------------------------------------------------------------ the public interface
 
-def propose_with_cost(conn, source: dict, version: dict, profile_hint: str | None = None) -> tuple[list[dict], Decimal]:
+def propose_with_cost(conn, source: dict, version: dict, profile_hint: str | None = None,
+                      length: tuple[float, float] | None = None) -> tuple[list[dict], Decimal]:
     """Candidates for one source, best first, and what the LLM calls cost. `version` is the campaign version the
-    source belongs to (kept for the phase-4 signature: a practice campaign has no brief to read).
-    Raises AppError when no valid moment can be had; the pipeline then falls back to manual selection."""
-    lo, hi = length_range(profile_hint)
+    source belongs to (kept for the phase-4 signature: a practice campaign has no brief to read). `length` is the clip
+    length range to use (the moment engine passes its profile's); without it the niche hint decides.
+    Raises AppError when no valid moment can be had."""
+    lo, hi = length or length_range(profile_hint)
     words = transcripts.load(conn, source["id"])["words"]
     duration = float(source["duration_s"] or 0) or words[-1]["end"]
     language = source["language"] if source["language"] in ("en", "ar") else "en"
@@ -204,3 +206,7 @@ def propose(conn, source: dict, version: dict, profile_hint: str | None = None) 
     """The pinned contract: Candidate dicts {start_s, end_s, variant, score, rank, reasons, features, source}
     (plus an additive `hook` line), best first."""
     return propose_with_cost(conn, source, version, profile_hint)[0]
+
+
+# The moment engine (moments.py, moment_engines.py) builds on the same text helpers under public names.
+sentences, chunks, fit, overlap_share, hook_line = _sentences, _chunks, _fit, _overlap, _hook_line

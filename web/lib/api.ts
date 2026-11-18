@@ -34,6 +34,12 @@ export type Clip = {
   cover_url?: string | null;
 };
 
+/** A moment the engine set aside (layer 1 hard rule, 2 below the episode's cut-off, 3 not among the top picks). */
+export type FilteredMoment = {
+  id: string; source_id: string; campaign_id: string; campaign_name: string; start_s: number; end_s: number; score: number | null;
+  reason: string; layer: 1 | 2 | 3; profile: string | null; engine: string | null;
+};
+
 export type Review = { id: string; clip_id: string; decision: string; queued?: boolean };
 
 export class ApiError extends Error {

@@ -2,7 +2,7 @@
 **Created:** 2026-11-17
 **Status:** in-progress
 **Started:** 2026-11-17 19:40
-**Current Phase:** 4
+**Current Phase:** 5
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -595,7 +595,15 @@ Summary: One-tap practice campaigns (owner gate kept, posting and payouts refuse
 ### Phase 3: Signals (Gate: Standard)
 - [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
 - [x] REVIEW: DEFERRED — batch pending (tests green at commit)
+- Covered by batch review 2026-11-18 (phases 3–4)
 - [x] Committed
 Commit: (see git log, phase 3)
 Summary: signals.compute stores per-second loudness, speech rate, turns, scene, face (stand-in), laughter (burst fallback), reaction words (en/ar), chat bursts and YouTube most-replayed, plus TextTiling-style topics, once per source after transcription (new signals job before moments); a 2-hour file measures in about 83 s.
+
+### Phase 4: Moment engine (Gate: Standard, security-sensitive)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: Verification passed (batch review phases 3–4, 2026-11-18)
+- [x] Committed
+Commit: (see git log, phase 4)
+Summary: moments.find runs a per-profile route of engines (own, topic, hype, pilot, vendor) behind one interface, filters in three layers (hard gates, auditable soft score with cross-modal discounts, both-order pairwise with Bradley-Terry), keeps a percentile cut with a profile minimum, stores filtered moments with reasons (rescue in Review), gives three cut variants, and learns engine, hook-pattern and feature weights from labels; real Arabic and English runs cost about 2 cents each.
 

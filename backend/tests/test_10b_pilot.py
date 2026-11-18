@@ -143,17 +143,17 @@ def test_DW_2P_1_practice_footage_runs_the_whole_pipeline_to_reviewable_clips_wi
     assert sent.status_code == 200, sent.text
     assert pipeline.run_until_idle(db) > 0
     feed = c.get(f"/api/feed?campaign_id={cid}").json()["clips"]
-    assert len(feed) == 2                                         # the fake LLM picks two 20-45 s moments in a 60 s video
+    assert len(feed) == 3                                         # the engine keeps the stream profile's minimum of three in a 60 s video
     for clip in feed:
         assert clip["is_practice"] is True and clip["status"] == "ready_for_review" and clip["compliance_status"] == "pass"
         assert clip["caption_text"].startswith("#ad") and clip["render_meta"]["overlay_burned"] is True
-        assert 20 <= float(clip["duration_s"]) <= 45 and clip["moment_reason"].startswith("A self-contained stretch")
-        assert "Hook:" in clip["moment_reason"] and clip["hook_text"]
+        assert 8 <= float(clip["duration_s"]) <= 45 and clip["moment_reason"]   # a 60 s video shrinks the 20-45 s range
+        assert clip["hook_text"]
         cover = c.get(clip["cover_url"])
         assert cover.status_code == 200 and cover.content[:2] == b"\xff\xd8"   # a real JPEG
         assert c.get(clip["video_url"]).status_code == 200
     with db.session(owner) as conn:
-        assert {r["provider"] for r in conn.execute("select provider from candidates").fetchall()} == {"pilot_llm"}
+        assert {r["provider"] for r in conn.execute("select provider from candidates").fetchall()} <= {"own", "hype", "topic", "fake"}
 
 
 def test_DW_2P_1_posting_scheduling_and_marking_posted_are_refused_for_a_practice_clip(db, owner, footage):
@@ -239,7 +239,7 @@ def test_practice_is_not_held_to_the_weekly_clip_cap(db, owner, footage):
         campaigns.register_source(conn, owner, campaign["id"], footage, "en")
     pipeline.run_until_idle(db)
     with db.session(owner) as conn:
-        assert len(review.feed(conn, owner.operator_id)) == 2
+        assert len(review.feed(conn, owner.operator_id)) == 3
         assert "weekly_clip_cap" not in [r["type"] for r in conn.execute("select type from alerts").fetchall()]
 
 
@@ -386,23 +386,19 @@ def test_DW_2P_2_bad_llm_output_gives_a_clear_refusal_instead_of_a_crash_or_a_wr
 
 @pytest.mark.parametrize("raw", ["not json", {"moments": [{"start_s": 5, "end_s": 900, "score": 0.9, "reason": "after the end"}]},
                                  {"moments": "soon"}])
-def test_DW_2P_2_bad_llm_output_falls_back_to_manual_selection_with_an_alert_and_the_job_finishes(db, owner, footage, raw):
-    campaign = make_practice(db, owner)
+def test_DW_2P_2_bad_llm_output_from_the_picker_engine_never_stops_the_job_and_the_other_engines_carry_on(db, owner, footage, raw):
+    campaign = make_practice(db, owner, niche="lifestyle")      # the lifestyle route includes the LLM picker engine
     with db.session(owner) as conn:
         campaigns.register_source(conn, owner, campaign["id"], footage, "en")
     fake_llm.FAKE_MOMENTS["answer"] = raw
     pipeline.run_until_idle(db)
     with db.session(owner) as conn:
-        alert = conn.execute("select message, severity from alerts where type = 'manual_selection'").fetchone()
-        assert "Pick the moments by hand" in alert["message"] and alert["severity"] == "warn"
-        assert conn.execute("select count(*) as n from candidates").fetchone()["n"] == 0
         assert {r["status"] for r in conn.execute("select status from jobs").fetchall()} == {"done"}   # nothing failed or crashed
-        source_id = conn.execute("select id from source_assets").fetchone()["id"]
-        picked = pipeline.add_manual_candidates(conn, owner, source_id, [{"start_s": 5, "end_s": 30}])   # the fallback works
-        assert picked == 1
+        assert conn.execute("select count(*) as n from candidates where origin = 'pilot_llm'").fetchone()["n"] == 0
+        assert conn.execute("select count(*) as n from candidates where status <> 'filtered'").fetchone()["n"] >= 1
 
 
-def test_an_adapter_that_keeps_failing_also_ends_in_the_manual_selection_alert(db, owner, footage, monkeypatch):
+def test_an_adapter_that_keeps_failing_leaves_the_signals_to_rank_and_says_so(db, owner, footage, monkeypatch):
     def broken(self, task, payload):
         raise AdapterError("the model is down")
 
@@ -411,20 +407,24 @@ def test_an_adapter_that_keeps_failing_also_ends_in_the_manual_selection_alert(d
     with db.session(owner) as conn:
         campaigns.register_source(conn, owner, campaign["id"], footage, "en")
     pipeline.run_until_idle(db)
-    assert "manual_selection" in alert_types(db, owner)
+    assert "moments_signals_only" in alert_types(db, owner)
+    with db.session(owner) as conn:
+        assert conn.execute("select count(*) as n from candidates where status = 'new'").fetchone()["n"] >= 1
 
 
-def test_a_paused_llm_ends_in_the_manual_selection_alert(db, owner, footage):
+def test_a_paused_llm_leaves_the_signals_to_rank_and_says_so(db, owner, footage):
     campaign = make_practice(db, owner)
     with db.session(owner) as conn:
         campaigns.register_source(conn, owner, campaign["id"], footage, "en")
         conn.execute("update adapters set paused_reason = 'monthly cap of $10 reached' where stage = 'llm' and active")
     pipeline.run_until_idle(db)
-    assert "manual_selection" in alert_types(db, owner)
+    assert "moments_signals_only" in alert_types(db, owner)
 
 
-def test_an_unexpected_bug_in_the_picker_still_degrades_to_the_alert(db, owner, footage, monkeypatch):
-    monkeypatch.setattr(moments_pilot, "propose_with_cost", lambda *a, **k: 1 / 0)
+def test_an_unexpected_bug_in_the_engine_still_degrades_to_the_manual_selection_alert(db, owner, footage, monkeypatch):
+    from clipping import moments
+
+    monkeypatch.setattr(moments, "find", lambda *a, **k: 1 / 0)
     campaign = make_practice(db, owner)
     with db.session(owner) as conn:
         campaigns.register_source(conn, owner, campaign["id"], footage, "en")
@@ -589,10 +589,10 @@ def test_refuse_practice_ignores_real_and_missing_campaigns(db, owner):
             campaigns.refuse_practice(conn, make_practice(db, owner)["id"], "publishing")
 
 
-def test_a_real_campaign_still_uses_the_moments_adapter_not_the_pilot_picker(produced):
+def test_a_real_campaign_runs_the_engine_with_the_moments_adapter_as_one_engine_and_no_pilot_picker(produced):
     with produced.db.session(produced.owner) as conn:
         providers = {r["provider"] for r in conn.execute("select provider from candidates").fetchall()}
-    assert providers == {"fake"} and not fake_llm.FAKE_MOMENTS["calls"]
+    assert providers and "pilot_llm" not in providers and not fake_llm.FAKE_MOMENTS["calls"]
     assert ops.ensure_owner(produced.db).operator_id == produced.owner.operator_id
 
 

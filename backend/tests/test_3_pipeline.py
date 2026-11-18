@@ -11,6 +11,7 @@ from clipping import alerts, campaigns, core, ffmpeg, pipeline
 from clipping.adapters import fake_llm, media, vendors
 from clipping.agents import compliance as agent_c
 from clipping.agents import hooks as agent_b
+from clipping.core import AppError
 from clipping.db import Actor
 from conftest import add_accounts, approved_campaign
 
@@ -147,7 +148,9 @@ def test_pipeline_produces_packaged_compliant_clips(produced):
     assert len(clips) == 3 and len(candidates) == 3
     assert sorted(j["type"] for j in jobs) == sorted(["transcribe", "signals", "moments"] + ["hooks", "render", "captions", "compliance", "package"] * 3)
     assert all(j["status"] == "done" and j["cost_usd"] is not None for j in jobs)
-    assert [float(c["score"]) for c in candidates] == [0.91, 0.78, 0.66]
+    scores = [float(c["score"]) for c in candidates]   # the moment engine's own scores (phase 4), best first
+    assert scores == sorted(scores, reverse=True) and all(0 < x <= 1 for x in scores)
+    assert [c["rank"] for c in candidates] == [1, 2, 3] and all(c["origin"] and c["profile"] == "podcast" for c in candidates)
     starts, _ = pipeline.sentence_bounds(words)
     for clip in clips:
         assert clip["status"] == "ready_for_review" and clip["compliance_status"] == "pass"
@@ -209,7 +212,7 @@ def test_arabic_source_gets_arabic_captions_and_disclosure(db, owner, footage):
     assert clip["caption_text"].startswith("#إعلان ") and clip["overlay_json"]["text"] == "#إعلان"
     assert clip["status"] == "ready_for_review" and clip["compliance_status"] == "pass"
     ass = storage.path(clip["file_path"]).with_suffix(".ass").read_text(encoding="utf-8-sig")
-    assert "#إعلان" in ass and any(word in ass for word in ("الناس", "النجاح", "تماماً", "خسرت"))
+    assert "#إعلان" in ass and "Caption" in ass and any(0x600 <= ord(ch) <= 0x6FF for ch in ass.split("[Events]")[-1].replace("#إعلان", ""))
     assert cap_alert is not None   # weekly clip cap is soft: it warns
 
 
@@ -267,7 +270,7 @@ def test_a_clip_that_fails_compliance_never_reaches_the_feed(db, owner, footage)
     add_accounts(db, owner)
     campaign_id = approved_campaign(db, owner)
     with db.session(Actor.system()) as conn:
-        conn.execute("update categories set banned_words = '{costs}' where name = 'podcast'")   # the top hook says "costs you"
+        conn.execute("update categories set banned_words = '{costs,tells,unpopular,started,wrong,mistake,what,the,you}' where name = 'podcast'")   # every hook uses one
         conn.execute("update settings set value = '13' where key = 'clip_max_duration_s'")
     with db.session(owner) as conn:
         campaigns.register_source(conn, owner, campaign_id, footage, "en", permission_ref="P-5")
@@ -287,11 +290,29 @@ def test_a_clip_that_fails_compliance_never_reaches_the_feed(db, owner, footage)
             conn.execute("update clips set status = 'ready_for_review' where compliance_status = 'fail'")
 
 
-def test_moment_adapter_failure_falls_back_to_manual_selection(db, owner, footage):
+def test_a_paused_moment_service_does_not_stop_the_engine(db, owner, footage):
     add_accounts(db, owner)
     campaign_id = approved_campaign(db, owner)
     with db.session(Actor.system()) as conn:
         conn.execute("update adapters set paused_reason = 'test outage' where stage = 'moments' and active")
+    with db.session(owner) as conn:
+        campaigns.register_source(conn, owner, campaign_id, footage, "en", permission_ref="P-6")
+    pipeline.run_until_idle(db)
+    with db.session(owner) as conn:
+        origins = {r["origin"] for r in conn.execute("select origin from candidates").fetchall()}
+        assert origins and "fake" not in origins            # our own engines carried on without the vendor
+        assert conn.execute("select count(*) as n from alerts where type = 'manual_selection'").fetchone()["n"] == 0
+
+
+def test_when_the_engine_itself_fails_the_owner_is_told_to_pick_by_hand(db, owner, footage, monkeypatch):
+    from clipping import moments
+
+    def broken(*args, **kwargs):
+        raise AppError("The engine is down.", "engine_down")
+
+    monkeypatch.setattr(moments, "find", broken)
+    add_accounts(db, owner)
+    campaign_id = approved_campaign(db, owner)
     with db.session(owner) as conn:
         source = campaigns.register_source(conn, owner, campaign_id, footage, "en", permission_ref="P-6")
     pipeline.run_until_idle(db)

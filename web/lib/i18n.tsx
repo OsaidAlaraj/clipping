@@ -8,14 +8,14 @@ const LABELS = {
   en: {
     home: "Home", feed: "Feed", queue: "Queue", more: "More",
     accept: "Accept", reject: "Reject", hooks: "Hooks", edit: "Edit", later: "Review later",
-    undo: "Undo", rejected: "Rejected", stopHere: "Stop here", soundOn: "Tap for sound", muted: "Muted",
+    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", stopHere: "Stop here", soundOn: "Tap for sound", muted: "Muted",
     reviewLater: "Review Later", ledger: "Ledger", alerts: "Alerts", settings: "Settings",
     explore: "Explore", review: "Review", profile: "Profile", create: "New", addCampaign: "Add campaign", addVideo: "Add video",
   },
   ar: {
     home: "الرئيسية", feed: "المراجعة", queue: "قائمة النشر", more: "المزيد",
     accept: "قبول", reject: "رفض", hooks: "العناوين", edit: "تعديل", later: "مراجعة لاحقاً",
-    undo: "تراجع", rejected: "تم الرفض", stopHere: "توقف هنا", soundOn: "اضغط لتشغيل الصوت", muted: "صامت",
+    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", stopHere: "توقف هنا", soundOn: "اضغط لتشغيل الصوت", muted: "صامت",
     reviewLater: "للمراجعة لاحقاً", ledger: "السجل المالي", alerts: "التنبيهات", settings: "الإعدادات",
     explore: "استكشاف", review: "المراجعة", profile: "ملفي", create: "جديد", addCampaign: "إضافة حملة", addVideo: "إضافة فيديو",
   },

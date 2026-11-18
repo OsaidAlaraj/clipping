@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, campaigns, config, discovery, ledger, ops, pipeline, progress, publish, ranking, review, sources, transcripts
+from . import alerts, auth, campaigns, config, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -705,9 +705,30 @@ def device_code(actor: Actor = Depends(current_actor)):
 def get_feed(campaign_id: str | None = None, actor: Actor = Depends(current_actor)):
     with get_db().session(actor) as conn:
         return {"clips": review.feed(conn, actor.operator_id, campaign_id), "kill_switch": kill_switch(conn)["active"],
+                "filtered": moments.filtered_list(conn, campaign_id),
                 "undo_window_s": review.get_setting(conn, "undo_window_s", actor.operator_id),
                 "session_length_min": review.get_setting(conn, "session_length_min", actor.operator_id),
                 "pay_per_clip_display": review.get_setting(conn, "pay_per_clip_display", actor.operator_id)}
+
+
+@app.post("/api/candidates/{candidate_id}/rescue")
+def rescue_moment(candidate_id: str, actor: Actor = Depends(current_actor)):
+    """The owner overrides the moment filter: the moment is cut like any other and the rescue teaches the engine."""
+    return run(actor, moments.rescue, actor, candidate_id)
+
+
+class ProfileIn(BaseModel):
+    profile: str | None = None
+
+
+@app.get("/api/profiles")
+def list_profiles(actor: Actor = Depends(current_actor)):
+    return {"profiles": run(actor, profiles.listing)}
+
+
+@app.put("/api/sources/{source_id}/profile")
+def set_source_profile(source_id: str, body: ProfileIn, actor: Actor = Depends(current_actor)):
+    return run(actor, moments.set_profile, actor, source_id, body.profile)
 
 
 @app.get("/api/clips/{clip_id}")

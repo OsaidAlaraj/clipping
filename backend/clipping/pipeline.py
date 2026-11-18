@@ -4,7 +4,6 @@ The worker can run every stage, but it cannot pass a human gate (database trigge
 from __future__ import annotations
 
 import tempfile
-import time
 from decimal import Decimal
 from pathlib import Path
 
@@ -173,64 +172,30 @@ def _manual_selection_alert(conn, owner, campaign: dict, source: dict, why: str)
                 f"{campaign['name']}: moment finding is unavailable ({why}). Pick the moments by hand.")
 
 
-def _pilot_moments(conn, source: dict, campaign: dict, version: dict) -> Decimal:
-    """Practice campaigns: the LLM reads the transcript and picks the moments (moments_pilot). Whatever goes wrong with
-    its answer ends in the manual-selection alert; the job never crashes on bad model output."""
-    from . import moments_pilot   # lazy: moments_pilot builds on this module's snapping
+def stage_moments(conn, job: dict) -> Decimal:
+    """The moment engine (moments.find) picks the moments for every campaign, practice or real: engines propose, one filter
+    decides. Whatever goes wrong ends in the manual-selection alert; the job never crashes on bad model output."""
+    from . import moments   # lazy: moments builds on this module's snapping
 
+    source, campaign, version = _source_ctx(conn, job["payload"]["source_id"])
     owner = source["owner_operator_id"]
-    niche = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone()
     try:
-        found, cost = moments_pilot.propose_with_cost(conn, source, version, niche["name"] if niche else None)
+        result = moments.find(conn, source["id"], version)
     except KillSwitchOn:
         raise
     except Exception as exc:
         _manual_selection_alert(conn, owner, campaign, source, str(exc) if isinstance(exc, AppError) else type(exc).__name__)
         return Decimal("0")
-    candidates = [{"start_s": c["start_s"], "end_s": c["end_s"], "score": c["score"],
-                   "reason": f"{c['reasons'][0]} (Hook: {c['hook']})" if c["hook"] else c["reasons"][0]} for c in found]
-    return cost + _store_candidates(conn, source, campaign, version, candidates, "pilot_llm")
+    if not result["kept"]:
+        if not result["filtered"]:
+            _manual_selection_alert(conn, owner, campaign, source, "no moment qualified")
+        return result["cost"]
+    return result["cost"] + _schedule_candidates(conn, source, campaign, version, result["kept"])
 
 
-def stage_moments(conn, job: dict) -> Decimal:
-    source, campaign, version = _source_ctx(conn, job["payload"]["source_id"])
-    if campaign["is_practice"]:
-        return _pilot_moments(conn, source, campaign, version)
+def _schedule_candidates(conn, source: dict, campaign: dict, version: dict, rows: list[dict]) -> Decimal:
+    """Queue the hooks job for each stored candidate (`id`, `rank`), within the weekly cap and the portfolio share."""
     owner = source["owner_operator_id"]
-    storage = registry.get(conn, "storage")
-    options = {"language": source["language"], "duration_s": float(source["duration_s"] or 0), "max_clips": 5}
-    try:
-        submitted, cost = registry.call(conn, "moments", "submit", {
-            "source": {"key": source["stored_path"], "url": storage.get_signed_url(source["stored_path"], 3600)},
-            "options": options}, owner)
-        for _ in range(120):
-            status, _ = registry.call(conn, "moments", "status", {"job_id": submitted["job_id"]}, owner)
-            if status.get("done"):
-                break
-            time.sleep(5)
-        else:
-            raise AppError("Moment finding did not finish in time.", "moments_timeout")
-        found, _ = registry.call(conn, "moments", "clips", {"job_id": submitted["job_id"]}, owner)
-    except KillSwitchOn:
-        raise
-    except AppError as exc:
-        # Declared fallback: manual selection in the review tool.
-        _manual_selection_alert(conn, owner, campaign, source, str(exc))
-        return Decimal("0")
-    provider = registry.row(conn, "moments")["provider"]
-    words = _words(conn, source)
-    quiet = ffmpeg.silences(storage.path(source["stored_path"]))
-    candidates = []
-    for item in found:
-        start, end = snap(float(item["start_s"]), float(item["end_s"]), words, quiet)
-        candidates.append({"start_s": start, "end_s": min(end, float(source["duration_s"] or end)),
-                           "score": item.get("score"), "reason": item.get("reason")})
-    return cost + _store_candidates(conn, source, campaign, version, candidates, provider)
-
-
-def _store_candidates(conn, source: dict, campaign: dict, version: dict, candidates: list[dict], provider: str) -> Decimal:
-    owner = source["owner_operator_id"]
-    ranked = agent_b.rank_candidates(candidates)
     cap = int(get_setting(conn, "clips_per_campaign_per_week", campaign["id"]))
     made = conn.execute(
         "select count(*) as n from clips where campaign_id = %s and version_no = 1 and created_at > now() - interval '7 days'",
@@ -238,23 +203,32 @@ def _store_candidates(conn, source: dict, campaign: dict, version: dict, candida
     ).fetchone()["n"]
     room, share_note = max(cap - made, 0), None
     if campaign["is_practice"]:
-        room = len(ranked)   # practice has no weekly cap or risk spreading: it exists to try the system on any video
+        room = len(rows)   # practice has no weekly cap or risk spreading: it exists to try the system on any video
     else:
-        room, share_note = _portfolio_room(conn, owner, campaign["id"], made, room, len(ranked))
-    for candidate in ranked:
+        room, share_note = _portfolio_room(conn, owner, campaign["id"], made, room, len(rows))
+    for row in rows:
+        if row["rank"] <= room:
+            enqueue(conn, "hooks", {"candidate_id": str(row["id"])}, owner, source_id=source["id"], campaign_version_id=version["id"])
+    if len(rows) > room:
+        why = share_note or f"weekly clip cap of {cap} reached"
+        raise_alert(conn, owner, "weekly_clip_cap", "warn", "campaigns", campaign["id"],
+                    f"{campaign['name']}: {why}. {len(rows) - room} moments were kept but not cut; they can be cut by hand.")
+    return Decimal("0")
+
+
+def _store_candidates(conn, source: dict, campaign: dict, version: dict, candidates: list[dict], provider: str) -> Decimal:
+    """Manual selection: store the owner's own picks and queue them."""
+    owner = source["owner_operator_id"]
+    stored = []
+    for candidate in agent_b.rank_candidates(candidates):
         row = conn.execute(
             """insert into candidates (source_id, owner_operator_id, provider, start_s, end_s, score, rank, reason)
                values (%s, %s, %s, %s, %s, %s, %s, %s) returning id""",
             (source["id"], owner, provider, candidate["start_s"], candidate["end_s"], candidate["score"], candidate["rank"],
              candidate["reason"]),
         ).fetchone()
-        if candidate["rank"] <= room:
-            enqueue(conn, "hooks", {"candidate_id": str(row["id"])}, owner, source_id=source["id"], campaign_version_id=version["id"])
-    if len(ranked) > room:
-        why = share_note or f"weekly clip cap of {cap} reached"
-        raise_alert(conn, owner, "weekly_clip_cap", "warn", "campaigns", campaign["id"],
-                    f"{campaign['name']}: {why}. {len(ranked) - room} moments were kept but not cut; they can be cut by hand.")
-    return Decimal("0")
+        stored.append({"id": row["id"], "rank": candidate["rank"]})
+    return _schedule_candidates(conn, source, campaign, version, stored)
 
 
 def _portfolio_room(conn, owner, campaign_id, made: int, room: int, wanted: int) -> tuple[int, str | None]:
@@ -292,6 +266,24 @@ def add_manual_candidates(conn, actor, source_id, moments: list[dict]) -> int:
     return len(candidates)
 
 
+def _with_pattern_hook(conn, candidate: dict, source: dict, hooks: list[dict]) -> list[dict]:
+    """The engine's own hook (written in a library pattern, rated for concreteness and checked to be paid off in the clip)
+    joins the agent's hooks and competes on its rating; it carries its pattern so the owner's choice can teach the library."""
+    from . import moment_rank
+
+    text = candidate.get("hook_text")
+    if not text:
+        return hooks
+    row = conn.execute("select hook_type from hook_patterns where name = %s and language = %s",
+                       (candidate.get("hook_pattern"), source["language"])).fetchone()
+    ours = {"text": text, "hook_type": row["hook_type"] if row else "question", "score": moment_rank.hook_rating(text),
+            "chosen": False, "pattern": candidate.get("hook_pattern")}
+    merged = sorted([h for h in hooks if h["text"].lower() != text.lower()] + [ours], key=lambda h: -h["score"])[:3]
+    for rank_, hook in enumerate(merged, start=1):
+        hook["rank"] = rank_
+    return merged
+
+
 def stage_hooks(conn, job: dict) -> Decimal:
     candidate = conn.execute("select * from candidates where id = %s", (job["payload"]["candidate_id"],)).fetchone()
     source, campaign, version = _source_ctx(conn, candidate["source_id"])
@@ -308,6 +300,7 @@ def stage_hooks(conn, job: dict) -> Decimal:
         raise_alert(conn, owner, "moment_filtered", "info", "candidates", candidate["id"],
                     f"{campaign['name']}: one moment was set aside because {str(exc)[0].lower()}{str(exc)[1:]}")
         return Decimal("0")
+    hooks = _with_pattern_hook(conn, candidate, source, hooks)
     clip = conn.execute(
         """insert into clips (candidate_id, campaign_id, campaign_version_id, owner_operator_id, start_s, end_s, language, dialect, status)
            values (%s, %s, %s, %s, %s, %s, %s, %s, 'rendering') returning *""",
@@ -317,9 +310,9 @@ def stage_hooks(conn, job: dict) -> Decimal:
     top = None
     for hook in hooks:
         row = conn.execute(
-            """insert into hooks (candidate_id, clip_id, owner_operator_id, text, hook_type, chosen, rank, score)
-               values (%s, %s, %s, %s, %s, false, %s, %s) returning id""",
-            (candidate["id"], clip["id"], owner, hook["text"], hook["hook_type"], hook["rank"], hook["score"]),
+            """insert into hooks (candidate_id, clip_id, owner_operator_id, text, hook_type, chosen, rank, score, pattern)
+               values (%s, %s, %s, %s, %s, false, %s, %s, %s) returning id""",
+            (candidate["id"], clip["id"], owner, hook["text"], hook["hook_type"], hook["rank"], hook["score"], hook.get("pattern")),
         ).fetchone()
         if hook["rank"] == 1:
             top = {"hook_id": str(row["id"]), "hook_text": hook["text"], "hook_score": hook["score"]}

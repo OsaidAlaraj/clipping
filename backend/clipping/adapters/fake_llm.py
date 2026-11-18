@@ -205,5 +205,61 @@ def moments(payload: dict) -> dict:
     return {"moments": found}
 
 
+# The moment engine's two LLM tasks. Tests set "rate" / "compare" to a raw reply (or a function of the payload), "bias" to
+# "first" to simulate a model that always prefers the first of a pair, and read "calls" for every payload received.
+FAKE_MOMENT_LLM: dict = {"rate": None, "compare": None, "bias": None, "calls": []}
+FUNNY = re.compile(r"\b(haha|lol|joke|funny|laugh\w*)\b|ههه|ضحك", re.I)
+HYPE = re.compile(r"\b(wow|insane|unbelievable|no way|crazy)\b|!|والله|مستحيل", re.I)
+
+
+def quality(text: str) -> float:
+    """A stable stand-in for "how good is this clip": questions, numbers and strong words help, plus fixed variety."""
+    import zlib
+
+    value = 0.4 + (0.15 if "?" in text or "؟" in text else 0.0) + (0.1 if any(c.isdigit() for c in text) else 0.0)
+    value += 0.15 if re.search(r"never|nobody|wrong|secret|lost|mistake|why|how|لماذا|كيف|خسرت", text, re.I) else 0.0
+    return min(value + (zlib.crc32(text.encode("utf-8")) % 100) / 1000, 0.95)
+
+
+def _hook_from(pattern: dict | None, text: str) -> str:
+    """The pattern's template filled with the clip's closing words, so the hook is paid off inside the clip."""
+    if not pattern:
+        return ""
+    last = (sentences(text) or [text])[-1].rstrip(".?!؟")
+    gist = " ".join(last.split()[:7])
+    return pattern["template"].replace("{x}", gist).replace("{n}", "3")[:140]
+
+
+def moment_score(payload: dict) -> dict:
+    FAKE_MOMENT_LLM["calls"].append(("rate", payload))
+    answer = FAKE_MOMENT_LLM["rate"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    ratings = []
+    for item in payload["candidates"]:
+        text = item["text"]
+        emotion = "funny" if FUNNY.search(text) else "hype" if HYPE.search(text) else "informational" if re.search(r"\d", text) else "calm"
+        q = quality(text)
+        ratings.append({"id": item["id"], "hook": round(q, 2), "standalone": round(min(q + 0.1, 1), 2), "payoff": round(q, 2),
+                        "value": round(q - 0.1, 2), "emotion": emotion, "emotion_strength": 0.85 if emotion in ("funny", "hype") else 0.5,
+                        "overall": round(q, 2), "reason": f"A clear, self-contained stretch ({emotion}).",
+                        "hook_text": _hook_from(item.get("pattern"), text)})
+    return {"ratings": ratings}
+
+
+def moment_compare(payload: dict) -> dict:
+    FAKE_MOMENT_LLM["calls"].append(("compare", payload))
+    answer = FAKE_MOMENT_LLM["compare"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    texts, results = payload["candidates"], []
+    for first, second in payload["pairs"]:
+        a, b = quality(texts[first]), quality(texts[second])
+        winner = first if FAKE_MOMENT_LLM["bias"] == "first" else first if a > b else second if b > a else "tie"
+        results.append({"first": first, "second": second, "winner": winner})
+    return {"results": results}
+
+
 def complete(task: str, payload: dict) -> dict:
-    return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments}[task](payload)
+    return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments,
+            "moment_score": moment_score, "moment_compare": moment_compare}[task](payload)

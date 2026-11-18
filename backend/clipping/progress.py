@@ -76,7 +76,7 @@ def overview(conn, actor: Actor) -> dict:
                             and j.payload->>'candidate_id' = ca.id::text and j.status <> 'cancelled')) as planned,
              (select count(*) from clips cl join candidates ca on ca.id = cl.candidate_id
                where ca.source_id = s.id and cl.version_no = 1 and cl.status <> 'rendering') as done,
-             (select count(*) from candidates ca where ca.source_id = s.id) as moments
+             (select count(*) from candidates ca where ca.source_id = s.id and ca.status <> 'filtered') as moments
            from source_assets s where s.id = any(%s)""", (ids,)).fetchall() if ids else []
     fetches = conn.execute(
         """select j.id, j.status, j.error, j.created_at, j.updated_at, c.id as campaign_id, c.name, c.is_practice
