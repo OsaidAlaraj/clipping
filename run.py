@@ -99,7 +99,7 @@ def main() -> int:
     command = sys.argv[1] if len(sys.argv) > 1 else "start"
     bootstrap()
     if command == "test":
-        backend = subprocess.call([str(PY), "-m", "pytest"], cwd=BACKEND, env=env())
+        backend = subprocess.call([str(PY), "-m", "pytest", "-n", "auto"], cwd=BACKEND, env=env())   # parallel workers
         web = subprocess.call([node_tool(), "exec", "vitest", "run"], cwd=WEB, env=env())
         types = subprocess.call([node_tool(), "exec", "tsc", "--noEmit"], cwd=WEB, env=env())
         print(f"\nbackend tests: {'PASS' if backend == 0 else 'FAIL'}   web tests: {'PASS' if web == 0 else 'FAIL'}   "
