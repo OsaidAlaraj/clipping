@@ -229,7 +229,7 @@ describe("review and correction screens: stylesheet audit", () => {
     [".feed .quality", /overflow-wrap:\s*anywhere/],
     [".feed .caption", /-webkit-line-clamp:\s*2/],
     [".feed .top .name", /min-width:\s*0/],
-    [".feed .top .name", /text-overflow:\s*ellipsis/],
+    [".feed .top .name .title", /text-overflow:\s*ellipsis/],
     [".feed-card", /max-width:\s*640px/],
     [".feed", /overflow:\s*hidden/],
     // sheets scroll inside the screen and never grow past it

@@ -131,7 +131,15 @@ function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Recor
   );
 }
 
-const LAYER_LABEL: Record<number, string> = { 1: "Hard rule", 2: "Below this video's cut-off", 3: "Not among the top picks" };
+const LAYER_LABEL: Record<number, string> = { 1: "Blocked by a rule", 2: "Not strong enough", 3: "Not among the best" };
+/** The engine's reason in plain words (it writes scores and cut-offs). */
+export function plainMoment(reason: string): string {
+  let m = reason.match(/Scored ([\d.]+), below this episode's cut-off of ([\d.]+)/);
+  if (m) return `Score ${m[1]} out of 1. It needs ${m[2]} to be picked for this video.`;
+  m = reason.match(/Ranked #(\d+); this type keeps the top (\d+)/);
+  if (m) return `Number ${m[1]} of its kind. Only the best ${m[2]} are kept.`;
+  return reason;
+}
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 /** Moments the engine set aside, each with its reason. Rescuing one removes it at once and cuts it like any other moment. */
@@ -139,14 +147,14 @@ export function FilteredSheet({ items, onRescue, onClose }: { items: FilteredMom
   const { t } = useLang();
   return (
     <SheetFrame title={t("filtered")} onClose={onClose}>
-      <p className="small muted">Nothing is hidden: these moments were set aside, with the reason. Rescue one to cut it anyway; the engine learns from it.</p>
+      <p className="small muted">These moments were not chosen, and here is why. Tap Rescue to make a clip from one anyway.</p>
       {items.length === 0 && <p className="muted">Nothing is set aside.</p>}
       <div className="stack">
         {items.map((item) => (
           <div key={item.id} className="row between" data-testid="filtered-moment">
             <span dir="auto">
               {item.campaign_name} · {clock(Number(item.start_s))}–{clock(Number(item.end_s))}<br />
-              <span className="small muted">{LAYER_LABEL[item.layer]}: {item.reason}</span>
+              <span className="small muted">{LAYER_LABEL[item.layer]}. {plainMoment(item.reason)}</span>
             </span>
             <button className="btn" onClick={() => onRescue(item)}>{t("rescue")}</button>
           </div>
@@ -283,9 +291,6 @@ function ClipCard({ clip, active, preload, onAccept, onReject, onNext, onPrev, o
           <span>{clip.platform ? PLATFORM_LABEL[clip.platform] ?? clip.platform : "No platform"}</span>
           <span>{clip.language === "ar" ? "Arabic" : "English"}</span>
           <span>{clip.duration_s ? `${Math.round(Number(clip.duration_s))} s` : ""}</span>
-          <button className={`badge ${clip.compliance_status}`} style={{ minHeight: 28, border: 0 }} onPointerDown={(event) => event.stopPropagation()} onClick={() => onOpen("report")}>
-            Compliance: {clip.compliance_status}
-          </button>
         </div>
         <div className="caption" dir="auto">{clip.caption_text}</div>
         {clip.moment_reason && <div className="reason" dir="auto">Why this moment: {clip.moment_reason}</div>}
@@ -512,8 +517,11 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       {clip ? (
         <div className="feed">
           <div className="top">
-            <span className="name">{clip.is_practice && <span className="badge info" style={{ marginInlineEnd: 8 }}>Practice</span>}{clip.campaign_name}</span>
+            <span className="name">{clip.is_practice && <span className="badge info practice">Practice</span>}<span className="title">{clip.campaign_name}</span></span>
             <span className="row">
+              <button className={`chip rules ${clip.compliance_status}`} onClick={() => setSheet("report")} aria-label={`Rules check: ${clip.compliance_status}`}>
+                {clip.compliance_status === "pass" ? "Rules OK" : clip.compliance_status === "fail" ? "Rules failed" : "Check rules"}
+              </button>
               <span className="chip" aria-label="Position in feed">{index + 1} of {clips.length}</span>
               {filtered.length > 0 && <button className="chip" onClick={() => setSheet("filtered")}>{t("filtered")} {filtered.length}</button>}
               <button className="chip" onClick={() => endSession()}>{t("stopHere")}</button>

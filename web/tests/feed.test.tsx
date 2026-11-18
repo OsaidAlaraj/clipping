@@ -35,7 +35,7 @@ describe("feed card", () => {
     expect(screen.getByText("TikTok")).toBeTruthy();
     expect(screen.getByText("English")).toBeTruthy();
     expect(screen.getByText("13 s")).toBeTruthy();
-    expect(screen.getByText("Compliance: pass")).toBeTruthy();
+    expect(screen.getByText("Rules OK")).toBeTruthy();
     expect(screen.getByText("Top-paying campaign")).toBeTruthy();
     expect(screen.getByText("1 of 3")).toBeTruthy();
     expect(screen.getByRole("progressbar")).toBeTruthy();
