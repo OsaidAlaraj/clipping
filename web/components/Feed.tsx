@@ -134,7 +134,7 @@ function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Recor
 const LAYER_LABEL: Record<number, string> = { 1: "Blocked by a rule", 2: "Not strong enough", 3: "Not among the best" };
 /** The engine's reason in plain words (it writes scores and cut-offs). */
 export function plainMoment(reason: string): string {
-  let m = reason.match(/Scored ([\d.]+), below this episode's cut-off of ([\d.]+)/);
+  let m = reason.match(/Scored (\d+\.\d+), below this episode's cut-off of (\d+\.\d+)/);
   if (m) return `Score ${m[1]} out of 1. It needs ${m[2]} to be picked for this video.`;
   m = reason.match(/Ranked #(\d+); this type keeps the top (\d+)/);
   if (m) return `Number ${m[1]} of its kind. Only the best ${m[2]} are kept.`;
