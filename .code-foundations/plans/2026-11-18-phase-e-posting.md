@@ -2,7 +2,7 @@
 **Created:** 2026-11-18
 **Status:** in-progress
 **Started:** 2026-11-18 12:00
-**Current Phase:** 2
+**Current Phase:** 3
 **Complexity:** complex
 **Review cadence:** 5
 **Check-ins:** checkpoints
@@ -236,11 +236,25 @@
 | 5 | 1 | OAuth state identifies the owner at the callback (hashed, single-use, 10 min) | build agent | assumed |
 | 6 | 1 | Connecting with no matching account creates the accounts row from the platform handle | build agent | assumed |
 | 7 | 1 | OAuth provider chosen by CLIPPING_USE_FAKES (fake) else platforms; adapter rows stay inactive | build agent | assumed |
+| 8 | 2 | Callers pass provider=publishing.provider_name() to registry.call (adapter rows stay inactive, per #7) | build agent | assumed |
+| 9 | 2 | Added finish_publish(connection_id, platform, platform_post_id) to publish an Instagram container still processing; check_status stays read-only | build agent | assumed |
+| 10 | 2 | Once the first byte is sent, any non-success or unreadable answer is needs_check (never retried); before it, failures are failed with a reason | build agent | assumed |
+| 11 | 2 | Refusals (quota, caption, missing file, wrong-platform connection) return failed; only not_connected and NeedsReconnect raise AppError | build agent | assumed |
+| 12 | 2 | Quota: rolling 24 h, per account for Instagram and TikTok, project-wide for YouTube, counted at upload start, advisory lock | build agent | assumed |
+| 13 | 2 | Missing privacy defaults to private; YouTube forced private while unverified_project; TikTok caption not sent (owner adds it in TikTok) | build agent | assumed |
+| 14 | 2 | Alerts raised inside a session that then raises are rolled back with it; Phase 3 must raise alerts in a committed session | build agent | assumed |
 ---
 ## Execution Log
 ### Phase 1: Connected accounts and token vault (Gate: Standard, security-sensitive)
 - [x] BUILD: Discovery + design + implementation complete
 - [x] REVIEW: Verification passed (fail->pass, 2 attempts: coverage of the real OAuth provider added)
 - [x] Committed
-Commit: PENDING
+Commit: 64bf5ff
 Summary: Owners connect YouTube, Instagram and TikTok via OAuth (state + PKCE); tokens live AES-GCM-encrypted in platform_connections (migration 015) and `vault.access_token()` refreshes them or marks needs_reconnect with an alert; Profile shows connection state in English and Arabic.
+
+### Phase 2: Publish adapters (Gate: Standard, security-sensitive)
+- [x] BUILD: Discovery + design + implementation complete
+- [x] REVIEW: Verification passed
+- [x] Committed
+Commit: PENDING
+Summary: `publishing` stage adapters for YouTube (resumable, private while unverified, paid flag), Instagram Reels (resumable, publish, finish_publish) and TikTok (inbox draft) plus fixture-driven fakes; no retry once bytes are sent (needs_check), quota ledger with RLS (migration 016); call via registry.call(..., provider=publishing.provider_name()).

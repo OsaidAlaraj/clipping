@@ -1,0 +1,9 @@
+{
+  "_source": "developers.google.com/youtube/v3/guides/using_resumable_upload_protocol, docs/videos (documented shapes)",
+  "session_location": "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&upload_id=fake-session-1&part=snippet,status",
+  "insert_created": {"kind": "youtube#video", "id": "FkVid_abc12", "snippet": {"title": "Clip", "categoryId": "22"}, "status": {"uploadStatus": "uploaded", "privacyStatus": "private"}},
+  "status_processed": {"kind": "youtube#videoListResponse", "items": [{"id": "FkVid_abc12", "status": {"uploadStatus": "processed", "privacyStatus": "private"}, "processingDetails": {"processingStatus": "succeeded"}}]},
+  "status_processing": {"kind": "youtube#videoListResponse", "items": [{"id": "FkVid_abc12", "status": {"uploadStatus": "uploaded", "privacyStatus": "private"}, "processingDetails": {"processingStatus": "processing"}}]},
+  "status_failed": {"kind": "youtube#videoListResponse", "items": [{"id": "FkVid_abc12", "status": {"uploadStatus": "rejected", "rejectionReason": "duplicate", "privacyStatus": "private"}}]},
+  "error_forbidden": {"error": {"code": 403, "message": "The request cannot be completed because you have exceeded your quota.", "errors": [{"reason": "quotaExceeded"}]}}
+}

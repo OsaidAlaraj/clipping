@@ -96,6 +96,9 @@ def _reset_fakes() -> None:
     from clipping.adapters import oauth as _oauth
 
     _oauth.reset_fake()
+    from clipping.adapters import publishing as _publishing
+
+    _publishing.reset_fake()
 
 
 @pytest.fixture

@@ -1,0 +1,11 @@
+{
+  "_source": "developers.facebook.com/docs/instagram-platform/content-publishing (documented shapes)",
+  "container_created": {"id": "17889455560051444"},
+  "upload_ok": {"success": true, "message": "Upload successful."},
+  "status_in_progress": {"status_code": "IN_PROGRESS", "id": "17889455560051444"},
+  "status_finished": {"status_code": "FINISHED", "id": "17889455560051444"},
+  "status_error": {"status_code": "ERROR", "id": "17889455560051444"},
+  "publish_ok": {"id": "17900000000000001"},
+  "permalink": {"permalink": "https://www.instagram.com/reel/FkReel123/", "id": "17900000000000001"},
+  "error_param": {"error": {"message": "Invalid parameter", "type": "OAuthException", "code": 100}}
+}

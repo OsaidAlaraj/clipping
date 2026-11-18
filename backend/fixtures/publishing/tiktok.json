@@ -1,0 +1,9 @@
+{
+  "_source": "developers.tiktok.com/doc/content-posting-api-reference-upload-video and -get-video-status (documented shapes)",
+  "init_ok": {"data": {"publish_id": "v_inbox_file~v2.123456789", "upload_url": "https://open-upload.tiktokapis.com/video/?upload_id=67890&upload_token=fake"}, "error": {"code": "ok", "message": "", "log_id": "log1"}},
+  "status_processing": {"data": {"status": "PROCESSING_UPLOAD"}, "error": {"code": "ok", "message": "", "log_id": "log2"}},
+  "status_inbox": {"data": {"status": "SEND_TO_USER_INBOX", "publicaly_available_post_id": []}, "error": {"code": "ok", "message": "", "log_id": "log3"}},
+  "status_complete": {"data": {"status": "PUBLISH_COMPLETE", "publicaly_available_post_id": [7300000000000000001]}, "error": {"code": "ok", "message": "", "log_id": "log4"}},
+  "status_failed": {"data": {"status": "FAILED", "fail_reason": "file_format_check_failed"}, "error": {"code": "ok", "message": "", "log_id": "log5"}},
+  "error_spam": {"error": {"code": "spam_risk_too_many_pending_share", "message": "Too many pending shares.", "log_id": "log6"}}
+}

@@ -51,10 +51,19 @@ class Adapter:
     stage: str = ""
     provider: str = ""
     requires_env: tuple[str, ...] = ()
+    # Methods that must run at most once per call: after they start, a retry could repeat a side effect (a second post).
+    # The registry makes one attempt, never falls back, and raises AdapterUnavailable on an unexpected failure.
+    no_retry: tuple[str, ...] = ()
 
     def __init__(self, row: dict):
         self.row = row
         self.cfg: dict = dict(row.get("config_json") or {})
+        # Bound by Registry.call for adapters that need the session (token vault, quota ledger) or the alert hook.
+        self.conn = None
+        self.owner_id = None
+
+    def alert(self, type_: str, severity: str, message: str) -> None:
+        """Raise an owner alert about this adapter. A no-op until the registry binds a hook."""
 
     # --- common interface (spec 10.3)
     def health(self) -> dict:
@@ -130,6 +139,8 @@ class Registry:
         adapter = self.get(conn, stage, provider)
         row = self._roll_month(conn, adapter.row)
         adapter.row = row
+        adapter.conn, adapter.owner_id = conn, owner_id
+        adapter.alert = lambda type_, severity, message: self._alert(conn, owner_id, type_, severity, row["id"], message)
         if row["paused_reason"]:
             raise AdapterPaused(stage, row["paused_reason"])
 
@@ -150,7 +161,8 @@ class Registry:
         cost = cost or Decimal("0")
 
         last_error = ""
-        for attempt in range(1, self.max_attempts + 1):
+        once = method in adapter.no_retry
+        for attempt in range(1, 2 if once else self.max_attempts + 1):
             try:
                 result = getattr(adapter, method)(**request)
             except AppError:
@@ -168,6 +180,10 @@ class Registry:
 
         audit(conn, "adapter.call", "adapters", row["id"],
               {"stage": stage, "provider": row["provider"], "method": method, "ok": False, "error": last_error})
+        if once:
+            self._alert(conn, owner_id, "adapter_failed", "warn", row["id"],
+                        f"{stage} adapter ({row['provider']}) failed during {method}. It was not retried: check the platform before trying again.")
+            raise AdapterUnavailable(stage, f"{method} failed once ({last_error}) and was not retried")
         fallback = row["fallback_provider"]
         self._alert(conn, owner_id, "adapter_failed", "warn", row["id"],
                     f"{stage} adapter ({row['provider']}) failed {self.max_attempts} times. Fallback: {fallback or 'none'}.")
