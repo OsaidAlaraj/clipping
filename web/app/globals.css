@@ -96,7 +96,7 @@ button { cursor: pointer; }
 
 @media (min-width: 900px) {
   .shell { display: grid; grid-template-columns: var(--side-w) minmax(0, 1fr); gap: 24px; padding: 20px; min-height: 100dvh; }
-  .app { max-width: 1120px; margin: 0; padding-bottom: 40px; }
+  .app { max-width: 1120px; width: 100%; margin: 0 auto; padding-bottom: 40px; }
   .nav { display: none; }
   .side { display: flex; flex-direction: column; gap: 6px; background: #0E0E10; color: #FFFFFF; border-radius: 28px; padding: 20px 12px; align-self: start; position: sticky; top: 20px; height: calc(100dvh - 40px); overflow-y: auto; }
   .side .wordmark { color: #FFFFFF; padding: 4px 12px 18px; }
@@ -251,7 +251,7 @@ blockquote { margin: 4px 0 0; padding-inline-start: 10px; border-inline-start: 2
 
 /* ---- Home: one column on phone, feed + side column on desktop */
 .home-grid { display: grid; gap: 14px; }
-@media (min-width: 1100px) { .home-grid { grid-template-columns: minmax(0, 680px) minmax(260px, 340px); align-items: start; gap: 24px; } }
+@media (min-width: 1100px) { .home-grid { grid-template-columns: minmax(0, 680px) minmax(260px, 340px); align-items: start; gap: 24px; justify-content: center; margin-inline: auto; } .home-side { position: sticky; top: 20px; } }
 
 /* ---- Transcript correction: edits show at once, so every state keeps its footprint (no layout shift) */
 .sk { display: block; background: var(--surface-2); border-radius: 8px; animation: sk 1.4s ease-in-out infinite; }
