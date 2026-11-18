@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ApiError, Clip, ConnectionsData, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
+import { plainAlert } from "@/lib/alertText";
 import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
@@ -158,7 +159,8 @@ export function Alerts() {
       {data?.alerts.map((alert) => (
         <section key={alert.id} className="card stack">
           <div className="row between"><span className={`badge ${alert.severity}`}>{alert.severity}</span><span className="small muted">{new Date(alert.created_at).toLocaleString()}</span></div>
-          <p>{alert.message}</p>
+          <p>{plainAlert(alert.message).text}</p>
+          {plainAlert(alert.message).text !== alert.message && <details className="small muted"><summary>Details</summary>{alert.message}</details>}
           <div className="row">
             <button className="btn grow" onClick={() => act(`/api/alerts/${alert.id}/ack`)}>Acknowledge</button>
             {alert.severity !== "block" && <button className="btn ghost grow" onClick={() => act(`/api/alerts/${alert.id}/snooze`, { hours: 4 })}>Snooze 4 h</button>}

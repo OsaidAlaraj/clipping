@@ -37,7 +37,7 @@ describe("Explore", () => {
     await waitFor(() => expect(mock.calls.find((c) => c.method === "PUT")?.body).toEqual({ niches: ["gaming"] }));
     await waitFor(() => expect(screen.getAllByTestId("listing-card")).toHaveLength(1));
     expect(screen.getByText("Game clip")).toBeTruthy();
-    expect(screen.getByText(/median \$1\.00 per 1,000 views/)).toBeTruthy();
+    expect(screen.getByText(/Typical pay across campaigns: \$1\.00 per 1,000 views/)).toBeTruthy();
     expect(screen.getByText(/ClippingAlpha \(clippingalpha\.com\), CC BY 4\.0/)).toBeTruthy();
   });
 

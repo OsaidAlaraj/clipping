@@ -262,7 +262,7 @@ export default function ExploreScreen() {
           <button className="btn" onClick={refresh}>Check now</button>
         </div>
       </div>
-      {cpm && <p className="small muted">Market: median ${Number(cpm.medianUsd).toFixed(2)} per 1,000 views, middle half ${Number(cpm.p25Usd).toFixed(2)} to ${Number(cpm.p75Usd).toFixed(2)}.</p>}
+      {cpm && <p className="small muted">Typical pay across campaigns: ${Number(cpm.medianUsd).toFixed(2)} per 1,000 views (most pay ${Number(cpm.p25Usd).toFixed(2)} to ${Number(cpm.p75Usd).toFixed(2)}).</p>}
       {me && me.niches.length === 0 && (
         <section className="card stack" aria-label="Pick your niches">
           <strong>Which niches do you want to clip?</strong>

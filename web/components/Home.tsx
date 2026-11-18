@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { api, ApiError, money, PLATFORM_LABEL } from "@/lib/api";
 import { mutate, peek, useData } from "@/lib/data";
+import { plainAlert } from "@/lib/alertText";
 import { showToast } from "@/lib/toast";
 import { useSwipe } from "@/lib/useSwipe";
 import ProgressCards, { useProgress } from "./Progress";
@@ -129,7 +130,7 @@ export default function Home() {
             return (
               <Link key={story.id} className="story" href={`/review?campaign=${story.id}`}
                 aria-label={`${story.name}: ${byBudget ? `${story.budget_left_pct}% budget left` : deadlineText(story.hours_to_deadline)}, ${story.clips_ready} clips to review`}>
-                <span className={`ring ${p < 25 ? "low" : ""}`} style={{ ["--p" as any]: p }}>
+                <span className={`ring ${story.clips_ready === 0 ? "done" : p < 25 ? "low" : ""}`} style={{ ["--p" as any]: p }}>
                   <span className="avatar" style={{ background: tintFor(story.id) }}>{initials(story.name)}</span>
                 </span>
                 <span className="name">{story.name}</span>
@@ -161,10 +162,18 @@ export default function Home() {
         )}
 
         {data.attention.length > 0 && (
-          <section className="stack" aria-label="Attention">
-            <div className="row between"><h2>Attention</h2><Link href="/alerts" className="small">All alerts</Link></div>
-            {data.attention.map((alert) => <div key={alert.id} className={`banner ${alert.severity}`}>{alert.message}</div>)}
-          </section>
+          <details className="attention stack" aria-label="Attention" open={data.attention.length <= 2}>
+            <summary className="row between"><h2>Needs attention ({data.attention.length})</h2><Link href="/alerts" className="small">All alerts</Link></summary>
+            {data.attention.map((alert) => {
+              const plain = plainAlert(alert.message);
+              return (
+                <div key={alert.id} className={`banner ${alert.severity}`}>
+                  {plain.text}
+                  {plain.text !== plain.raw && <details className="small"><summary>Details</summary>{plain.raw}</details>}
+                </div>
+              );
+            })}
+          </details>
         )}
 
         <section className="stack" aria-label="Campaigns">
