@@ -288,7 +288,7 @@ Summary: Queue sheet now shows PostPanel (platform picker, one combined checklis
 - [x] BUILD: Docs updated (guide section "النشر", handoff plan with per-platform setup steps, decisions round E, open items phase E)
 - [x] REVIEW: DEFERRED — batch pending (docs only)
 - [x] Committed
-Commit: PENDING
+Commit: e658b19
 Summary: The Arabic guide and handoff plan describe posting and the Google, Meta and TikTok app setup; decisions and open items record round E and every live check still owed.
 
 ### Pending after this plan
