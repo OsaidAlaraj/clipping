@@ -1,7 +1,7 @@
 // Offline support (spec section 7): cached app shell, cached Home and Queue data.
 // Review actions are queued in the page (lib/outbox.ts) and sent when the connection returns.
 const CACHE = "clipping-v1";
-const DATA = ["/api/home", "/api/queue", "/api/reference", "/api/review-later"];
+const DATA = ["/api/home", "/api/counts", "/api/queue", "/api/reference", "/api/review-later"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(["/", "/queue", "/manifest.webmanifest"]).catch(() => undefined)));

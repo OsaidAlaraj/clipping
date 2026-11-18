@@ -109,3 +109,6 @@ Still open:
 - **The no-keys demo runs on the seeded stand-ins.** With fakes off and no keys, the adapters that need keys simply stay on their fakes, so `demo --no-keys` completes but does not run local Whisper. Local Whisper (Phase 1) and signals-only ranking (Phase 4, and a rolled-back check in the demo itself) are proven by their own tests. A real Whisper run in the demo would download the 1.6 GB model into every throwaway data directory.
 - **A brand is the listing's brand, else the campaign's name.** Two campaigns of one brand that were added by hand share nothing until they come from the same listing.
 - **Brand rules read English and Arabic cue words only.** A reason in another language becomes a reminder.
+
+- Under `pytest -n auto` with the app's own worker running, 4 load-sensitive tests (3 render template tests in test_13, the 2-hour signals speed test in test_11) can fail; they pass alone. Make them GPU/time tolerant or mark them serial.
+- Sign-out and a 401 should call the web cache's `clearCache()` (phase 7 left this open).

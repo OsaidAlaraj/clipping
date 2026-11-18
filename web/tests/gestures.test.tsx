@@ -5,8 +5,8 @@ import { EDGE_GUARD_PX, SWIPE_X_PX, useSwipe } from "@/lib/useSwipe";
 import { swipe } from "./helpers";
 
 function Pad(props: Parameters<typeof useSwipe>[0]) {
-  const { bind, offset } = useSwipe(props);
-  return <div data-testid="pad" data-x={offset.x} {...bind} style={{ width: 300, height: 500 }} />;
+  const { bind, ref, intent } = useSwipe(props);
+  return <div data-testid="pad" data-intent={intent ?? ""} ref={ref as React.RefObject<HTMLDivElement>} {...bind} style={{ width: 300, height: 500 }} />;
 }
 
 function setup() {

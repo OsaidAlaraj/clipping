@@ -1,12 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api, ApiError, Clip, FilteredMoment, money, PLATFORM_LABEL, Review, reviewAction, undoReview } from "@/lib/api";
+import { fetchData, invalidate, mutate, peek } from "@/lib/data";
 import { qualityText, useLang } from "@/lib/i18n";
 import { useSwipe } from "@/lib/useSwipe";
+import { FeedSkeleton } from "./Skeleton";
 import { Icon } from "./Shell";
 
 export const REASONS: [string, string][] = [
@@ -25,7 +26,16 @@ export const REASONS: [string, string][] = [
 
 type Summary = { clips_reviewed: number; accepted: number; rejected: number; parked: number; posts_due: number; minutes_logged: number; hours_today: number; pay_per_clip?: { name: string; rate_per_1k: number | null; max_payout_per_clip: number | null }[] };
 type Sheet = null | "reject" | "hooks" | "edit" | "report" | "filtered";
-type UndoState = { review: Review; clip: Clip; index: number } | null;
+type Decision = "accept" | "reject" | "later";
+/** The last decision, kept for Undo. `review` settles when the server (or the offline outbox) has recorded it. */
+type UndoState = { review: Promise<Review>; clip: Clip; index: number; kind: Decision; queued: boolean } | null;
+type FeedData = { clips: Clip[]; kill_switch: boolean; filtered?: FilteredMoment[]; undo_window_s: number; session_length_min: number; pay_per_clip_display: string };
+
+const feedKey = (campaignId?: string) => `/api/feed${campaignId ? `?campaign_id=${campaignId}` : ""}`;
+const configOf = (data?: FeedData) => ({ undo: Number(data?.undo_window_s ?? 10), length: Number(data?.session_length_min ?? 25), pay: data?.pay_per_clip_display ?? "summary", killed: data?.kill_switch ?? false });
+/** The clip on screen, the one behind it and the next two stay mounted, so the next clip is already loaded when a swipe lands. */
+const BEHIND = 1;
+const AHEAD = 2;
 
 // ------------------------------------------------------------------ sheets
 
@@ -222,36 +232,52 @@ export function SessionSummary({ summary, onDone }: { summary: Summary; onDone: 
 
 // ------------------------------------------------------------------ one clip, full screen
 
-function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }: {
-  clip: Clip; onAccept: () => void; onReject: () => void; onNext: () => void; onPrev: () => void; onOpen: (sheet: Sheet | "later") => void; showPay: boolean;
+function ClipCard({ clip, active, preload, onAccept, onReject, onNext, onPrev, onOpen, showPay }: {
+  clip: Clip; active: boolean; preload: "auto" | "metadata"; onAccept: () => void; onReject: () => void; onNext: () => void; onPrev: () => void;
+  onOpen: (sheet: Sheet | "later") => void; showPay: boolean;
 }) {
   const { t, lang } = useLang();
-  const reduce = useReducedMotion();
   const video = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true); // iOS blocks sound autoplay: clips start muted, a tap turns sound on
   const [progress, setProgress] = useState(0);
-  const { offset, bind } = useSwipe({ onRight: onAccept, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setMuted((value) => !value) });
+  const [textHidden, setTextHidden] = useState(false); // the caption block can be hidden to see the whole picture
+  const { ref, intent, bind } = useSwipe(active ? { onRight: onAccept, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setMuted((value) => !value) } : {}, { tilt: true });
 
+  // Only the clip on screen plays; the buffered ones wait and start from their first frame the moment they are shown.
   useEffect(() => {
-    setMuted(true);
-    setProgress(0);
-  }, [clip.id]);
+    const el = video.current;
+    if (!el) return;
+    if (active) el.play()?.catch?.(() => undefined);
+    else { el.pause(); setMuted(true); setProgress(0); }
+  }, [active]);
+
+  /** Full screen with sound. iPhone Safari only supports its own player on a video element (webkitEnterFullscreen). */
+  const fullScreen = () => {
+    const el = video.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    if (!el) return;
+    el.muted = false;
+    setMuted(false);
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => el.webkitEnterFullscreen?.());
+    else el.webkitEnterFullscreen?.();
+  };
+
+  const player = clip.video_url && (
+    <video ref={video} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={muted} autoPlay={active} loop playsInline preload={preload}
+      onTimeUpdate={active ? (event) => { const el = event.currentTarget; if (el.duration) setProgress((el.currentTime / el.duration) * 100); } : undefined} />
+  );
+  // The buffered card keeps the video in the same position as the visible one, so React reuses the element (and its loaded data) when the card becomes active.
+  if (!active) return <div className="feed-card idle" aria-hidden="true">{null}{player}</div>;
 
   return (
-    <motion.div className="feed-card" data-testid="clip-card" {...bind}
-      animate={reduce ? { x: 0, y: 0 } : { x: offset.x, y: offset.y * 0.4, rotate: offset.x / 40 }}
-      transition={{ type: "tween", duration: offset.x || offset.y ? 0 : 0.18 }}>
+    <div className="feed-card" data-testid="clip-card" ref={ref as React.RefObject<HTMLDivElement>} {...bind}>
       <div className="progress" role="progressbar" aria-label="Clip progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
         <i style={{ width: `${progress}%` }} />
       </div>
-      {clip.video_url && (
-        <video ref={video} key={clip.id} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={muted} autoPlay loop playsInline preload="metadata"
-          onTimeUpdate={(event) => { const el = event.currentTarget; if (el.duration) setProgress((el.currentTime / el.duration) * 100); }} />
-      )}
-      {offset.x > 30 && <div className="swipe-flag yes">{t("accept")}</div>}
-      {offset.x < -30 && <div className="swipe-flag no">{t("reject")}</div>}
+      {player}
+      {intent === "right" && <div className="swipe-flag yes">{t("accept")}</div>}
+      {intent === "left" && <div className="swipe-flag no">{t("reject")}</div>}
       {muted && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
-      <div className="bottom">
+      <div className={`bottom${textHidden ? " text-hidden" : ""}`} aria-hidden={textHidden || undefined}>
         <div className="line">
           <strong>{clip.account_handle ? `@${clip.account_handle}` : "No account"}</strong>
           <span>{clip.platform ? PLATFORM_LABEL[clip.platform] ?? clip.platform : "No platform"}</span>
@@ -267,13 +293,15 @@ function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }:
         <div className="reason">{clip.priority_reason}{showPay && clip.rate_per_1k ? ` · ${money(clip.rate_per_1k)} per 1,000 views` : ""}</div>
       </div>
       <div className="rail" onPointerDown={(event) => event.stopPropagation()}>
+        <button aria-label={t("fullScreen")} onClick={fullScreen}>{Icon.expand}</button>
+        <button aria-label={textHidden ? t("showText") : t("hideText")} aria-pressed={textHidden} onClick={() => setTextHidden((value) => !value)}>{Icon.text}</button>
         <button aria-label={t("later")} onClick={() => onOpen("later")}>{Icon.later}</button>
         <button aria-label={t("edit")} onClick={() => onOpen("edit")}>{Icon.edit}</button>
         <button aria-label={t("hooks")} onClick={() => onOpen("hooks")}>{Icon.hooks}</button>
         <button className="reject" aria-label={t("reject")} onClick={onReject}>{Icon.cross}</button>
         <button className="accept" aria-label={t("accept")} onClick={onAccept}>{Icon.check}</button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -281,22 +309,30 @@ function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }:
 
 export default function Feed({ campaignId, onExit }: { campaignId?: string; onExit?: () => void }) {
   const { t } = useLang();
-  const [clips, setClips] = useState<Clip[] | null>(null);
+  const key = feedKey(campaignId);
+  const cached = peek<FeedData>(key);
+  // A feed seen a moment ago is on screen straight away; the fresh one replaces it while nothing has been decided yet.
+  const [clips, setClips] = useState<Clip[] | null>(cached?.clips ?? null);
   const [index, setIndex] = useState(0);
   const [sheet, setSheet] = useState<Sheet>(null);
   const [undo, setUndo] = useState<UndoState>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
-  const [filtered, setFiltered] = useState<FilteredMoment[]>([]);
+  const [filtered, setFiltered] = useState<FilteredMoment[]>(cached?.filtered ?? []);
   const [message, setMessage] = useState("");
-  const [config, setConfig] = useState({ undo: 10, length: 25, pay: "summary", killed: false });
+  const [rolledBack, setRolledBack] = useState(false);
+  const [config, setConfig] = useState(configOf(cached));
   const session = useRef<string | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ended = useRef(false);
+  const touched = useRef(false); // true once the person has decided or moved, so a refreshed list never reshuffles under them
   const state = useRef({ clips: [] as Clip[], index: 0 });
   const clip = clips && clips.length ? clips[Math.min(index, clips.length - 1)] : null;
   state.current = { clips: clips ?? [], index };
 
-  const fail = (error: unknown) => setMessage(error instanceof ApiError ? error.message : "Something went wrong. Try again.");
+  const fail = (error: unknown, putBack = false) => {
+    setRolledBack(putBack);
+    setMessage(error instanceof ApiError ? error.message : error instanceof Error && error.message ? error.message : "Something went wrong. Try again.");
+  };
 
   const endSession = useCallback(async (position?: Record<string, unknown>) => {
     if (ended.current) return;
@@ -312,96 +348,103 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
     }
   }, [campaignId]);
 
-  // Load the feed (recalculated by the server on every load) and start the session timer.
+  // The feed (recalculated by the server on every load) and the session timer start together, not one after the other.
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let cancelled = false;
+    const starting = api("/api/sessions", { body: { campaign_id: campaignId ?? null } }).catch(() => null);
     (async () => {
       try {
-        const data = await api(`/api/feed${campaignId ? `?campaign_id=${campaignId}` : ""}`);
+        const data = await fetchData<FeedData>(key);
         if (cancelled) return;
-        setClips(data.clips);
+        if (!touched.current) setClips(data.clips);
         setFiltered(data.filtered ?? []);
-        setConfig({ undo: Number(data.undo_window_s), length: Number(data.session_length_min), pay: data.pay_per_clip_display, killed: data.kill_switch });
-        const started = await api("/api/sessions", { body: { campaign_id: campaignId ?? null } });
+        setConfig(configOf(data));
+        const started = await starting;
         if (cancelled) return;
-        session.current = started.id;
-        const resume = started.resume_position?.clip_id;
-        const at = resume ? (data.clips as Clip[]).findIndex((item) => item.id === resume) : -1;
+        session.current = started?.id ?? null;
+        const resume = started?.resume_position?.clip_id;
+        const at = resume && !touched.current ? data.clips.findIndex((item) => item.id === resume) : -1;
         if (at > 0) setIndex(at);
         timer = setTimeout(() => endSession(), Number(data.session_length_min) * 60 * 1000); // bounded feed
       } catch (error) {
-        if (!cancelled) { setClips([]); fail(error); }
+        if (!cancelled) { setClips((list) => list ?? []); fail(error); }
       }
     })();
     return () => { cancelled = true; if (timer) clearTimeout(timer); if (undoTimer.current) clearTimeout(undoTimer.current); };
-  }, [campaignId, endSession]);
+  }, [campaignId, endSession, key]);
+
+  // Keep the cached copy in step with what is on screen, so coming back later never shows a clip already decided.
+  useEffect(() => { if (clips && peek(key)) mutate<FeedData>(key, (d) => ({ ...d!, clips })); }, [clips, key]);
 
   const removeCurrent = useCallback(() => {
     const { clips: list, index: at } = state.current;
     const next = list.filter((_, i) => i !== at);
+    touched.current = true;
     setClips(next);
     setIndex(Math.min(at, Math.max(next.length - 1, 0)));
   }, []);
 
-  const startUndo = useCallback((review: Review, removed: Clip, at: number) => {
-    if (undoTimer.current) clearTimeout(undoTimer.current);
-    setUndo({ review, clip: removed, index: at });
-    undoTimer.current = setTimeout(() => setUndo(null), config.undo * 1000);
-  }, [config.undo]);
+  /** Put a clip back where it was (a refused decision, or Undo). */
+  const reinsert = useCallback((back: Clip, at: number) => {
+    setClips((list) => {
+      if ((list ?? []).some((item) => item.id === back.id)) return list;
+      const next = [...(list ?? [])];
+      next.splice(Math.min(at, next.length), 0, back);
+      return next;
+    });
+    setIndex(at);
+  }, []);
 
-  const accept = useCallback(async () => {
-    const current = state.current.clips[state.current.index];
-    if (!current) return;
-    removeCurrent(); // accept updates at once; the server confirms in the background
-    try {
-      await reviewAction("accept", current.id, { session_id: session.current });
-    } catch (error) {
-      setClips((list) => [current, ...(list ?? [])]);
-      fail(error);
-    }
-  }, [removeCurrent]);
-
-  const reject = useCallback(async (reason: string, notes: string) => {
+  /** Accept, reject and save for later all work the same way: the clip leaves at once, the server is told in the background,
+   *  Undo is offered, and a refusal puts the clip back with the reason. Nothing here waits on the network. */
+  const decide = useCallback((kind: Decision, body: Record<string, unknown> = {}) => {
     const { clips: list, index: at } = state.current;
     const current = list[at];
-    if (!current || !reason) return; // a rejection always needs a reason
-    setSheet(null);
+    if (!current) return;
     removeCurrent();
-    try {
-      const review = await reviewAction("reject", current.id, { reason_code: reason, notes: notes || null, session_id: session.current });
-      startUndo(review, current, at);
-    } catch (error) {
-      setClips((items) => [current, ...(items ?? [])]);
-      fail(error);
-    }
-  }, [removeCurrent, startUndo]);
+    mutate<{ to_review: number; alerts: number }>("/api/counts", (c) => (c ? { ...c, to_review: Math.max(c.to_review - 1, 0) } : c as any));
+    const review = reviewAction(kind, current.id, { ...body, session_id: session.current });
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    const entry: UndoState = { review, clip: current, index: at, kind, queued: false };
+    setUndo(entry);
+    undoTimer.current = setTimeout(() => setUndo((u) => (u?.review === review ? null : u)), config.undo * 1000);
+    review.then(
+      (done) => {
+        setUndo((u) => (u?.review === review ? { ...u, queued: !!done.queued } : u));
+        for (const path of ["/api/home", "/api/counts", "/api/queue", "/api/review-later"]) invalidate(path);
+      },
+      (error) => {
+        reinsert(current, at);
+        setUndo((u) => (u?.review === review ? null : u));
+        mutate<{ to_review: number; alerts: number }>("/api/counts", (c) => (c ? { ...c, to_review: c.to_review + 1 } : c as any));
+        fail(error, true);
+      },
+    );
+  }, [removeCurrent, reinsert, config.undo]);
+
+  const accept = useCallback(() => decide("accept"), [decide]);
+  const later = useCallback(() => decide("later"), [decide]);
+  const reject = useCallback((reason: string, notes: string) => {
+    if (!state.current.clips[state.current.index] || !reason) return; // a rejection always needs a reason
+    setSheet(null);
+    decide("reject", { reason_code: reason, notes: notes || null });
+  }, [decide]);
 
   const doUndo = useCallback(async () => {
     const pending = undo;
     if (!pending) return;
     if (undoTimer.current) clearTimeout(undoTimer.current);
     setUndo(null);
+    reinsert(pending.clip, pending.index); // back on screen at once
     try {
-      await undoReview(pending.review);
-      setClips((list) => { const next = [...(list ?? [])]; next.splice(Math.min(pending.index, next.length), 0, pending.clip); return next; });
-      setIndex(pending.index);
+      await undoReview(await pending.review);
+      for (const path of ["/api/home", "/api/counts", "/api/queue", "/api/review-later"]) invalidate(path);
     } catch (error) {
+      setClips((list) => (list ?? []).filter((item) => item.id !== pending.clip.id)); // the server refused: the decision stands
       fail(error);
     }
-  }, [undo]);
-
-  const later = useCallback(async () => {
-    const current = state.current.clips[state.current.index];
-    if (!current) return;
-    removeCurrent();
-    try {
-      await reviewAction("later", current.id, { session_id: session.current });
-    } catch (error) {
-      setClips((list) => [current, ...(list ?? [])]);
-      fail(error);
-    }
-  }, [removeCurrent]);
+  }, [undo, reinsert]);
 
   const saveEdit = useCallback(async (body: Record<string, unknown>) => {
     const current = state.current.clips[state.current.index];
@@ -434,8 +477,8 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
     }
   }, []);
 
-  const next = useCallback(() => setIndex((i) => Math.min(i + 1, Math.max(state.current.clips.length - 1, 0))), []);
-  const prev = useCallback(() => setIndex((i) => Math.max(i - 1, 0)), []);
+  const next = useCallback(() => { touched.current = true; setIndex((i) => Math.min(i + 1, Math.max(state.current.clips.length - 1, 0))); }, []);
+  const prev = useCallback(() => { touched.current = true; setIndex((i) => Math.max(i - 1, 0)); }, []);
 
   // Desktop keyboard shortcuts (FR-35).
   useEffect(() => {
@@ -460,7 +503,9 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
   const showPay = useMemo(() => config.pay === "card", [config.pay]);
 
   if (summary) return <SessionSummary summary={summary} onDone={() => (onExit ? onExit() : (window.location.href = "/"))} />;
-  if (clips === null) return <div className="empty"><p className="muted">Loading the feed…</p></div>;
+  if (clips === null) return <FeedSkeleton />;
+  const at = Math.min(index, Math.max(clips.length - 1, 0));
+  const visible = clips.slice(Math.max(at - BEHIND, 0), at + AHEAD + 1);
 
   return (
     <>
@@ -474,8 +519,11 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
               <button className="chip" onClick={() => endSession()}>{t("stopHere")}</button>
             </span>
           </div>
-          <ClipCard clip={clip} showPay={showPay} onAccept={accept} onReject={() => setSheet("reject")} onNext={next} onPrev={prev}
-            onOpen={(which) => (which === "later" ? later() : setSheet(which))} />
+          {visible.map((item) => (
+            <ClipCard key={item.id} clip={item} active={item.id === clip.id} preload={item.id === clip.id || item.id === clips[at + 1]?.id ? "auto" : "metadata"}
+              showPay={showPay} onAccept={accept} onReject={() => setSheet("reject")} onNext={next} onPrev={prev}
+              onOpen={(which) => (which === "later" ? later() : setSheet(which))} />
+          ))}
         </div>
       ) : (
         <div className="empty">
@@ -487,11 +535,11 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       )}
       {message && (
         <div className="toast" role="alert" style={{ bottom: undo ? "calc(var(--tab-h) + 84px)" : undefined }}>
-          <span>{message}</span>
-          <button className="btn ghost" onClick={() => setMessage("")}>Dismiss</button>
+          <span className="msg">{message}{rolledBack && <><br /><span className="small">The clip is back in your feed.</span></>}</span>
+          <button className="btn ghost" onClick={() => { setMessage(""); setRolledBack(false); }}>Dismiss</button>
         </div>
       )}
-      {undo && <UndoToast seconds={config.undo} onUndo={doUndo} label={undo.review.queued ? `${t("rejected")} (saved offline)` : t("rejected")} />}
+      {undo && <UndoToast seconds={config.undo} onUndo={doUndo} label={`${t(undo.kind === "accept" ? "accepted" : undo.kind === "reject" ? "rejected" : "parked")}${undo.queued ? " · saved" : ""}`} />}
       {sheet === "reject" && <RejectSheet onSubmit={reject} onClose={() => setSheet(null)} />}
       {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} />}
       {sheet === "edit" && clip && <EditSheet clip={clip} onClose={() => setSheet(null)} onSave={saveEdit} />}

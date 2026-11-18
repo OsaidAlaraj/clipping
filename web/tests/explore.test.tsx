@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/explore", useSearchParams: () => new URLSearchParams() }));
+const nav = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: nav.push, replace: nav.push }), usePathname: () => "/explore", useSearchParams: () => new URLSearchParams() }));
 vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a href={href} {...rest}>{children}</a> }));
 
 import ExploreScreen, { ListingPage } from "@/components/Explore";
@@ -87,10 +88,8 @@ describe("Explore", () => {
 
 describe("campaign profile", () => {
   it("shows the cautious numbers, rules and reasons, and adding goes to approval", async () => {
-    const assign = vi.fn();
-    Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, assign } });
-    const detail = { ...listing("1"), rules: [{ key: "do", title: "DO", items: [{ text: "Tag @brand" }] }], wants: {}, join: {}, verdicts: [{ key: "pay", label: "Pay", verdict: "High", fact: "$2.00 per 1K" }] };
-    const mock = mockApi({ "GET /api/listings/1": detail, "GET /api/reference": { categories: [{ name: "podcast" }, { name: "gaming" }] }, "POST /api/listings/1/add": { campaign: { id: "c9" } } });
+    const detail = { ...listing("1"), categories: ["gaming", "podcast"], rules: [{ key: "do", title: "DO", items: [{ text: "Tag @brand" }] }], wants: {}, join: {}, verdicts: [{ key: "pay", label: "Pay", verdict: "High", fact: "$2.00 per 1K" }] };
+    const mock = mockApi({ "GET /api/listings/1": detail, "POST /api/listings/1/add": { campaign: { id: "c9" } } });
     render(<ListingPage id="1" />);
     await screen.findByText("Campaign 1");
     expect(screen.getByText("$3.40")).toBeTruthy();
@@ -100,7 +99,7 @@ describe("campaign profile", () => {
     expect(screen.getByText(/new: budget is fresh/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "Open on the marketplace" }).getAttribute("href")).toBe("https://contentrewards.com/c/x");
     fireEvent.click(screen.getByRole("button", { name: "Add to my campaigns" }));
-    await waitFor(() => expect(assign).toHaveBeenCalledWith("/campaign?id=c9"));
+    await waitFor(() => expect(nav.push).toHaveBeenCalledWith("/campaign?id=c9"));
     expect(mock.posts("/add")[0].body).toEqual({ category: "podcast" });
   });
 });

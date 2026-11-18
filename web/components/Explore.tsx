@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { api, ApiError, money, PLATFORM_LABEL } from "@/lib/api";
+import { cachedKeys, mutate, peek, useData } from "@/lib/data";
+import { showToast } from "@/lib/toast";
 import { initials, tintFor } from "./Home";
+import { DetailSkeleton, ExploreSkeleton } from "./Skeleton";
 
 export type Rank = {
   modelled: boolean; score: number | null; fixed_first?: boolean; language_mismatch?: boolean; p25_per_clip?: number; mean_per_clip?: number; p25_per_hour?: number; mean_per_hour?: number;
@@ -112,7 +116,7 @@ function ListingCard({ l, i }: { l: Listing; i: number }) {
   const budget = l.budget_total ? Math.round(((l.budget_left ?? 0) / l.budget_total) * 100) : null;
   return (
     <Link href={`/listing?id=${l.id}`} className="tile-card" data-testid="listing-card">
-      <div className="cover" style={{ background: tintFor(l.id), minHeight: [140, 110, 165][i % 3] }}>
+      <div className="cover" style={{ background: tintFor(l.id), minHeight: [140, 110, 165][Math.floor(i / 2) % 3] }}>
         <span className="mk">{boardName(l.board_slug)}</span>
         {l.brief_grade && <span className="mk" style={{ insetInlineStart: "auto", insetInlineEnd: 10 }}>Brief {l.brief_grade}</span>}
         <span className="big-num">{l.rate_per_1k !== null ? money(l.rate_per_1k) : "?"}</span>
@@ -137,7 +141,7 @@ function ListingTable({ rows }: { rows: Listing[] }) {
         </tr></thead>
         <tbody>
           {rows.map((l) => (
-            <tr key={l.id} data-testid="listing-row">
+            <tr key={l.id} className="listing-row" data-testid="listing-row">
               <td><Link href={`/listing?id=${l.id}`} className="row" style={{ textDecoration: "none" }}>
                 <span className="avatar-sm" style={{ background: tintFor(l.id), width: 36, height: 36 }} aria-hidden="true">{initials(l.title)}</span>
                 <span className="stack" style={{ gap: 0 }}><strong>{l.title}</strong><span className="small muted">{boardName(l.board_slug)}{l.agency ? ` · ${l.agency}` : ""}</span></span>
@@ -158,23 +162,32 @@ function ListingTable({ rows }: { rows: Listing[] }) {
   );
 }
 
+const PAGE = 30;
+type ListingsData = { listings: Listing[]; market: any; last_refresh: string | null; hidden_out_of_reach?: number };
+
 export default function ExploreScreen() {
-  const [data, setData] = useState<{ listings: Listing[]; market: any; last_refresh: string | null; hidden_out_of_reach?: number } | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const [me, setMe] = useState<{ niches: string[]; all_niches: string[] } | null>(null);
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [sort, setSort] = useState<string>("rank");
   const [query, setQuery] = useState("");
+  const [settledQuery, setSettledQuery] = useState("");
   const [sheet, setSheet] = useState(false);
   const [view, setView] = useState<"cards" | "table">("cards");
   const [note, setNote] = useState("");
+  const [limit, setLimit] = useState(PAGE);
+  const meData = useData<{ niches: string[]; all_niches: string[] }>("/api/me");
+  const me = meData.data ?? null;
+  const seeded = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia?.("(min-width: 900px)").matches) setView("table");
-    api("/api/me").then((m) => { setMe(m); setFilters((f) => ({ ...f, niches: m.niches ?? [] })); }).catch(() => undefined);
   }, []);
+  useEffect(() => {
+    if (meData.data && !seeded.current) { seeded.current = true; setFilters((f) => ({ ...f, niches: meData.data!.niches ?? [] })); }
+  }, [meData.data]);
+  useEffect(() => { const t = setTimeout(() => setSettledQuery(query), query ? 250 : 0); return () => clearTimeout(t); }, [query]);
 
-  const load = useCallback(() => {
+  const listingsKey = useMemo(() => {
     const p = new URLSearchParams({ sort });
     if (filters.platform) p.set("platform", filters.platform);
     if (filters.board) p.set("board", filters.board);
@@ -189,12 +202,32 @@ export default function ExploreScreen() {
     if (isNum(filters.minBudget)) p.set("min_budget_left", filters.minBudget);
     if (filters.noCountryRule) p.set("no_country_rule", "true");
     if (showAll) p.set("show_out_of_reach", "true");
-    if (query.trim()) p.set("q", query.trim());
-    api(`/api/listings?${p.toString()}`).then(setData).catch((e) => setNote(e instanceof ApiError ? e.message : "Could not load campaigns."));
-  }, [filters, sort, query, showAll]);
-  useEffect(() => { const t = setTimeout(load, query ? 250 : 0); return () => clearTimeout(t); }, [load, query]);
+    if (settledQuery.trim()) p.set("q", settledQuery.trim());
+    return `/api/listings?${p.toString()}`;
+  }, [filters, sort, settledQuery, showAll]);
+  // Changing a filter keeps the old list on screen until the new one arrives, so the page never blanks or jumps.
+  const result = useData<ListingsData>(listingsKey);
+  const lastData = useRef<ListingsData | undefined>(undefined);
+  if (result.data) lastData.current = result.data;
+  const data = result.data ?? lastData.current ?? null;
+  useEffect(() => {
+    if (result.error) setNote(result.error instanceof ApiError ? result.error.message : "Could not load campaigns.");
+  }, [result.error]);
+  const nicheKey = filters.niches.join(",");
+  useEffect(() => setLimit(PAGE), [listingsKey, nicheKey]);
 
-  const shown = useMemo(() => (data?.listings ?? []).filter((l) => filters.niches.length === 0 || (l.niche !== null && filters.niches.includes(l.niche))), [data, filters.niches]);
+  const filtered = useMemo(() => (data?.listings ?? []).filter((l) => filters.niches.length === 0 || (l.niche !== null && filters.niches.includes(l.niche))), [data, filters.niches]);
+  const shown = useMemo(() => filtered.slice(0, limit), [filtered, limit]);
+  // A very long list draws a page at a time and adds the next one just before the end is reached.
+  const sentinel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinel.current;
+    if (!el || limit >= filtered.length) return;
+    if (typeof IntersectionObserver === "undefined") { setLimit(filtered.length); return; }
+    const observer = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) setLimit((n) => n + PAGE); }, { rootMargin: "900px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [filtered.length, limit]);
   const active = [filters.platform && FEED_PLATFORM[filters.platform], ...filters.niches.map((n) => NICHE_LABEL[n] ?? n), filters.board && BOARD_LABEL[filters.board],
     filters.minRate && `≥ $${filters.minRate}/1K`, filters.minDays && `≥ ${filters.minDays} days`, filters.openOnly && "Open to join", filters.feeKnown && "Fee known",
     filters.goodBrief && "Clear briefs", filters.payModel && PAY_MODEL_LABEL[filters.payModel],
@@ -207,11 +240,19 @@ export default function ExploreScreen() {
     catch (e) { setNote(e instanceof ApiError ? e.message : "No connection."); }
   };
   const saveNiches = async (niches: string[]) => {
-    try { await api("/api/me/niches", { method: "PUT", body: { niches } }); setMe((m) => (m ? { ...m, niches } : m)); setFilters((f) => ({ ...f, niches })); }
-    catch (e) { setNote(e instanceof ApiError ? e.message : "No connection."); }
+    const before = peek<{ niches: string[] }>("/api/me")?.niches ?? [];
+    mutate<{ niches: string[]; all_niches: string[] }>("/api/me", (m) => ({ ...(m as any), niches })); // shown at once; a refusal puts the old choice back
+    setFilters((f) => ({ ...f, niches }));
+    try { await api("/api/me/niches", { method: "PUT", body: { niches } }); }
+    catch (e) {
+      mutate<{ niches: string[]; all_niches: string[] }>("/api/me", (m) => ({ ...(m as any), niches: before }));
+      setFilters((f) => ({ ...f, niches: before }));
+      setNote(e instanceof ApiError ? e.message : "No connection.");
+    }
   };
 
   const cpm = data?.market?.data?.cpm;
+  if (!data && !result.error) return <ExploreSkeleton />;
   return (
     <div className="page">
       <div className="row between wrap">
@@ -259,8 +300,9 @@ export default function ExploreScreen() {
           <button className="btn ghost" onClick={() => setShowAll(true)}>Show them</button>
         </div>
       )}
-      {data && shown.length === 0 && <p className="muted">No campaigns match. Loosen a filter, or tap “Check now”.</p>}
+      {data && filtered.length === 0 && <p className="muted">No campaigns match. Loosen a filter, or tap “Check now”.</p>}
       {view === "cards" ? <div className="masonry">{shown.map((l, i) => <ListingCard key={l.id} l={l} i={i} />)}</div> : <ListingTable rows={shown} />}
+      {limit < filtered.length && <div ref={sentinel} className="more-sentinel" aria-hidden="true" />}
       <p className="small muted">Campaign data: ClippingAlpha (clippingalpha.com), CC BY 4.0. Each marketplace's own page is the source of truth. “Cautious $ / clip” is the 25th-percentile outcome for your best account, after fees, audience rules, minimums, approval and budget.</p>
       {sheet && me && <FilterSheet value={filters} allNiches={me.all_niches} onChange={setFilters} onClose={() => setSheet(false)} />}
     </div>
@@ -269,28 +311,67 @@ export default function ExploreScreen() {
 
 // ---------------------------------------------------------------- one campaign, like a brand's profile
 
+type Removed = { key: string; listing: Listing; at: number }[];
+
+/** Take a listing out of every cached list at once. Returns what was removed, so it can be put back. */
+function removeFromLists(id: string): Removed {
+  const removed: Removed = [];
+  for (const key of cachedKeys("/api/listings?")) {
+    const current = peek<ListingsData>(key);
+    const at = current?.listings.findIndex((x) => x.id === id) ?? -1;
+    if (current && at >= 0) {
+      removed.push({ key, listing: current.listings[at], at });
+      mutate<ListingsData>(key, (c) => ({ ...c!, listings: c!.listings.filter((x) => x.id !== id) }));
+    }
+  }
+  return removed;
+}
+
+function restoreToLists(removed: Removed) {
+  for (const { key, listing, at } of removed) {
+    mutate<ListingsData>(key, (c) => {
+      if (!c || c.listings.some((x) => x.id === listing.id)) return c as ListingsData;
+      const next = [...c.listings];
+      next.splice(Math.min(at, next.length), 0, listing);
+      return { ...c, listings: next };
+    });
+  }
+}
+
 export function ListingPage({ id }: { id: string }) {
-  const [l, setL] = useState<any>(null);
+  const router = useRouter();
+  const detail = useData<any>(`/api/listings/${id}`);
+  const l = detail.data ?? null;
   const [tab, setTab] = useState<"rules" | "pay" | "why">("rules");
-  const [category, setCategory] = useState("podcast");
-  const [cats, setCats] = useState<string[]>([]);
+  const [category, setCategory] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const cats: string[] = l?.categories ?? [];
+  const chosen = category ?? (l && (l.niche === "gaming" || l.niche === "streams") ? "gaming" : "podcast");
 
   useEffect(() => {
-    api(`/api/listings/${id}`).then((x) => { setL(x); if (x.niche === "gaming" || x.niche === "streams") setCategory("gaming"); })
-      .catch((e) => setError(e instanceof ApiError ? e.message : "Could not load."));
-    api("/api/reference").then((r) => setCats(r.categories.map((c: any) => c.name))).catch(() => undefined);
-  }, [id]);
+    if (detail.error) setError(detail.error instanceof ApiError ? detail.error.message : "Could not load.");
+  }, [detail.error]);
 
   const add = async () => {
     setBusy(true); setError("");
-    try { const res = await api(`/api/listings/${id}/add`, { body: { category } }); window.location.assign(`/campaign?id=${res.campaign.id}`); }
+    try { const res = await api(`/api/listings/${id}/add`, { body: { category: chosen } }); router.push(`/campaign?id=${res.campaign.id}`); }
     catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } finally { setBusy(false); }
   };
-  const dismiss = async () => { await api(`/api/listings/${id}/dismiss`, { body: {} }).catch(() => undefined); window.location.assign("/explore"); };
+  // Not for me: leave at once and take the campaign off the lists. Undo brings it back; a refusal puts it back with a note.
+  const dismiss = () => {
+    const removed = removeFromLists(id);
+    router.push("/explore");
+    api(`/api/listings/${id}/dismiss`, { body: {} }).then(
+      () => showToast("Campaign dismissed.", { action: { label: "Undo", run: () => {
+        restoreToLists(removed);
+        api(`/api/listings/${id}/dismiss?undo=true`, { body: {} }).catch((e) => { removeFromLists(id); showToast(`Could not undo: ${e instanceof ApiError ? e.message : "no connection"}.`, { tone: "error" }); });
+      } } }),
+      (e) => { restoreToLists(removed); showToast(`Could not dismiss it. ${e instanceof ApiError ? e.message : "No connection."} It is back in the list.`, { tone: "error" }); },
+    );
+  };
 
-  if (!l) return <div className="page"><p className="muted">{error || "Loading…"}</p></div>;
+  if (!l) return error ? <div className="page"><p className="muted">{error}</p></div> : <DetailSkeleton />;
   const r: Rank = l.rank;
   return (
     <div className="page" style={{ maxWidth: 860 }}>
@@ -316,7 +397,7 @@ export function ListingPage({ id }: { id: string }) {
         ) : (
           <div className="row wrap">
             <div className="field" style={{ flex: "1 1 160px" }}><label htmlFor="l-cat">Your niche for this</label>
-              <select id="l-cat" className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <select id="l-cat" className="input" value={chosen} onChange={(e) => setCategory(e.target.value)}>
                 {(cats.length ? cats : ["podcast"]).map((c) => <option key={c} value={c}>{c.replace("_", " ")}</option>)}
               </select></div>
             <button className="btn primary" style={{ flex: "2 1 220px", alignSelf: "end" }} disabled={busy} onClick={add}>Add to my campaigns</button>

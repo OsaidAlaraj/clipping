@@ -160,9 +160,8 @@ textarea.input { min-height: 120px; resize: vertical; }
 .swipe-hint { font-size: 0.75rem; color: var(--muted); display: flex; justify-content: space-between; }
 .avatar-sm { width: 42px; height: 42px; border-radius: 21px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; flex: none; background: #E7E3FF; color: #0E0E10; }
 .big-num { font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; letter-spacing: -0.02em; }
-.masonry { columns: 2; column-gap: 10px; }
-.masonry > * { break-inside: avoid; margin-bottom: 10px; }
-@media (min-width: 900px) { .masonry { columns: 3; } .tiles { gap: 12px; } }
+.masonry { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
+@media (min-width: 900px) { .masonry { grid-template-columns: repeat(3, minmax(0, 1fr)); } .tiles { gap: 12px; } }
 .tile-card { background: var(--surface); border-radius: 20px; overflow: hidden; display: block; text-decoration: none; color: var(--fg); }
 .tile-card .cover { display: flex; align-items: flex-end; padding: 12px; position: relative; min-height: 110px; color: #0E0E10; }
 .tile-card .cover .mk { position: absolute; top: 10px; inset-inline-start: 10px; font-size: 0.66rem; font-weight: 700; padding: 4px 8px; border-radius: 999px; background: #FFFFFF; }
@@ -316,3 +315,26 @@ a.pg-card { display: grid; }
 .pg-bar > i { transition: width 0.4s ease; }
 .pg-bar.failed > i { background: var(--urgent); }
 .pg-meta { font-variant-numeric: tabular-nums; min-height: 1.3em; }
+
+/* ---- Smoothness (phase 7) */
+.sk.dark { background: rgba(255, 255, 255, 0.14); }
+.feed .top .sk { display: inline-block; }
+.feed .bottom .sk { display: block; }
+/* Only the visible card paints and moves; the clips after it sit buffered behind it, so a swipe never waits on a load. */
+.feed-card { will-change: transform; contain: layout paint style; touch-action: none; }
+.feed .bottom { transition: opacity 0.15s ease; }
+.feed .bottom.text-hidden { opacity: 0; pointer-events: none; }
+.feed-card.idle { visibility: hidden; pointer-events: none; }
+.feed-card.settling { transition: transform 0.18s ease-out; }
+/* Long lists: rows far from the screen are skipped by the browser until they scroll near. */
+.campaign, tr.listing-row { content-visibility: auto; contain-intrinsic-size: auto 190px; }
+tr.listing-row { contain-intrinsic-size: auto 52px; }
+.more-sentinel { height: 1px; }
+/* The saved/offline notice floats, so showing or hiding it never moves the page. */
+.sync-pill { position: fixed; top: calc(env(safe-area-inset-top) + 8px); inset-inline-end: 12px; z-index: 40; padding: 6px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+  background: var(--warn-fill); color: var(--warn); pointer-events: none; }
+.sync-pill.ok { background: var(--ok-fill); color: var(--ok); }
+.toast.error { background: #3A0D0D; }
+.toast .msg { min-width: 0; overflow-wrap: anywhere; }
+img, video { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) { .feed-card.settling { transition: none; } .sk { animation: none; } }

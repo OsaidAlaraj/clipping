@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 import { CampaignDetail } from "@/components/More";
+import { DetailSkeleton } from "@/components/Skeleton";
 
 function CampaignPage() {
   const id = useSearchParams().get("id");
@@ -12,7 +13,7 @@ function CampaignPage() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<DetailSkeleton />}>
       <CampaignPage />
     </Suspense>
   );

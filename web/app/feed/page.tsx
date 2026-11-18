@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 import Feed from "@/components/Feed";
+import { FeedSkeleton } from "@/components/Skeleton";
 
 function FeedPage() {
   const campaign = useSearchParams().get("campaign") ?? undefined;
@@ -12,7 +13,7 @@ function FeedPage() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<FeedSkeleton />}>
       <FeedPage />
     </Suspense>
   );

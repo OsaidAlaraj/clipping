@@ -569,6 +569,11 @@ Research cited for this plan:
 | 15 | 3 | Signals failure (other than bad media) alerts and still enqueues moments | build agent | assumed |
 | 16 | 6 | No-keys demo runs on the seeded stand-in adapters (fakes off, keys blank); local Whisper and signals-only ranking are covered by their own tests; a real no-AI run needs a shared model cache, a speech sample and a hooks fallback (open item) | build agent | assumed |
 | 17 | 6 | Brand check severities: banned phrase = block, missing tag/phrase = warn, vague = reminder | build agent | assumed |
+| 18 | 7 | Added GET /api/counts for nav badges and categories on GET /api/listings/{id} (small additive endpoints, though the plan said no new interfaces) | build agent | assumed |
+| 19 | 7 | Home approve/park roll back on refusal but have no Undo (approval is an owner gate); review accept/reject/later all have Undo | build agent | assumed |
+| 20 | 7 | useSwipe returns {ref, intent, bind}; drag writes transform per frame with no React render; feed mounts at most 4 videos | build agent | assumed |
+| 21 | 7 | Full screen plus Hide text buttons on the review rail (owner request); Hide text is a rail toggle because tap toggles sound | build agent | assumed |
+| 22 | 7 | 4G simulated with a fetch delay wrapper (150 ms + 1.6 Mbit/s), desktop CPU; real phone not measured | build agent | assumed |
 ---
 ## Execution Log
 _To be filled during /code-foundations:build_
@@ -624,4 +629,11 @@ Covered by batch review 2026-11-18 (phases 5–6): PASS — .code-foundations/bu
 Commit: (see git log, phase 6)
 Summary: Review shows a chance-to-clear per clip and sinks weak clips with a reason; marketplace rejections become per-brand checks (block, warn or reminder) in compliance; the correction queue favours words inside likely moments; signals refresh text series after transcript edits; the demo runs every stage and stops cleanly on the kill switch; the user guide covers the new features.
 Covered by batch review 2026-11-18 (phases 5–6): PASS — .code-foundations/build/2026-11-17-phase-d-making-clips-batch-phases-5-6-review.md
+
+### Phase 7: Social-media smoothness (Gate: Standard)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: DEFERRED — batch pending (web 217/217, tsc clean; backend green except 4 load-sensitive render/timing tests that pass alone)
+- [x] Committed
+Commit: (see git log, phase 7)
+Summary: Every screen draws cached data or a matching skeleton in its first frame and refreshes quietly; review actions are optimistic with undo and roll back with the server's reason; the feed keeps the next two clips buffered so a swipe plays at once; fewer, smaller API calls; quiet offline retries; full-screen and hide-text buttons on review clips. Measured: 13–17 ms tap to content, CLS 0, next clip playing 4 ms after a swipe.
 

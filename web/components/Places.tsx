@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ApiError, money, PLATFORM_LABEL, uploadBase } from "@/lib/api";
+import { fetchData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { Card } from "./Home";
 import { AccountLook } from "./Look";
@@ -219,7 +220,7 @@ export function NewPlace() {
     setShared(text || url || title ? { name: title, text, url: link } : {});
   }, []);
   useEffect(() => {
-    api("/api/home").then((home) => {
+    fetchData<any>("/api/home").then((home) => {
       const fetched: Approved[] = home.campaigns.filter((c: Card) => c.status === "approved")
         .map((c: Card) => ({ id: c.id, name: c.name, practice: !!c.is_practice, language: c.language ?? null }));
       // A practice campaign made a moment ago may not be in a slow answer yet: keep it.
@@ -323,11 +324,12 @@ export function Profile() {
   const [error, setError] = useState("");
   const [net, setNet] = useState<any>(null);
 
-  const load = useCallback(() => {
-    api("/api/reference").then((ref) => { setAccounts(ref.accounts); setCategories(ref.categories.map((c: any) => c.name)); }).catch(() => setError("Could not load."));
-    api("/api/home").then((home) => setNet(home.net_per_hour)).catch(() => undefined);
+  // The first look reuses what the tab already fetched; after a change it asks the server again.
+  const load = useCallback((force = true) => {
+    fetchData<any>("/api/reference", { force }).then((ref) => { setAccounts(ref.accounts); setCategories(ref.categories.map((c: any) => c.name)); }).catch(() => setError("Could not load."));
+    fetchData<any>("/api/home", { force }).then((home) => setNet(home.net_per_hour)).catch(() => undefined);
   }, []);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(false); }, [load]);
 
   const add = async () => {
     setError("");

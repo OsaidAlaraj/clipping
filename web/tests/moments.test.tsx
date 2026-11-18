@@ -1,10 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/feed", useSearchParams: () => new URLSearchParams() }));
+const nav = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: nav.push, replace: nav.push }), usePathname: () => "/feed", useSearchParams: () => new URLSearchParams() }));
 vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a href={href} {...rest}>{children}</a> }));
 
 import Feed from "@/components/Feed";
+import { clearCache } from "@/lib/data";
 import { LangProvider } from "@/lib/i18n";
 import { clip, feedRoutes, mockApi } from "./helpers";
 
@@ -58,6 +60,7 @@ describe("Filtered moments in Review", () => {
     await screen.findByText("Nothing to review");
     expect(screen.getByRole("button", { name: "Filtered 1" })).toBeTruthy();
     view.unmount();
+    clearCache();
     mockApi(feedRoutes([clip("c1")]));
     render(<LangProvider initial="en"><Feed /></LangProvider>);
     await screen.findByTestId("clip-card");

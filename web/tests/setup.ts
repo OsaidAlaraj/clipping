@@ -1,8 +1,13 @@
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 
+import { clearCache } from "@/lib/data";
+import { dismissToast } from "@/lib/toast";
+
 afterEach(() => {
   cleanup();
+  clearCache();
+  dismissToast();
   localStorage.clear();
   vi.useRealTimers();
   vi.unstubAllGlobals();

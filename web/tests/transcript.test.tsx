@@ -3,10 +3,12 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 
 let search = new URLSearchParams("id=s1");
-vi.mock("next/navigation", () => ({ usePathname: () => "/transcript", useSearchParams: () => search }));
+const nav = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: nav.push, replace: nav.push }), usePathname: () => "/transcript", useSearchParams: () => search }));
 vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a href={href} {...rest}>{children}</a> }));
 
 import Feed from "@/components/Feed";
+import { clearCache } from "@/lib/data";
 import { CampaignDetail, Settings } from "@/components/More";
 import Transcript from "@/components/Transcript";
 import {
@@ -559,6 +561,7 @@ describe("DW-2.3 accuracy in Settings, and the ways to reach the screen", () => 
     expect(view.container.querySelector("[aria-label='Transcript accuracy'][aria-busy='true'] .sk")).toBeTruthy();
     expect(await screen.findByText("Fix a transcript and its accuracy appears here.")).toBeTruthy();
     view.unmount();
+    clearCache();   // a second visit with nothing cached
     mockApi({ "GET /api/settings": { settings: [], kill_switch: { active: false, reason: null } }, "GET /api/reference": { adapters: [], accounts: [] } });
     render(<Settings />);
     expect(await screen.findByText(/Accuracy could not be loaded/)).toBeTruthy();

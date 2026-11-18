@@ -8,7 +8,7 @@ const LABELS = {
   en: {
     home: "Home", feed: "Feed", queue: "Queue", more: "More",
     accept: "Accept", reject: "Reject", hooks: "Hooks", edit: "Edit", later: "Review later",
-    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", stopHere: "Stop here", soundOn: "Tap for sound", muted: "Muted",
+    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", accepted: "Accepted", fullScreen: "Full screen", hideText: "Hide text", showText: "Show text", parked: "Saved for later", stopHere: "Stop here", soundOn: "Tap for sound", muted: "Muted",
     reviewLater: "Review Later", ledger: "Ledger", alerts: "Alerts", settings: "Settings",
     explore: "Explore", review: "Review", profile: "Profile", create: "New", addCampaign: "Add campaign", addVideo: "Add video",
     marketRejected: "The marketplace rejected this clip", marketReasonLabel: "What did the marketplace say?",
@@ -20,7 +20,7 @@ const LABELS = {
   ar: {
     home: "الرئيسية", feed: "المراجعة", queue: "قائمة النشر", more: "المزيد",
     accept: "قبول", reject: "رفض", hooks: "العناوين", edit: "تعديل", later: "مراجعة لاحقاً",
-    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", stopHere: "توقف هنا", soundOn: "اضغط لتشغيل الصوت", muted: "صامت",
+    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", accepted: "تم القبول", fullScreen: "ملء الشاشة", hideText: "إخفاء النص", showText: "إظهار النص", parked: "حُفظ للمراجعة لاحقاً", stopHere: "توقف هنا", soundOn: "اضغط لتشغيل الصوت", muted: "صامت",
     reviewLater: "للمراجعة لاحقاً", ledger: "السجل المالي", alerts: "التنبيهات", settings: "الإعدادات",
     explore: "استكشاف", review: "المراجعة", profile: "ملفي", create: "جديد", addCampaign: "إضافة حملة", addVideo: "إضافة فيديو",
     marketRejected: "المنصّة رفضت هذا المقطع", marketReasonLabel: "ماذا قالت المنصّة؟",

@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { api, ApiError, Clip, PLATFORM_LABEL } from "@/lib/api";
+import { useData } from "@/lib/data";
+import { ListSkeleton } from "./Skeleton";
 import { useLang } from "@/lib/i18n";
 
 type ChecklistState = {
@@ -187,11 +189,13 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
 }
 
 export default function Queue() {
-  const [data, setData] = useState<{ kill_switch: boolean; items: Clip[] } | null>(null);
+  const queue = useData<{ kill_switch: boolean; items: Clip[] }>("/api/queue");
+  const data = queue.data ?? null;
   const [open, setOpen] = useState<string | null>(null);
-  const [error, setError] = useState("");
-  const load = useCallback(() => api("/api/queue").then(setData).catch(() => setError("Could not load the Queue.")), []);
-  useEffect(() => { load(); }, [load]);
+  const error = queue.error && !data ? "Could not load the Queue." : "";
+  const load = queue.reload;
+
+  if (!data && !error) return <ListSkeleton title="Queue" />;
 
   return (
     <div className="page">

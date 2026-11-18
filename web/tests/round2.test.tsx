@@ -2,7 +2,8 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { describe, expect, it, vi } from "vitest";
 
 let currentPath = "/";
-vi.mock("next/navigation", () => ({ usePathname: () => currentPath, useSearchParams: () => new URLSearchParams() }));
+const nav = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: nav.push, replace: nav.push }), usePathname: () => currentPath, useSearchParams: () => new URLSearchParams() }));
 vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a href={href} {...rest}>{children}</a> }));
 const startRegistration = vi.fn(async () => ({ id: "cred", response: {} }));
 const startAuthentication = vi.fn(async () => ({ id: "cred", response: {} }));
@@ -24,7 +25,7 @@ const homeData = {
 
 describe("five places, same on phone and desktop", () => {
   it("shows Home, Explore, New, Review and Profile in both navigations, with the review count and alert dot", async () => {
-    mockApi({ "GET /api/home": homeData });
+    mockApi({ "GET /api/counts": { to_review: 7, alerts: 1 } });
     currentPath = "/explore";
     const view = render(<Shell><p>content</p></Shell>);
     expect(PLACES.map((p) => p.href)).toEqual(["/", "/explore", "/new", "/review", "/profile"]);
@@ -38,14 +39,14 @@ describe("five places, same on phone and desktop", () => {
   });
 
   it("hides the top bar on the full-screen review", () => {
-    mockApi({ "GET /api/home": homeData });
+    mockApi({ "GET /api/counts": { to_review: 7, alerts: 1 } });
     currentPath = "/review";
     render(<Shell><p>video</p></Shell>);
     expect(screen.queryByRole("link", { name: /Alerts/ })).toBeNull();
   });
 
   it("sends a signed-out request to the sign-in page", async () => {
-    mockApi({ "GET /api/home": { __status: 401, body: { error: "Sign in with your passkey.", code: "signin_required" } } });
+    mockApi({ "GET /api/counts": { __status: 401, body: { error: "Sign in with your passkey.", code: "signin_required" } } });
     const assign = vi.fn();
     Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, pathname: "/queue", search: "", assign } });
     currentPath = "/queue";

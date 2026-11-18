@@ -2,6 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     { "name": "clipping", "runtimeExecutable": "python", "runtimeArgs": ["run.py"], "port": 3000 },
+    { "name": "clipping-stable", "runtimeExecutable": "cmd", "runtimeArgs": ["/c", "cd /d L:\\Projects\\Clipping\\.scratch\\stable&& set CLIPPING_DATA_DIR=L:\\Projects\\Clipping\\.data&& python run.py"], "port": 3000 },
     { "name": "clipping-nosignin", "runtimeExecutable": "cmd", "runtimeArgs": ["/c", "set AUTH_MODE=local&& python run.py"], "port": 3000 }
   ]
 }

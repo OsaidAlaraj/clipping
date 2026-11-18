@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { api, ApiError, money, PLATFORM_LABEL } from "@/lib/api";
+import { mutate, peek, useData } from "@/lib/data";
+import { showToast } from "@/lib/toast";
 import { useSwipe } from "@/lib/useSwipe";
 import ProgressCards, { useProgress } from "./Progress";
+import { HomeSkeleton } from "./Skeleton";
 
 export type Card = {
   id: string; name: string; status: string; status_reason: string | null; marketplace: string; niche: string | null;
@@ -39,14 +42,14 @@ export function deadlineText(hours: number | null): string {
 }
 
 export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; onApprove: () => void; onPark: () => void; onOpen: () => void }) {
-  const { offset, bind } = useSwipe({ onRight: onApprove, onLeft: onPark, onTap: onOpen }, { vertical: false });
+  const { ref, intent, bind } = useSwipe({ onRight: onApprove, onLeft: onPark, onTap: onOpen }, { vertical: false });
   const badge = card.compliance_status === "pass" ? "pass" : card.compliance_status === "blocked" ? "blocked" : "review";
   const low = card.budget_left_pct !== null && card.budget_left_pct < 25;
   return (
-    <article className="card campaign stack" data-testid="campaign-card" {...bind} role="button" tabIndex={0}
+    <article className="card campaign stack" data-testid="campaign-card" {...bind} ref={ref as React.RefObject<HTMLElement>} role="button" tabIndex={0}
       aria-label={`${card.name}. Swipe right to approve, left to park, tap to open.`}
       onKeyDown={(event) => { if (event.key === "Enter") onOpen(); }}
-      style={{ transform: `translateX(${offset.x}px)`, outline: offset.x > 30 ? "2px solid var(--fg)" : offset.x < -30 ? "2px solid var(--urgent)" : undefined }}>
+      style={{ outline: intent === "right" ? "2px solid var(--fg)" : intent === "left" ? "2px solid var(--urgent)" : undefined }}>
       <div className="row">
         <span className="avatar-sm" style={{ background: tintFor(card.id) }} aria-hidden="true">{initials(card.name)}</span>
         <div className="grow stack" style={{ gap: 0 }}>
@@ -82,24 +85,29 @@ export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; 
 }
 
 export default function Home() {
-  const [data, setData] = useState<HomeData | null>(null);
-  const [message, setMessage] = useState("");
+  const router = useRouter();
+  const home = useData<HomeData>("/api/home");
+  const data = home.data ?? null;
   const progress = useProgress();
 
-  const load = useCallback(() => api<HomeData>("/api/home").then(setData).catch(() => setMessage("Could not load. Showing nothing until you are back online.")), []);
-  useEffect(() => { load(); }, [load]);
-
+  // Approve and park show at once. The server confirms in the background; a refusal puts the card back with the reason.
   const act = async (id: string, action: "approve" | "park") => {
+    const before = peek<HomeData>("/api/home");
+    const status = action === "approve" ? "approved" : "paused";
+    mutate<HomeData>("/api/home", (h) => ({ ...h!, campaigns: h!.campaigns.map((c) => (c.id === id ? { ...c, status } : c)) }));
     try {
       await api(`/api/campaigns/${id}/${action}`, { method: "POST" });
-      setMessage(action === "approve" ? "Campaign approved." : "Campaign parked.");
-      load();
+      showToast(action === "approve" ? "Campaign approved." : "Campaign parked.");
+      void home.reload();
     } catch (error) {
-      setMessage(error instanceof ApiError ? error.message : "That did not work.");
+      if (before) mutate<HomeData>("/api/home", () => before);
+      showToast(error instanceof ApiError ? error.message : "That did not work. Nothing changed.", { tone: "error" });
     }
   };
 
-  if (!data || !progress.settled) return <div className="page"><h1>Home</h1><p className="muted">{message || "Loading…"}</p></div>;
+  if (!data || !progress.settled) {
+    return home.error && !data ? <div className="page"><h1>Home</h1><p className="muted">Could not load. Showing nothing until you are back online.</p></div> : <HomeSkeleton />;
+  }
   const { today, net_per_hour: net } = data;
   const week = net.this_week, month = net.month_to_date;
   const perHour = (b: any) => (b.with_pending_per_hour === null ? "—" : `$${Number(b.with_pending_per_hour).toFixed(2)}`);
@@ -109,7 +117,6 @@ export default function Home() {
       <h1 className="sr-only">Home</h1>
       <div className="stack home-main" style={{ gap: 14 }}>
         {data.kill_switch.active && <div className="banner block" role="alert">The kill switch is on. No new jobs run and ready-to-post clips are hidden.</div>}
-        {message && <div className="banner" role="status">{message}</div>}
 
         <section aria-label="Active campaigns" className="stories">
           <Link href="/explore" className="story">
@@ -165,9 +172,9 @@ export default function Home() {
           {data.campaigns.length === 0 && <p className="muted">No campaigns yet. Tap ➕ to add one by pasting its brief.</p>}
           {data.campaigns.map((card) => (
             <CampaignCard key={card.id} card={card}
-              onApprove={() => (card.status === "approved" ? setMessage("Already approved.") : act(card.id, "approve"))}
+              onApprove={() => (card.status === "approved" ? showToast("Already approved.") : act(card.id, "approve"))}
               onPark={() => act(card.id, "park")}
-              onOpen={() => { window.location.href = card.status === "approved" ? `/review?campaign=${card.id}` : `/campaign?id=${card.id}`; }} />
+              onOpen={() => router.push(card.status === "approved" ? `/review?campaign=${card.id}` : `/campaign?id=${card.id}`)} />
           ))}
         </section>
       </div>

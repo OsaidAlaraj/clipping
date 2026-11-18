@@ -4,8 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { api, flushOutbox, readOutbox } from "@/lib/api";
+import { flushOutbox, OUTBOX_EVENT, readOutbox } from "@/lib/api";
+import { hydrateCache, prefetch, useData } from "@/lib/data";
 import { LangProvider, useLang } from "@/lib/i18n";
+import ToastHost from "./ToastHost";
 
 export const Icon = {
   home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /></svg>,
@@ -20,6 +22,8 @@ export const Icon = {
   cross: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>,
   hooks: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h8" /></svg>,
   edit: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" /></svg>,
+  expand: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>,
+  text: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h9" /><path d="M3 21L21 3" /></svg>,
   later: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 4h12v16l-6-4-6 4z" /></svg>,
 };
 
@@ -32,6 +36,16 @@ export const PLACES = [
   { href: "/profile", key: "profile", icon: Icon.profile, match: (p: string) => p.startsWith("/profile") || p.startsWith("/queue") || p.startsWith("/more") },
 ] as const;
 
+/** The data each place opens with. Warmed when a finger or pointer reaches the tab, so the screen is ready by the time it opens. */
+const PLACE_DATA: Record<string, string[]> = {
+  "/": ["/api/home"],
+  "/explore": ["/api/listings?sort=rank", "/api/me"],
+  "/review": ["/api/feed"],
+  "/profile": ["/api/queue"],
+};
+const warm = (href: string) => (PLACE_DATA[href] ?? []).forEach(prefetch);
+const warmProps = (href: string) => ({ onPointerEnter: () => warm(href), onPointerDown: () => warm(href), onFocus: () => warm(href) });
+
 function Navigation({ toReview }: { toReview: number }) {
   const path = usePathname() ?? "/";
   const { t } = useLang();
@@ -40,7 +54,7 @@ function Navigation({ toReview }: { toReview: number }) {
     <>
       <nav className="nav" aria-label="Main">
         {items.map((item) => (
-          <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined}
+          <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined} {...warmProps(item.href)}
             aria-current={item.active ? "page" : undefined} aria-label={item.active ? undefined : item.label}>
             {item.icon}
             <span className="label">{item.label}</span>
@@ -51,7 +65,7 @@ function Navigation({ toReview }: { toReview: number }) {
       <nav className="side" aria-label="Main">
         <Link href="/" className="wordmark">clipping</Link>
         {items.filter((item) => item.key !== "create").map((item) => (
-          <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined}>
+          <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} {...warmProps(item.href)}>
             {item.icon}<span>{item.label}</span>
             {item.key === "review" && toReview > 0 && <span className="count" aria-label={`${toReview} waiting`}>{toReview}</span>}
           </Link>
@@ -76,53 +90,74 @@ export function TopBar({ alerts }: { alerts: number }) {
   );
 }
 
+const RETRY_MS = [4_000, 8_000, 16_000, 30_000, 60_000];
+
 export default function Shell({ children }: { children: React.ReactNode }) {
-  const [counts, setCounts] = useState({ toReview: 0, alerts: 0 });
+  const counts = useData<{ to_review: number; alerts: number }>("/api/counts").data ?? { to_review: 0, alerts: 0 };
   const [offline, setOffline] = useState(false);
   const [pending, setPending] = useState(0);
+  const [justSaved, setJustSaved] = useState(false);
   const path = usePathname() ?? "/";
   const fullScreen = path.startsWith("/review") || path.startsWith("/feed") || path.startsWith("/signin");
 
   useEffect(() => {
+    hydrateCache(); // after the first render, so the server and the browser agree on the first markup
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    let attempt = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let savedTimer: ReturnType<typeof setTimeout> | undefined;
+    // Saved actions are sent when the connection is back, and retried with growing gaps while it is not.
     const sync = async () => {
+      if (timer) clearTimeout(timer);
       setOffline(!navigator.onLine);
-      if (navigator.onLine) await flushOutbox();
-      setPending(readOutbox().length);
+      const before = readOutbox().length;
+      if (navigator.onLine && before > 0) {
+        const sent = await flushOutbox();
+        if (sent > 0) { setJustSaved(true); if (savedTimer) clearTimeout(savedTimer); savedTimer = setTimeout(() => setJustSaved(false), 2500); }
+      }
+      const left = readOutbox().length;
+      setPending(left);
+      if (left > 0) { timer = setTimeout(sync, RETRY_MS[Math.min(attempt, RETRY_MS.length - 1)]); attempt += 1; } else attempt = 0;
     };
+    const onOutbox = () => setPending(readOutbox().length);
+    const onVisible = () => { if (document.visibilityState === "visible") void sync(); };
     sync();
     window.addEventListener("online", sync);
     window.addEventListener("offline", sync);
+    window.addEventListener(OUTBOX_EVENT, onOutbox);
+    document.addEventListener("visibilitychange", onVisible);
+    // Once the page is idle, warm the data of the other places so the first tap on each is instant too.
+    const idle = (window as any).requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 1200));
+    idle(() => Object.keys(PLACE_DATA).forEach(warm));
     return () => {
+      if (timer) clearTimeout(timer);
+      if (savedTimer) clearTimeout(savedTimer);
       window.removeEventListener("online", sync);
       window.removeEventListener("offline", sync);
+      window.removeEventListener(OUTBOX_EVENT, onOutbox);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
-  useEffect(() => {
-    api("/api/home")
-      .then((home) => setCounts({ toReview: home.today.to_review, alerts: home.attention.length }))
-      .catch(() => undefined);
-    setPending(readOutbox().length);
-  }, [path]);
+  useEffect(() => { prefetch("/api/counts"); setPending(readOutbox().length); }, [path]);
 
   return (
     <LangProvider>
       <div className="shell">
-        <Navigation toReview={counts.toReview} />
+        <Navigation toReview={counts.to_review} />
         <div className="app">
           {!fullScreen && <TopBar alerts={counts.alerts} />}
-          {(offline || pending > 0) && (
-            <div className="page" style={{ paddingBottom: 0 }}>
-              <div className="banner warn" role="status">
-                {offline ? "You are offline. Review actions are saved on this device and sent when you reconnect. Posting needs a connection." : null}
-                {!offline && pending > 0 ? `${pending} saved action${pending === 1 ? "" : "s"} waiting to send.` : null}
-              </div>
-            </div>
-          )}
           {children}
         </div>
       </div>
+      {/* Floating and quiet: it never moves the page. Offline and waiting actions are saved on this device. */}
+      {(offline || pending > 0) && (
+        <div className="sync-pill" role="status">
+          {offline ? `Offline. ${pending > 0 ? `${pending} saved here` : "Review actions are saved here"} and sent when you reconnect.` : `${pending} saved, sending…`}
+        </div>
+      )}
+      {!offline && pending === 0 && justSaved && <div className="sync-pill ok" role="status">All saved</div>}
+      <ToastHost />
     </LangProvider>
   );
 }

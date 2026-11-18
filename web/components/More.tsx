@@ -4,16 +4,20 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ApiError, Clip, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
+import { useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
 import { RejectSheet } from "./Feed";
+import { DetailSkeleton, RowsSkeleton } from "./Skeleton";
 
+/** A screen's data: the last copy at once if there is one, refreshed in the background. */
 function useLoad<T>(path: string) {
-  const [data, setData] = useState<T | null>(null);
+  const result = useData<T>(path);
   const [error, setError] = useState("");
-  const load = useCallback(() => api<T>(path).then(setData).catch((e) => setError(e instanceof ApiError ? e.message : "No connection.")), [path]);
-  useEffect(() => { load(); }, [load]);
-  return { data, error, setError, load };
+  useEffect(() => { if (result.error) setError(result.error instanceof ApiError ? result.error.message : "No connection."); }, [result.error]);
+  useEffect(() => { if (result.data !== undefined) setError(""); }, [result.data]);
+  const load = useCallback(() => result.reload(), [result.reload]);
+  return { data: (result.data ?? null) as T | null, error, setError, load };
 }
 
 function Head({ title, back = "/profile" }: { title: string; back?: string }) {
@@ -48,6 +52,7 @@ export function ReviewLater() {
     <div className="page">
       <Head title="Review Later" />
       {error && <p className="error">{error}</p>}
+      {data === null && !error && <RowsSkeleton />}
       {data?.folders.length === 0 && <p className="muted">Nothing parked. Clips you mark “review later” in the Feed collect here, grouped by campaign.</p>}
       {data?.folders.map((folder) => (
         <section key={folder.campaign_id} className="card stack" aria-label={folder.campaign_name} style={{ opacity: folder.closed ? 0.75 : 1 }}>
@@ -94,6 +99,7 @@ export function Ledger() {
     <div className="page">
       <Head title="Ledger" />
       {error && <p className="error" role="alert">{error}</p>}
+      {data === null && !error && <RowsSkeleton />}
       {data && (
         <>
           <section className="card stack">
@@ -147,6 +153,7 @@ export function Alerts() {
     <div className="page">
       <Head title="Alerts" />
       {error && <p className="error">{error}</p>}
+      {data === null && !error && <RowsSkeleton rows={2} />}
       {data?.alerts.length === 0 && <p className="muted">No open alerts.</p>}
       {data?.alerts.map((alert) => (
         <section key={alert.id} className="card stack">
@@ -402,7 +409,7 @@ export function CampaignDetail({ id }: { id: string }) {
   const [source, setSource] = useState({ file_path: "", language: "en", permission_ref: "" });
   const [note, setNote] = useState("");
   const act = async (fn: () => Promise<unknown>, done?: string) => { setError(""); try { await fn(); setNote(done ?? ""); load(); } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } };
-  if (!data) return <div className="page"><Head title="Campaign" back="/" /><p className="muted">{error || "Loading…"}</p></div>;
+  if (!data) return error ? <div className="page"><Head title="Campaign" back="/" /><p className="muted">{error}</p></div> : <DetailSkeleton />;
   const { campaign, version } = data;
   const rules = version.rules_json;
   const payoutQuotes = rules.payout?.quotes ?? {};

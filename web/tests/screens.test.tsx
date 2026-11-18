@@ -1,9 +1,14 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+const nav = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: nav.push, replace: nav.push }), usePathname: () => "/", useSearchParams: () => new URLSearchParams() }));
+vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a href={href} {...rest}>{children}</a> }));
 
 import Home from "@/components/Home";
 import { ReviewLater, Settings } from "@/components/More";
 import Queue from "@/components/Queue";
+import ToastHost from "@/components/ToastHost";
 import { LangProvider } from "@/lib/i18n";
 import { clip, mockApi, swipe } from "./helpers";
 
@@ -46,13 +51,13 @@ describe("Home", () => {
 
   it("shows pay per clip on the card when the setting sends it", async () => {
     mockApi({ "GET /api/home": home({ campaigns: [card("p1", { max_payout_per_clip: 150 })] }) });
-    render(<Home />);
+    render(<><Home /><ToastHost /></>);
     await screen.findByText("Max $150.00 per clip");
   });
 
   it("swipe right approves a campaign and swipe left parks it", async () => {
     const mock = mockApi({ "GET /api/home": home(), "POST /api/campaigns/": { ok: true } });
-    render(<Home />);
+    render(<><Home /><ToastHost /></>);
     const cards = await screen.findAllByTestId("campaign-card");
     swipe(cards[0], [100, 300], [260, 302]);
     await waitFor(() => expect(mock.posts("/approve")).toHaveLength(1));
@@ -64,7 +69,7 @@ describe("Home", () => {
 
   it("a campaign swipe from the left edge is ignored, and a refusal is shown", async () => {
     const mock = mockApi({ "GET /api/home": home(), "POST /api/campaigns/p1/approve": { __status: 403, body: { error: "This campaign is hard-blocked and cannot be approved." } } });
-    render(<Home />);
+    render(<><Home /><ToastHost /></>);
     const cards = await screen.findAllByTestId("campaign-card");
     swipe(cards[0], [12, 300], [260, 300]);
     expect(mock.posts("/approve")).toHaveLength(0);
@@ -74,7 +79,7 @@ describe("Home", () => {
 
   it("warns when the kill switch is on", async () => {
     mockApi({ "GET /api/home": home({ kill_switch: { active: true } }) });
-    render(<Home />);
+    render(<><Home /><ToastHost /></>);
     expect((await screen.findByRole("alert")).textContent).toMatch(/kill switch is on/);
   });
 });

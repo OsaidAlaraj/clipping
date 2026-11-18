@@ -123,12 +123,15 @@ export function readOutbox(): OutboxItem[] {
   }
 }
 
+export const OUTBOX_EVENT = "clipping:outbox";
+
 function writeOutbox(items: OutboxItem[]): void {
   try {
     localStorage.setItem(OUTBOX_KEY, JSON.stringify(items));
   } catch {
     /* storage unavailable */
   }
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(OUTBOX_EVENT)); // the "saved" notice follows the outbox at once
 }
 
 export function removeFromOutbox(id: string): boolean {

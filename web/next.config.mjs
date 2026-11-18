@@ -2,6 +2,8 @@
 const api = process.env.CLIPPING_API_URL || "http://127.0.0.1:8787";
 
 export default {
+  // A second build can live beside the dev one (for measuring a production build without disturbing the running dev server).
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   reactStrictMode: true,
   // The phone reaches the laptop through Tailscale (https://<laptop>.<tailnet>.ts.net).
   allowedDevOrigins: ["*.ts.net", "*.trycloudflare.com"],

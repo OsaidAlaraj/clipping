@@ -11,3 +11,4 @@ web/public/sw.js.map
 .claude/worktrees/
 .code-foundations/wave-worktrees/
 *.tsbuildinfo
+.next-*/

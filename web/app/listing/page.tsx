@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 import { ListingPage } from "@/components/Explore";
+import { DetailSkeleton } from "@/components/Skeleton";
 
 function Inner() {
   const id = useSearchParams().get("id");
@@ -12,7 +13,7 @@ function Inner() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<DetailSkeleton />}>
       <Inner />
     </Suspense>
   );

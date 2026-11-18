@@ -280,6 +280,14 @@ def get_home(actor: Actor = Depends(current_actor)):
     return run(actor, ops.home, actor)
 
 
+@app.get("/api/counts")
+def get_counts(actor: Actor = Depends(current_actor)):
+    """The two numbers the navigation badges show. Far smaller and cheaper than /api/home, so every screen can refresh them."""
+    with get_db().session(actor) as conn:
+        to_review = conn.execute("select count(*) as n from clips where status = 'ready_for_review'").fetchone()["n"]
+        return {"to_review": to_review, "alerts": min(len(alerts.inbox(conn)), 5)}
+
+
 @app.get("/api/progress")
 def get_progress(actor: Actor = Depends(current_actor)):
     return run(actor, progress.overview, actor)
@@ -509,6 +517,7 @@ def get_listing(listing_id: str, actor: Actor = Depends(current_actor)):
         ranked["join"] = brief.get("join") or {}
         ranked["verdicts"] = (analytics.get("alpha") or {}).get("verdicts") or []
         ranked["about"] = raw.get("about")
+        ranked["categories"] = [c["name"] for c in conn.execute("select name from categories order by name").fetchall()]   # saves the page a second call
         return ranked
 
 
