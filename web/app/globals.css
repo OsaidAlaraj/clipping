@@ -233,6 +233,11 @@ textarea.input { min-height: 120px; resize: vertical; }
 .check .state.no { background: transparent; border: 2px solid var(--urgent); color: var(--danger); }
 .later-row { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; align-items: start; }
 .later-row video { width: 72px; height: 128px; object-fit: cover; border-radius: 12px; background: #000; }
+.aud { gap: 10px; padding-top: 2px; }
+.aud-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.aud-fields .input { min-height: 44px; width: 100%; }
+.aud-actions { gap: 8px; }
+.aud-actions .btn { min-height: 40px; padding: 0 16px; font-size: 0.85rem; }
 .thumbs { display: flex; gap: 6px; overflow-x: auto; }
 .thumbs video { width: 54px; height: 96px; object-fit: cover; border-radius: 10px; background: #000; flex: 0 0 auto; }
 table.ledger { width: 100%; border-collapse: collapse; font-size: 0.85rem; }

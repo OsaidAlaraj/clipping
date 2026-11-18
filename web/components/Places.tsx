@@ -288,29 +288,33 @@ function AudienceField({ account, onSaved }: { account: Account; onSaved: () => 
   };
   const top = Object.entries(account.audience_countries ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 4);
   return (
-    <div className="stack small" style={{ gap: 6 }}>
-      <div className="row wrap" style={{ gap: 6 }}>
-        <label htmlFor={`lang-${account.id}`} className="muted">Posts in</label>
-        <select id={`lang-${account.id}`} className="input" style={{ width: "auto", minHeight: 36, padding: "4px 10px" }} value={account.language ?? ""}
-          onChange={(e) => save({ language: e.target.value || null, tier1_pct: account.audience_tier1_pct ?? null })}>
-          <option value="">Not set</option>
-          {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-        <label htmlFor={`t1-${account.id}`} className="muted">US/UK/CA/AU audience %</label>
-        <input id={`t1-${account.id}`} className="input" style={{ width: 80, minHeight: 36, padding: "4px 10px" }} inputMode="numeric" placeholder="?"
-          value={value} onChange={(e) => setValue(e.target.value)} onBlur={() => save({ tier1_pct: value.trim() === "" ? null : Number(value) })} />
+    <div className="aud stack small">
+      <div className="aud-fields">
+        <div className="field">
+          <label htmlFor={`lang-${account.id}`}>Posts in</label>
+          <select id={`lang-${account.id}`} className="input" value={account.language ?? ""}
+            onChange={(e) => save({ language: e.target.value || null, tier1_pct: account.audience_tier1_pct ?? null })}>
+            <option value="">Not set</option>
+            {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor={`t1-${account.id}`}>US/UK/CA/AU audience %</label>
+          <input id={`t1-${account.id}`} className="input" inputMode="numeric" placeholder="?"
+            value={value} onChange={(e) => setValue(e.target.value)} onBlur={() => save({ tier1_pct: value.trim() === "" ? null : Number(value) })} />
+        </div>
       </div>
-      <div className="row wrap" style={{ gap: 6 }}>
-        <label className="btn ghost" style={{ minHeight: 36 }}>
+      <span className="muted">
+        {account.audience_source ? `Audience ${SOURCE_LABEL[account.audience_source] ?? account.audience_source}` : `Not filled yet. Screenshot: ${WHERE_TO_LOOK[account.platform] ?? "the platform's audience page"}`}
+        {top.length > 0 && ` · ${top.map(([c, v]) => `${c} ${Math.round(v)}%`).join(", ")}`}
+      </span>
+      <div className="row wrap aud-actions">
+        {account.platform !== "tiktok" && <button className="btn dark" disabled={busy} onClick={fromPlatform}>Read from the platform</button>}
+        <label className="btn">
           {busy ? "Reading…" : "Read from a screenshot"}
           <input type="file" accept="image/*" className="sr-only" aria-label={`Audience screenshot for @${account.handle}`} onChange={(e) => readScreenshot(e.target.files?.[0])} />
         </label>
-        {account.platform !== "tiktok" && <button className="btn ghost" style={{ minHeight: 36 }} disabled={busy} onClick={fromPlatform}>Read from the platform</button>}
       </div>
-      <span className="muted">
-        {account.audience_source ? `Audience ${SOURCE_LABEL[account.audience_source] ?? account.audience_source}` : `Screenshot: ${WHERE_TO_LOOK[account.platform] ?? "the platform's audience page"}`}
-        {top.length > 0 && ` · ${top.map(([c, v]) => `${c} ${Math.round(v)}%`).join(", ")}`}
-      </span>
       {error && <span className="error" role="alert">{error}</span>}
     </div>
   );
