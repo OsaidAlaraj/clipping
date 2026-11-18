@@ -10,10 +10,23 @@ import { AddCampaign } from "./More";
 
 // ---------------------------------------------------------------- New: add a campaign or a video
 
-type Approved = { id: string; name: string };
+export type Approved = { id: string; name: string; practice?: boolean; language?: string | null };
 
-export function UploadVideo({ campaigns }: { campaigns: Approved[] }) {
-  const [campaignId, setCampaignId] = useState(campaigns[0]?.id ?? "");
+// The server takes up to 10 GB. Past 1.5 GB a phone upload often drops, so say so before it starts.
+export const MAX_UPLOAD_BYTES = 10 * 1024 ** 3;
+export const LARGE_UPLOAD_BYTES = 1.5 * 1024 ** 3;
+const gb = (bytes: number) => `${(bytes / 1024 ** 3).toFixed(1)} GB`;
+const PRACTICE_PERMISSION = "Practice footage (the owner's own test video)";
+
+export function uploadProblem(file: File | null): { block: boolean; text: string } | null {
+  if (!file) return null;
+  if (file.size > MAX_UPLOAD_BYTES) return { block: true, text: `This video is ${gb(file.size)}. The most the system takes is 10 GB. Trim it, or send it as a link instead.` };
+  if (file.size > LARGE_UPLOAD_BYTES) return { block: false, text: `This is a large video (${gb(file.size)}). Keep this screen open until it finishes. If it stops, send it as a link instead.` };
+  return null;
+}
+
+export function UploadVideo({ campaigns, initialId }: { campaigns: Approved[]; initialId?: string }) {
+  const [campaignId, setCampaignId] = useState(initialId ?? campaigns[0]?.id ?? "");
   const [mode, setMode] = useState<"file" | "link">("file");
   const [file, setFile] = useState<File | null>(null);
   const [link, setLink] = useState("");
@@ -24,18 +37,25 @@ export function UploadVideo({ campaigns }: { campaigns: Approved[] }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [over, setOver] = useState(false);
+  const [doneFor, setDoneFor] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const isYoutube = /youtu\.?be/i.test(link);
+  const chosen = campaigns.find((c) => c.id === campaignId);
+  const practice = !!chosen?.practice;
+  const problem = mode === "file" ? uploadProblem(file) : null;
 
   useEffect(() => { if (!campaignId && campaigns[0]) setCampaignId(campaigns[0].id); }, [campaigns, campaignId]);
+  useEffect(() => { if (initialId) setCampaignId(initialId); }, [initialId]);
+  useEffect(() => { if (chosen?.practice && chosen.language) setLanguage(chosen.language); }, [chosen]);
 
-  const ready = campaignId && permission.trim() && (mode === "file" ? !!file : /^https?:\/\//i.test(link.trim()) && (!isYoutube || youtubeOk));
+  const ready = campaignId && (practice || permission.trim()) && !problem?.block
+    && (mode === "file" ? !!file : /^https?:\/\//i.test(link.trim()) && (!isYoutube || youtubeOk));
 
   const sendFile = () => new Promise<void>((resolve, reject) => {
     const form = new FormData();
     form.append("file", file as File);
     form.append("language", language);
-    form.append("permission_ref", permission.trim());
+    form.append("permission_ref", practice ? "" : permission.trim());
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${uploadBase()}/api/campaigns/${campaignId}/sources/upload`);
     xhr.withCredentials = true;   // the session cookie also applies on the API's own port
@@ -48,7 +68,9 @@ export function UploadVideo({ campaigns }: { campaigns: Approved[] }) {
         reject(new ApiError(msg, xhr.status));
       }
     };
-    xhr.onerror = () => reject(new ApiError("No connection. Uploading needs a connection.", 0));
+    xhr.onerror = () => reject(new ApiError(file && file.size > LARGE_UPLOAD_BYTES
+      ? `The upload of this ${gb(file.size)} video stopped. Big videos often drop on a phone: send it as a link instead, or try again on Wi-Fi.`
+      : "No connection. Uploading needs a connection.", 0));
     xhr.send(form);
   });
 
@@ -59,9 +81,10 @@ export function UploadVideo({ campaigns }: { campaigns: Approved[] }) {
         setProgress(0);
         await sendFile();
       } else {
-        await api(`/api/campaigns/${campaignId}/sources/link`, { body: { url: link.trim(), language, permission_ref: permission.trim(), youtube_permitted: youtubeOk } });
+        await api(`/api/campaigns/${campaignId}/sources/link`, { body: { url: link.trim(), language, permission_ref: practice ? PRACTICE_PERMISSION : permission.trim(), youtube_permitted: youtubeOk } });
       }
       setMessage(mode === "file" ? "Uploaded. Clips appear in Review when they are ready." : "Fetching the video. Clips appear in Review when they are ready.");
+      setDoneFor(campaignId);
       setFile(null); setLink(""); setProgress(null);
     } catch (e) {
       setProgress(null);
@@ -78,6 +101,7 @@ export function UploadVideo({ campaigns }: { campaigns: Approved[] }) {
         <select id="v-campaign" className="input" value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>
           {campaigns.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
+        {practice && <span className="small muted">Practice: for trying the system. Nothing is posted and no money is involved.</span>}
       </div>
       <div className="segmented" role="tablist" aria-label="Source">
         <button role="tab" aria-selected={mode === "file"} onClick={() => setMode("file")}>From this device</button>
@@ -113,22 +137,78 @@ export function UploadVideo({ campaigns }: { campaigns: Approved[] }) {
             <option value="en">English</option><option value="ar">Arabic</option>
           </select>
         </div>
-        <div className="field" style={{ flex: "2 1 220px" }}>
-          <label htmlFor="v-perm">Permission or licence reference</label>
-          <input id="v-perm" className="input" placeholder="e.g. footage link from the brief" value={permission} onChange={(e) => setPermission(e.target.value)} />
-        </div>
+        {!practice && (
+          <div className="field" style={{ flex: "2 1 220px" }}>
+            <label htmlFor="v-perm">Permission or licence reference</label>
+            <input id="v-perm" className="input" placeholder="e.g. footage link from the brief" value={permission} onChange={(e) => setPermission(e.target.value)} />
+          </div>
+        )}
       </div>
       {progress !== null && <div className="progress-line" role="progressbar" aria-label="Upload progress" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><i style={{ width: `${progress}%` }} /></div>}
+      {problem && <div className={`banner ${problem.block ? "block" : "warn"}`} role={problem.block ? "alert" : "status"}>{problem.text}</div>}
       {error && <p className="error" role="alert">{error}</p>}
-      {message && <div className="banner ok" role="status">{message}</div>}
+      {message && (
+        <div className="banner ok stack" role="status" style={{ gap: 8 }}>
+          <span>{message}</span>
+          {doneFor && <Link className="btn" href={`/review?campaign=${doneFor}`}>Open Review</Link>}
+        </div>
+      )}
       <button className="btn primary block" disabled={!ready || progress !== null} onClick={submit}>{mode === "file" ? "Upload and start" : "Fetch and start"}</button>
+    </div>
+  );
+}
+
+const PRACTICE_NICHES = ["podcast", "gaming", "lifestyle", "reddit_story"];
+
+/** One tap: a practice campaign for trying the system on your own video. No marketplace, no money, nothing is posted. */
+export function PracticeForm({ onCreated }: { onCreated: (campaign: Approved) => void }) {
+  const [name, setName] = useState("My first video");
+  const [niche, setNiche] = useState("podcast");
+  const [language, setLanguage] = useState<"en" | "ar">("en");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const create = async () => {
+    setBusy(true); setError("");
+    try {
+      const made = await api("/api/campaigns/practice", { body: { name: name.trim(), niche, language } });
+      onCreated({ id: made.id, name: made.name, practice: true, language });
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "No connection. Try again when you are back online.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="stack" style={{ gap: 14 }}>
+      <p className="small muted">A practice campaign has no brief and no money. Upload any video to see the clips the system makes. Nothing is posted, and posting is switched off for it.</p>
+      <div className="field">
+        <label htmlFor="p-name">Name</label>
+        <input id="p-name" className="input" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} />
+      </div>
+      <div className="row wrap">
+        <div className="field grow">
+          <label htmlFor="p-niche">Niche</label>
+          <select id="p-niche" className="input" value={niche} onChange={(e) => setNiche(e.target.value)}>
+            {PRACTICE_NICHES.map((n) => <option key={n} value={n}>{n.replace("_", " ")}</option>)}
+          </select>
+        </div>
+        <div className="field grow">
+          <label htmlFor="p-lang">Language of the video</label>
+          <select id="p-lang" className="input" value={language} onChange={(e) => setLanguage(e.target.value as "en" | "ar")}>
+            <option value="en">English</option><option value="ar">Arabic</option>
+          </select>
+        </div>
+      </div>
+      {error && <p className="error" role="alert">{error}</p>}
+      <button className="btn primary block" disabled={busy || !name.trim()} onClick={create}>{busy ? "Creating…" : "Create practice campaign"}</button>
     </div>
   );
 }
 
 export function NewPlace() {
   const { t } = useLang();
-  const [choice, setChoice] = useState<"campaign" | "video">("campaign");
+  const [choice, setChoice] = useState<"campaign" | "video" | "practice">("campaign");
+  const [justMade, setJustMade] = useState<string | undefined>();
   const [approved, setApproved] = useState<Approved[]>([]);
   const [shared, setShared] = useState<{ name?: string; text?: string; url?: string } | null>(null);
   useEffect(() => {
@@ -138,16 +218,29 @@ export function NewPlace() {
     setShared(text || url || title ? { name: title, text, url: link } : {});
   }, []);
   useEffect(() => {
-    api("/api/home").then((home) => setApproved(home.campaigns.filter((c: Card) => c.status === "approved").map((c: Card) => ({ id: c.id, name: c.name })))).catch(() => undefined);
+    api("/api/home").then((home) => {
+      const fetched: Approved[] = home.campaigns.filter((c: Card) => c.status === "approved")
+        .map((c: Card) => ({ id: c.id, name: c.name, practice: !!c.is_practice, language: c.language ?? null }));
+      // A practice campaign made a moment ago may not be in a slow answer yet: keep it.
+      setApproved((list) => [...list.filter((c) => !fetched.some((f) => f.id === c.id)), ...fetched]);
+    }).catch(() => undefined);
   }, []);
+  const practiceCreated = (campaign: Approved) => {   // straight to the upload form, no waiting for a reload
+    setApproved((list) => [campaign, ...list.filter((c) => c.id !== campaign.id)]);
+    setJustMade(campaign.id);
+    setChoice("video");
+  };
   return (
     <div className="page" style={{ maxWidth: 720 }}>
       <h1>{t("create")}</h1>
       <div className="segmented" role="tablist" aria-label="What to add">
         <button role="tab" aria-selected={choice === "campaign"} onClick={() => setChoice("campaign")}>{t("addCampaign")}</button>
         <button role="tab" aria-selected={choice === "video"} onClick={() => setChoice("video")}>{t("addVideo")}</button>
+        <button role="tab" aria-selected={choice === "practice"} onClick={() => setChoice("practice")}>Practice</button>
       </div>
-      {choice === "campaign" ? (shared && <AddCampaign key={JSON.stringify(shared)} embedded initial={shared} />) : <UploadVideo campaigns={approved} />}
+      {choice === "campaign" && shared && <AddCampaign key={JSON.stringify(shared)} embedded initial={shared} />}
+      {choice === "video" && <UploadVideo campaigns={approved} initialId={justMade} />}
+      {choice === "practice" && <PracticeForm onCreated={practiceCreated} />}
     </div>
   );
 }

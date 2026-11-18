@@ -81,7 +81,8 @@ CLIP_VIEW = """
            cl.hook_score, cl.park_reason, cl.due_at, cl.render_meta, cl.campaign_id, cl.account_id, cl.start_s, cl.end_s,
            cl.candidate_id, cl.approved_file_hash, cl.campaign_version_id,
            (select source_id from candidates where id = cl.candidate_id) as source_id,
-           c.name as campaign_name, c.deadline, c.status as campaign_status,
+           c.name as campaign_name, c.deadline, c.status as campaign_status, c.is_practice,
+           (select reason from candidates where id = cl.candidate_id) as moment_reason,
            v.budget_total, v.budget_remaining, v.rate_per_1k, v.fee_pct, v.max_payout_per_clip,
            a.handle as account_handle, a.daily_cap as account_daily_cap,
            (select count(*) from posts p where p.account_id = cl.account_id and p.posted_at::date = now()::date) as account_posts_today
@@ -102,6 +103,8 @@ def _decorate(conn, rows: list[dict]) -> list[dict]:
         rate = Decimal(str(row["rate_per_1k"] or 0))
         row["est_net_per_hour"] = float(rate * (1 - Decimal(str(row["fee_pct"] or 0)) / 100))
         row["video_url"] = storage.get_signed_url(row["file_path"], 900) if row["file_path"] else None
+        cover = (row.get("render_meta") or {}).get("cover_key")
+        row["cover_url"] = storage.get_signed_url(cover, 900) if cover else None
         row["hook_text"] = (row.get("render_meta") or {}).get("hook_text")
         row["hooks"] = conn.execute(
             "select id, text, hook_type, chosen, rank, score from hooks where candidate_id = %s order by rank", (row["candidate_id"],)

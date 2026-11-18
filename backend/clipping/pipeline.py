@@ -118,12 +118,24 @@ def _transcribe(conn, source: dict, campaign: dict, version: dict, video: Path) 
             return registry.call(conn, "transcription", "transcribe", request, owner, provider=LOCAL_TRANSCRIBER)
 
 
+def _drop_fake_transcript_if_real_provider(conn, source: dict) -> None:
+    """A transcript made by the fake provider is test data. When a real provider is active it is never reused:
+    it is removed so the video is transcribed for real."""
+    if registry.row(conn, "transcription")["is_fake"]:
+        return
+    cached = transcripts.find(conn, source)
+    if cached is not None and cached["provider"] == "fake":
+        conn.execute("delete from transcripts where id = %s", (cached["id"],))
+        audit(conn, "transcript.fake_discarded", "transcripts", cached["id"], {"source_id": str(source["id"])})
+
+
 def stage_transcribe(conn, job: dict) -> Decimal:
     source, campaign, version = _source_ctx(conn, job["payload"]["source_id"])
     path = registry.get(conn, "storage").path(source["stored_path"])
     if not path.exists() or ffmpeg.sha256_file(path) != source["file_hash"]:
         raise AppError("Source file hash mismatch. The job is stopped.", "hash_mismatch")   # S3
     cost = Decimal("0")
+    _drop_fake_transcript_if_real_provider(conn, source)
     if transcripts.find(conn, source) is None:
         result, cost = _transcribe(conn, source, campaign, version, path)
         transcripts.create(conn, source, result)
@@ -135,8 +147,35 @@ def stage_transcribe(conn, job: dict) -> Decimal:
     return cost
 
 
+def _manual_selection_alert(conn, owner, campaign: dict, source: dict, why: str) -> None:
+    """The declared fallback of moment finding: the owner picks the moments by hand in the review tool."""
+    raise_alert(conn, owner, "manual_selection", "warn", "source_assets", source["id"],
+                f"{campaign['name']}: moment finding is unavailable ({why}). Pick the moments by hand.")
+
+
+def _pilot_moments(conn, source: dict, campaign: dict, version: dict) -> Decimal:
+    """Practice campaigns: the LLM reads the transcript and picks the moments (moments_pilot). Whatever goes wrong with
+    its answer ends in the manual-selection alert; the job never crashes on bad model output."""
+    from . import moments_pilot   # lazy: moments_pilot builds on this module's snapping
+
+    owner = source["owner_operator_id"]
+    niche = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone()
+    try:
+        found, cost = moments_pilot.propose_with_cost(conn, source, version, niche["name"] if niche else None)
+    except KillSwitchOn:
+        raise
+    except Exception as exc:
+        _manual_selection_alert(conn, owner, campaign, source, str(exc) if isinstance(exc, AppError) else type(exc).__name__)
+        return Decimal("0")
+    candidates = [{"start_s": c["start_s"], "end_s": c["end_s"], "score": c["score"],
+                   "reason": f"{c['reasons'][0]} (Hook: {c['hook']})" if c["hook"] else c["reasons"][0]} for c in found]
+    return cost + _store_candidates(conn, source, campaign, version, candidates, "pilot_llm")
+
+
 def stage_moments(conn, job: dict) -> Decimal:
     source, campaign, version = _source_ctx(conn, job["payload"]["source_id"])
+    if campaign["is_practice"]:
+        return _pilot_moments(conn, source, campaign, version)
     owner = source["owner_operator_id"]
     storage = registry.get(conn, "storage")
     options = {"language": source["language"], "duration_s": float(source["duration_s"] or 0), "max_clips": 5}
@@ -156,8 +195,7 @@ def stage_moments(conn, job: dict) -> Decimal:
         raise
     except AppError as exc:
         # Declared fallback: manual selection in the review tool.
-        raise_alert(conn, owner, "manual_selection", "warn", "source_assets", source["id"],
-                    f"{campaign['name']}: moment finding is unavailable ({exc}). Pick the moments by hand.")
+        _manual_selection_alert(conn, owner, campaign, source, str(exc))
         return Decimal("0")
     provider = registry.row(conn, "moments")["provider"]
     words = _words(conn, source)
@@ -178,8 +216,11 @@ def _store_candidates(conn, source: dict, campaign: dict, version: dict, candida
         "select count(*) as n from clips where campaign_id = %s and version_no = 1 and created_at > now() - interval '7 days'",
         (campaign["id"],),
     ).fetchone()["n"]
-    room = max(cap - made, 0)
-    room, share_note = _portfolio_room(conn, owner, campaign["id"], made, room, len(ranked))
+    room, share_note = max(cap - made, 0), None
+    if campaign["is_practice"]:
+        room = len(ranked)   # practice has no weekly cap or risk spreading: it exists to try the system on any video
+    else:
+        room, share_note = _portfolio_room(conn, owner, campaign["id"], made, room, len(ranked))
     for candidate in ranked:
         row = conn.execute(
             """insert into candidates (source_id, owner_operator_id, provider, start_s, end_s, score, rank, reason)
@@ -200,13 +241,14 @@ def _portfolio_room(conn, owner, campaign_id, made: int, room: int, wanted: int)
     """Spread risk (practitioner lesson): while the owner has other approved campaigns, one campaign may take at
     most portfolio_max_share_pct of the week's clips. With a single approved campaign there is nothing to spread."""
     others = conn.execute(
-        "select count(*) as n from campaigns where owner_operator_id = %s and status = 'approved' and id <> %s",
+        "select count(*) as n from campaigns where owner_operator_id = %s and status = 'approved' and id <> %s and not is_practice",
         (owner, campaign_id)).fetchone()["n"]
     if not others:
         return room, None
     share = float(get_setting(conn, "portfolio_max_share_pct", owner)) / 100
     week = conn.execute(
-        "select count(*) as n from clips where owner_operator_id = %s and version_no = 1 and created_at > now() - interval '7 days'",
+        """select count(*) as n from clips cl join campaigns c on c.id = cl.campaign_id
+           where cl.owner_operator_id = %s and cl.version_no = 1 and cl.created_at > now() - interval '7 days' and not c.is_practice""",
         (owner,)).fetchone()["n"]
     # Largest n with (made + n) <= share * (week + n), and always at least one clip so a new campaign can start.
     allowed = int((share * week - made) // (1 - share)) if share < 1 else wanted
@@ -285,6 +327,20 @@ def stage_render(conn, job: dict) -> Decimal:
     return cost
 
 
+def _make_cover(storage, clip_id, video: Path, duration_s) -> str | None:
+    """The pilot cover: one still frame of the finished clip, used as the feed poster. Phase 5 replaces it with the
+    designed cover. A cover is a nicety, so a failure leaves the clip without one and never blocks it."""
+    key = f"clips/{clip_id}/cover.jpg"
+    out = storage.path(key)
+    try:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        ffmpeg.run(["-ss", f"{min(1.2, float(duration_s or 0) / 3):.3f}", "-i", str(video), "-frames:v", "1", "-q:v", "3", str(out)])
+        storage.put(key, str(out))
+    except Exception:
+        return None
+    return key
+
+
 def stage_captions(conn, job: dict) -> Decimal:
     clip, source, campaign, version = _clip_ctx(conn, job["payload"]["clip_id"])
     owner = clip["owner_operator_id"]
@@ -309,6 +365,9 @@ def stage_captions(conn, job: dict) -> Decimal:
         caption, hashtags, mentions = build_caption(template["caption_text"], meta.get("hook_text") or "", version["rules_json"])
     meta.update(overlay_burned=result["overlay"] is not None, captions=result["captions"],
                 caption_language=clip["language"], disclosure_template_id=str(template["id"]))
+    cover_key = _make_cover(storage, clip["id"], out, info["duration_s"])
+    if cover_key:
+        meta["cover_key"] = cover_key
     conn.execute(
         """update clips set file_path = %s, file_hash = %s, duration_s = %s, width = %s, height = %s, overlay_json = %s,
                caption_text = %s, hashtags = %s, mentions = %s, render_meta = %s where id = %s""",

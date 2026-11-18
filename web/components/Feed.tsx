@@ -216,7 +216,7 @@ function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }:
         <i style={{ width: `${progress}%` }} />
       </div>
       {clip.video_url && (
-        <video ref={video} key={clip.id} src={clip.video_url} muted={muted} autoPlay loop playsInline preload="metadata"
+        <video ref={video} key={clip.id} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={muted} autoPlay loop playsInline preload="metadata"
           onTimeUpdate={(event) => { const el = event.currentTarget; if (el.duration) setProgress((el.currentTime / el.duration) * 100); }} />
       )}
       {offset.x > 30 && <div className="swipe-flag yes">{t("accept")}</div>}
@@ -233,6 +233,7 @@ function ClipCard({ clip, onAccept, onReject, onNext, onPrev, onOpen, showPay }:
           </button>
         </div>
         <div className="caption" dir="auto">{clip.caption_text}</div>
+        {clip.moment_reason && <div className="reason" dir="auto">Why this moment: {clip.moment_reason}</div>}
         <div className="reason">{clip.priority_reason}{showPay && clip.rate_per_1k ? ` · ${money(clip.rate_per_1k)} per 1,000 views` : ""}</div>
       </div>
       <div className="rail" onPointerDown={(event) => event.stopPropagation()}>
@@ -422,7 +423,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       {clip ? (
         <div className="feed">
           <div className="top">
-            <span className="name">{clip.campaign_name}</span>
+            <span className="name">{clip.is_practice && <span className="badge info" style={{ marginInlineEnd: 8 }}>Practice</span>}{clip.campaign_name}</span>
             <span className="row">
               <span className="chip" aria-label="Position in feed">{index + 1} of {clips.length}</span>
               <button className="chip" onClick={() => endSession()}>{t("stopHere")}</button>

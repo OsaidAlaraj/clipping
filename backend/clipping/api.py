@@ -106,6 +106,12 @@ class IntakeIn(BaseModel):
     licence_ref: str | None = None
 
 
+class PracticeIn(BaseModel):
+    name: str
+    niche: str = "podcast"
+    language: str = "en"
+
+
 class ReasonIn(BaseModel):
     reason: str | None = None
 
@@ -270,7 +276,7 @@ def get_home(actor: Actor = Depends(current_actor)):
 def reference(actor: Actor = Depends(current_actor)):
     with get_db().session(actor) as conn:
         return {
-            "marketplaces": conn.execute("select slug, name, platforms, source_adapter, scraper_enabled, terms_version, terms_read_at, notes from marketplaces order by name").fetchall(),
+            "marketplaces": conn.execute("select slug, name, platforms, source_adapter, scraper_enabled, terms_version, terms_read_at, notes from marketplaces where slug <> %s order by name", (campaigns.PRACTICE_SLUG,)).fetchall(),
             "categories": conn.execute("select name from categories order by name").fetchall(),
             "reason_codes": review.REASON_CODES,
             "accounts": conn.execute(
@@ -285,6 +291,12 @@ def reference(actor: Actor = Depends(current_actor)):
 def post_campaign(body: IntakeIn, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.intake, actor, body.marketplace, body.name, body.brief_text, body.url, body.category,
                body.deadline, body.licence_ref)
+
+
+@app.post("/api/campaigns/practice")
+def post_practice_campaign(body: PracticeIn, actor: Actor = Depends(current_actor)):
+    """One tap: a practice campaign for trying the pipeline on your own video. No marketplace, no money, nothing posted."""
+    return run(actor, campaigns.create_practice, actor, body.name, body.niche, body.language)
 
 
 @app.get("/api/campaigns/{campaign_id}")

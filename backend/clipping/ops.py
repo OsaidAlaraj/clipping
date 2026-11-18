@@ -42,7 +42,8 @@ def home(conn, actor: Actor) -> dict:
     now = dt.datetime.now(dt.timezone.utc)
     show_pay = get_setting(conn, "pay_per_clip_display", actor.operator_id) == "card"
     cards = conn.execute(
-        """select c.id, c.name, c.status, c.status_reason, c.deadline, m.name as marketplace, cat.name as niche,
+        """select c.id, c.name, c.status, c.status_reason, c.deadline, m.name as marketplace, cat.name as niche, c.is_practice,
+                  v.rules_json->'languages_allowed'->>0 as language,
                   v.rate_per_1k, v.fee_pct, v.budget_total, v.budget_remaining, v.max_payout_per_clip, v.payout_model,
                   v.compliance_status, v.hard_blocks, v.unclear_fields, v.version_no, v.min_views_to_qualify,
                   v.rules_json->'platforms_allowed' as platforms, v.rules_confirmed_at,
@@ -71,7 +72,8 @@ def home(conn, actor: Actor) -> dict:
              (select count(*) from reviews r where r.reviewer_id = %(op)s and r.decision = 'accept' and r.created_at::date = now()::date
                and not exists (select 1 from reviews u where u.undo_of = r.id)) as accepted,
              (select count(*) from posts where confirmed_by = %(op)s and posted_at::date = now()::date) as posts_done,
-             (select count(*) from clips where status in ('accepted', 'ready_to_post', 'queued')) as posts_due,
+             (select count(*) from clips cl join campaigns c on c.id = cl.campaign_id
+               where cl.status in ('accepted', 'ready_to_post', 'queued') and not c.is_practice) as posts_due,
              (select count(*) from clips where status = 'ready_for_review') as to_review,
              (select count(*) from clips where status = 'review_later') as review_later""",
         {"op": actor.operator_id},

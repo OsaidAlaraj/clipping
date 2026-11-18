@@ -2,7 +2,7 @@
 **Created:** 2026-11-17
 **Status:** in-progress
 **Started:** 2026-11-17 19:40
-**Current Phase:** 2P
+**Current Phase:** 3
 **Complexity:** complex
 **Review cadence:** 2
 **Check-ins:** checkpoints
@@ -187,7 +187,7 @@ source, version, profile_hint) -> list[Candidate]` with the phase 4 Candidate sh
 **Gate:** Standard
 **Depends on:** Phase 1, Phase 2P | **Unlocks:** Phase 4
 **File scope:** backend/clipping/signals.py (new), backend/clipping/ffmpeg.py, backend/clipping/sources.py, backend/clipping/adapters/heatmap.py (new), backend/fixtures/ytdlp/** (new), backend/migrations/010_*.sql, backend/tests/test_11_signals.py
-**Security-sensitive:** yes (yt-dlp metadata is untrusted; FFmpeg parses uploaded media)
+**Security-sensitive:** no (owner decision 2026-11-18: batch review; untrusted-input handling stays a DW/edge-case check)
 **Rollback:** migration 010 is additive; signals are optional inputs, so removing them returns ranking to text only.
 
 **Goal:** Measure per-second signals for a source once and store them.
@@ -328,7 +328,7 @@ episode and campaign context, pairwise LLM ranking and learned weights.
 **Gate:** Standard
 **Depends on:** Phase 1, Phase 2, Phase 3, Phase 4 (Phase 2 listed so the shared api.py edits stay in order) | **Unlocks:** Phase 6
 **File scope:** backend/clipping/adapters/media.py, backend/clipping/ffmpeg.py, backend/clipping/templates.py (new), backend/clipping/pipeline.py, backend/clipping/api.py, backend/migrations/012_*.sql, backend/tests/test_13_render.py, web/components/Places.tsx, web/tests/round2.test.tsx
-**Security-sensitive:** yes (hook and template text go into ASS and FFmpeg filter arguments)
+**Security-sensitive:** no (owner decision 2026-11-18: batch review; escaping is covered by the dirty tests)
 **Rollback:** the `captions` stage stays registered as a no-op passthrough for jobs already queued; migration 012 is additive.
 
 **Goal:** Render each clip in one FFmpeg encode with the account's template, and make a cover.
@@ -383,7 +383,7 @@ episode and campaign context, pairwise LLM ranking and learned weights.
 **Gate:** Standard
 **Depends on:** Phase 2, Phase 4, Phase 5 | **Unlocks:** none
 **File scope:** backend/clipping/review.py, backend/clipping/agents/compliance.py, backend/clipping/brand_checks.py (new), backend/clipping/transcripts.py, backend/clipping/demo.py, backend/clipping/api.py, backend/migrations/013_*.sql, backend/tests/test_14_quality.py, web/app/review/**, web/components/Feed.tsx, web/components/Queue.tsx, web/tests/**, docs/**
-**Security-sensitive:** yes (free-text rejection reasons become checks)
+**Security-sensitive:** no (owner decision 2026-11-18: batch review)
 **Rollback:** brand checks only add warnings or blocks to future clips; disabling them is a settings change. Migration 013 is additive.
 
 **Goal:** Weak clips stay out of the top of review; rejection reasons protect future clips; the whole flow runs end to end, including with no keys.
@@ -521,6 +521,7 @@ very smooth, like social media sites").
 | Social-media smoothness as its own phase | fold into phase 6 | owner asked for it explicitly; it touches every screen | 7 |
 | Creative library and hook patterns as versioned, learned data | fixed templates and prompts | owner wants accounts and hooks to keep up; no release needed for new looks | 4, 5, F |
 | Pilot slice before signals and the full engine | finish all phases first | owner wants to test with real videos as soon as possible, without money or posting | 2P |
+| Blocking review only for 2P and 4; phases 3, 5, 6, 7 go to batch reviews every two phases | blocking review on every phase | owner, 2026-11-18: save quota, keep full reviews for security, money and posting | all |
 | Moment router over several engines with learned per-profile routes | one fixed engine; one merged mega-repo | owner asked for routes, not one fixed thing; engines stay swappable; licences respected | 4 |
 
 Research cited for this plan:
@@ -579,4 +580,11 @@ Summary: Transcripts now come from Deepgram Nova-3 with dialect code, speakers, 
 - [x] Committed
 Commit: (see git log, phase 2)
 Summary: A correction screen at /transcript (reached from the campaign page and Review) shows key-term mismatches and low-confidence words first, applies edits instantly with background save, undo (revert op) and stale-merge (409), handles Arabic RTL with English, and keeps running WER per provider and dialect shown in Settings; routes take the source id.
+
+### Phase 2P: Pilot slice (Gate: Standard, security-sensitive)
+- [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
+- [x] REVIEW: Verification passed
+- [x] Committed
+Commit: (see git log, phase 2P)
+Summary: One-tap practice campaigns (owner gate kept, posting and payouts refused in the API and by DB triggers) run the full pipeline with an interim gpt-5-mini moment picker (chunked, sentence-snapped, niche length ranges, strict JSON, manual-selection fallback) and a cover frame; a real run on an 8-minute Arabic interview and 10 minutes of an English podcast gave 3 clips each in about 3 minutes for about 6 cents; cached fake transcripts are discarded when a real provider is active.
 

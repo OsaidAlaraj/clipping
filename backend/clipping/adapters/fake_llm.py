@@ -179,7 +179,31 @@ def compliance(payload: dict) -> dict:
 
 
 FAKE_IMAGE_TEXT: str | None = None   # tests set this to simulate a vision model
+FAKE_MOMENTS: dict = {"answer": None, "calls": []}   # tests set "answer" to a raw reply (or a function of the payload) to simulate a model
+
+
+def moments(payload: dict) -> dict:
+    """The moment picker's stand-in: from each stretch it takes sentences spread evenly, builds windows that start at a
+    segment start and run to the first segment end inside the length range, and quotes the first sentence as the hook."""
+    FAKE_MOMENTS["calls"].append(payload)
+    answer = FAKE_MOMENTS["answer"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    segments, lo, hi, limit = payload["segments"], payload["min_s"], payload["max_s"], payload["max_moments"]
+    found, used_until = [], -1.0
+    for start, _, text in segments:
+        if len(found) >= limit:
+            break
+        if start < used_until:
+            continue
+        end = next((e for _, e, _ in segments if lo + 1 <= e - start <= hi - 1), None)
+        if end is None:
+            continue
+        found.append({"start_s": start, "end_s": end, "score": round(max(0.95 - 0.05 * len(found), 0.1), 2),
+                      "reason": f"A self-contained stretch that opens on: {text[:60]}", "hook": " ".join(text.split()[:8])})
+        used_until = end + 1
+    return {"moments": found}
 
 
 def complete(task: str, payload: dict) -> dict:
-    return {"rules": extract_rules, "hooks": hooks, "compliance": compliance}[task](payload)
+    return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments}[task](payload)

@@ -11,6 +11,7 @@ export type Card = {
   rate_per_1k: number | null; fee_known: boolean; fee_pct?: number | null; est_net_rate_per_1k: number; budget_left_pct: number | null;
   hours_to_deadline: number | null; compliance_status: string; platforms: string[] | null; clips_ready: number;
   max_payout_per_clip?: number | null; unclear_fields: string[]; min_views_to_qualify?: number | null;
+  is_practice?: boolean; language?: string | null;
 };
 type HomeData = {
   stories: { id: string; name: string; budget_left_pct: number | null; hours_to_deadline: number | null; clips_ready: number }[];
@@ -51,13 +52,17 @@ export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; 
           <strong>{card.name}</strong>
           <span className="small muted">{card.marketplace}{card.niche ? ` · ${card.niche}` : ""}</span>
         </div>
-        <span className={`badge ${badge}`}>{card.status === "approved" ? "approved" : card.status === "paused" ? "parked" : `rules: ${card.compliance_status}`}</span>
+        <span className={`badge ${card.is_practice ? "info" : badge}`}>{card.is_practice ? "Practice" : card.status === "approved" ? "approved" : card.status === "paused" ? "parked" : `rules: ${card.compliance_status}`}</span>
       </div>
-      <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
-        <span className="big-num">{card.rate_per_1k !== null ? money(card.rate_per_1k) : "Rate unclear"}</span>
-        <span className="small muted">{card.rate_per_1k !== null ? "per 1,000 views" : ""}{card.fee_known ? "" : " · fee unknown"}</span>
-      </div>
-      <div className="stack" style={{ gap: 6 }}>
+      {card.is_practice ? (
+        <p className="small muted">For trying the system. No money, and nothing is posted.</p>
+      ) : (
+        <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
+          <span className="big-num">{card.rate_per_1k !== null ? money(card.rate_per_1k) : "Rate unclear"}</span>
+          <span className="small muted">{card.rate_per_1k !== null ? "per 1,000 views" : ""}{card.fee_known ? "" : " · fee unknown"}</span>
+        </div>
+      )}
+      {!card.is_practice && <div className="stack" style={{ gap: 6 }}>
         {card.budget_left_pct !== null && <div className="bar" aria-hidden="true"><i className={low ? "low" : undefined} style={{ width: `${card.budget_left_pct}%` }} /></div>}
         <div className="meta">
           <span>{card.budget_left_pct !== null ? `${card.budget_left_pct}% budget left` : "Budget unknown"}</span>
@@ -65,7 +70,7 @@ export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; 
           <span>{(card.platforms ?? []).map((p) => PLATFORM_LABEL[p] ?? p).join(", ") || "Platforms unclear"}</span>
           {card.max_payout_per_clip ? <span>Max {money(card.max_payout_per_clip)} per clip</span> : null}
         </div>
-      </div>
+      </div>}
       <div className="swipe-hint">
         <span>← Park</span>
         <span>{card.status === "approved" ? `${card.clips_ready} to review` : "Tap to read the rules"}</span>

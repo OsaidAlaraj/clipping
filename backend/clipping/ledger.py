@@ -7,6 +7,7 @@ import io
 import statistics
 from decimal import Decimal
 
+from . import campaigns
 from .alerts import raise_alert
 from .core import AppError, audit
 
@@ -32,6 +33,19 @@ def compute_amounts(views: int, version: dict, withdrawal_fee_usd=None) -> dict:
     return {"gross_usd": gross, "fee_usd": fee, "net_usd": net, "below_min_views": below, "cap_reached": cap_reached}
 
 
+def _refuse_practice_clip(conn, clip_id) -> None:
+    """No money entry exists for a practice campaign's clip (views, payout status, disputes)."""
+    clip = conn.execute("select campaign_id from clips where id = %s", (clip_id,)).fetchone()
+    if clip:
+        campaigns.refuse_practice(conn, clip["campaign_id"], "tracking views or payouts")
+
+
+def _refuse_practice_payout(conn, payout_id) -> None:
+    payout = conn.execute("select clip_id from payouts where id = %s", (payout_id,)).fetchone()
+    if payout:
+        _refuse_practice_clip(conn, payout["clip_id"])
+
+
 def record_views(conn, actor, post_id, window: str, views: int, watch_time_s=None, source: str = "manual") -> dict:
     """A11: a metrics snapshot (never edited). Also refreshes the clip's payout figures."""
     if window not in ("h48", "d7"):
@@ -39,6 +53,7 @@ def record_views(conn, actor, post_id, window: str, views: int, watch_time_s=Non
     post = conn.execute("select * from posts where id = %s", (post_id,)).fetchone()
     if post is None:
         raise AppError("Post not found.", "not_found")
+    _refuse_practice_clip(conn, post["clip_id"])
     metric = conn.execute(
         """insert into metrics (post_id, owner_operator_id, "window", views, watch_time_s, source)
            values (%s, %s, %s, %s, %s, %s) returning *""",
@@ -62,6 +77,7 @@ def record_views(conn, actor, post_id, window: str, views: int, watch_time_s=Non
 
 def set_payout_status(conn, actor, payout_id, status: str, withdrawal_fee_usd=None, note: str | None = None) -> dict:
     """A12: manual reconciliation. The allowed order is enforced by a database trigger."""
+    _refuse_practice_payout(conn, payout_id)
     try:
         with conn.transaction():
             row = conn.execute(
@@ -80,6 +96,7 @@ def set_payout_status(conn, actor, payout_id, status: str, withdrawal_fee_usd=No
 
 
 def mark_disputed(conn, actor, payout_id, note: str | None = None) -> dict:
+    _refuse_practice_payout(conn, payout_id)
     row = conn.execute("update payouts set disputed = true, notes = coalesce(%s, notes) where id = %s returning *",
                        (note, payout_id)).fetchone()
     if row is None:

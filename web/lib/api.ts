@@ -29,6 +29,9 @@ export type Clip = {
   start_s: number;
   end_s: number;
   source_id?: string | null;
+  is_practice?: boolean;
+  moment_reason?: string | null;
+  cover_url?: string | null;
 };
 
 export type Review = { id: string; clip_id: string; decision: string; queued?: boolean };

@@ -72,6 +72,7 @@ def checklist(conn, actor, clip_id) -> dict:
         "warnings": cap_warnings(conn, actor, account),
         "scheduler_has_disclosure_toggle": bool(registry.get(conn, "scheduler").cfg.get("paid_partnership_toggle")),
         "campaign_needs_reapproval": not version_ok,
+        "practice": bool(campaign["is_practice"]),
     }
 
 
@@ -81,6 +82,7 @@ def approve_publish(conn, actor, clip_id, ticks: dict) -> dict:
         raise GateError("Publish approval needs a human.")
     require_kill_switch_off(conn)
     state = checklist(conn, actor, clip_id)
+    campaigns.refuse_practice(conn, state["clip"]["campaign_id"], "publishing")
     if state["clip"]["status"] != "accepted":
         raise AppError("Only an accepted clip can be approved for publishing.", "bad_status")
     failed = [item["label"] for item in state["server"].values() if not item["ok"]]
@@ -105,6 +107,7 @@ def schedule(conn, actor, clip_id, scheduled_at: str, channel_id: str, confirm: 
         raise AppError("Scheduling needs an explicit confirm.", "confirm_required")
     require_kill_switch_off(conn)
     clip = review.get_clip(conn, clip_id)
+    campaigns.refuse_practice(conn, clip["campaign_id"], "scheduling")
     if clip["status"] != "ready_to_post":
         raise AppError("Approve the publish checklist first.", "bad_status")
     storage = registry.get(conn, "storage")
@@ -137,6 +140,7 @@ def mark_posted(conn, actor, clip_id, post_url: str, confirm: bool, disclosure_t
         raise AppError("Switch the paid-partnership toggle on in the platform app, then confirm it here.", "toggle_required")
     require_kill_switch_off(conn)
     clip = review.get_clip(conn, clip_id)
+    campaigns.refuse_practice(conn, clip["campaign_id"], "marking a clip posted")
     if clip["status"] not in ("ready_to_post", "queued"):
         raise AppError("Approve the publish checklist first.", "bad_status")
     meta = clip["render_meta"] or {}

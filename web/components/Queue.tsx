@@ -11,6 +11,7 @@ type ChecklistState = {
   warnings: string[];
   scheduler_has_disclosure_toggle: boolean;
   campaign_needs_reapproval: boolean;
+  practice?: boolean;
 };
 
 const TICK_LABEL: Record<string, string> = {
@@ -61,7 +62,14 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
           {clip.video_url && <a className="btn" href={clip.video_url} download>Download the approved video</a>}
         </div>
 
-        {!ready && (
+        {state.practice && (
+          <>
+            <div className="banner">This is a practice clip. It cannot be posted or scheduled, and no money is tracked for it. Download it to look at it, or move it back to Review Later.</div>
+            <button className="btn ghost block" onClick={() => run(() => api(`/api/clips/${clipId}/back-to-later`, { body: {} }), () => { onChanged(); onClose(); })}>Move back to Review Later</button>
+          </>
+        )}
+
+        {!ready && !state.practice && (
           <>
             <div>
               {Object.entries(state.server).map(([name, item]) => (
@@ -98,7 +106,7 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
           </>
         )}
 
-        {ready && (
+        {ready && !state.practice && (
           <div className="stack">
             <div className="banner">Approved for publishing. Post it yourself in the platform app, then record the link here. Nothing posts automatically.</div>
             <div className="field">
@@ -145,7 +153,8 @@ export default function Queue() {
         <button key={clip.id} className="card stack" style={{ textAlign: "start" }} onClick={() => setOpen(clip.id)}>
           <div className="row between">
             <strong>{clip.campaign_name}</strong>
-            <span className={`badge ${clip.status === "accepted" ? "review" : "pass"}`}>{clip.status === "accepted" ? "checklist open" : clip.status === "queued" ? "scheduled" : "ready to post"}</span>
+            {clip.is_practice ? <span className="badge info">Practice · not for posting</span>
+              : <span className={`badge ${clip.status === "accepted" ? "review" : "pass"}`}>{clip.status === "accepted" ? "checklist open" : clip.status === "queued" ? "scheduled" : "ready to post"}</span>}
           </div>
           <span className="small muted">{clip.account_handle ? `@${clip.account_handle}` : "No account"} · {clip.platform ? PLATFORM_LABEL[clip.platform] : "No platform"} · due {clip.due_at ? new Date(clip.due_at).toLocaleDateString() : "any time"}</span>
           <span className="small" dir="auto">{clip.hook_text}</span>

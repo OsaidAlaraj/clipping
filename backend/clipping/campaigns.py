@@ -14,6 +14,10 @@ from .alerts import raise_alert, registry
 from .core import AppError, GateError, audit, enqueue, get_setting, sha256_text
 
 RECHECK_VALID_HOURS = 6   # one posting batch (docs/decisions.md)
+PRACTICE_SLUG = "practice"
+PRACTICE_PREFIX = "Practice · "
+PRACTICE_PERMISSION = "Practice footage (the owner's own test video)"
+PRACTICE_NAME_MAX = 80
 
 
 def fee_pct_from_marketplace(fee_rules: dict, model: str | None, budget_total) -> Decimal | None:
@@ -79,7 +83,7 @@ def intake(conn, actor, marketplace_slug: str, name: str, brief_text: str, url: 
     if not brief_text or not brief_text.strip():
         raise AppError("Paste the brief text.", "empty_brief")
     marketplace = conn.execute("select * from marketplaces where slug = %s", (marketplace_slug,)).fetchone()
-    if marketplace is None:
+    if marketplace is None or marketplace["slug"] == PRACTICE_SLUG:   # practice campaigns have their own one-tap path
         raise AppError(f"Unknown marketplace: {marketplace_slug}", "unknown_marketplace")
     category_row = conn.execute("select * from categories where name = %s", (category,)).fetchone()
     if category_row is None:
@@ -166,6 +170,61 @@ def close(conn, actor, campaign_id) -> dict:
     return conn.execute("update campaigns set status = 'closed' where id = %s returning *", (campaign_id,)).fetchone()
 
 
+# ------------------------------------------------------------------ practice campaigns (pilot)
+
+def create_practice(conn, actor, name: str, niche: str, language: str) -> dict:
+    """One step: a practice campaign the owner can feed their own videos. It goes through the same owner gate as any
+    campaign (confirm_rules, then approve, which the database trigger checks), so no gate is bypassed. It has no
+    marketplace, no brief, no money, and posting, scheduling and payouts are refused for it."""
+    if actor.kind != "operator":
+        raise GateError("Only the owner can create a practice campaign.")
+    name = " ".join((name or "").split())[:PRACTICE_NAME_MAX]
+    if not name:
+        raise AppError("Give the practice campaign a name.", "name_required")
+    if language not in ("en", "ar"):
+        raise AppError("Language must be en or ar.", "bad_language")
+    category = conn.execute("select id from categories where name = %s", (niche,)).fetchone()
+    if category is None:
+        raise AppError(f"Unknown niche: {niche}.", "unknown_category")
+    marketplace = conn.execute("select id from marketplaces where slug = %s", (PRACTICE_SLUG,)).fetchone()
+    if marketplace is None:
+        raise AppError("The practice marketplace is missing. Run the database migrations.", "no_practice_marketplace")
+    if not name.lower().startswith("practice"):
+        name = PRACTICE_PREFIX + name   # every list, alert and clip card shows the label without extra UI work
+    campaign = conn.execute(
+        """insert into campaigns (owner_operator_id, marketplace_id, name, category_id, status, is_practice)
+           values (%s, %s, %s, %s, 'reading', true) returning *""",
+        (actor.operator_id, marketplace["id"], name, category["id"]),
+    ).fetchone()
+    brief = "Practice campaign. There is no brief. Nothing made here is posted and no money is involved."
+    rules = {"campaign_ref": None, "marketplace": PRACTICE_SLUG, "version": 1, "practice": True, "snapshot_hash": sha256_text(brief),
+             "payout": {"currency": "USD", "model": None, "rate_per_1k": None, "fee_pct": None, "min_views_to_qualify": None,
+                        "max_payout_per_clip": None, "budget_total": None, "budget_remaining": None, "quotes": {}},
+             "platforms_allowed": [], "languages_allowed": [language],
+             "accounts": {"max_per_platform": 1, "second_account_allowed": False, "required_per_platform": None, "quote": None},
+             "disclosure": {"required_by_brief": False, "forbidden_by_brief": False, "quote": None},
+             "content_rules": [], "music_policy": "campaign_audio_only", "music_quote": None, "risk_flags": [],
+             "deadline": None, "hard_blocks": []}
+    version = conn.execute(
+        """insert into campaign_versions (campaign_id, owner_operator_id, version_no, snapshot_hash, raw_text, rules_json,
+               compliance_status, hard_blocks, unclear_fields)
+           values (%s, %s, 1, %s, %s, %s, 'pass', '[]', '[]') returning id""",
+        (campaign["id"], actor.operator_id, sha256_text(brief), brief, Jsonb(rules)),
+    ).fetchone()
+    conn.execute("update campaigns set status = 'pending_approval', current_version_id = %s where id = %s", (version["id"], campaign["id"]))
+    audit(conn, "campaign.practice_created", "campaigns", campaign["id"], {"niche": niche, "language": language})
+    confirm_rules(conn, actor, campaign["id"])
+    return approve(conn, actor, campaign["id"])
+
+
+def refuse_practice(conn, campaign_id, what: str) -> None:
+    """Practice campaigns never post, schedule or pay. Every posting and money entry point calls this first."""
+    row = conn.execute("select is_practice from campaigns where id = %s", (campaign_id,)).fetchone()
+    if row and row["is_practice"]:
+        raise AppError(f"This is a practice campaign, so {what} is not available. Practice clips are for trying the system; "
+                       "nothing is posted and no money is involved.", "practice_no_posting")
+
+
 # ------------------------------------------------------------------ rule-change detection (spec 12.5)
 
 def recheck_brief(conn, actor, campaign_id, current_text: str | None = None, unchanged_confirmed: bool = False) -> dict:
@@ -232,6 +291,8 @@ def register_source(conn, actor, campaign_id, file_path: str, language: str, dia
         raise GateError("Only an approved campaign can take source footage.")
     if language not in ("en", "ar"):
         raise AppError("Language must be en or ar.", "bad_language")
+    if campaign["is_practice"] and not (licence_ref or permission_ref):
+        permission_ref = PRACTICE_PERMISSION   # the owner's own test video: no brief to point at
     if not (licence_ref or permission_ref):
         raise AppError("Permitted footage only: give a licence reference or a written-permission reference.", "no_permission")
     path = Path(file_path)
