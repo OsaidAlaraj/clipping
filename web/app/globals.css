@@ -301,3 +301,16 @@ blockquote { margin: 4px 0 0; padding-inline-start: 10px; border-inline-start: 2
 .fix-row { display: flex; gap: 8px; align-items: center; }
 .fix-row .input { flex: 1; min-width: 0; }
 .fix-row .icon-btn { flex: none; border: 1.5px solid var(--line); box-shadow: none; }
+
+/* ---- Home: upload progress cards. Every state keeps the same footprint, so updates never move the page. */
+.pg-card { color: var(--fg); text-decoration: none; min-width: 0; }
+a.pg-card { display: grid; }
+.pg-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.pg-step { padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; background: var(--surface-2); color: var(--muted); }
+.pg-step.done { background: var(--ok-fill); color: var(--ok); }
+.pg-step.current { background: var(--ink); color: var(--on-ink); }
+.pg-step.failed { background: var(--danger-fill); color: var(--danger); }
+.pg-bar > i { transition: width 0.4s ease; }
+.pg-bar.failed > i { background: var(--urgent); }
+.pg-meta { font-variant-numeric: tabular-nums; min-height: 1.3em; }

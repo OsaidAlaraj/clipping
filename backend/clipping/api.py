@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, campaigns, config, discovery, ledger, ops, pipeline, publish, ranking, review, sources, transcripts
+from . import alerts, auth, campaigns, config, discovery, ledger, ops, pipeline, progress, publish, ranking, review, sources, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -270,6 +270,11 @@ def health():
 @app.get("/api/home")
 def get_home(actor: Actor = Depends(current_actor)):
     return run(actor, ops.home, actor)
+
+
+@app.get("/api/progress")
+def get_progress(actor: Actor = Depends(current_actor)):
+    return run(actor, progress.overview, actor)
 
 
 @app.get("/api/reference")

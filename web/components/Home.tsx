@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { api, ApiError, money, PLATFORM_LABEL } from "@/lib/api";
 import { useSwipe } from "@/lib/useSwipe";
+import ProgressCards, { useProgress } from "./Progress";
 
 export type Card = {
   id: string; name: string; status: string; status_reason: string | null; marketplace: string; niche: string | null;
@@ -83,6 +84,7 @@ export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; 
 export default function Home() {
   const [data, setData] = useState<HomeData | null>(null);
   const [message, setMessage] = useState("");
+  const progress = useProgress();
 
   const load = useCallback(() => api<HomeData>("/api/home").then(setData).catch(() => setMessage("Could not load. Showing nothing until you are back online.")), []);
   useEffect(() => { load(); }, [load]);
@@ -97,7 +99,7 @@ export default function Home() {
     }
   };
 
-  if (!data) return <div className="page"><h1>Home</h1><p className="muted">{message || "Loading…"}</p></div>;
+  if (!data || !progress.settled) return <div className="page"><h1>Home</h1><p className="muted">{message || "Loading…"}</p></div>;
   const { today, net_per_hour: net } = data;
   const week = net.this_week, month = net.month_to_date;
   const perHour = (b: any) => (b.with_pending_per_hour === null ? "—" : `$${Number(b.with_pending_per_hour).toFixed(2)}`);
@@ -128,6 +130,8 @@ export default function Home() {
             );
           })}
         </section>
+
+        <ProgressCards data={progress.data} />
 
         <section aria-label="Today" className="card tiles">
           <div className="tile">
