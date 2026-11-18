@@ -256,5 +256,11 @@ Summary: Owners connect YouTube, Instagram and TikTok via OAuth (state + PKCE); 
 - [x] BUILD: Discovery + design + implementation complete
 - [x] REVIEW: Verification passed
 - [x] Committed
-Commit: PENDING
+Commit: 524e73c
 Summary: `publishing` stage adapters for YouTube (resumable, private while unverified, paid flag), Instagram Reels (resumable, publish, finish_publish) and TikTok (inbox draft) plus fixture-driven fakes; no retry once bytes are sent (needs_check), quota ledger with RLS (migration 016); call via registry.call(..., provider=publishing.provider_name()).
+
+### Phase 3: Post targets, one-tap confirm and post records (Gate: Standard, security-sensitive) — PAUSED 2026-11-18
+- [x] BUILD: complete (builder: full suite green, 1 skip); discovery at .code-foundations/build/2026-11-18-phase-e-posting-phase-3-discovery.md
+- [ ] REVIEW: blocking review was started and stopped (owner disconnecting the laptop). Re-dispatch the Phase 3 REVIEW first.
+- [ ] Committed — Phase 3 code is UNCOMMITTED in the working tree (migration 017, publish.py, pipeline.py, core.py, api.py, ops.py, test_18_post_targets.py).
+Resume: re-run the Phase 3 blocking review, commit on PASS, then Phase 4.
