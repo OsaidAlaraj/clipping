@@ -615,6 +615,7 @@ Summary: moments.find runs a per-profile route of engines (own, topic, hype, pil
 - [x] Committed
 Commit: (see git log, phase 5)
 Summary: stage_render makes each clip in one encode (NVENC with x264 fallback, about 7 s per clip) with the account's versioned template (rotation, revert, starter set), platform caption style, emphasis zooms, progress bar and title card, the Arabic label top right, a face-aware crop per profile and a PNG cover with the hook line; Profile has a look editor and a posting plan; account is chosen at render.
+Covered by batch review 2026-11-18 (phases 5–6): PASS — .code-foundations/build/2026-11-17-phase-d-making-clips-batch-phases-5-6-review.md
 
 ### Phase 6: Quality gate, brand checks, end-to-end (Gate: Standard)
 - [x] BUILD: Discovery + design + implementation (stub → implement → validate) complete
@@ -622,4 +623,5 @@ Summary: stage_render makes each clip in one encode (NVENC with x264 fallback, a
 - [x] Committed
 Commit: (see git log, phase 6)
 Summary: Review shows a chance-to-clear per clip and sinks weak clips with a reason; marketplace rejections become per-brand checks (block, warn or reminder) in compliance; the correction queue favours words inside likely moments; signals refresh text series after transcript edits; the demo runs every stage and stops cleanly on the kill switch; the user guide covers the new features.
+Covered by batch review 2026-11-18 (phases 5–6): PASS — .code-foundations/build/2026-11-17-phase-d-making-clips-batch-phases-5-6-review.md
 
