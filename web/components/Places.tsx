@@ -8,7 +8,7 @@ import { fetchData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { Card } from "./Home";
 import { AccountLook } from "./Look";
-import { AddCampaign } from "./More";
+import { AddCampaign, Connections } from "./More";
 
 // ---------------------------------------------------------------- New: add a campaign or a video
 
@@ -361,6 +361,7 @@ export function Profile() {
         <Link className="list-link" href="/alerts">{t("alerts")}<span aria-hidden="true">›</span></Link>
         <Link className="list-link" href="/more/settings">{t("settings")}<span aria-hidden="true">›</span></Link>
       </nav>
+      <Connections />
       <section className="stack" aria-label="Your accounts">
         <h2>Your accounts</h2>
         <p className="small muted">One account per platform for each niche. The system never stores passwords, only the handle. Set the language each account posts in, and its US/UK/Canada/Australia audience share: many campaigns only pay for those views, and the ranking uses both. A screenshot of the platform's audience page is enough.</p>

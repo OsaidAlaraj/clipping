@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { api, ApiError, Clip, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
+import { api, ApiError, Clip, ConnectionsData, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
 import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
@@ -486,5 +486,85 @@ export function CampaignDetail({ id }: { id: string }) {
         </section>
       )}
     </div>
+  );
+}
+
+// ------------------------------------------------------------------ Connected accounts (shown in Profile)
+
+const CONNECT_TEXT = {
+  en: {
+    title: "Connected accounts", intro: "Connect an account so a post can go out through its official API after your confirm tap. Your passwords are never asked for or stored.",
+    connect: "Connect", reconnect: "Reconnect", disconnect: "Disconnect", confirmDisconnect: "Yes, disconnect", cancel: "Cancel", none: "Not connected",
+    connected: "Connected", expiring: "Expiring soon", needs_reconnect: "Needs reconnect", noVault: "Connecting is off until TOKEN_VAULT_KEY is set in .env (see .env.example). Then restart.",
+    justConnected: "Connected.", offline: "No connection.", loadFailed: "Could not load your connections.", busy: "Working…",
+    platform: { youtube_shorts: "YouTube", instagram_reels: "Instagram", tiktok: "TikTok" },
+  },
+  ar: {
+    title: "الحسابات المربوطة", intro: "اربط حساباً ليُنشر المقطع عبر الواجهة الرسمية للمنصّة بعد أن تضغط على تأكيد. لا نطلب كلمات مرورك ولا نخزّنها.",
+    connect: "اربط", reconnect: "أعد الربط", disconnect: "افصل", confirmDisconnect: "نعم، افصل", cancel: "إلغاء", none: "غير مربوط",
+    connected: "متصل", expiring: "ينتهي قريباً", needs_reconnect: "يحتاج إعادة ربط", noVault: "الربط متوقف حتى تضبط TOKEN_VAULT_KEY في ملف .env (انظر .env.example) ثم تعيد التشغيل.",
+    justConnected: "تم الربط.", offline: "لا يوجد اتصال.", loadFailed: "تعذّر تحميل الحسابات المربوطة.", busy: "جارٍ العمل…",
+    platform: { youtube_shorts: "يوتيوب", instagram_reels: "إنستغرام", tiktok: "تيك توك" },
+  },
+} as const;
+
+const STATE_BADGE: Record<string, string> = { connected: "pass", expiring: "review", needs_reconnect: "fail" };
+
+/** Each platform's connections with their state, a Connect button and a two-step Disconnect. Tokens never reach this screen. */
+export function Connections() {
+  const { lang, rtl } = useLang();
+  const tx = CONNECT_TEXT[lang];
+  const { data, error, setError, load } = useLoad<ConnectionsData>("/api/connections");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [asking, setAsking] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+  useEffect(() => {
+    const params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
+    if (params.get("connect_error")) setError(params.get("connect_error") as string);
+    else if (params.get("connected")) setNote(tx.justConnected);
+  }, [setError, tx.justConnected]);
+
+  const fail = (e: unknown) => setError(e instanceof ApiError ? e.message : tx.offline);
+  const connect = async (platform: string, accountId?: string) => {
+    setBusy(platform); setError(""); setNote("");
+    try { window.location.assign((await api<{ url: string }>(`/api/connections/${platform}/start`, { body: { account_id: accountId ?? null } })).url); }
+    catch (e) { fail(e); setBusy(null); }
+  };
+  const disconnect = async (id: string) => {
+    setBusy(id); setError(""); setAsking(null);
+    try { await api(`/api/connections/${id}/disconnect`, { body: {} }); load(); } catch (e) { fail(e); } finally { setBusy(null); }
+  };
+
+  return (
+    <section className="stack" aria-label={tx.title} dir={rtl ? "rtl" : "ltr"}>
+      <h2>{tx.title}</h2>
+      <p className="small muted">{tx.intro}</p>
+      {error && <p className="error" role="alert">{error}</p>}
+      {note && <p className="small" role="status">{note}</p>}
+      {data && !data.vault_ready && <p className="small muted" role="status">{tx.noVault}</p>}
+      {data?.platforms.map(({ platform }) => {
+        const mine = data.connections.filter((c) => c.platform === platform);
+        return (
+          <div key={platform} className="card stack" aria-label={tx.platform[platform as keyof typeof tx.platform]}>
+            <div className="row between"><strong>{tx.platform[platform as keyof typeof tx.platform]}</strong>
+              {mine.length === 0 && <span className="small muted">{tx.none}</span>}</div>
+            {mine.map((c) => (
+              <div key={c.id} className="row between wrap" data-testid={`connection-${c.id}`}>
+                <span dir="ltr">@{c.handle}</span>
+                <span className="row">
+                  <span className={`badge ${STATE_BADGE[c.state] ?? ""}`}>{tx[c.state as "connected" | "expiring" | "needs_reconnect"]}</span>
+                  {c.state === "needs_reconnect" && <button className="btn" disabled={!data.vault_ready || busy === platform} onClick={() => connect(platform, c.account_id)}>{tx.reconnect}</button>}
+                  {asking === c.id
+                    ? <><button className="btn danger" disabled={busy === c.id} onClick={() => disconnect(c.id)}>{tx.confirmDisconnect}</button><button className="btn ghost" onClick={() => setAsking(null)}>{tx.cancel}</button></>
+                    : <button className="btn ghost" disabled={busy === c.id} onClick={() => setAsking(c.id)}>{tx.disconnect}</button>}
+                </span>
+              </div>
+            ))}
+            <button className="btn primary" disabled={!data.vault_ready || busy === platform} onClick={() => connect(platform)}>
+              {busy === platform ? tx.busy : `${tx.connect} ${tx.platform[platform as keyof typeof tx.platform]}`}</button>
+          </div>
+        );
+      })}
+    </section>
   );
 }

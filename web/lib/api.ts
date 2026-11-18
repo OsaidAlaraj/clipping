@@ -51,6 +51,13 @@ export type FilteredMoment = {
   reason: string; layer: 1 | 2 | 3; profile: string | null; engine: string | null;
 };
 
+/** A connected posting account. `state` is connected, expiring (its sign-in runs out within a week) or needs_reconnect. No tokens, ever. */
+export type Connection = {
+  id: string; account_id: string; platform: string; handle: string | null; state: "connected" | "expiring" | "needs_reconnect";
+  scopes: string[]; expires_at: string | null; refresh_expires_at: string | null;
+};
+export type ConnectionsData = { vault_ready: boolean; platforms: { platform: string; label: string }[]; connections: Connection[] };
+
 export type Review = { id: string; clip_id: string; decision: string; queued?: boolean };
 
 export class ApiError extends Error {

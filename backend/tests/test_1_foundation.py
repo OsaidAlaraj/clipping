@@ -221,7 +221,7 @@ def test_jobs_are_idempotent_and_need_an_approved_campaign(db, owner):
 # ------------------------------------------------------------------ adapters
 
 STAGES = ["source", "discovery", "audience", "llm", "transcription", "moments", "render", "captions", "scheduler", "storage", "database", "alerts",
-          "metrics", "payouts"]
+          "metrics", "payouts", "oauth"]
 
 
 def test_every_adapter_has_the_common_interface_and_every_external_service_has_a_fake(db, owner):
@@ -236,7 +236,7 @@ def test_every_adapter_has_the_common_interface_and_every_external_service_has_a
         assert adapter.config()["stage"] == row["stage"] and "fallback" in adapter.config()
         cost = adapter.cost({})
         assert cost is None or isinstance(cost, Decimal)
-    for stage in ("source", "discovery", "audience", "llm", "transcription", "moments", "scheduler", "alerts"):
+    for stage in ("source", "discovery", "audience", "llm", "transcription", "moments", "scheduler", "alerts", "oauth"):
         assert any(r["stage"] == stage and r["is_fake"] for r in rows), stage
     external = [r for r in rows if r["provider"] in ("scraper", "azure_openai", "deepgram", "vizard", "klap", "opusclip", "buffer", "r2", "telegram", "clippingalpha", "platform_apis")]
     assert all(r["fallback_provider"] for r in external) and not any(r["active"] for r in external)

@@ -11,10 +11,10 @@ from typing import Any
 
 import psycopg
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, brand_checks, campaigns, config, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
+from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -413,6 +413,42 @@ def add_account(body: AccountIn, actor: Actor = Depends(current_actor)):
                values (%s, %s, %s, %s, %s, %s) returning *""",
             (body.platform, handle, body.niche or None, language, (body.platform_account_id or "").strip() or None,
              actor.operator_id)).fetchone()
+
+
+# ------------------------------------------------------------------ connected platform accounts
+
+class ConnectStartIn(BaseModel):
+    account_id: str | None = None
+
+
+@app.get("/api/connections")
+def list_connections(actor: Actor = Depends(current_actor)):
+    return run(actor, connections.list_all)
+
+
+@app.post("/api/connections/{platform}/start")
+def start_connection(platform: str, body: ConnectStartIn | None = None, actor: Actor = Depends(current_actor)):
+    return run(actor, connections.start, actor, platform, body.account_id if body else None)
+
+
+@app.get("/api/connections/{platform}/callback")
+def connection_callback(platform: str, code: str | None = None, state: str | None = None, error: str | None = None):
+    """The platform sends the browser back here. No session is needed: the one-time state identifies the owner.
+    The owner lands on Profile, with a plain message when it did not work."""
+    from urllib.parse import quote
+
+    try:
+        if error or not code:
+            raise AppError("The sign-in was cancelled. Nothing was connected.", "cancelled")
+        connections.complete(get_db(), platform, code, state or "")
+    except AppError as exc:
+        return RedirectResponse(f"/profile?connect_error={quote(str(exc))}", status_code=303)
+    return RedirectResponse(f"/profile?connected={quote(platform)}", status_code=303)
+
+
+@app.post("/api/connections/{connection_id}/disconnect")
+def disconnect_connection(connection_id: str, actor: Actor = Depends(current_actor)):
+    return run(actor, connections.disconnect, actor, connection_id)
 
 
 # ------------------------------------------------------------------ discovery (Explore)

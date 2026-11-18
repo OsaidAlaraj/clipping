@@ -20,6 +20,7 @@ _TMP = Path(tempfile.mkdtemp(prefix="clip_test_"))
 os.environ["CLIPPING_DATA_DIR"] = str(_TMP / "data")
 os.environ["CLIPPING_USE_FAKES"] = "1"
 os.environ["AUTH_MODE"] = "local"
+os.environ["TOKEN_VAULT_KEY"] = "dGVzdC12YXVsdC1rZXktMzItYnl0ZXMtbG9uZy0hISE="   # tests only (32 bytes, base64)
 for _name in ("DATABASE_URL", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "DEEPGRAM_API_KEY", "VIZARD_API_KEY"):
     os.environ.pop(_name, None)
 
@@ -92,6 +93,9 @@ def _reset_fakes() -> None:
     from clipping.adapters import audience as _audience
 
     _audience.FAKE_AUDIENCE.update(countries={"US": 40, "GB": 10, "SA": 30, "EG": 20}, fail=False, calls=[])
+    from clipping.adapters import oauth as _oauth
+
+    _oauth.reset_fake()
 
 
 @pytest.fixture
