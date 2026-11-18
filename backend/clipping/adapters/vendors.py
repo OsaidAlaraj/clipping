@@ -15,6 +15,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from .. import config, ffmpeg
+from ..core import AppError
 from .base import Adapter, AdapterError, check_response, http_client, register
 from .transcription import FAKE_SENTENCES, fake_words  # noqa: F401  (registers the A3 providers; re-exported for older imports)
 
@@ -186,8 +187,30 @@ class AzureOpenAILLM(Adapter):
                 f"{endpoint}/openai/deployments/{deployment}/chat/completions", params={"api-version": version},
                 headers={"api-key": config.env("AZURE_OPENAI_API_KEY", "")}, json=body,
             )
+        _raise_if_content_filtered(response)
         data = check_response(response)
         return json.loads(data["choices"][0]["message"]["content"])
+
+
+class ContentFiltered(AppError):
+    """Azure's safety filter refused the text (e.g. graphic violence). Deterministic: never retried."""
+
+    def __init__(self, categories: list[str]):
+        super().__init__(f"The AI safety filter flagged this moment ({', '.join(categories) or 'unsafe content'}).", "content_filtered")
+        self.categories = categories
+
+
+def _raise_if_content_filtered(response) -> None:
+    if response.status_code != 400:
+        return
+    try:
+        error = response.json().get("error") or {}
+    except ValueError:
+        return
+    if error.get("code") != "content_filter":
+        return
+    result = (error.get("innererror") or {}).get("content_filter_result") or {}
+    raise ContentFiltered(sorted(k for k, v in result.items() if isinstance(v, dict) and v.get("filtered")))
 
 
 def _reasoning_model(deployment: str | None) -> bool:

@@ -12,6 +12,7 @@ from psycopg.types.json import Jsonb
 
 from . import config, ffmpeg, transcripts
 from .adapters.base import AdapterPaused
+from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
 from .agents import hooks as agent_b
 from .alerts import raise_alert, registry
@@ -278,7 +279,16 @@ def stage_hooks(conn, job: dict) -> Decimal:
     owner = source["owner_operator_id"]
     words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
     segment = " ".join(w["text"] for w in words)
-    hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner)
+    try:
+        hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner)
+    except ContentFiltered as exc:
+        # The AI safety filter refused this moment (e.g. graphic violence): not brand-safe either, so the moment is
+        # set aside with its reason and the other moments carry on. Never retried, never a failed job.
+        conn.execute("update candidates set status = 'discarded', reason = %s where id = %s",
+                     (f"Filtered: {exc}", candidate["id"]))
+        raise_alert(conn, owner, "moment_filtered", "info", "candidates", candidate["id"],
+                    f"{campaign['name']}: one moment was set aside because {str(exc)[0].lower()}{str(exc)[1:]}")
+        return Decimal("0")
     clip = conn.execute(
         """insert into clips (candidate_id, campaign_id, campaign_version_id, owner_operator_id, start_s, end_s, language, dialect, status)
            values (%s, %s, %s, %s, %s, %s, %s, %s, 'rendering') returning *""",
