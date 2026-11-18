@@ -4,6 +4,7 @@ import { startAuthentication, startRegistration } from "@simplewebauthn/browser"
 import { useEffect, useState } from "react";
 
 import { api, ApiError } from "@/lib/api";
+import { clearCache } from "@/lib/data";
 
 function nextPath(): string {
   if (typeof window === "undefined") return "/";
@@ -37,6 +38,7 @@ export default function SignIn() {
       const options = await api("/api/auth/login/options", { body: {} });
       const credential = await startAuthentication({ optionsJSON: options });
       await api("/api/auth/login/verify", { body: { credential } });
+      clearCache();
       window.location.replace(nextPath());
     } catch (e) { fail(e); } finally { setBusy(false); }
   };
@@ -48,6 +50,7 @@ export default function SignIn() {
       const options = await api("/api/auth/register/options", { body: { setup_code: setupCode } });
       const credential = await startRegistration({ optionsJSON: options });
       await api("/api/auth/register/verify", { body: { credential, setup_code: setupCode, device_name: navigator.platform || "device" } });
+      clearCache();
       window.location.replace(nextPath());
     } catch (e) { fail(e); } finally { setBusy(false); }
   };

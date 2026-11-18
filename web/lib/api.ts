@@ -76,6 +76,10 @@ function headers(): Record<string, string> {
   return out;
 }
 
+let signedOutHandler: (() => void) | undefined;
+/** Register what runs when a 401 sends the person to sign in (the data cache clears itself). */
+export function onSignedOut(handler: () => void): void { signedOutHandler = handler; }
+
 export async function api<T = any>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
   let response: Response;
   try {
@@ -89,6 +93,7 @@ export async function api<T = any>(path: string, init?: { method?: string; body?
   }
   if (response.status === 401 && typeof window !== "undefined" && !window.location.pathname.startsWith("/signin")
       && !path.startsWith("/api/auth/")) {
+    signedOutHandler?.();
     window.location.assign(`/signin?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
   }
   if (!response.ok) {

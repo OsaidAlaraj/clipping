@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ApiError, Clip, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
-import { useData } from "@/lib/data";
+import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
 import { RejectSheet } from "./Feed";
@@ -233,6 +233,7 @@ function DeviceSection() {
   };
   const signOut = async () => {
     await api("/api/auth/logout", { body: {} }).catch(() => undefined);
+    clearCache();
     window.location.assign("/signin");
   };
   return (

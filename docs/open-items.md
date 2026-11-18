@@ -111,4 +111,4 @@ Still open:
 - **Brand rules read English and Arabic cue words only.** A reason in another language becomes a reminder.
 
 - Under `pytest -n auto` with the app's own worker running, 4 load-sensitive tests (3 render template tests in test_13, the 2-hour signals speed test in test_11) can fail; they pass alone. Make them GPU/time tolerant or mark them serial.
-- Sign-out and a 401 should call the web cache's `clearCache()` (phase 7 left this open).
+- DW-6.4 live check of the review and correction screens on a real phone (375 px) is left to the owner's pilot use; component tests and the stylesheet audit passed.

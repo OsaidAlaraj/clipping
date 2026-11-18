@@ -1,6 +1,6 @@
 # Plan: Phase D: making clips (transcription, moment engine, render)
 **Created:** 2026-11-17
-**Status:** in-progress
+**Status:** complete
 **Started:** 2026-11-17 19:40
 **Current Phase:** 7
 **Complexity:** complex
@@ -636,4 +636,5 @@ Covered by batch review 2026-11-18 (phases 5–6): PASS — .code-foundations/bu
 - [x] Committed
 Commit: (see git log, phase 7)
 Summary: Every screen draws cached data or a matching skeleton in its first frame and refreshes quietly; review actions are optimistic with undo and roll back with the server's reason; the feed keeps the next two clips buffered so a swipe plays at once; fewer, smaller API calls; quiet offline retries; full-screen and hide-text buttons on review clips. Measured: 13–17 ms tap to content, CLS 0, next clip playing 4 ms after a swipe.
+Covered by batch review 2026-11-18 (phase 7): FAIL (sign-out cache leak), fixed forward in fix(phase-7); fix verified by the orchestrator against the finding (web 222/222, tsc clean) — .code-foundations/build/2026-11-17-phase-d-making-clips-batch-phase-7-review.md
 

@@ -13,6 +13,13 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Sign-in, sign-out and a 401 change who is using the app: the page asks for the cached data to be dropped.
+const dropData = () => caches.open(CACHE).then((cache) => Promise.all(DATA.map((path) => cache.keys().then((keys) =>
+  Promise.all(keys.filter((r) => new URL(r.url).pathname === path).map((r) => cache.delete(r)))))));
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "clear-data") event.waitUntil(dropData());
+});
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -28,6 +35,7 @@ self.addEventListener("fetch", (event) => {
           const copy = response.clone();
           caches.open(CACHE).then((cache) => cache.put(request, copy));
         }
+        if (response.status === 401 && isData) dropData(); // signed out: never serve the old person's copy offline
         return response;
       })
       .catch(() => caches.match(request).then((hit) => hit || caches.match("/")))

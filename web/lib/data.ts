@@ -5,7 +5,7 @@
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 
-import { api, NetworkError } from "./api";
+import { api, NetworkError, onSignedOut } from "./api";
 
 type Entry = { data?: unknown; at: number; promise?: Promise<unknown>; error?: unknown };
 
@@ -13,6 +13,13 @@ const store = new Map<string, Entry>();
 const listeners = new Map<string, Set<() => void>>();
 const STORAGE_PREFIX = "clipping_cache:";
 const PERSISTED = new Set(["/api/home", "/api/counts", "/api/queue", "/api/progress"]);
+// The app does not know the operator id on the client, so every saved copy carries an epoch that changes on each
+// sign-in, sign-out and 401 (stored on the device, so other tabs see it too). A copy from another epoch is discarded.
+const EPOCH_KEY = "clipping_cache_epoch";
+
+function currentEpoch(): string {
+  try { return localStorage.getItem(EPOCH_KEY) ?? ""; } catch { return ""; }
+}
 /** A refresh newer than this is reused as it is (a tab bounce does not refetch). */
 export const FRESH_MS = 8_000;
 const RETRY_DELAYS = [400, 1200];
@@ -24,7 +31,7 @@ function notify(key: string) {
 function persist(key: string, data: unknown) {
   if (!PERSISTED.has(key)) return;
   try {
-    sessionStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(data));
+    sessionStorage.setItem(STORAGE_PREFIX + key, JSON.stringify({ epoch: currentEpoch(), data }));
   } catch {
     /* storage unavailable or full: the memory copy still works */
   }
@@ -35,8 +42,12 @@ export function hydrateCache(): void {
   try {
     for (const key of PERSISTED) {
       const raw = sessionStorage.getItem(STORAGE_PREFIX + key);
-      if (raw && !store.get(key)?.data) {
-        store.set(key, { data: JSON.parse(raw), at: 0 });
+      if (!raw) continue;
+      const saved = JSON.parse(raw) as { epoch?: string; data?: unknown };
+      if (saved.epoch !== currentEpoch() || saved.data === undefined) {
+        sessionStorage.removeItem(STORAGE_PREFIX + key); // saved for someone else, or before the last sign-in change
+      } else if (!store.get(key)?.data) {
+        store.set(key, { data: saved.data, at: 0 });
         notify(key);
       }
     }
@@ -48,12 +59,16 @@ export function hydrateCache(): void {
 /** Forget everything (sign-out, a new account, tests). */
 export function clearCache(): void {
   store.clear();
+  try { localStorage.setItem(EPOCH_KEY, crypto.randomUUID()); } catch { /* storage unavailable */ }
+  try { navigator.serviceWorker?.controller?.postMessage({ type: "clear-data" }); } catch { /* no service worker */ }
   try {
     for (const key of PERSISTED) sessionStorage.removeItem(STORAGE_PREFIX + key);
   } catch {
     /* storage unavailable */
   }
 }
+
+onSignedOut(clearCache);
 
 /** Paths currently cached that start with the prefix (for updating every copy of a list at once). */
 export function cachedKeys(prefix: string): string[] {
