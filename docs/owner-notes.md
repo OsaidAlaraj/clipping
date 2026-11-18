@@ -9,9 +9,9 @@ Classes: bug, small, big (goes to `open-items.md`), question.
 | 2026-11-19 | Alerts: plain English, collapsible list | small | fixed (Home + Alerts page) | 196e86c |
 | 2026-11-19 | Explore "Market:" line unclear | small | fixed (new wording) | 196e86c |
 | 2026-11-19 | Filter sheet scrollbar looks odd | bug | fixed (thin scrollbar) | 196e86c |
-| 2026-11-19 | Home not centred, empty space | small | fixed, 3 min | 327339b |
-| 2026-11-19 | Review: technical text, scroll, Practice shadow, compliance pass placement | small | fixed, 12 min | 522ec4f, 0025dbd |
+| 2026-11-19 | Home not centred, empty space | small | fixed, under 1 min | 327339b |
+| 2026-11-19 | Review: technical text, scroll, Practice shadow, compliance pass placement | small | fixed, about 3 min | 522ec4f, 0025dbd |
 | 2026-11-19 | Review: skipped clips should come back later, decided ones never | big | open-items | - |
-| 2026-11-19 | Profile layout messy | small | tidied (not redesigned), 6 min | 1f33b06 |
-| 2026-11-19 | Review Later unclear | small | fixed, 5 min | 1293378 |
+| 2026-11-19 | Profile layout messy | small | tidied (not redesigned), about 1 min | 1f33b06 |
+| 2026-11-19 | Review Later unclear | small | fixed, about 1 min | 1293378 |
 | 2026-11-19 | Rename to ClipMind + new logo in brand colors | small | waiting for owner's yes on name placement | - |
