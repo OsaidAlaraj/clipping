@@ -280,5 +280,5 @@ Summary: One owner tap (`POST /api/clips/{id}/post`) creates staggered per-platf
 - [x] BUILD: Discovery + design + implementation complete; also cleared the four Phase 3 review notes (TargetLinkIn rename, unused IN_FLIGHT, housekeeping-sweep test, Instagram finish claim)
 - [x] REVIEW: DEFERRED — batch pending (full backend suite green, 270 web tests, tsc clean at commit)
 - [x] Committed
-Commit: PENDING
+Commit: 80738c8
 Summary: Queue sheet now shows PostPanel (platform picker, one combined checklist, one confirm, live per-platform status with Cancel, offline queue), PostManual (share or download file, copy caption and hashtags, paste link), 30-minute `submit_by` countdown, "finish in the app" alert and a daily morning summary; English and Arabic, RTL.
