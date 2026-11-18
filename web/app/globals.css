@@ -231,6 +231,8 @@ textarea.input { min-height: 120px; resize: vertical; }
 .check .state { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 800; flex: 0 0 auto; margin-top: 2px; }
 .check .state.ok { background: var(--accent); color: var(--accent-ink); }
 .check .state.no { background: transparent; border: 2px solid var(--urgent); color: var(--danger); }
+.later-row { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; align-items: start; }
+.later-row video { width: 72px; height: 128px; object-fit: cover; border-radius: 12px; background: #000; }
 .thumbs { display: flex; gap: 6px; overflow-x: auto; }
 .thumbs video { width: 54px; height: 96px; object-fit: cover; border-radius: 10px; background: #000; flex: 0 0 auto; }
 table.ledger { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
