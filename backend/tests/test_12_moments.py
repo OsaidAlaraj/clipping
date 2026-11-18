@@ -906,3 +906,13 @@ def test_the_pilot_engine_runs_on_the_lifestyle_route_and_its_hook_is_kept(db, o
     assert "pilot" in result["route"] and fake_llm.FAKE_MOMENTS["calls"]
     everyone = result["kept"] + [f["candidate"] for f in result["filtered"]]
     assert any(c["source"] == "pilot_llm" for c in everyone) and result["cost"] >= 0
+
+
+def test_hourly_housekeeping_runs_learning_for_each_active_owner(db, owner, monkeypatch):
+    from clipping import moment_learning, ops
+
+    seen = []
+    monkeypatch.setattr(moment_learning, "learn", lambda conn, owner_id=None: seen.append(str(owner_id)) or {})
+    monkeypatch.setattr(ops, "_audience_checked", {"at": 0.0})
+    ops.housekeeping(db)
+    assert owner.operator_id in seen

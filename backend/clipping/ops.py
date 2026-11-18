@@ -138,6 +138,16 @@ def housekeeping(db: Database) -> None:
 
         with db.session(Actor.worker()) as conn:
             audience.refresh_all(conn)
+        # Learning: turn each owner's new review decisions and 48 h views into labels, and refit the moment-engine,
+        # engine-route and hook-pattern weights (hourly; a no-op until a profile has enough labels).
+        from . import moment_learning
+
+        with db.session(Actor.worker()) as conn:
+            for row in conn.execute("select id from operators where status = 'active'").fetchall():
+                try:
+                    moment_learning.learn(conn, row["id"])
+                except Exception:   # learning must never stop housekeeping
+                    pass
     with db.session(Actor.worker()) as conn:
         for row in conn.execute("select id from operators where status = 'active'").fetchall():
             alerts.evaluate(conn, row["id"])
