@@ -152,6 +152,10 @@ def housekeeping(db: Database) -> None:
         for row in conn.execute("select id from operators where status = 'active'").fetchall():
             alerts.evaluate(conn, row["id"])
         campaigns.purge_expired_sources(conn)
+    from . import publish
+
+    with db.session(Actor.worker()) as conn:
+        publish.sweep(conn)      # a send that never finished becomes needs_check; processing posts get their next status check
 
 
 _awake = {"on": False}

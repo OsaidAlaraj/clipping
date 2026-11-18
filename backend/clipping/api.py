@@ -162,6 +162,16 @@ class PublishIn(BaseModel):
     ticks: dict
 
 
+class PostIn(BaseModel):
+    platforms: list[str]
+    ticks: dict
+    request_id: str
+
+
+class LinkIn(BaseModel):
+    url: str
+
+
 class ScheduleIn(BaseModel):
     scheduled_at: str
     channel_id: str
@@ -935,6 +945,31 @@ def get_checklist(clip_id: str, actor: Actor = Depends(current_actor)):
 @app.post("/api/clips/{clip_id}/publish-approve")
 def publish_approve(clip_id: str, body: PublishIn, actor: Actor = Depends(current_actor)):
     return run(actor, publish.approve_publish, actor, clip_id, body.ticks)
+
+
+@app.get("/api/clips/{clip_id}/post-options")
+def post_options(clip_id: str, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.post_options, actor, clip_id)
+
+
+@app.post("/api/clips/{clip_id}/post")
+def post_clip(clip_id: str, body: PostIn, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.confirm_post, actor, clip_id, body.platforms, body.ticks, body.request_id)
+
+
+@app.get("/api/clips/{clip_id}/post-status")
+def post_status(clip_id: str, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.post_status, clip_id)
+
+
+@app.post("/api/targets/{target_id}/cancel")
+def cancel_target(target_id: str, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.cancel_target, actor, target_id)
+
+
+@app.post("/api/targets/{target_id}/link")
+def target_link(target_id: str, body: LinkIn, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.paste_link, actor, target_id, body.url)
 
 
 @app.post("/api/clips/{clip_id}/schedule")

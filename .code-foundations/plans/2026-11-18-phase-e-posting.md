@@ -2,7 +2,7 @@
 **Created:** 2026-11-18
 **Status:** in-progress
 **Started:** 2026-11-18 12:00
-**Current Phase:** 3
+**Current Phase:** 4
 **Complexity:** complex
 **Review cadence:** 5
 **Check-ins:** checkpoints
@@ -243,6 +243,11 @@
 | 12 | 2 | Quota: rolling 24 h, per account for Instagram and TikTok, project-wide for YouTube, counted at upload start, advisory lock | build agent | assumed |
 | 13 | 2 | Missing privacy defaults to private; YouTube forced private while unverified_project; TikTok caption not sent (owner adds it in TikTok) | build agent | assumed |
 | 14 | 2 | Alerts raised inside a session that then raises are rolled back with it; Phase 3 must raise alerts in a committed session | build agent | assumed |
+| 15 | 3 | Unconnected or needs-reconnect accounts get a manual target, never enqueued, completed by pasting the link | build agent | assumed |
+| 16 | 3 | Stagger follows request order: previous + post_stagger_min (operator setting, floor 10), then moved into each account's window | build agent | assumed |
+| 17 | 3 | Worker commits `sending` before any byte; AppError->failed, unknown->needs_check, send-time blocker->cancelled; stuck sending -> needs_check after 10 min via sweep | build agent | assumed |
+| 18 | 3 | post_gate lets the worker record an API publish that already happened even if the kill switch went on meanwhile (fact, not a new post) | build agent | assumed |
+| 19 | 3 | Pasted target links must be on the platform's own host; confirm_post and paste_link are owner-only | build agent | assumed |
 ---
 ## Execution Log
 ### Phase 1: Connected accounts and token vault (Gate: Standard, security-sensitive)
@@ -259,8 +264,9 @@ Summary: Owners connect YouTube, Instagram and TikTok via OAuth (state + PKCE); 
 Commit: 524e73c
 Summary: `publishing` stage adapters for YouTube (resumable, private while unverified, paid flag), Instagram Reels (resumable, publish, finish_publish) and TikTok (inbox draft) plus fixture-driven fakes; no retry once bytes are sent (needs_check), quota ledger with RLS (migration 016); call via registry.call(..., provider=publishing.provider_name()).
 
-### Phase 3: Post targets, one-tap confirm and post records (Gate: Standard, security-sensitive) — PAUSED 2026-11-18
-- [x] BUILD: complete (builder: full suite green, 1 skip); discovery at .code-foundations/build/2026-11-18-phase-e-posting-phase-3-discovery.md
-- [ ] REVIEW: blocking review was started and stopped (owner disconnecting the laptop). Re-dispatch the Phase 3 REVIEW first.
-- [ ] Committed — Phase 3 code is UNCOMMITTED in the working tree (migration 017, publish.py, pipeline.py, core.py, api.py, ops.py, test_18_post_targets.py).
-Resume: re-run the Phase 3 blocking review, commit on PASS, then Phase 4.
+### Phase 3: Post targets, one-tap confirm and post records (Gate: Standard, security-sensitive)
+- [x] BUILD: Discovery + design + implementation complete (paused once for laptop shutdown)
+- [x] REVIEW: Verification passed
+- [x] Committed
+Commit: PENDING
+Summary: One owner tap (`POST /api/clips/{id}/post`) creates staggered per-platform `post_targets` (migration 017, DB guards for human/kill switch/practice/allowed platform/one account per platform); worker stage `publish` sends each once (sending committed first, crash -> needs_check via sweep), `post_status` polls processing, `posts` rows only with a public link; post-options, post-status, cancel and link routes exist.

@@ -487,8 +487,21 @@ def stage_discover(conn, job: dict) -> Decimal:
     return Decimal("0")
 
 
+def stage_publish(conn, job: dict) -> Decimal:
+    from . import publish   # lazy: publish builds on the review and campaign modules
+
+    return publish.stage_publish(conn, job)
+
+
+def stage_post_status(conn, job: dict) -> Decimal:
+    from . import publish
+
+    return publish.stage_post_status(conn, job)
+
+
 HANDLERS = {"discover": stage_discover, "fetch_source": stage_fetch_source, "transcribe": stage_transcribe, "signals": stage_signals, "moments": stage_moments, "hooks": stage_hooks, "render": stage_render,
-            "captions": stage_captions, "compliance": stage_compliance, "package": stage_package}
+            "captions": stage_captions, "compliance": stage_compliance, "package": stage_package,
+            "publish": stage_publish, "post_status": stage_post_status}
 
 
 # ------------------------------------------------------------------ worker loop

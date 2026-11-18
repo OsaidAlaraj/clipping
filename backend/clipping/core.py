@@ -135,16 +135,16 @@ def require_kill_switch_off(conn) -> None:
 
 # ------------------------------------------------------------------ jobs
 
-def enqueue(conn, job_type: str, payload: dict, owner_operator_id, source_id=None, campaign_version_id=None) -> dict | None:
-    """Add a job. Idempotent on type + input hash: the same input never creates a second job.
+def enqueue(conn, job_type: str, payload: dict, owner_operator_id, source_id=None, campaign_version_id=None, run_after=None) -> dict | None:
+    """Add a job (not before run_after, when given). Idempotent on type + input hash: the same input never creates a second job.
     Returns the new row, or None if the job already exists. Refused while the kill switch is on."""
     require_kill_switch_off(conn)
     input_hash = stable_hash(payload)
     return conn.execute(
-        """insert into jobs (type, source_id, campaign_version_id, input_hash, idempotency_key, payload, owner_operator_id)
-           values (%s, %s, %s, %s, %s, %s, %s)
+        """insert into jobs (type, source_id, campaign_version_id, input_hash, idempotency_key, payload, owner_operator_id, run_after)
+           values (%s, %s, %s, %s, %s, %s, %s, coalesce(%s, now()))
            on conflict (idempotency_key) do nothing returning *""",
-        (job_type, source_id, campaign_version_id, input_hash, f"{job_type}:{input_hash}", Jsonb(payload), owner_operator_id),
+        (job_type, source_id, campaign_version_id, input_hash, f"{job_type}:{input_hash}", Jsonb(payload), owner_operator_id, run_after),
     ).fetchone()
 
 
