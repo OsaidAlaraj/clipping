@@ -1,6 +1,7 @@
 """One command for the whole system.
 
-    python run.py          install what is missing, then start the API, the worker and the review app
+    python run.py          ONE command for everything: install what is missing, start the API, the worker and the review app,
+                           wait until they answer, open the browser, and print the phone address (or double-click start.cmd)
     python run.py test     run the backend and web test suites
     python run.py demo     run the sample-campaign demo (all fakes) against a fresh throwaway database and print the run log
     python run.py demo --no-keys   the same flow with fakes off and every key blanked: it runs on the declared fallbacks
@@ -111,6 +112,44 @@ def env() -> dict:
     return out
 
 
+def wait_and_open() -> None:
+    """When the API and the review app both answer, open the browser and print where to find the app (runs in a thread)."""
+    import threading
+    import time
+    import urllib.request
+    import webbrowser
+
+    def up(url: str) -> bool:
+        try:
+            with urllib.request.urlopen(url, timeout=3) as response:
+                return response.status < 500
+        except Exception:
+            return False
+
+    def run() -> None:
+        deadline = time.time() + 240
+        while time.time() < deadline and not (up("http://127.0.0.1:8787/api/health") and up("http://localhost:3000/signin")):
+            time.sleep(2)
+        else:
+            if time.time() >= deadline:
+                print("The app did not answer within 4 minutes. Check the messages above.")
+                return
+        webbrowser.open("http://localhost:3000")
+        origin = ""
+        env_file = ROOT / ".env"
+        if env_file.exists():
+            for line in env_file.read_text(encoding="utf-8").splitlines():
+                if line.startswith("CLIPPING_PUBLIC_ORIGIN="):
+                    origin = line.split("=", 1)[1].strip()
+        print()
+        print("Ready. On this laptop: http://localhost:3000")
+        print(f"On your phone (Tailscale on): {origin}" if origin else "For the phone, run  python run.py phone  once.")
+        print("Ctrl+C stops everything.")
+        print()
+
+    threading.Thread(target=run, daemon=True).start()
+
+
 def main() -> int:
     command = sys.argv[1] if len(sys.argv) > 1 else "start"
     bootstrap()
@@ -128,11 +167,12 @@ def main() -> int:
             return subprocess.call([str(PY), "-m", "clipping", "demo"], cwd=BACKEND, env=demo_env(tmp, "--no-keys" in sys.argv[2:]))
     if command == "stop":
         return subprocess.call([str(PY), "-m", "clipping", "stop"], cwd=BACKEND, env=env())
-    if command != "start":
+    if command not in ("start", "up"):
         print(__doc__)
         return 2
     print("Starting the API and worker on http://127.0.0.1:8787 and the review app on http://localhost:3000")
     print("First start seeds the sample campaign, which takes about a minute. Ctrl+C stops everything.\n")
+    wait_and_open()
     api = subprocess.Popen([str(PY), "-m", "clipping", "dev"], cwd=BACKEND, env=env())
     web = subprocess.Popen([node_tool(), "run", "dev"], cwd=WEB, env=env())
     try:
