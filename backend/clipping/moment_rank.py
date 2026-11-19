@@ -591,7 +591,28 @@ def laugh_tail(ep: Episode, end: float, cap: float) -> float:
     return round(min(max(tail + 0.3, end), max(limit, end)), 3)
 
 
+MIN_SNAP_S = 15.0
+
+
+def sentence_end(ep: Episode, first: dict, last: dict, floor: float = MIN_SNAP_S) -> dict:
+    """The line the clip should end on: `last` when it ends a sentence, else the nearest earlier line (up to three back) that does and
+    still leaves the clip at least `floor` seconds; `last` when none does (4 of 19 clips in the diagnosis ended mid-sentence)."""
+    if last["text"].rstrip()[-1:] in ".?!؟":
+        return last
+    k = bisect_left(ep.line_ends, last["end"] - 0.01)
+    for back in range(1, 4):
+        if k - back < 0:
+            break
+        cand = ep.lines[k - back]
+        if cand["start"] <= first["start"]:
+            break
+        if cand["end"] - first["start"] >= floor and cand["text"].rstrip()[-1:] in ".?!؟":
+            return cand
+    return last
+
+
 def _span(ep: Episode, first: dict, last: dict, hi: float) -> dict:
+    last = sentence_end(ep, first, last)
     start = max(first["start"] - BREATH_BEFORE, 0.0)
     end = min(last["end"] + BREATH_AFTER, ep.duration)
     return {"start_s": round(start, 3), "end_s": round(min(laugh_tail(ep, end, start + hi), ep.duration), 3)}

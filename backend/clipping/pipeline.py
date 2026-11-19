@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, signals, templates, transcripts
+from . import brand_checks, config, ffmpeg, language_check, signals, templates, transcripts
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -112,7 +112,11 @@ def _transcribe(conn, source: dict, campaign: dict, version: dict, video: Path) 
         audio = ffmpeg.extract_audio(video, Path(folder) / "audio.wav")
         request["audio_path"] = str(audio)
         try:
-            return registry.call(conn, "transcription", "transcribe", request, owner)
+            result = registry.call(conn, "transcription", "transcribe", request, owner)
+            problem = language_check.empty_transcript_message(result[0].get("words") or [], request["duration_s"], source["language"])
+            if problem:
+                raise_alert(conn, owner, "transcript_too_thin", "warn", "source_assets", source["id"], f"{campaign['name']}: {problem}")
+            return result
         except AdapterPaused as exc:
             raise_alert(conn, owner, "transcription_paused", "warn", "source_assets", source["id"],
                         f"{campaign['name']}: {exc} The local Whisper transcribes this video instead.")
