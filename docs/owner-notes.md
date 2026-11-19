@@ -20,4 +20,4 @@ Classes: bug, small, big (goes to `open-items.md`), question.
 | 2026-11-19 | Story order: clips left first | small | fixed | b3a49c3 |
 | 2026-11-19 | Rename to ClipMind, new logo and icons | small | fixed | c54347a |
 | 2026-11-19 | Review order rule (decided never returns, skipped returns after ~5) | big | rule confirmed, not built | - |
-| 2026-11-19 | Phone nav: New button not centred (LTR and RTL) | small | fixed | see commit |
+| 2026-11-19 | Phone nav: New button not centred (LTR and RTL) | small | fixed | 13ef0eb |
