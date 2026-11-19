@@ -116,15 +116,13 @@ def _server_dsn() -> Iterator[str]:
 
     pgdata = config.data_dir() / "pg"
     pgdata.mkdir(parents=True, exist_ok=True)
-    server = pgserver.get_server(pgdata, cleanup_mode=None, start=False)
-    started = server.get_pid() is None
-    if started:
-        server.start()
+    was_running = (pgdata / "postmaster.pid").exists()   # a running or stale server left by the app
+    server = pgserver.get_server(pgdata, cleanup_mode=None)   # attaches to a running server, or starts one
     try:
         yield server.get_uri()
     finally:
-        if started:
-            server.stop()
+        if not was_running:   # only stop a server this command started
+            server.cleanup()
 
 
 def cli(argv: list[str]) -> int:
