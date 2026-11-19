@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { api, ApiError, money, PLATFORM_LABEL } from "@/lib/api";
 import { mutate, peek, useData } from "@/lib/data";
+import { plainAlert } from "@/lib/alertText";
 import { showToast } from "@/lib/toast";
 import { useSwipe } from "@/lib/useSwipe";
 import ProgressCards, { useProgress } from "./Progress";
@@ -84,6 +85,11 @@ export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; 
   );
 }
 
+/** Stories with clips left come first (most clips first); finished ones go last. Ties keep the server's order. */
+export function orderStories<T extends { clips_ready: number }>(stories: T[]): T[] {
+  return stories.map((story, i) => ({ story, i })).sort((a, b) => b.story.clips_ready - a.story.clips_ready || a.i - b.i).map((x) => x.story);
+}
+
 export default function Home() {
   const router = useRouter();
   const home = useData<HomeData>("/api/home");
@@ -123,13 +129,13 @@ export default function Home() {
             <span className="ring add"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></span>
             <span className="name">Find more</span>
           </Link>
-          {data.stories.map((story) => {
+          {orderStories(data.stories).map((story) => {
             const byBudget = story.budget_left_pct !== null;
             const p = byBudget ? story.budget_left_pct! : story.hours_to_deadline !== null ? Math.max(0, Math.min(100, (story.hours_to_deadline / (14 * 24)) * 100)) : 100;
             return (
               <Link key={story.id} className="story" href={`/review?campaign=${story.id}`}
                 aria-label={`${story.name}: ${byBudget ? `${story.budget_left_pct}% budget left` : deadlineText(story.hours_to_deadline)}, ${story.clips_ready} clips to review`}>
-                <span className={`ring ${p < 25 ? "low" : ""}`} style={{ ["--p" as any]: p }}>
+                <span className={`ring ${story.clips_ready === 0 ? "done" : p < 25 ? "low" : ""}`} style={{ ["--p" as any]: p }}>
                   <span className="avatar" style={{ background: tintFor(story.id) }}>{initials(story.name)}</span>
                 </span>
                 <span className="name">{story.name}</span>
@@ -161,10 +167,18 @@ export default function Home() {
         )}
 
         {data.attention.length > 0 && (
-          <section className="stack" aria-label="Attention">
-            <div className="row between"><h2>Attention</h2><Link href="/alerts" className="small">All alerts</Link></div>
-            {data.attention.map((alert) => <div key={alert.id} className={`banner ${alert.severity}`}>{alert.message}</div>)}
-          </section>
+          <details className="attention stack" aria-label="Attention" open={data.attention.length <= 2}>
+            <summary className="row between"><h2>Needs attention ({data.attention.length})</h2><Link href="/alerts" className="small">All alerts</Link></summary>
+            {data.attention.map((alert) => {
+              const plain = plainAlert(alert.message);
+              return (
+                <div key={alert.id} className={`banner ${alert.severity}`}>
+                  <p>{plain.text}</p>
+                  {plain.text !== plain.raw && <details className="small"><summary>Technical details</summary><p>{plain.raw}</p></details>}
+                </div>
+              );
+            })}
+          </details>
         )}
 
         <section className="stack" aria-label="Campaigns">

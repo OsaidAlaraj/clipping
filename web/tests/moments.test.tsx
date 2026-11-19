@@ -24,8 +24,8 @@ describe("Filtered moments in Review", () => {
     const rows = await screen.findAllByTestId("filtered-moment");
     expect(rows).toHaveLength(2);
     expect(rows[0].textContent).toContain("1:15–1:58");
-    expect(rows[0].textContent).toContain("Below this video's cut-off");
-    expect(rows[1].textContent).toContain("Hard rule");
+    expect(rows[0].textContent).toContain("Not strong enough");
+    expect(rows[1].textContent).toContain("Blocked by a rule");
     expect(rows[1].textContent).toContain("brief says to avoid");
   });
 
@@ -72,5 +72,13 @@ describe("Filtered moments in Review", () => {
     render(<LangProvider initial="ar"><Feed /></LangProvider>);
     fireEvent.click(await screen.findByRole("button", { name: "المستبعدة 1" }));
     expect(await screen.findByRole("button", { name: "إنقاذ" })).toBeTruthy();
+  });
+});
+
+describe("plain wording of set-aside moments", () => {
+  it("turns scores and ranks into sentences", async () => {
+    const { plainMoment } = await import("@/components/Feed");
+    expect(plainMoment("Scored 0.77, below this episode's cut-off of 0.78.")).toBe("Score 0.77 out of 1. It needs 0.78 to be picked for this video.");
+    expect(plainMoment("Ranked #9; this type keeps the top 8.")).toBe("Number 9 of its kind. Only the best 8 are kept.");
   });
 });

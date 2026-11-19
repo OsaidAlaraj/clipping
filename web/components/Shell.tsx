@@ -9,6 +9,21 @@ import { hydrateCache, prefetch, useData } from "@/lib/data";
 import { LangProvider, useLang } from "@/lib/i18n";
 import ToastHost from "./ToastHost";
 
+/** The ClipMind mark and name. On the dark side menu the square is lime; on light pages it is near-black. */
+export function Logo({ size = 28, onDark = false }: { size?: number; onDark?: boolean }) {
+  const [bg, fg] = onDark ? ["#CCF24A", "#0E0E10"] : ["#0E0E10", "#CCF24A"];
+  return (
+    <span className="logo">
+      <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
+        <rect width="100" height="100" rx="22" fill={bg} />
+        <path d="M65.56 34.44A22 22 0 1 0 65.56 65.56" fill="none" stroke={fg} strokeWidth="11" strokeLinecap="round" />
+        <circle cx="78" cy="50" r="5.5" fill={fg} />
+      </svg>
+      <span>ClipMind</span>
+    </span>
+  );
+}
+
 export const Icon = {
   home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /></svg>,
   explore: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>,
@@ -55,15 +70,14 @@ function Navigation({ toReview }: { toReview: number }) {
       <nav className="nav" aria-label="Main">
         {items.map((item) => (
           <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined} {...warmProps(item.href)}
-            aria-current={item.active ? "page" : undefined} aria-label={item.active ? undefined : item.label}>
+            aria-current={item.active ? "page" : undefined} aria-label={item.label}>
             {item.icon}
-            <span className="label">{item.label}</span>
             {item.key === "review" && toReview > 0 && !item.active && <span className="count" aria-label={`${toReview} waiting`}>{toReview}</span>}
           </Link>
         ))}
       </nav>
       <nav className="side" aria-label="Main">
-        <Link href="/" className="wordmark">clipping</Link>
+        <Link href="/" className="wordmark" aria-label="ClipMind"><Logo onDark /></Link>
         {items.filter((item) => item.key !== "create").map((item) => (
           <Link key={item.href} href={item.href} aria-current={item.active ? "page" : undefined} {...warmProps(item.href)}>
             {item.icon}<span>{item.label}</span>
@@ -80,7 +94,7 @@ export function TopBar({ alerts }: { alerts: number }) {
   const { t } = useLang();
   return (
     <div className="topbar">
-      <Link href="/" className="wordmark">clipping</Link>
+      <Link href="/" className="wordmark" aria-label="ClipMind"><Logo /></Link>
       <span className="grow" />
       <Link href="/alerts" className="icon-btn" aria-label={alerts > 0 ? `${t("alerts")}, ${alerts} open` : t("alerts")}>
         {Icon.bell}

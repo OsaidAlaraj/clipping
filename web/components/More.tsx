@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ApiError, Clip, ConnectionsData, money, PLATFORM_LABEL, reviewAction, uploadBase } from "@/lib/api";
+import { plainAlert } from "@/lib/alertText";
 import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
@@ -53,25 +54,27 @@ export function ReviewLater() {
       <Head title="Review Later" />
       {error && <p className="error">{error}</p>}
       {data === null && !error && <RowsSkeleton />}
-      {data?.folders.length === 0 && <p className="muted">Nothing parked. Clips you mark “review later” in the Feed collect here, grouped by campaign.</p>}
+      {data?.folders.length === 0 && <p className="muted">Nothing here yet. Clips you save for later while reviewing collect here, grouped by campaign.</p>}
       {data?.folders.map((folder) => (
         <section key={folder.campaign_id} className="card stack" aria-label={folder.campaign_name} style={{ opacity: folder.closed ? 0.75 : 1 }}>
           <div className="row between">
             <strong>{folder.campaign_name}</strong>
             <span className="badge">{folder.count} clip{folder.count === 1 ? "" : "s"}{folder.closed ? " · closed" : ""}</span>
           </div>
-          <span className="small muted">{folder.deadline ? `Deadline ${new Date(folder.deadline).toLocaleDateString()}` : "No deadline"}</span>
-          <div className="thumbs">{folder.clips.map((clip) => clip.video_url && <video key={clip.id} src={clip.video_url} muted playsInline preload="metadata" />)}</div>
+          <span className="small muted">{folder.deadline ? `Deadline ${new Date(folder.deadline).toLocaleDateString()}` : "No deadline"}{folder.closed ? ". This campaign is closed, so these clips can no longer be accepted." : ""}</span>
           {folder.clips.map((clip) => (
-            <div key={clip.id} className="stack" style={{ borderTop: "1px solid var(--line)", paddingTop: 10 }}>
-              <span dir="auto">{clip.hook_text}</span>
-              <span className="small muted">Parked: {clip.park_reason ?? "no reason given"}</span>
-              {!folder.closed && (
-                <div className="row">
-                  <button className="btn primary grow" onClick={() => act(() => reviewAction("accept", clip.id))}>Accept</button>
-                  <button className="btn danger grow" onClick={() => setRejecting(clip.id)}>Reject</button>
-                </div>
-              )}
+            <div key={clip.id} className="later-row">
+              {clip.video_url && <video src={clip.video_url} muted playsInline preload="metadata" />}
+              <div className="stack" style={{ gap: 6 }}>
+                <span dir="auto" style={{ fontWeight: 600 }}>{clip.hook_text}</span>
+                <span className="small muted">Parked: {clip.park_reason ?? "no reason given"}</span>
+                {!folder.closed && (
+                  <div className="row">
+                    <button className="btn primary grow" onClick={() => act(() => reviewAction("accept", clip.id))}>Accept</button>
+                    <button className="btn danger grow" onClick={() => setRejecting(clip.id)}>Reject</button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </section>
@@ -158,7 +161,8 @@ export function Alerts() {
       {data?.alerts.map((alert) => (
         <section key={alert.id} className="card stack">
           <div className="row between"><span className={`badge ${alert.severity}`}>{alert.severity}</span><span className="small muted">{new Date(alert.created_at).toLocaleString()}</span></div>
-          <p>{alert.message}</p>
+          <p>{plainAlert(alert.message).text}</p>
+          {plainAlert(alert.message).text !== alert.message && <details className="small muted"><summary>Technical details</summary>{alert.message}</details>}
           <div className="row">
             <button className="btn grow" onClick={() => act(`/api/alerts/${alert.id}/ack`)}>Acknowledge</button>
             {alert.severity !== "block" && <button className="btn ghost grow" onClick={() => act(`/api/alerts/${alert.id}/snooze`, { hours: 4 })}>Snooze 4 h</button>}

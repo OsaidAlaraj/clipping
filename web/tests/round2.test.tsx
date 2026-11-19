@@ -127,7 +127,11 @@ describe("profile", () => {
       audience_countries: { SA: 40, US: 20, EG: 10 }, audience_source: "screenshot", audience_tier1_pct: 20 }];
     const mock = mockApi({ "GET /api/reference": { accounts, categories: [] }, "GET /api/home": homeData, "PUT /api/accounts/a1/audience": { id: "a1" } });
     render(<LangProvider initial="en"><Profile /></LangProvider>);
-    await screen.findByText("@pod_tt");
+    const head = await screen.findByRole("button", { name: /@pod_tt/ });
+    expect(head.getAttribute("aria-expanded")).toBe("false");           // collapsed by default
+    expect(head.textContent).toContain("Posts in: Not set");            // one-line summary
+    expect(screen.queryByLabelText("Posts in", { selector: "#lang-a1" })).toBeNull();
+    fireEvent.click(head);
     const apiFetch = globalThis.fetch;
     const fetchMock = vi.fn((url: any, init?: any) => String(url).endsWith("/audience/screenshot")
       ? Promise.resolve({ ok: true, json: async () => ({ audience_tier1_pct: 35 }) } as Response) : apiFetch(url, init));
@@ -139,7 +143,7 @@ describe("profile", () => {
     const file = new File([new Uint8Array([137, 80])], "viewers.png", { type: "image/png" });
     fireEvent.change(screen.getByLabelText("Audience screenshot for @pod_tt"), { target: { files: [file] } });
     await waitFor(() => expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/api/accounts/a1/audience/screenshot"))).toBe(true));
-    await waitFor(() => expect((screen.getByLabelText("US/UK/CA/AU audience %") as HTMLInputElement).value).toBe("35"));
+    await waitFor(() => expect((screen.getByLabelText("Audience in US/UK/CA/AU, %") as HTMLInputElement).value).toBe("35"));
     vi.unstubAllGlobals();
   });
 });

@@ -1,6 +1,6 @@
 {
-  "name": "Clipping Review",
-  "short_name": "Clipping",
+  "name": "ClipMind",
+  "short_name": "ClipMind",
   "description": "Review, queue and track clips for paid clipping campaigns.",
   "start_url": "/",
   "scope": "/",

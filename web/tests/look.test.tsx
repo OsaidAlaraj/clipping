@@ -193,7 +193,7 @@ describe("Profile", () => {
       "GET /api/home": { net_per_hour: { this_week: { with_pending_per_hour: null, paid_usd: 0, hours: 0 }, month_to_date: { with_pending_per_hour: null, paid_usd: "0", hours: 0 }, confidence: "low" } },
     });
     render(<LangProvider initial="en"><Profile /></LangProvider>);
-    await screen.findByText("@pod_tt");
+    fireEvent.click(await screen.findByRole("button", { name: /@pod_tt/ }));
     expect(screen.getByRole("button", { name: /Look and posting plan/ })).toBeTruthy();
   });
 });

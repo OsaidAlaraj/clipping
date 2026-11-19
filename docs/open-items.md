@@ -142,3 +142,9 @@ Phase E is built and pushed on `feature/phase-e-posting`. Everything was tested 
 ### Owner setup (not a code task)
 - **Developer apps.** Create the Google, Meta and TikTok apps, and add each redirect URL. Steps are in `docs/خطة-المتابعة.md`.
 - **`.env` values.** Add the client ids, secrets, `OAUTH_REDIRECT_BASE` and a new `TOKEN_VAULT_KEY`. Never paste them in chat.
+
+## Owner notes (2026-11-19)
+
+Done in small commits (see `docs/owner-notes.md`): Home layout, Review wording and chips, Review Later, Profile tidy-up.
+- **Review order** ("scroll without deciding; decided clips never return, skipped ones come back after a few"). Waiting for the owner to confirm the rule. Priority: high. Size: 1–2 h, touches the review queue logic.
+- **Profile full redesign**, if the tidy-up is not enough. Priority: low. Size: 2 h.
