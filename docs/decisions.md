@@ -171,3 +171,6 @@ Decided by the owner, with these limits (relayed in the session notes; the owner
 - **Not run:** OpenShorts, wjs-reframing-video, clipsai resize, AutoFlip, TalkNet, Light-ASD (see docs/survey-table.md). No candidate was rejected on evidence there.
 - **Method limits:** the reference face is a detector consensus (YuNet-favoured); video C is slides with no face, so it measures nothing. Frame strips are included for checking by eye.
 - **Automatic backups.** One pg_dump (custom format) per 24 hours from housekeeping into `.data/backups`, newest 14 kept; `python run.py backup` for a dump now, `python -m clipping restore <file>` restores into a new scratch database, never the live one.
+
+## Decision 31 (2026-11-19): swipe right is the owner's confirm to post
+In the review feed a swipe right accepts the clip AND is the owner's deliberate confirm to post. It shows a bar ("Posts to TikTok and Instagram in 20 minutes", staggered as in Round E) with a 10-second undo. If the account is not connected, it shows "Ready to post manually" with the caption ready to copy. Unchanged: no posting on practice campaigns, every post is recorded, the kill switch stops the queue, the human-gate triggers stay. Reason: the owner wants swipe-right to mean publish, and a visible bar with undo keeps it a conscious owner action.
