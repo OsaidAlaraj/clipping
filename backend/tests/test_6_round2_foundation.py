@@ -8,6 +8,8 @@ import threading
 from pathlib import Path
 from types import SimpleNamespace
 
+import sys
+
 import pytest
 
 from clipping import auth, campaigns, ffmpeg, ops, pipeline, sources
@@ -35,7 +37,8 @@ def test_youtube_links_are_recognised():
         assert sources.link_kind(url) == "youtube"
 
 
-def test_link_rules(db, owner):
+def test_link_rules(db, owner, monkeypatch):
+    monkeypatch.setitem(sys.modules, "yt_dlp", None)   # the case below assumes yt-dlp is not installed, whatever is in the venv
     with db.session(owner) as conn:
         draft = campaigns.intake(conn, owner, "content_rewards", "Draft", brief("01"))["campaign"]["id"]
     campaign_id = approved_campaign(db, owner)
