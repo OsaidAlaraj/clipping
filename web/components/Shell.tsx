@@ -68,17 +68,12 @@ function Navigation({ toReview }: { toReview: number }) {
   return (
     <>
       <nav className="nav" aria-label="Main">
-        {[items.slice(0, 2), items.slice(2, 3), items.slice(3)].map((group, g) => (
-          <div key={g} className={g === 1 ? "nav-mid" : "nav-side-group"}>
-            {group.map((item) => (
-              <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined} {...warmProps(item.href)}
-                aria-current={item.active ? "page" : undefined} aria-label={item.active ? undefined : item.label}>
-                {item.icon}
-                <span className="label">{item.label}</span>
-                {item.key === "review" && toReview > 0 && !item.active && <span className="count" aria-label={`${toReview} waiting`}>{toReview}</span>}
-              </Link>
-            ))}
-          </div>
+        {items.map((item) => (
+          <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined} {...warmProps(item.href)}
+            aria-current={item.active ? "page" : undefined} aria-label={item.label}>
+            {item.icon}
+            {item.key === "review" && toReview > 0 && !item.active && <span className="count" aria-label={`${toReview} waiting`}>{toReview}</span>}
+          </Link>
         ))}
       </nav>
       <nav className="side" aria-label="Main">

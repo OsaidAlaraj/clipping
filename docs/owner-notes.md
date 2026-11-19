@@ -22,3 +22,4 @@ Classes: bug, small, big (goes to `open-items.md`), question.
 | 2026-11-19 | Review order rule (decided never returns, skipped returns after ~5) | big | rule confirmed, not built | - |
 | 2026-11-19 | Phone nav: New button not centred (LTR and RTL) | small | fixed | 13ef0eb |
 | 2026-11-19 | Profile account rows still ugly on phone: compact collapsible cards, one primary action | small | redesigned, checked at 375 px | 1cb11b2, c008e38 |
+| 2026-11-19 | Phone nav still uneven; dev "1 Issue" badge on Home icon | small | 5 equal columns, active = fixed circle; devIndicators off. The console shows only a service-worker fetch error in the test browser, no hydration warning, so no change to the body tag | a0bbabc |
