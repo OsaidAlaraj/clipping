@@ -15,8 +15,9 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, view
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr">
-      <body>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
+      {/* Browser extensions such as Grammarly add attributes to <body> before React loads; this hides only that attribute mismatch. */}
+      <body suppressHydrationWarning>
         <Shell>{children}</Shell>
       </body>
     </html>
