@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, language_check, signals, templates, transcripts
+from . import brand_checks, config, ffmpeg, language_check, quality_gate, signals, templates, transcripts
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -423,6 +423,12 @@ def stage_render(conn, job: dict) -> Decimal:
     caption, hashtags, mentions = clip["caption_text"], clip["hashtags"], clip["mentions"]
     if not (meta.get("caption_edited") and caption):
         caption, hashtags, mentions = build_caption(disclosure["caption_text"], meta.get("hook_text") or "", version["rules_json"])
+    try:   # the gate only reports: a failure here must never stop the render
+        gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=clip["caption_text"],
+                                disclosure=disclosure.get("caption_text"))
+    except Exception:
+        gate = None
+    meta["gate"] = gate
     meta.update(template_id=template["id"], template_version=template["version"], encoder=result["encoder"], encodes=result["encodes"],
                 reframe=result["reframe"], loudness_normalised=result["loudness_normalised"], overlay_burned=True,
                 captions=result["captions"], zooms=result.get("zooms", 0), caption_language=clip["language"],

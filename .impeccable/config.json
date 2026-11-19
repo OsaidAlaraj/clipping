@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "docs/bakeoff/reframe/index.html"
+        ],
+        "createdAt": "2026-11-19T14:07:40.362Z",
+        "reason": "assistant: computed ratios are 10:1 or more (#f2f2f2, #d0d0d0, #a6f5b4 on #101010; #f2f2f2 on #0f3d1e); the checker likely misses the body background set on a dark page"
+      }
+    ]
+  }
+}
