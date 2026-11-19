@@ -132,15 +132,15 @@ describe("accept and reject gestures", () => {
     await screen.findByText("1 of 2");
   });
 
-  it("swipe up and down move between clips without deciding anything", async () => {
+  it("swiping up skips a clip without deciding it: the next clip shows and the skip is reported with its place", async () => {
     const { mock, card } = await open(feedRoutes(three()));
     swipe(card, [150, 400], [150, 250]);
-    await screen.findByText("2 of 3");
-    expect(screen.getByText("Second Show")).toBeTruthy();
+    await waitFor(() => expect(screen.getByText("Second Show")).toBeTruthy());
+    expect(screen.getByText("1 of 3")).toBeTruthy();
     expect(screen.getByText("Lower: needs a compliance look")).toBeTruthy();
-    swipe(screen.getByTestId("clip-card"), [150, 250], [150, 400]);
-    await screen.findByText("1 of 3");
-    expect(mock.calls.filter((c) => c.path.startsWith("/api/clips/"))).toHaveLength(0);
+    await waitFor(() => expect(mock.posts("/api/clips/c1/skip")).toHaveLength(1));
+    expect(mock.posts("/api/clips/c1/skip")[0].body.anchor_id).toBe("c3");        // it goes back behind the last clip
+    expect(mock.calls.filter((c) => /\/(accept|reject|later)$/.test(c.path))).toHaveLength(0);
   });
 
   it("a swipe from the left edge is ignored", async () => {
@@ -173,9 +173,9 @@ describe("hooks sheet and keyboard", () => {
   it("desktop shortcuts: A accepts, R opens reasons, Esc closes, arrows move, U undoes", async () => {
     const { mock } = await open(feedRoutes(three()));
     fireEvent.keyDown(window, { key: "ArrowDown" });
-    await screen.findByText("2 of 3");
-    fireEvent.keyDown(window, { key: "ArrowUp" });
-    await screen.findByText("1 of 3");
+    await screen.findByText("Second Show");
+    fireEvent.keyDown(window, { key: "ArrowUp" });          // nothing to go back to: skipped clips come back later
+    expect(screen.getByText("1 of 3")).toBeTruthy();
     fireEvent.keyDown(window, { key: "r" });
     await screen.findByRole("dialog", { name: "Why reject this clip?" });
     fireEvent.keyDown(window, { key: "Escape" });
@@ -214,7 +214,7 @@ describe("session", () => {
   it("Stop here saves the position and shows the summary", async () => {
     const { mock, card } = await open(feedRoutes(three()));
     swipe(card, [150, 400], [150, 250]);
-    await screen.findByText("2 of 3");
+    await screen.findByText("Second Show");
     fireEvent.click(screen.getByRole("button", { name: "Stop here" }));
     await screen.findByRole("region", { name: "Session summary" });
     expect(mock.posts("/stop")[0].body.position).toEqual({ campaign_id: null, clip_id: "c2" });

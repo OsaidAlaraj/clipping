@@ -27,6 +27,8 @@ export const REASONS: [string, string][] = [
 type Summary = { clips_reviewed: number; accepted: number; rejected: number; parked: number; posts_due: number; minutes_logged: number; hours_today: number; pay_per_clip?: { name: string; rate_per_1k: number | null; max_payout_per_clip: number | null }[] };
 type Sheet = null | "reject" | "hooks" | "edit" | "report" | "filtered";
 type Decision = "accept" | "reject" | "later";
+const SKIP_GAP = 5;        // a skipped clip returns after this many other clips
+const MAX_RETURNS = 2;     // it returns at most twice; the next skip moves it to Review Later
 /** The last decision, kept for Undo. `review` settles when the server (or the offline outbox) has recorded it. */
 type UndoState = { review: Promise<Review>; clip: Clip; index: number; kind: Decision; queued: boolean } | null;
 type FeedData = { clips: Clip[]; kill_switch: boolean; filtered?: FilteredMoment[]; undo_window_s: number; session_length_min: number; pay_per_clip_display: string };
@@ -495,7 +497,31 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
     }
   }, []);
 
-  const next = useCallback(() => { touched.current = true; setIndex((i) => Math.min(i + 1, Math.max(state.current.clips.length - 1, 0))); }, []);
+  /** Swiping past a clip is a skip: it comes back after SKIP_GAP other clips, at most MAX_RETURNS times, and the third skip moves it
+   *  to Review Later. The server keeps the order (so a reload gives the same feed); the screen moves at once and never waits. */
+  const next = useCallback(() => {
+    const { clips: list, index: at } = state.current;
+    const current = list[at];
+    if (!current || at >= list.length - 1) return;           // nothing ahead to skip to
+    touched.current = true;
+    const rest = list.filter((_, i) => i !== at);
+    const skips = current.skip_count ?? 0;
+    let anchor: string | null = null;
+    if (skips >= MAX_RETURNS) {
+      setClips(rest);
+      mutate<{ to_review: number; alerts: number }>("/api/counts", (c) => (c ? { ...c, to_review: Math.max(c.to_review - 1, 0) } : c as any));
+      setMessage("Skipped three times: moved to Review Later.");
+    } else {
+      const to = Math.min(at + SKIP_GAP, rest.length);
+      anchor = rest[to - 1]?.id ?? null;
+      setClips([...rest.slice(0, to), { ...current, skip_count: skips + 1 }, ...rest.slice(to)]);
+    }
+    setIndex(at);
+    api(`/api/clips/${current.id}/skip`, { body: { anchor_id: anchor, session_id: session.current } }).then(
+      () => { if (skips >= MAX_RETURNS) for (const path of ["/api/home", "/api/counts", "/api/review-later"]) invalidate(path); },
+      () => undefined,                                          // the order is a comfort: a failed report changes nothing the owner decided
+    );
+  }, []);
   const prev = useCallback(() => { touched.current = true; setIndex((i) => Math.max(i - 1, 0)); }, []);
 
   // Desktop keyboard shortcuts (FR-35).

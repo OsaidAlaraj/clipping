@@ -895,6 +895,17 @@ def later(clip_id: str, body: DecisionIn, actor: Actor = Depends(current_actor))
     return run(actor, review.park, actor, clip_id, body.reason, body.session_id, body.client_action_id)
 
 
+class SkipIn(BaseModel):
+    anchor_id: str | None = None
+    session_id: str | None = None
+
+
+@app.post("/api/clips/{clip_id}/skip")
+def skip_clip(clip_id: str, body: SkipIn, actor: Actor = Depends(current_actor)):
+    """Swiped past without a decision: the clip returns after about five others, at most twice, then goes to Review Later."""
+    return run(actor, review.skip, actor, clip_id, body.anchor_id, body.session_id)
+
+
 @app.post("/api/reviews/undo")
 def undo(body: UndoIn, actor: Actor = Depends(current_actor)):
     return run(actor, review.undo, actor, body.review_id, body.client_action_id)
