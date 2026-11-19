@@ -171,12 +171,12 @@ describe("DW-7.2 optimistic actions", () => {
 
   it("a refused save for later puts the clip back where it was and says so", async () => {
     await open(feedRoutes(feedOf(3), { "POST /api/clips/c2/later": { __status: 403, body: { error: "This clip is closed." } } }));
-    fireEvent.keyDown(window, { key: "ArrowDown" });
-    expect(await screen.findByText("2 of 3")).toBeTruthy();
+    fireEvent.keyDown(window, { key: "ArrowDown" });        // c1 is skipped, so c2 is on screen
+    expect(await screen.findByText("Show 2")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Review later" }));
     await screen.findByText("This clip is closed.");
     expect(screen.getByText("The clip is back in your feed.")).toBeTruthy();
-    expect(screen.getByText("2 of 3")).toBeTruthy();
+    expect(screen.getByText("1 of 3")).toBeTruthy();
     expect(screen.getByText("Show 2")).toBeTruthy();
   });
 
@@ -286,8 +286,34 @@ describe("DW-7.3 the feed plays the next clip with no visible load", () => {
     await open(feedRoutes(feedOf(1000)));
     expect(videos().length).toBeLessThanOrEqual(4);
     for (let i = 0; i < 40; i += 1) fireEvent.keyDown(window, { key: "ArrowDown" });
-    expect(await screen.findByText("41 of 1000")).toBeTruthy();
+    // Six clips rotate at the front; each is skipped twice and the third skip parks it, so 40 skips park c1 to c12 and leave c17 first.
+    expect(await screen.findByText("Show 17")).toBeTruthy();
+    expect(screen.getByText("1 of 988")).toBeTruthy();
     expect(videos().length).toBeLessThanOrEqual(4);
+  });
+
+  it("a skipped clip returns after five other clips, and the third skip moves it to Review Later", async () => {
+    const { mock } = await open(feedRoutes(feedOf(8)));
+    fireEvent.keyDown(window, { key: "ArrowDown" });                    // skip c1: [c2..c6, c1, c7, c8]
+    for (let i = 0; i < 5; i += 1) { await screen.findByText(`Show ${i + 2}`); fireEvent.keyDown(window, { key: "a" }); }
+    expect(await screen.findByText("Show 1")).toBeTruthy();             // back after five others
+    expect(mock.posts("/api/clips/c1/skip")[0].body.anchor_id).toBe("c6");
+    fireEvent.keyDown(window, { key: "ArrowDown" });                    // second skip: it comes back once more
+    await screen.findByText("Show 7");
+    fireEvent.keyDown(window, { key: "ArrowDown" });                    // c7 skipped, then c8 is the only other clip
+    await screen.findByText("Show 8");
+    fireEvent.keyDown(window, { key: "ArrowDown" });
+    await screen.findByText("Show 1");
+    fireEvent.keyDown(window, { key: "ArrowDown" });                    // third skip of c1
+    await screen.findByText("Skipped three times: moved to Review Later.");
+    expect(mock.posts("/api/clips/c1/skip")).toHaveLength(3);
+    expect(screen.queryByText("Show 1")).toBeNull();
+  });
+
+  it("the server's order is shown as it comes: a clip already skipped is not moved again by the screen", async () => {
+    await open(feedRoutes([clip("c1", { campaign_name: "Show 1" }), clip("c2", { campaign_name: "Show 2", skip_count: 1 })]));
+    expect(screen.getByText("Show 1")).toBeTruthy();
+    expect(screen.getByText("1 of 2")).toBeTruthy();
   });
 
   it("a feed seen a moment ago is on screen straight away, and the fresh one replaces it before anything is decided", async () => {

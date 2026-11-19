@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import math
+import uuid
 from decimal import Decimal
 from statistics import NormalDist
 
@@ -142,7 +143,7 @@ CLIP_VIEW = """
     select cl.id, cl.status, cl.created_at, cl.version_no, cl.duration_s, cl.caption_text, cl.hashtags, cl.mentions,
            cl.language, cl.dialect, cl.compliance_status, cl.compliance_report, cl.file_path, cl.file_hash, cl.platform,
            cl.hook_score, cl.park_reason, cl.due_at, cl.render_meta, cl.campaign_id, cl.account_id, cl.start_s, cl.end_s,
-           cl.candidate_id, cl.approved_file_hash, cl.campaign_version_id,
+           cl.candidate_id, cl.approved_file_hash, cl.campaign_version_id, cl.skip_count, cl.skip_anchor, cl.skipped_at,
            (select source_id from candidates where id = cl.candidate_id) as source_id,
            c.name as campaign_name, c.deadline, c.status as campaign_status, c.is_practice,
            (select reason from candidates where id = cl.candidate_id) as moment_reason,
@@ -178,6 +179,22 @@ def _decorate(conn, rows: list[dict], operator_id=None) -> list[dict]:
     return rows
 
 
+SKIP_GAP = 5          # a skipped clip comes back after about this many other clips
+MAX_RETURNS = 2       # it comes back at most twice; the third skip moves it to Review Later
+
+
+def place_skipped(ranked: list[dict]) -> list[dict]:
+    """Skipped clips leave their ranked place and sit after the clip they were skipped behind (else after SKIP_GAP clips).
+    Clips skipped earlier are placed first, so a later skip can land behind an earlier one."""
+    out = [c for c in ranked if not c.get("skip_count")]
+    movers = sorted((c for c in ranked if c.get("skip_count")), key=lambda c: c.get("skipped_at") or dt.datetime.min.replace(tzinfo=dt.timezone.utc))
+    for clip in movers:
+        ids = [str(c["id"]) for c in out]
+        anchor = str(clip["skip_anchor"]) if clip.get("skip_anchor") else None
+        out.insert(ids.index(anchor) + 1 if anchor in ids else min(SKIP_GAP, len(out)), clip)
+    return out
+
+
 def feed(conn, operator_id, campaign_id=None) -> list[dict]:
     """Recalculated on every load. Review Later clips are not here; hard-blocked clips never are."""
     if kill_switch_on(conn):
@@ -187,7 +204,7 @@ def feed(conn, operator_id, campaign_id=None) -> list[dict]:
             and cl.compliance_status in ('pass', 'review') and (%s::uuid is null or cl.campaign_id = %s)""",
         (campaign_id, campaign_id),
     ).fetchall()
-    return rank_feed(_decorate(conn, rows, operator_id), weights_for(conn, operator_id))
+    return place_skipped(rank_feed(_decorate(conn, rows, operator_id), weights_for(conn, operator_id)))
 
 
 def review_later(conn) -> list[dict]:
@@ -290,6 +307,24 @@ def park(conn, actor, clip_id, reason: str | None = None, session_id=None, clien
     if clip["status"] == "ready_for_review":
         _bump(conn, session_id, "parked")
     return review
+
+
+def skip(conn, actor, clip_id, anchor_id: str | None = None, session_id=None) -> dict:
+    """The owner swiped past a clip without deciding. It comes back after about SKIP_GAP other clips, at most MAX_RETURNS times;
+    the next skip moves it to Review Later. A clip that was decided in the meantime is left alone."""
+    clip = get_clip(conn, clip_id)
+    if clip["status"] != "ready_for_review":
+        return {"clip_id": str(clip["id"]), "skipped": False, "parked": False, "status": clip["status"]}
+    count = int(clip["skip_count"]) + 1
+    if count > MAX_RETURNS:
+        park(conn, actor, clip_id, "Skipped three times", session_id)
+        return {"clip_id": str(clip["id"]), "skipped": True, "parked": True, "skip_count": count}
+    try:
+        anchor = str(uuid.UUID(str(anchor_id))) if anchor_id and str(anchor_id) != str(clip["id"]) else None
+    except ValueError:
+        anchor = None
+    conn.execute("update clips set skip_count = %s, skip_anchor = %s, skipped_at = now() where id = %s", (count, anchor, clip_id))
+    return {"clip_id": str(clip["id"]), "skipped": True, "parked": False, "skip_count": count}
 
 
 def undo(conn, actor, review_id, client_action_id=None) -> dict:

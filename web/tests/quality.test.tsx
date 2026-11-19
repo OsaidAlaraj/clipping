@@ -41,10 +41,10 @@ describe("quality on the review card", () => {
     const card = await openFeed([clip("c1", { quality: OK }), clip("c2", { quality: OK }), clip("c3", { quality: WEAK })]);
     expect(screen.getByText("1 of 3")).toBeTruthy();
     expect(card).toBeTruthy();
+    fireEvent.keyDown(window, { key: "ArrowDown" });        // each skip sends the clip to the back, so two skips bring the weak one up
     fireEvent.keyDown(window, { key: "ArrowDown" });
-    fireEvent.keyDown(window, { key: "ArrowDown" });
-    await waitFor(() => expect(screen.getByText("3 of 3")).toBeTruthy());
-    expect(screen.getByTestId("quality").textContent).toMatch(/^Weak/);
+    await waitFor(() => expect(screen.getByTestId("quality").textContent).toMatch(/^Weak/));
+    expect(screen.getByText("1 of 3")).toBeTruthy();
   });
 
   it("says there is no minimum when the campaign has none, and shows nothing for an older server without quality", async () => {

@@ -31,6 +31,7 @@ export type Clip = {
   hook_text: string | null;
   hooks: Hook[];
   park_reason: string | null;
+  skip_count?: number;
   deadline: string | null;
   due_at: string | null;
   rate_per_1k: number | null;
