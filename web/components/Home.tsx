@@ -85,6 +85,11 @@ export function CampaignCard({ card, onApprove, onPark, onOpen }: { card: Card; 
   );
 }
 
+/** Stories with clips left come first (most clips first); finished ones go last. Ties keep the server's order. */
+export function orderStories<T extends { clips_ready: number }>(stories: T[]): T[] {
+  return stories.map((story, i) => ({ story, i })).sort((a, b) => b.story.clips_ready - a.story.clips_ready || a.i - b.i).map((x) => x.story);
+}
+
 export default function Home() {
   const router = useRouter();
   const home = useData<HomeData>("/api/home");
@@ -124,7 +129,7 @@ export default function Home() {
             <span className="ring add"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></span>
             <span className="name">Find more</span>
           </Link>
-          {data.stories.map((story) => {
+          {orderStories(data.stories).map((story) => {
             const byBudget = story.budget_left_pct !== null;
             const p = byBudget ? story.budget_left_pct! : story.hours_to_deadline !== null ? Math.max(0, Math.min(100, (story.hours_to_deadline / (14 * 24)) * 100)) : 100;
             return (
