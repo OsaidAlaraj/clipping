@@ -21,23 +21,46 @@ def empty_transcript_message(words: list[dict], duration_s: float, language: str
             f"The video may be in another language than '{language}'. Check the language and transcribe again.")
 
 
-def detect_language(audio_path: str, samples: int = 3) -> str | None:
-    """Language code from local Whisper on a few 30 s samples (the most common answer), or None when it cannot be told.
-    Used at upload to pre-select the language and warn when the owner's choice disagrees."""
+SUPPORTED = ("en", "ar")
+
+
+def _sample(video, at_s: float, seconds: int = 30):
+    """16 kHz mono float samples of `seconds` from `at_s`, read straight from the video (no full-length audio file)."""
+    import numpy as np
+    from . import ffmpeg
+    import subprocess
+    raw = subprocess.run([ffmpeg.exe(), "-v", "error", "-nostdin", "-ss", f"{at_s:.1f}", "-t", str(seconds), "-i", str(video), "-vn", "-ac", "1",
+                          "-ar", "16000", "-f", "s16le", "-"], capture_output=True, timeout=300).stdout
+    return np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+
+
+def detect_language(video, duration_s: float | None = None, samples: int = 3) -> str | None:
+    """'en' or 'ar' from local Whisper on a few 30 s samples spread over the video (the most common confident answer), or None when
+    it cannot be told (no speech, a model error, another language). Used at upload to warn on a wrong choice and after a thin
+    transcript to retry in the right language."""
+    from . import config
+    if config.use_fakes():
+        return None          # tests and demos run without the real models
     try:
-        from .adapters.transcription import load_whisper_model, read_wav
         import collections
-        audio = read_wav(audio_path)
-        model = load_whisper_model("small", "auto", "int8")
-        rate, span = 16000, 30 * 16000
-        votes = collections.Counter()
+        from . import ffmpeg
+        from .adapters.transcription import cuda_available, load_whisper_model
+        duration = duration_s or ffmpeg.probe(video)["duration_s"]
+        device = "cuda" if cuda_available() else "cpu"
+        model = load_whisper_model("large-v3-turbo", device, "float16" if device == "cuda" else "int8")
+        votes: collections.Counter = collections.Counter()
         for k in range(samples):
-            at = int((k + 1) * len(audio) / (samples + 1))
-            chunk = audio[at:at + span]
-            if len(chunk) >= rate * 5:
+            chunk = _sample(video, duration * (k + 1) / (samples + 1))
+            if len(chunk) >= 16000 * 5:
                 lang, prob, _ = model.detect_language(chunk)
-                if prob >= 0.5:
+                if prob >= 0.6:
                     votes[lang] += 1
         return votes.most_common(1)[0][0] if votes else None
     except Exception:
         return None
+
+
+def mismatch_message(chosen: str, detected: str | None) -> str | None:
+    if detected and detected in SUPPORTED and detected != chosen:
+        return f"This video sounds like '{detected}', but '{chosen}' is selected. Transcribing in the wrong language gives an empty transcript."
+    return None

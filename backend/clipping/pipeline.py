@@ -113,14 +113,42 @@ def _transcribe(conn, source: dict, campaign: dict, version: dict, video: Path) 
         request["audio_path"] = str(audio)
         try:
             result = registry.call(conn, "transcription", "transcribe", request, owner)
-            problem = language_check.empty_transcript_message(result[0].get("words") or [], request["duration_s"], source["language"])
-            if problem:
-                raise_alert(conn, owner, "transcript_too_thin", "warn", "source_assets", source["id"], f"{campaign['name']}: {problem}")
-            return result
+            return _retry_if_thin(conn, source, campaign, video, request, result, owner)
         except AdapterPaused as exc:
             raise_alert(conn, owner, "transcription_paused", "warn", "source_assets", source["id"],
                         f"{campaign['name']}: {exc} The local Whisper transcribes this video instead.")
+            detected = language_check.detect_language(video, request["duration_s"])   # never force Whisper into a language the audio is not in
+            if detected in language_check.SUPPORTED and detected != request["language"]:
+                request = {**request, "language": detected, "dialect_hint": None}
+                _set_source_language(conn, source, detected)
             return registry.call(conn, "transcription", "transcribe", request, owner, provider=LOCAL_TRANSCRIBER)
+
+
+def _set_source_language(conn, source: dict, language: str) -> None:
+    conn.execute("update source_assets set language = %s, dialect = null where id = %s", (language, source["id"]))
+    audit(conn, "source.language_corrected", "source_assets", source["id"], {"from": source["language"], "to": language})
+    source["language"], source["dialect"] = language, None   # the caller stores the transcript under the corrected language
+
+
+def _retry_if_thin(conn, source: dict, campaign: dict, video: Path, request: dict, result: tuple, owner) -> tuple[dict, Decimal]:
+    """A long video with almost no words is in another language than the one chosen. Alert, detect the language, and transcribe ONCE
+    more in it; keep whichever transcript has more words."""
+    words, cost = result[0].get("words") or [], result[1]
+    problem = language_check.empty_transcript_message(words, request["duration_s"], source["language"])
+    if not problem:
+        return result
+    raise_alert(conn, owner, "transcript_too_thin", "warn", "source_assets", source["id"], f"{campaign['name']}: {problem}")
+    detected = language_check.detect_language(video, request["duration_s"])
+    if detected not in language_check.SUPPORTED or detected == source["language"]:
+        return result
+    retry_request = {**request, "language": detected, "dialect_hint": None}
+    retry = registry.call(conn, "transcription", "transcribe", retry_request, owner)
+    total = cost + retry[1]
+    if len(retry[0].get("words") or []) <= len(words):
+        return result[0], total
+    _set_source_language(conn, source, detected)
+    audit(conn, "transcription.retried_in_detected_language", "source_assets", source["id"], {"language": detected})
+    return retry[0], total
 
 
 def _drop_fake_transcript_if_real_provider(conn, source: dict) -> None:

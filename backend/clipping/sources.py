@@ -10,7 +10,7 @@ from decimal import Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import campaigns, config, ffmpeg, signals
+from . import campaigns, config, ffmpeg, language_check, signals
 from .adapters import heatmap
 from .core import AppError, GateError, audit, enqueue
 from .db import Actor
@@ -73,8 +73,12 @@ def register_upload(conn, actor, campaign_id, path: Path, language: str, permiss
             ffmpeg.probe(path)
         except Exception:
             raise AppError("That file is not a video the system can read.", "not_a_video") from None
-        return campaigns.register_source(conn, actor, campaign_id, str(path), language, permission_ref=permission_ref,
-                                         origin_url=f"upload:{filename or path.name}")
+        detected = language_check.detect_language(path)
+        result = campaigns.register_source(conn, actor, campaign_id, str(path), language, permission_ref=permission_ref,
+                                           origin_url=f"upload:{filename or path.name}")
+        if isinstance(result, dict):   # the owner's choice stands; the answer carries the detection so the form can pre-select and warn
+            result = {**result, "detected_language": detected, "language_warning": language_check.mismatch_message(language, detected)}
+        return result
     finally:
         path.unlink(missing_ok=True)
 

@@ -1,0 +1,3 @@
+UPLOAD {'detected_language': 'en', 'language_warning': "This video sounds like 'en', but 'ar' is selected. Transcribing in the wrong language gives an empty transcript."}
+RESULT {'language': 'en', 'provider': 'deepgram', 'language_code': 'en', 'word_json_path': 'transcripts/8e788ecd08134b9bffb18f63fc3bdad3b8facd8f7ebd9fa5afe9254f553b86e2_en_default_deepgram.json', 'source': {'language': 'en', 'dialect': None}}
+WORDS 875
