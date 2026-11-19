@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { api, ApiError } from "@/lib/api";
 import { clearCache } from "@/lib/data";
+import { Logo } from "./Shell";
 
 function nextPath(): string {
   if (typeof window === "undefined") return "/";
@@ -57,7 +58,7 @@ export default function SignIn() {
 
   return (
     <div className="page" style={{ maxWidth: 440, margin: "0 auto", minHeight: "80dvh", alignContent: "center" }}>
-      <span className="wordmark" style={{ fontSize: "2rem" }}>clipping</span>
+      <span className="wordmark" style={{ fontSize: "2rem" }}><Logo size={40} /></span>
       {!setup ? (
         <div className="card stack" style={{ gap: 14 }}>
           <h1 style={{ fontSize: "1.4rem" }}>Sign in</h1>
