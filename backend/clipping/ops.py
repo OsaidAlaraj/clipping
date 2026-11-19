@@ -5,7 +5,7 @@ import datetime as dt
 import threading
 import time
 
-from . import alerts, campaigns, config, ledger, pipeline
+from . import alerts, backup, campaigns, config, ledger, pipeline
 from .core import audit, get_setting, kill_switch
 from .db import Actor, Database
 
@@ -148,6 +148,10 @@ def housekeeping(db: Database) -> None:
                     moment_learning.learn(conn, row["id"])
                 except Exception:   # learning must never stop housekeeping
                     pass
+    try:   # one automatic dump per 24 hours; a failure is alerted and never stops the rest of housekeeping
+        backup.run_if_due(db.dsn)
+    except Exception as exc:
+        _alert_backup_failed(db, exc)
     with db.session(Actor.worker()) as conn:
         for row in conn.execute("select id from operators where status = 'active'").fetchall():
             alerts.evaluate(conn, row["id"])
@@ -157,6 +161,16 @@ def housekeeping(db: Database) -> None:
 
     with db.session(Actor.worker()) as conn:
         publish.sweep(conn)      # a send that never finished becomes needs_check; processing posts get their next status check
+
+
+def _alert_backup_failed(db: Database, exc: Exception) -> None:
+    try:
+        with db.session(Actor.worker()) as conn:
+            for row in conn.execute("select id from operators where role = 'admin'").fetchall():
+                alerts.raise_alert(conn, row["id"], "backup_failed", "info", None, None,
+                                   f"Automatic database backup failed: {config.redact(str(exc))[:200]}")
+    except Exception:
+        pass   # the alert itself must not stop housekeeping either
 
 
 _awake = {"on": False}

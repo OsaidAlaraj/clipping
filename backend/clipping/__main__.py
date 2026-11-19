@@ -7,6 +7,8 @@
   demo       run the sample-campaign demo and print the run log
   keepalive  run the database keep-alive once
   stop       stop the embedded Postgres if it was left running
+  backup     write a database dump now into .data/backups (keeps the newest 14)
+  restore    restore a dump into a new scratch database (never the live one)
 """
 from __future__ import annotations
 
@@ -20,6 +22,10 @@ from .db import get_db
 def main(argv: list[str]) -> int:
     config.load_dotenv()
     command = argv[1] if len(argv) > 1 else "dev"
+    if command in ("backup", "restore"):
+        from . import backup
+
+        return backup.cli(argv)
     if command == "stop":   # stop the embedded Postgres if an abrupt exit left it running
         from . import db as dbmod
 

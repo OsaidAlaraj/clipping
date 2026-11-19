@@ -170,3 +170,4 @@ Decided by the owner, with these limits (relayed in the session notes; the owner
 - **Kept as tie-break only: MediaPipe FaceLandmarker mouth activity** (Apache-2.0). 76 % in crop vs YuNet 89 % on single-face shots; its value is on wide two-shots, which the sample did not contain. Not adopted.
 - **Not run:** OpenShorts, wjs-reframing-video, clipsai resize, AutoFlip, TalkNet, Light-ASD (see docs/survey-table.md). No candidate was rejected on evidence there.
 - **Method limits:** the reference face is a detector consensus (YuNet-favoured); video C is slides with no face, so it measures nothing. Frame strips are included for checking by eye.
+- **Automatic backups.** One pg_dump (custom format) per 24 hours from housekeeping into `.data/backups`, newest 14 kept; `python run.py backup` for a dump now, `python -m clipping restore <file>` restores into a new scratch database, never the live one.

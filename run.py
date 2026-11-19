@@ -8,6 +8,7 @@
                                    (local Whisper, signals-only ranking), whatever is in .env
     python run.py phone    make the app reachable from your phone through Tailscale
     python run.py stop     stop the local Postgres if a killed run left it running
+    python run.py backup   write a database dump now into .data/backups (keeps the newest 14)
 
 Needs Python 3.11+ and Node 20+ (with pnpm or npm). Postgres and FFmpeg are installed into .venv by pip.
 """
@@ -167,6 +168,8 @@ def main() -> int:
             return subprocess.call([str(PY), "-m", "clipping", "demo"], cwd=BACKEND, env=demo_env(tmp, "--no-keys" in sys.argv[2:]))
     if command == "stop":
         return subprocess.call([str(PY), "-m", "clipping", "stop"], cwd=BACKEND, env=env())
+    if command == "backup":
+        return subprocess.call([str(PY), "-m", "clipping", "backup"], cwd=BACKEND, env=env())
     if command not in ("start", "up"):
         print(__doc__)
         return 2
