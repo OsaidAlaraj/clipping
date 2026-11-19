@@ -16,10 +16,11 @@ from .base import Adapter, register
 
 # ------------------------------------------------------------------ the template: what makes an account's clips look like its own
 
-TEMPLATE_DEFAULTS: dict = {"font": "Arial", "primary": "#FFFFFF", "accent": "#FFC400", "caption_position": "lower",
+TEMPLATE_DEFAULTS: dict = {"layout": "auto", "font": "Arial", "primary": "#FFFFFF", "accent": "#FFC400", "caption_position": "lower",
                            "title_card": True, "progress_bar": True, "zooms": True, "font_size": 4.2, "cover": "band"}
 CAPTION_POSITIONS = ("lower", "middle")
 COVER_STYLES = ("band", "outline")
+LAYOUTS = ("auto", "blur_pad")   # auto: the profile crop decides; blur_pad: the whole picture centred on a blurred, darkened 9:16 copy
 FLAGS = ("title_card", "progress_bar", "zooms")
 FONT_SIZE_RANGE = (2.5, 6.5)          # caption size as a percentage of the frame height
 _FONT = re.compile(r"^\w[\w .\-]{0,59}$")
@@ -38,6 +39,8 @@ def _checked(key: str, value):
         raise _bad(f"The {key} colour must look like #FFC400.")
     if key == "caption_position" and value not in CAPTION_POSITIONS:
         raise _bad("The caption position must be lower or middle.")
+    if key == "layout" and value not in LAYOUTS:
+        raise _bad("The layout must be auto or blur_pad.")
     if key == "cover" and value not in COVER_STYLES:
         raise _bad("The cover style must be band or outline.")
     if key in FLAGS and not isinstance(value, bool):
@@ -101,6 +104,10 @@ FACE_MIN_SHARE = 0.02          # skin-toned share of the frame below which nobod
 def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay", path: list[tuple[float, float]] | None = None) -> str:
     """The reframing part of the filter graph, ending at the pad `[label]`. `facecam_over_game` keeps the whole picture (the
     facecam stays in it) fitted to the width over a blurred fill; every other style is a 9:16 crop."""
+    if style == "blur_pad":
+        return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
+                f"boxblur=luma_radius=30:luma_power=2,eq=brightness=-0.18[bg];[fga]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease[fg];"
+                f"[bg][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,setsar=1[{label}]")
     if style == "facecam_over_game" and src_w / src_h > out_w / out_h:
         return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
                 f"boxblur=luma_radius=24:luma_power=2[bg];[fga]scale={out_w}:-2[fg];"
@@ -398,6 +405,8 @@ class FFmpegRender(Adapter):
         width, height = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
         start, end = float(clip["start_s"]), float(clip["end_s"])
         duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
+        if tpl["layout"] == "blur_pad" and self.force_crop is None:
+            style = "blur_pad"
         tracked = faces.track(src_path, clip) if style in FOLLOW_STYLES else None   # YuNet path; None falls back to the old single-point focus
         path, focus = (tracked if tracked else (None, face_focus(src_path, clip) if style in FOLLOW_STYLES else None))
         events = caption_events(words, start, end, clip.get("platform") in SOCIAL_PLATFORMS, clip.get("emphasis") or [], tpl["accent"])
