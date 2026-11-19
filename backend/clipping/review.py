@@ -133,9 +133,10 @@ def _annotate_quality(conn, rows: list[dict], operator_id) -> None:
         q = moment_percentile(row.pop("moment_score", None), scores.get(row.get("source_id"), []))
         min_views = row.get("min_views_to_qualify")
         p = chance_to_clear(min_views, q, stats[key])
-        weak = p is not None and p < threshold
+        gate = (row.get("render_meta") or {}).get("gate")
+        weak = (p is not None and p < threshold) or bool(gate and gate.get("status") == "fail")   # a failed quality gate sinks the clip too
         row["quality"] = {"p_clear": None if p is None else round(p, 3), "label": quality_label(p, min_views, stats[key]["basis"], weak),
-                          "basis": stats[key]["basis"], "weak": weak, "min_views": int(float(min_views)) if min_views else None,
+                          "basis": stats[key]["basis"], "weak": weak, "gate": gate, "min_views": int(float(min_views)) if min_views else None,
                           "moment_percentile": None if q is None else round(q, 3), "threshold": threshold}
 
 
