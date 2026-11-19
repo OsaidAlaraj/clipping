@@ -24,3 +24,4 @@ Classes: bug, small, big (goes to `open-items.md`), question.
 | 2026-11-19 | Profile account rows still ugly on phone: compact collapsible cards, one primary action | small | redesigned, checked at 375 px | 1cb11b2, c008e38 |
 | 2026-11-19 | Phone nav still uneven; dev "1 Issue" badge on Home icon | small | 5 equal columns, active = fixed circle; dev badge kept (owner asked). The console shows only a service-worker fetch error in the test browser, no hydration warning, so no change to the body tag | f624799 |
 | 2026-11-19 | Clips look dumb (cuts, scenes, cropping); 109-min Arabic podcast had no clips | big | diagnosed, see `docs/quality-diagnosis.md`; fixes await owner OK | see git log |
+| 2026-11-19 | Add objective clip standards, market calibration benchmark (all platforms, anonymous), decision recorded | big | planned in quality-diagnosis.md sections 7 to 9; no download yet | see git log |

@@ -150,3 +150,15 @@ Decided during phase E. These replace earlier lines where they conflict.
 - **Manual target only for unconnected platforms.** A connected platform cannot be posted by hand yet.
 - **Pasted links on the platform's own host.** A pasted link must be on that platform's own site. Other links are refused.
 - **Morning summary at 08:00.** Drafts, private uploads and other "finish in the app" items appear in one daily summary from 08:00.
+
+---
+
+# Benchmark downloads (2026-11-19)
+
+Decided by the owner, with these limits (relayed in the session notes; the owner's words are the source):
+- **Internal measurement only.** Videos from any platform may be downloaded to train and test the moment and crop models. Nothing is posted, shared or re-uploaded. Videos, frames and audio are deleted after the features and metrics are extracted; only numbers, labels and small feature files stay.
+- **Location.** `.data/benchmark/` on drive L only, with `.data/benchmark/manifest.json` listing source URL, platform, date, size and deletion status.
+- **Anonymous access only.** No cookies, logins or tokens from the owner's real accounts. If a platform refuses anonymous access, report it; no workaround. Twitch metadata only through the official Helix API with an app token.
+- **Gentle pace.** About 2 downloads a minute at most, a small total, and the first batch limited to 10 videos. The bulk runs after the owner confirms their social accounts exist, so downloading does not hurt the IP reputation those accounts start with.
+- **Platforms in scope.** YouTube, Twitch, TikTok, Instagram, Facebook. YouTube and Twitch give usable crowd labels; the others give one number per finished short or nothing.
+- **Plan.** `docs/quality-diagnosis.md`, sections 7 to 9.
