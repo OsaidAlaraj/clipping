@@ -287,35 +287,65 @@ function AudienceField({ account, onSaved }: { account: Account; onSaved: () => 
     catch (e) { fail(e); } finally { setBusy(false); }
   };
   const top = Object.entries(account.audience_countries ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const canRead = account.platform !== "tiktok";
+  const hint = (account.audience_source ? `Audience ${SOURCE_LABEL[account.audience_source] ?? account.audience_source}` : `Find it: ${WHERE_TO_LOOK[account.platform] ?? "the platform's audience page"}`)
+    + (top.length > 0 ? ` · ${top.map(([c, v]) => `${c} ${Math.round(v)}%`).join(", ")}` : "");
+  const shot = <input type="file" accept="image/*" className="sr-only" aria-label={`Audience screenshot for @${account.handle}`} onChange={(e) => readScreenshot(e.target.files?.[0])} />;
   return (
-    <div className="aud stack small">
-      <div className="aud-fields">
-        <div className="field">
-          <label htmlFor={`lang-${account.id}`}>Posts in</label>
-          <select id={`lang-${account.id}`} className="input" value={account.language ?? ""}
-            onChange={(e) => save({ language: e.target.value || null, tier1_pct: account.audience_tier1_pct ?? null })}>
-            <option value="">Not set</option>
-            {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor={`t1-${account.id}`}>US/UK/CA/AU audience %</label>
-          <input id={`t1-${account.id}`} className="input" inputMode="numeric" placeholder="?"
-            value={value} onChange={(e) => setValue(e.target.value)} onBlur={() => save({ tier1_pct: value.trim() === "" ? null : Number(value) })} />
-        </div>
+    <div className="aud">
+      <div className="field">
+        <label htmlFor={`lang-${account.id}`}>Posts in</label>
+        <select id={`lang-${account.id}`} className="input" value={account.language ?? ""}
+          onChange={(e) => save({ language: e.target.value || null, tier1_pct: account.audience_tier1_pct ?? null })}>
+          <option value="">Not set</option>
+          {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </select>
       </div>
-      <span className="muted">
-        {account.audience_source ? `Audience ${SOURCE_LABEL[account.audience_source] ?? account.audience_source}` : `Not filled yet. Screenshot: ${WHERE_TO_LOOK[account.platform] ?? "the platform's audience page"}`}
-        {top.length > 0 && ` · ${top.map(([c, v]) => `${c} ${Math.round(v)}%`).join(", ")}`}
-      </span>
-      <div className="row wrap aud-actions">
-        {account.platform !== "tiktok" && <button className="btn dark" disabled={busy} onClick={fromPlatform}>Read from the platform</button>}
-        <label className="btn">
-          {busy ? "Reading…" : "Read from a screenshot"}
-          <input type="file" accept="image/*" className="sr-only" aria-label={`Audience screenshot for @${account.handle}`} onChange={(e) => readScreenshot(e.target.files?.[0])} />
-        </label>
+      <div className="field">
+        <label htmlFor={`t1-${account.id}`}>Audience in US/UK/CA/AU, %</label>
+        <input id={`t1-${account.id}`} className="input" inputMode="numeric" placeholder="?"
+          value={value} onChange={(e) => setValue(e.target.value)} onBlur={() => save({ tier1_pct: value.trim() === "" ? null : Number(value) })} />
+        <span className="hint" title={hint}>{hint}</span>
+      </div>
+      <div className="aud-actions">
+        {canRead ? (
+          <>
+            <button className="btn primary block" disabled={busy} onClick={fromPlatform}>Read from the platform</button>
+            <label className="linkbtn">{busy ? "Reading…" : "Read from a screenshot"}{shot}</label>
+          </>
+        ) : (
+          <label className="btn primary block">{busy ? "Reading…" : "Read from a screenshot"}{shot}</label>
+        )}
       </div>
       {error && <span className="error" role="alert">{error}</span>}
+    </div>
+  );
+}
+
+const PLATFORM_SHORT: Record<string, string> = { tiktok: "TT", instagram_reels: "IG", youtube_shorts: "YT" };
+
+/** One account: a compact row (platform, handle, status, one-line summary) that opens to the audience fields and the look. */
+function AccountCard({ account, onSaved }: { account: Account; onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const pct = account.audience_tier1_pct;
+  const summary = `Posts in: ${LANGUAGES[account.language ?? ""] ?? "Not set"} · Audience: ${pct === null || pct === undefined ? "?" : `${pct}%`}`;
+  return (
+    <div className="acct">
+      <button type="button" className="acct-head" aria-expanded={open} aria-controls={`acct-${account.id}`} onClick={() => setOpen(!open)}>
+        <span className="acct-mark" aria-hidden="true">{PLATFORM_SHORT[account.platform] ?? "?"}</span>
+        <span className="acct-main">
+          <strong>@{account.handle}</strong>
+          <span className="small muted">{summary}</span>
+        </span>
+        <span className={`badge ${account.status === "active" ? "pass" : "review"}`}>{account.status}</span>
+        <span className="chev" aria-hidden="true" data-open={open} />
+      </button>
+      {open && (
+        <div id={`acct-${account.id}`} className="acct-body">
+          <AudienceField account={account} onSaved={onSaved} />
+          <AccountLook accountId={account.id} />
+        </div>
+      )}
     </div>
   );
 }
@@ -370,18 +400,9 @@ export function Profile() {
         <h2>Your accounts</h2>
         <p className="small muted">One account per platform for each niche. The system never stores passwords, only the handle. Set the language each account posts in, and its US/UK/Canada/Australia audience share: many campaigns only pay for those views, and the ranking uses both. A screenshot of the platform's audience page is enough.</p>
         {Object.entries(byNiche).map(([niche, list]) => (
-          <div key={niche} className="card stack">
-            <strong style={{ textTransform: "capitalize" }}>{niche.replace("_", " ")}</strong>
-            {list.map((a) => (
-              <div key={a.id} className="stack" style={{ gap: 4, paddingBottom: 8, borderBottom: "1px solid var(--surface-2)" }}>
-                <div className="row between">
-                  <span>@{a.handle}</span>
-                  <span className="row small"><span className="muted">{PLATFORM_LABEL[a.platform] ?? a.platform}</span><span className={`badge ${a.status === "active" ? "pass" : "review"}`}>{a.status}</span></span>
-                </div>
-                <AudienceField account={a} onSaved={load} />
-                <AccountLook accountId={a.id} />
-              </div>
-            ))}
+          <div key={niche} className="stack" style={{ gap: 8 }}>
+            <h3 className="group-label">{niche.replace("_", " ")}</h3>
+            {list.map((a) => <AccountCard key={a.id} account={a} onSaved={load} />)}
           </div>
         ))}
         <div className="card stack">

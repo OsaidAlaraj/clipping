@@ -138,9 +138,8 @@ export function AccountLook({ accountId }: { accountId: string }) {
 
   return (
     <div className="stack" style={{ gap: 8 }}>
-      <button type="button" className="btn ghost" aria-expanded={open} aria-controls={`look-${accountId}`} onClick={() => setOpen(!open)}
-        style={{ minHeight: 44, justifyContent: "space-between", padding: "0 4px" }}>
-        <span>Look and posting plan</span><span aria-hidden="true">{open ? "−" : "+"}</span>
+      <button type="button" className="sect-toggle" aria-expanded={open} aria-controls={`look-${accountId}`} onClick={() => setOpen(!open)}>
+        <span>Look and posting plan</span><span className="chev" aria-hidden="true" data-open={open} />
       </button>
       {open && (
         <div id={`look-${accountId}`} className="stack" style={{ gap: 12, minHeight: 260 }}>
