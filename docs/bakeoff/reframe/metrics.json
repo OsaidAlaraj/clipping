@@ -1,0 +1,467 @@
+{
+ "A_gaming_s0": {
+  "skin": {
+   "in_crop_pct": 84.6,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 84.6,
+   "jitter_px": 40.23,
+   "time_s": 1.66,
+   "facecam_found_pct": 100.0
+  },
+  "blaze": {
+   "in_crop_pct": 76.9,
+   "jitter_px": 14.57,
+   "time_s": 0.28,
+   "facecam_found_pct": 1.1
+  },
+  "mouth": {
+   "in_crop_pct": 61.5,
+   "jitter_px": 13.32,
+   "time_s": 0.41,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 286.6,
+   "ref_frames": 13,
+   "n": 90
+  }
+ },
+ "A_gaming_s1": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 1.63,
+   "facecam_found_pct": 100.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 0.72,
+   "time_s": 0.4,
+   "facecam_found_pct": 1.1
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.4,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 740.3,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "A_gaming_s2": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 5.65,
+   "time_s": 1.59,
+   "facecam_found_pct": 100.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.38,
+   "facecam_found_pct": 0.0
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.36,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 1194.1,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "A_gaming_s3": {
+  "skin": {
+   "in_crop_pct": 0.0,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 100.0,
+   "jitter_px": 4.84,
+   "time_s": 1.28,
+   "facecam_found_pct": 100.0
+  },
+  "blaze": {
+   "in_crop_pct": 100.0,
+   "jitter_px": 15.55,
+   "time_s": 0.24,
+   "facecam_found_pct": 1.1
+  },
+  "mouth": {
+   "in_crop_pct": 100.0,
+   "jitter_px": 8.43,
+   "time_s": 0.26,
+   "facecam_found_pct": 1.1
+  },
+  "_meta": {
+   "t0": 1647.8,
+   "ref_frames": 1,
+   "n": 90
+  }
+ },
+ "A_gaming_s4": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 2.92,
+   "time_s": 1.54,
+   "facecam_found_pct": 100.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 3.53,
+   "time_s": 0.34,
+   "facecam_found_pct": 56.7
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.88,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 2101.6,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "B_interview_s0": {
+  "skin": {
+   "in_crop_pct": 1.1,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 95.6,
+   "jitter_px": 64.21,
+   "time_s": 2.02,
+   "facecam_found_pct": 71.1
+  },
+  "blaze": {
+   "in_crop_pct": 70.0,
+   "jitter_px": 101.3,
+   "time_s": 0.24,
+   "facecam_found_pct": 72.2
+  },
+  "mouth": {
+   "in_crop_pct": 70.0,
+   "jitter_px": 75.01,
+   "time_s": 2.06,
+   "facecam_found_pct": 71.1
+  },
+  "_meta": {
+   "t0": 782.2,
+   "ref_frames": 90,
+   "n": 90
+  }
+ },
+ "B_interview_s1": {
+  "skin": {
+   "in_crop_pct": 7.8,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 97.8,
+   "jitter_px": 1.18,
+   "time_s": 1.75,
+   "facecam_found_pct": 0.0
+  },
+  "blaze": {
+   "in_crop_pct": 97.8,
+   "jitter_px": 1.17,
+   "time_s": 0.34,
+   "facecam_found_pct": 0.0
+  },
+  "mouth": {
+   "in_crop_pct": 97.8,
+   "jitter_px": 1.19,
+   "time_s": 1.28,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 2020.6,
+   "ref_frames": 90,
+   "n": 90
+  }
+ },
+ "B_interview_s2": {
+  "skin": {
+   "in_crop_pct": 0.0,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 100.0,
+   "jitter_px": 16.64,
+   "time_s": 1.56,
+   "facecam_found_pct": 100.0
+  },
+  "blaze": {
+   "in_crop_pct": 34.4,
+   "jitter_px": 162.15,
+   "time_s": 0.36,
+   "facecam_found_pct": 100.0
+  },
+  "mouth": {
+   "in_crop_pct": 96.7,
+   "jitter_px": 16.5,
+   "time_s": 2.22,
+   "facecam_found_pct": 97.8
+  },
+  "_meta": {
+   "t0": 3259.0,
+   "ref_frames": 90,
+   "n": 90
+  }
+ },
+ "B_interview_s3": {
+  "skin": {
+   "in_crop_pct": 15.6,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 60.0,
+   "jitter_px": 122.2,
+   "time_s": 2.03,
+   "facecam_found_pct": 48.9
+  },
+  "blaze": {
+   "in_crop_pct": 68.9,
+   "jitter_px": 80.36,
+   "time_s": 0.24,
+   "facecam_found_pct": 48.9
+  },
+  "mouth": {
+   "in_crop_pct": 68.9,
+   "jitter_px": 98.79,
+   "time_s": 3.51,
+   "facecam_found_pct": 28.9
+  },
+  "_meta": {
+   "t0": 4544.4,
+   "ref_frames": 90,
+   "n": 90
+  }
+ },
+ "B_interview_s4": {
+  "skin": {
+   "in_crop_pct": 26.7,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": 92.2,
+   "jitter_px": 78.4,
+   "time_s": 1.66,
+   "facecam_found_pct": 73.3
+  },
+  "blaze": {
+   "in_crop_pct": 60.0,
+   "jitter_px": 126.15,
+   "time_s": 0.41,
+   "facecam_found_pct": 73.3
+  },
+  "mouth": {
+   "in_crop_pct": 46.7,
+   "jitter_px": 44.51,
+   "time_s": 2.28,
+   "facecam_found_pct": 71.1
+  },
+  "_meta": {
+   "t0": 5735.9,
+   "ref_frames": 90,
+   "n": 90
+  }
+ },
+ "C_lecture_ar_s0": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 1.98,
+   "facecam_found_pct": 0.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 0.38,
+   "time_s": 0.71,
+   "facecam_found_pct": 0.0
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.44,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 355.7,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "C_lecture_ar_s1": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 4.92,
+   "time_s": 2.37,
+   "facecam_found_pct": 1.1
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 5.27,
+   "time_s": 0.57,
+   "facecam_found_pct": 1.1
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.66,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 918.8,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "C_lecture_ar_s2": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.96,
+   "facecam_found_pct": 0.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 10.74,
+   "time_s": 0.38,
+   "facecam_found_pct": 1.1
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.42,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 1482.0,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "C_lecture_ar_s3": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.01,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 1.48,
+   "facecam_found_pct": 0.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.36,
+   "facecam_found_pct": 0.0
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.33,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 2045.1,
+   "ref_frames": 0,
+   "n": 90
+  }
+ },
+ "C_lecture_ar_s4": {
+  "skin": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.0,
+   "facecam_found_pct": 0.0
+  },
+  "yunet": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.93,
+   "facecam_found_pct": 0.0
+  },
+  "blaze": {
+   "in_crop_pct": null,
+   "jitter_px": 0.33,
+   "time_s": 0.45,
+   "facecam_found_pct": 0.0
+  },
+  "mouth": {
+   "in_crop_pct": null,
+   "jitter_px": 0.0,
+   "time_s": 0.48,
+   "facecam_found_pct": 0.0
+  },
+  "_meta": {
+   "t0": 2655.3,
+   "ref_frames": 0,
+   "n": 90
+  }
+ }
+}

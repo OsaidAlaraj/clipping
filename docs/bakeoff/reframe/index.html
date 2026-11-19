@@ -1,0 +1,119 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Reframe bake-off</title>
+<style>body{font:14px system-ui;margin:16px;max-width:1340px;background:#111;color:#eee}img{max-width:100%;border:1px solid #333}table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #444;padding:3px 8px;text-align:right}th:first-child,td:first-child{text-align:left}.w{background:#164a26}h2{margin-top:32px}.v{color:#8f8}small{color:#aaa}</style>
+<h1>Reframe bake-off: who keeps the speaker inside the 9:16 crop?</h1>
+<p>5 segments of 30 s per video, sampled every 1/3 s. Green box = the 9:16 crop. Frames in each strip are 3 s apart. "In crop" = share of frames where the reference face lies fully inside the crop. <b>Caveat:</b> the reference face is one that YuNet and at least one other detector agree on, so YuNet is favoured by the reference; the strips are there so you can check by eye. Jitter = mean crop movement per sampled frame in 1280-px source pixels (shot cuts count as moves).</p>
+<h2>A. Gaming stream (Kubz, face-cam top-left)</h2>
+<table><tr><th>Candidate</th><th>In crop %</th><th>Jitter px</th><th>Time per 30 s</th><th>Face-cam found %</th></tr>
+<tr class=""><td>Current skin-colour crop (baseline)</td><td>42.3</td><td>0.0</td><td>0.01 s</td><td>0</td></tr>
+<tr class="w"><td>OpenCV YuNet + smoothing</td><td>92.3</td><td>10.7</td><td>1.54 s</td><td>100</td></tr>
+<tr class=""><td>MediaPipe BlazeFace + smoothing</td><td>88.4</td><td>6.9</td><td>0.33 s</td><td>12</td></tr>
+<tr class=""><td>MediaPipe FaceLandmarker + mouth-activity</td><td>80.8</td><td>4.3</td><td>0.46 s</td><td>0</td></tr>
+</table>
+<p class=v>Verdict: best in-crop = OpenCV YuNet + smoothing (92 %), baseline 42 %.</p>
+<p class=v><b>Read the strips before trusting the numbers.</b> On the gaming stream the "reference face" is mostly a game character, and every follow-the-face crop chases it: the streamer's own face-cam (top-left) is never inside the 9:16 box. YuNet does find the face-cam in 100 % of frames (skin baseline: 0 %), so its use here is as a face-cam locator for a stacked layout (face-cam on top, gameplay below), not as a crop follower. Plain 9:16 cropping is the wrong layout for this video type: verdict for A = inconclusive for crop, clear win for face-cam detection.</p>
+<h3>A_gaming_s0 <small>(starts at 286.6 s; reference face in 13/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>84.6</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>84.6</td><td>40.23</td><td>1.66</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>76.9</td><td>14.57</td><td>0.28</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>61.5</td><td>13.32</td><td>0.41</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/A_gaming_s0_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/A_gaming_s0_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/A_gaming_s0_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/A_gaming_s0_mouth.jpg"></div>
+<h3>A_gaming_s1 <small>(starts at 740.3 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>0.0</td><td>1.63</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>0.72</td><td>0.4</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.4</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/A_gaming_s1_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/A_gaming_s1_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/A_gaming_s1_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/A_gaming_s1_mouth.jpg"></div>
+<h3>A_gaming_s2 <small>(starts at 1194.1 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>5.65</td><td>1.59</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>0.0</td><td>0.38</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.36</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/A_gaming_s2_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/A_gaming_s2_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/A_gaming_s2_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/A_gaming_s2_mouth.jpg"></div>
+<h3>A_gaming_s3 <small>(starts at 1647.8 s; reference face in 1/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>0.0</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>100.0</td><td>4.84</td><td>1.28</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>100.0</td><td>15.55</td><td>0.24</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>100.0</td><td>8.43</td><td>0.26</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/A_gaming_s3_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/A_gaming_s3_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/A_gaming_s3_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/A_gaming_s3_mouth.jpg"></div>
+<h3>A_gaming_s4 <small>(starts at 2101.6 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>2.92</td><td>1.54</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>3.53</td><td>0.34</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.88</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/A_gaming_s4_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/A_gaming_s4_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/A_gaming_s4_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/A_gaming_s4_mouth.jpg"></div>
+<h2>B. Two-person interview podcast (109 min)</h2>
+<table><tr><th>Candidate</th><th>In crop %</th><th>Jitter px</th><th>Time per 30 s</th><th>Face-cam found %</th></tr>
+<tr class=""><td>Current skin-colour crop (baseline)</td><td>10.2</td><td>0.0</td><td>0.01 s</td><td>0</td></tr>
+<tr class="w"><td>OpenCV YuNet + smoothing</td><td>89.1</td><td>56.5</td><td>1.80 s</td><td>59</td></tr>
+<tr class=""><td>MediaPipe BlazeFace + smoothing</td><td>66.2</td><td>94.2</td><td>0.32 s</td><td>59</td></tr>
+<tr class=""><td>MediaPipe FaceLandmarker + mouth-activity</td><td>76.0</td><td>47.2</td><td>2.27 s</td><td>54</td></tr>
+</table>
+<p class=v>Verdict: best in-crop = OpenCV YuNet + smoothing (89 %), baseline 10 %.</p>
+<h3>B_interview_s0 <small>(starts at 782.2 s; reference face in 90/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>1.1</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>95.6</td><td>64.21</td><td>2.02</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>70.0</td><td>101.3</td><td>0.24</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>70.0</td><td>75.01</td><td>2.06</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/B_interview_s0_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/B_interview_s0_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/B_interview_s0_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/B_interview_s0_mouth.jpg"></div>
+<h3>B_interview_s1 <small>(starts at 2020.6 s; reference face in 90/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>7.8</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>97.8</td><td>1.18</td><td>1.75</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>97.8</td><td>1.17</td><td>0.34</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>97.8</td><td>1.19</td><td>1.28</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/B_interview_s1_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/B_interview_s1_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/B_interview_s1_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/B_interview_s1_mouth.jpg"></div>
+<h3>B_interview_s2 <small>(starts at 3259.0 s; reference face in 90/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>0.0</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>100.0</td><td>16.64</td><td>1.56</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>34.4</td><td>162.15</td><td>0.36</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>96.7</td><td>16.5</td><td>2.22</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/B_interview_s2_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/B_interview_s2_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/B_interview_s2_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/B_interview_s2_mouth.jpg"></div>
+<h3>B_interview_s3 <small>(starts at 4544.4 s; reference face in 90/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>15.6</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>60.0</td><td>122.2</td><td>2.03</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>68.9</td><td>80.36</td><td>0.24</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>68.9</td><td>98.79</td><td>3.51</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/B_interview_s3_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/B_interview_s3_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/B_interview_s3_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/B_interview_s3_mouth.jpg"></div>
+<h3>B_interview_s4 <small>(starts at 5735.9 s; reference face in 90/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>26.7</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>92.2</td><td>78.4</td><td>1.66</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>60.0</td><td>126.15</td><td>0.41</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>46.7</td><td>44.51</td><td>2.28</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/B_interview_s4_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/B_interview_s4_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/B_interview_s4_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/B_interview_s4_mouth.jpg"></div>
+<h2>C. Arabic lecture (slides + lecturer silhouette)</h2>
+<p>No face is visible in any segment (slides and a dark silhouette), so there is no reference: in-crop cannot be measured. All detectors correctly found no face; the pipeline should fall back to the centre crop. Strips below.</p>
+<table><tr><th>Candidate</th><th>In crop %</th><th>Jitter px</th><th>Time per 30 s</th><th>Face-cam found %</th></tr>
+<tr class=""><td>Current skin-colour crop (baseline)</td><td>n/a</td><td>0.0</td><td>0.00 s</td><td>0</td></tr>
+<tr class=""><td>OpenCV YuNet + smoothing</td><td>n/a</td><td>1.0</td><td>1.54 s</td><td>0</td></tr>
+<tr class=""><td>MediaPipe BlazeFace + smoothing</td><td>n/a</td><td>3.3</td><td>0.49 s</td><td>0</td></tr>
+<tr class=""><td>MediaPipe FaceLandmarker + mouth-activity</td><td>n/a</td><td>0.0</td><td>0.47 s</td><td>0</td></tr>
+</table>
+<h3>C_lecture_ar_s0 <small>(starts at 355.7 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>0.0</td><td>1.98</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>0.38</td><td>0.71</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.44</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/C_lecture_ar_s0_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s0_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s0_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/C_lecture_ar_s0_mouth.jpg"></div>
+<h3>C_lecture_ar_s1 <small>(starts at 918.8 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>4.92</td><td>2.37</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>5.27</td><td>0.57</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.66</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/C_lecture_ar_s1_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s1_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s1_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/C_lecture_ar_s1_mouth.jpg"></div>
+<h3>C_lecture_ar_s2 <small>(starts at 1482.0 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>0.0</td><td>0.96</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>10.74</td><td>0.38</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.42</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/C_lecture_ar_s2_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s2_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s2_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/C_lecture_ar_s2_mouth.jpg"></div>
+<h3>C_lecture_ar_s3 <small>(starts at 2045.1 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.01</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>0.0</td><td>1.48</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>0.0</td><td>0.36</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.33</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/C_lecture_ar_s3_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s3_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s3_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/C_lecture_ar_s3_mouth.jpg"></div>
+<h3>C_lecture_ar_s4 <small>(starts at 2655.3 s; reference face in 0/90 frames)</small></h3>
+<table><tr><th></th><th>In crop %</th><th>Jitter px</th><th>Time s</th></tr><tr><td>Current skin-colour crop (baseline)</td><td>None</td><td>0.0</td><td>0.0</td></tr><tr><td>OpenCV YuNet + smoothing</td><td>None</td><td>0.0</td><td>0.93</td></tr><tr><td>MediaPipe BlazeFace + smoothing</td><td>None</td><td>0.33</td><td>0.45</td></tr><tr><td>MediaPipe FaceLandmarker + mouth-activity</td><td>None</td><td>0.0</td><td>0.48</td></tr></table>
+<div><small>Current skin-colour crop (baseline)</small><br><img loading=lazy src="img/C_lecture_ar_s4_skin.jpg"></div>
+<div><small>OpenCV YuNet + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s4_yunet.jpg"></div>
+<div><small>MediaPipe BlazeFace + smoothing</small><br><img loading=lazy src="img/C_lecture_ar_s4_blaze.jpg"></div>
+<div><small>MediaPipe FaceLandmarker + mouth-activity</small><br><img loading=lazy src="img/C_lecture_ar_s4_mouth.jpg"></div>

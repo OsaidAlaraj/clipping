@@ -162,3 +162,11 @@ Decided by the owner, with these limits (relayed in the session notes; the owner
 - **Gentle pace.** About 2 downloads a minute at most, a small total, and the first batch limited to 10 videos. The bulk runs after the owner confirms their social accounts exist, so downloading does not hurt the IP reputation those accounts start with.
 - **Platforms in scope.** YouTube, Twitch, TikTok, Instagram, Facebook. YouTube and Twitch give usable crowd labels; the others give one number per finished short or nothing.
 - **Plan.** `docs/quality-diagnosis.md`, sections 7 to 9.
+
+## 2026-11-19: reframe bake-off (docs/bakeoff/reframe/index.html)
+
+- **Adopted: OpenCV YuNet** (MIT, `face_detection_yunet_2023mar.onnx`, 0.3 MB, CPU). Interview: crop holds the speaker 89 % of sampled frames vs 10 % for the skin baseline. Gaming: finds the face-cam in 100 % of frames (skin 0 %), but a plain face-follow crop chases game characters, so for gaming it is used as a face-cam locator only.
+- **Rejected as the main detector: MediaPipe BlazeFace** (Apache-2.0). Misses small faces (face-cam 12 %), 66 % in crop on the interview, jumpier.
+- **Kept as tie-break only: MediaPipe FaceLandmarker mouth activity** (Apache-2.0). 76 % in crop vs YuNet 89 % on single-face shots; its value is on wide two-shots, which the sample did not contain. Not adopted.
+- **Not run:** OpenShorts, wjs-reframing-video, clipsai resize, AutoFlip, TalkNet, Light-ASD (see docs/survey-table.md). No candidate was rejected on evidence there.
+- **Method limits:** the reference face is a detector consensus (YuNet-favoured); video C is slides with no face, so it measures nothing. Frame strips are included for checking by eye.
