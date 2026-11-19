@@ -5,8 +5,6 @@ export default {
   // A second build can live beside the dev one (for measuring a production build without disturbing the running dev server).
   distDir: process.env.NEXT_DIST_DIR || ".next",
   reactStrictMode: true,
-  // The dev-only "N Issue" badge covered the Home icon on the phone. Problems still show in the console.
-  devIndicators: false,
   // The phone reaches the laptop through Tailscale (https://<laptop>.<tailnet>.ts.net).
   allowedDevOrigins: ["*.ts.net", "*.trycloudflare.com"],
   // Phone uploads are proxied through /api when the app is opened through Tailscale or a tunnel.
