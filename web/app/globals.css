@@ -80,6 +80,8 @@ button { cursor: pointer; }
 .nav { position: fixed; inset-inline: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 30; max-width: 608px; margin: 0 auto;
   height: var(--nav-h); border-radius: 32px; background: #0E0E10; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
   box-shadow: 0 10px 30px rgba(14, 14, 16, 0.25); }
+.nav-side-group { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: space-around; }
+.nav-mid { flex: 0 0 auto; display: flex; }
 .nav a { width: 48px; height: 48px; border-radius: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #FFFFFF; text-decoration: none; position: relative; font-weight: 600; font-size: 0.9rem; }
 .nav a .label { display: none; }
 .nav a[aria-current="page"] { width: auto; padding: 0 16px; background: #FFFFFF; color: #0E0E10; }
