@@ -10,7 +10,7 @@ import math
 import re
 from pathlib import Path
 
-from .. import ffmpeg
+from .. import faces, ffmpeg
 from ..core import AppError
 from .base import Adapter, register
 
@@ -67,7 +67,7 @@ def normalize_template(spec, strict: bool = False) -> dict:
 
 # ------------------------------------------------------------------ framing
 
-def crop_filter(src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None = None) -> str:
+def crop_filter(src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None = None, path: list[tuple[float, float]] | None = None) -> str:
     """Crop to 9:16. focus_x (0..1) is the speaker's horizontal position when a face was found;
     None means centre crop, which is also the fallback."""
     target = out_w / out_h
@@ -76,24 +76,36 @@ def crop_filter(src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float |
         centre = (focus_x if focus_x is not None else 0.5) * src_w
         x = int(min(max(centre - crop_w / 2, 0), src_w - crop_w))
         crop = f"crop={crop_w}:{src_h}:{x}:0"
+        if path and len(path) > 1:
+            crop = f"crop={crop_w}:{src_h}:'{path_expr(path, src_w, crop_w)}':0"
     else:
         crop_h = int(round(src_w / target / 2) * 2)
         crop = f"crop={src_w}:{min(crop_h, src_h)}:0:{max((src_h - crop_h) // 2, 0)}"
     return f"{crop},scale={out_w}:{out_h},setsar=1"
 
 
+def path_expr(path: list[tuple[float, float]], src_w: int, crop_w: int) -> str:
+    """ffmpeg expression for the crop's left edge over time (t = seconds into the clip): straight lines between keyframes (time, centre 0..1)."""
+    xs = [(t, int(min(max(c * src_w - crop_w / 2, 0), src_w - crop_w))) for t, c in path]
+    expr = str(xs[-1][1])
+    for (t0, x0), (t1, x1) in reversed(list(zip(xs, xs[1:]))):
+        seg = str(x0) if x1 == x0 or t1 <= t0 else f"{x0}+({x1 - x0})*(t-{t0})/{t1 - t0:.3f}"
+        expr = f"if(lt(t,{t1}),{seg},{expr})"
+    return f"if(lt(t,{xs[0][0]}),{xs[0][1]},{expr})"
+
+
 FOLLOW_STYLES = ("follow_speaker", "follow_action")
 FACE_MIN_SHARE = 0.02          # skin-toned share of the frame below which nobody is taken to be there
 
 
-def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay") -> str:
+def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay", path: list[tuple[float, float]] | None = None) -> str:
     """The reframing part of the filter graph, ending at the pad `[label]`. `facecam_over_game` keeps the whole picture (the
     facecam stays in it) fitted to the width over a blurred fill; every other style is a 9:16 crop."""
     if style == "facecam_over_game" and src_w / src_h > out_w / out_h:
         return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
                 f"boxblur=luma_radius=24:luma_power=2[bg];[fga]scale={out_w}:-2[fg];"
                 f"[bg][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,setsar=1[{label}]")
-    return f"[0:v]{crop_filter(src_w, src_h, out_w, out_h, focus_x if style in FOLLOW_STYLES else None)}[{label}]"
+    return f"[0:v]{crop_filter(src_w, src_h, out_w, out_h, focus_x if style in FOLLOW_STYLES else None, path if style in FOLLOW_STYLES else None)}[{label}]"
 
 
 def _samples(clip: dict, count: int = 3) -> list[float]:
@@ -386,14 +398,15 @@ class FFmpegRender(Adapter):
         width, height = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
         start, end = float(clip["start_s"]), float(clip["end_s"])
         duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
-        focus = face_focus(src_path, clip) if style in FOLLOW_STYLES else None
+        tracked = faces.track(src_path, clip) if style in FOLLOW_STYLES else None   # YuNet path; None falls back to the old single-point focus
+        path, focus = (tracked if tracked else (None, face_focus(src_path, clip) if style in FOLLOW_STYLES else None))
         events = caption_events(words, start, end, clip.get("platform") in SOCIAL_PLATFORMS, clip.get("emphasis") or [], tpl["accent"])
         ass = build_ass(width, height, duration, events, label, clip.get("language") == "ar", tpl, clip.get("hook_text"))
         out_path.parent.mkdir(parents=True, exist_ok=True)
         ass_path = out_path.with_suffix(".ass")
         ass_path.write_text(ass, encoding="utf-8-sig")
         zooms = zoom_times(clip.get("emphasis") or [], start, duration) if tpl["zooms"] and self.force_crop is None else []
-        graph = layout_graph(style, info["width"], info["height"], width, height, focus)
+        graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path)
         graph += (";" + zoom_graph(zooms, width, height)) if zooms else ""
         graph += f";[{'zm' if zooms else 'lay'}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
         loudness = "loudnorm=I=-14:TP=-1.5:LRA=" + ("18" if clip.get("audio") == "natural" else "11")
