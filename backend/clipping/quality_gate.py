@@ -62,9 +62,12 @@ def face_share(video: Path, fps: float = 2.0) -> float | None:
             if i % every == 0:
                 ok, frame = cap.retrieve()
                 if ok:
-                    _, found = det.detect(cv2.resize(frame, (faces.FRAME_W, faces.FRAME_H)))
+                    h, w = frame.shape[:2]
+                    sw = max(1, round(w * faces.FRAME_H / h))        # keep the aspect: squashing a portrait frame hides faces from the detector
+                    padded = cv2.copyMakeBorder(cv2.resize(frame, (sw, faces.FRAME_H)), 0, 0, 0, max(faces.FRAME_W - sw, 0), cv2.BORDER_CONSTANT)
+                    _, found = det.detect(padded[:, :faces.FRAME_W])
                     seen += 1
-                    if found is not None and any(f[0] >= -2 and f[1] >= -2 and f[0] + f[2] <= faces.FRAME_W + 2 and f[1] + f[3] <= faces.FRAME_H + 2 for f in found):
+                    if found is not None and any(f[0] >= -2 and f[1] >= -2 and f[0] + f[2] <= sw + 2 and f[1] + f[3] <= faces.FRAME_H + 2 for f in found):
                         inside += 1
             i += 1
         cap.release()
