@@ -164,6 +164,19 @@ export function FilteredSheet({ items, onRescue, onClose }: { items: FilteredMom
   );
 }
 
+const CHECK_NAME: Record<string, string> = {
+  duration: "Clip length", aspect_9_16: "Vertical video (9:16)", caption_starts_with_disclosure: "Caption starts with #ad",
+  overlay_present_full_duration: "#ad label on screen the whole clip", banned_words: "No banned words",
+};
+const STATUS_WORD: Record<string, string> = { pass: "OK", fail: "Failed", review: "Check", pending: "Waiting" };
+/** Turns a check's name and evidence into plain words; unknown ones are shown as written. */
+export function plainCheck(check: string): string { return CHECK_NAME[check] ?? check.replaceAll("_", " "); }
+export function plainEvidence(text: string): string {
+  const m = text.match(/^([\d.]+) s; allowed (\d+) to (\d+) s$/);
+  if (m) return `${m[1]} seconds. Allowed: ${m[2]} to ${m[3]}.`;
+  return text === "none found" ? "None found." : text;
+}
+
 export function ComplianceSheet({ clip, onClose }: { clip: Clip; onClose: () => void }) {
   const { t } = useLang();
   const report = clip.compliance_report;
@@ -172,24 +185,24 @@ export function ComplianceSheet({ clip, onClose }: { clip: Clip; onClose: () => 
       {!report && <p className="muted">No report yet.</p>}
       {report && (
         <>
-          <div className="stack">
+          <div className="stack checks">
             {report.deterministic.map((check, index) => (
               <div key={`${check.check}-${index}`} className="row between" data-testid={check.brand ? "brand-check" : undefined}>
                 <span dir="auto">
-                  {check.brand ? <>{t("brandNote")}: {check.rule}</> : check.check.replaceAll("_", " ")}
-                  <br /><span className="small muted">{check.evidence}</span>
+                  {check.brand ? <>{t("brandNote")}: {check.rule}</> : plainCheck(check.check)}
+                  <br /><span className="small muted">{plainEvidence(check.evidence)}</span>
                 </span>
-                <span className={`badge ${check.status}`}>{check.status}</span>
+                <span className={`badge ${check.status}`}>{STATUS_WORD[check.status] ?? check.status}</span>
               </div>
             ))}
             {report.rules.map((rule, index) => (
               <div key={index} className="row between">
                 <span dir="auto">{rule.rule}<br /><span className="small muted">{rule.evidence || "No evidence found in the clip text."}</span></span>
-                <span className={`badge ${rule.status}`}>{rule.status}</span>
+                <span className={`badge ${rule.status}`}>{STATUS_WORD[rule.status] ?? rule.status}</span>
               </div>
             ))}
           </div>
-          <p className="small muted">{report.note} {report.legal_notice}</p>
+          <p className="small muted">Checked automatically against the campaign rules. It is a helper, not legal advice, and it cannot judge copyright or licences. You make the final call.</p>
         </>
       )}
     </SheetFrame>

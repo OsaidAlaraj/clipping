@@ -162,7 +162,7 @@ export function Alerts() {
         <section key={alert.id} className="card stack">
           <div className="row between"><span className={`badge ${alert.severity}`}>{alert.severity}</span><span className="small muted">{new Date(alert.created_at).toLocaleString()}</span></div>
           <p>{plainAlert(alert.message).text}</p>
-          {plainAlert(alert.message).text !== alert.message && <details className="small muted"><summary>Details</summary>{alert.message}</details>}
+          {plainAlert(alert.message).text !== alert.message && <details className="small muted"><summary>Technical details</summary>{alert.message}</details>}
           <div className="row">
             <button className="btn grow" onClick={() => act(`/api/alerts/${alert.id}/ack`)}>Acknowledge</button>
             {alert.severity !== "block" && <button className="btn ghost grow" onClick={() => act(`/api/alerts/${alert.id}/snooze`, { hours: 4 })}>Snooze 4 h</button>}

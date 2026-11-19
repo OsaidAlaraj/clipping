@@ -107,9 +107,9 @@ describe("brand checks in the compliance report", () => {
     expect(rows).toHaveLength(2);
     expect(rows[0].textContent).toContain("Brand note: Must contain “#sampletag”");
     expect(rows[0].textContent).toContain("The marketplace said: “missing #SampleTag”");
-    expect(within(rows[0]).getByText("review").className).toMatch(/review/);
+    expect(within(rows[0]).getByText("Check").className).toMatch(/review/);
     expect(within(rows[1]).getByText("note")).toBeTruthy();
-    expect(screen.getByText("duration")).toBeTruthy();
+    expect(screen.getByText("Clip length")).toBeTruthy();
     expect(errors.mock.calls.filter((c) => String(c[0]).includes("unique \"key\""))).toHaveLength(0);   // two brand rows, two keys
   });
 
@@ -122,7 +122,7 @@ describe("brand checks in the compliance report", () => {
   it("a report without brand checks looks exactly as before", () => {
     render(<LangProvider initial="en"><ComplianceSheet clip={clip("c1", { compliance_report: report([]) as any })} onClose={() => undefined} /></LangProvider>);
     expect(screen.queryAllByTestId("brand-check")).toHaveLength(0);
-    expect(screen.getByText("duration")).toBeTruthy();
+    expect(screen.getByText("Clip length")).toBeTruthy();
   });
 });
 

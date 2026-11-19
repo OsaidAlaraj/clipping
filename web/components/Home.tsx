@@ -168,8 +168,8 @@ export default function Home() {
               const plain = plainAlert(alert.message);
               return (
                 <div key={alert.id} className={`banner ${alert.severity}`}>
-                  {plain.text}
-                  {plain.text !== plain.raw && <details className="small"><summary>Details</summary>{plain.raw}</details>}
+                  <p>{plain.text}</p>
+                  {plain.text !== plain.raw && <details className="small"><summary>Technical details</summary><p>{plain.raw}</p></details>}
                 </div>
               );
             })}
