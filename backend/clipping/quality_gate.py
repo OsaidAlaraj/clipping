@@ -6,7 +6,7 @@ import re
 import subprocess
 from pathlib import Path
 
-from . import faces, ffmpeg
+from . import config, faces, ffmpeg
 
 MIN_WORDS_PER_S = 1.2            # talking content: real speech is about 2 to 3 words a second
 FACE_WARN, FACE_FAIL = 0.80, 0.50
@@ -108,11 +108,11 @@ def evaluate(m: dict) -> dict:
 def run(video: Path, words: list[dict], start: float, end: float, *, language: str, caption: str | None, disclosure: str | None,
         niche: str | None = None, layout: str | None = None, detected_language: str | None = None) -> dict:
     """Measure a rendered clip and evaluate it. Faces are expected in talking niches and in follow-the-speaker crops."""
-    talking = (niche or "podcast") in TALKING_NICHES
+    talking = niche in TALKING_NICHES          # an unknown niche is never failed for missing speech or faces
     m = {"words_per_s": round(words_per_second(words, start, end), 2), "sentence_end": sentence_end_ok(words, start, end),
          "word_start": word_start_ok(words, start), "lufs": loudness_lufs(video), "detected_language": detected_language, "source_language": language,
          "disclosure_first": disclosure_first(caption, disclosure) if disclosure is not None else None, "talking": talking,
-         "expects_face": talking and layout != "centre"}
+         "expects_face": talking and layout != "centre" and not config.use_fakes()}   # fixtures and demos have no real faces
     m["face_share"] = face_share(video) if m["expects_face"] else None
     for k in ("lufs", "face_share"):
         m[k] = None if m[k] is None else round(m[k], 2 if k == "face_share" else 1)

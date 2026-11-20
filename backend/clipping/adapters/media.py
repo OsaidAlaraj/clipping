@@ -10,7 +10,7 @@ import math
 import re
 from pathlib import Path
 
-from .. import faces, ffmpeg
+from .. import faces, ffmpeg, gaming_layout
 from ..core import AppError
 from .base import Adapter, register
 
@@ -20,7 +20,19 @@ TEMPLATE_DEFAULTS: dict = {"layout": "auto", "font": "Arial", "primary": "#FFFFF
                            "title_card": True, "progress_bar": True, "zooms": True, "font_size": 4.2, "cover": "band"}
 CAPTION_POSITIONS = ("lower", "middle")
 COVER_STYLES = ("band", "outline")
-LAYOUTS = ("auto", "blur_pad")   # auto: the profile crop decides; blur_pad: the whole picture centred on a blurred, darkened 9:16 copy
+NICHE_OF_CROP = {"facecam_over_game": "gaming", "follow_speaker": "podcast"}   # the profile's crop style tells the niche
+
+
+def niche_defaults(niche: str | None) -> dict:
+    """Per-niche render defaults (layout, caption position), from the measured market study; a template's own fields win."""
+    import json
+    try:
+        return json.loads((Path(__file__).resolve().parent.parent / "assets" / "render-profile-defaults.json").read_text(encoding="utf-8")).get(niche or "", {})
+    except (OSError, ValueError):
+        return {}
+
+
+LAYOUTS = ("auto", "blur_pad", "gaming_stack")   # auto: the profile crop decides; blur_pad: the whole picture centred on a blurred, darkened 9:16 copy
 FLAGS = ("title_card", "progress_bar", "zooms")
 FONT_SIZE_RANGE = (2.5, 6.5)          # caption size as a percentage of the frame height
 _FONT = re.compile(r"^\w[\w .\-]{0,59}$")
@@ -40,7 +52,7 @@ def _checked(key: str, value):
     if key == "caption_position" and value not in CAPTION_POSITIONS:
         raise _bad("The caption position must be lower or middle.")
     if key == "layout" and value not in LAYOUTS:
-        raise _bad("The layout must be auto or blur_pad.")
+        raise _bad("The layout must be auto, blur_pad or gaming_stack.")
     if key == "cover" and value not in COVER_STYLES:
         raise _bad("The cover style must be band or outline.")
     if key in FLAGS and not isinstance(value, bool):
@@ -101,9 +113,12 @@ FOLLOW_STYLES = ("follow_speaker", "follow_action")
 FACE_MIN_SHARE = 0.02          # skin-toned share of the frame below which nobody is taken to be there
 
 
-def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay", path: list[tuple[float, float]] | None = None) -> str:
+def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay", path: list[tuple[float, float]] | None = None, stack: dict | None = None) -> str:
     """The reframing part of the filter graph, ending at the pad `[label]`. `facecam_over_game` keeps the whole picture (the
     facecam stays in it) fitted to the width over a blurred fill; every other style is a 9:16 crop."""
+    if style == "gaming_stack" and stack and stack.get("layout") == "stack":
+        from .. import gaming_layout
+        return gaming_layout.stack_graph(stack, src_w, src_h, out_w, out_h, label)
     if style == "blur_pad":
         return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
                 f"boxblur=luma_radius=30:luma_power=2,eq=brightness=-0.18[bg];[fga]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease[fg];"
@@ -405,8 +420,17 @@ class FFmpegRender(Adapter):
         width, height = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
         start, end = float(clip["start_s"]), float(clip["end_s"])
         duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
-        if tpl["layout"] == "blur_pad" and self.force_crop is None:
-            style = "blur_pad"
+        niche = NICHE_OF_CROP.get(style)
+        wanted = tpl["layout"] if (isinstance(template, dict) and "layout" in template) else niche_defaults(niche).get("layout", "auto")
+        if self.force_crop is None and wanted in ("blur_pad", "gaming_stack"):
+            style = wanted
+        stack = None
+        if style in ("gaming_stack", "facecam_over_game"):
+            style = "gaming_stack"
+            stack = gaming_layout.plan(src_path, clip, info["width"], info["height"], width, height)
+            style = {"stack": "gaming_stack", "fullbleed": "follow_speaker"}.get(stack["layout"], "blur_pad")   # no face-cam: the whole picture on a blurred pad
+        if not (isinstance(template, dict) and "caption_position" in template) and niche_defaults(niche).get("caption_position") in CAPTION_POSITIONS:
+            tpl["caption_position"] = niche_defaults(niche)["caption_position"]
         tracked = faces.track(src_path, clip) if style in FOLLOW_STYLES else None   # YuNet path; None falls back to the old single-point focus
         path, focus = (tracked if tracked else (None, face_focus(src_path, clip) if style in FOLLOW_STYLES else None))
         events = caption_events(words, start, end, clip.get("platform") in SOCIAL_PLATFORMS, clip.get("emphasis") or [], tpl["accent"])
@@ -415,7 +439,7 @@ class FFmpegRender(Adapter):
         ass_path = out_path.with_suffix(".ass")
         ass_path.write_text(ass, encoding="utf-8-sig")
         zooms = zoom_times(clip.get("emphasis") or [], start, duration) if tpl["zooms"] and self.force_crop is None else []
-        graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path)
+        graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path, stack=stack)
         graph += (";" + zoom_graph(zooms, width, height)) if zooms else ""
         graph += f";[{'zm' if zooms else 'lay'}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
         loudness = "loudnorm=I=-14:TP=-1.5:LRA=" + ("18" if clip.get("audio") == "natural" else "11")
@@ -429,13 +453,13 @@ class FFmpegRender(Adapter):
 
         encoder = self._encode(args_for, out_path.parent)
         finished = ffmpeg.probe(out_path)
-        cover = self._cover(src_path, clip, tpl, style, info, (width, height), focus, out_path.with_name("cover.png"))
+        cover = self._cover(src_path, clip, tpl, style, info, (width, height), focus, out_path.with_name("cover.png"), stack)
         return {"path": str(out_path), "ass_path": str(ass_path), "encodes": 1, "encoder": encoder, "cover_path": cover,
                 "duration_s": finished["duration_s"], "captions": len(events), "zooms": len(zooms),
                 "reframe": "face" if focus is not None else "centre_crop", "loudness_normalised": bool(info["has_audio"]),
                 "overlay": {"text": label, "start_s": 0.0, "end_s": finished["duration_s"]}, "width": width, "height": height}
 
-    def _cover(self, src: Path, clip: dict, tpl: dict, style: str, info: dict, size: tuple[int, int], focus, out: Path) -> str | None:
+    def _cover(self, src: Path, clip: dict, tpl: dict, style: str, info: dict, size: tuple[int, int], focus, out: Path, stack: dict | None = None) -> str | None:
         """The cover PNG: the sharpest of the best candidate frames, reframed like the clip, with the short hook line. A cover is a
         nicety, so any failure leaves the clip without one and never blocks it."""
         width, height = size
@@ -443,7 +467,7 @@ class FFmpegRender(Adapter):
             at = sharpest_time(src, cover_times(clip))
             ass_path = out.with_suffix(".ass")
             ass_path.write_text(build_cover_ass(width, height, clip.get("hook_text"), tpl), encoding="utf-8-sig")
-            graph = layout_graph(style, info["width"], info["height"], width, height, focus) + f";[lay]ass={ass_path.name}[v]"
+            graph = layout_graph(style, info["width"], info["height"], width, height, focus, stack=stack) + f";[lay]ass={ass_path.name}[v]"
             ffmpeg.run(["-ss", f"{at:.3f}", "-i", str(src), "-filter_complex", graph, "-map", "[v]", "-frames:v", "1", str(out)], cwd=out.parent)
         except Exception:
             return None

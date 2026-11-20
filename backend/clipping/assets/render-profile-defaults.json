@@ -1,0 +1,43 @@
+{
+ "_note": "Per-niche render defaults from docs/market-style-study.md (measured on 9 reference Shorts at 144p: a first guess). Layout and caption_position are used by the render stage; the rest is guidance. A template's own fields win.",
+ "gaming": {
+  "layout": "gaming_stack",
+  "caption_position": "lower",
+  "clip_length_s": [
+   12,
+   20
+  ],
+  "cuts_per_10s": 7,
+  "hook_s": 1.5
+ },
+ "podcast": {
+  "layout": "auto",
+  "caption_position": "lower",
+  "clip_length_s": [
+   45,
+   90
+  ],
+  "cuts_per_10s": 1,
+  "hook_s": 3
+ },
+ "business": {
+  "layout": "blur_pad",
+  "caption_position": "lower",
+  "clip_length_s": [
+   30,
+   90
+  ],
+  "cuts_per_10s": 3.5,
+  "hook_s": 2
+ },
+ "arabic": {
+  "layout": "auto",
+  "caption_position": "lower",
+  "clip_length_s": [
+   30,
+   60
+  ],
+  "cuts_per_10s": 1.7,
+  "hook_s": 3
+ }
+}

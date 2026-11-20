@@ -11,6 +11,7 @@ from pathlib import Path
 from psycopg.types.json import Jsonb
 
 from . import brand_checks, config, ffmpeg, language_check, quality_gate, signals, templates, transcripts
+from .adapters import media
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -411,8 +412,9 @@ def stage_render(conn, job: dict) -> Decimal:
     key = f"clips/{clip['id']}/final.mp4"
     out = storage.path(key)
     words = _words(conn, source)
+    render_clip = _render_request(conn, clip, source, platform, meta.get("hook_text"))
     result, cost = registry.call(conn, "render", "render_clip", {
-        "src": str(storage.path(source["stored_path"])), "clip": _render_request(conn, clip, source, platform, meta.get("hook_text")),
+        "src": str(storage.path(source["stored_path"])), "clip": render_clip,
         "words": words, "template": template["spec"], "label": disclosure["overlay_text"], "out": str(out)}, owner)
     storage.put(key, str(out))
     cover_key = None
@@ -424,8 +426,8 @@ def stage_render(conn, job: dict) -> Decimal:
     if not (meta.get("caption_edited") and caption):
         caption, hashtags, mentions = build_caption(disclosure["caption_text"], meta.get("hook_text") or "", version["rules_json"])
     try:   # the gate only reports: a failure here must never stop the render
-        gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=clip["caption_text"],
-                                disclosure=disclosure.get("caption_text"))
+        gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=caption,
+                                disclosure=disclosure.get("caption_text"), niche=media.NICHE_OF_CROP.get(render_clip.get("crop")))
     except Exception:
         gate = None
     meta["gate"] = gate
