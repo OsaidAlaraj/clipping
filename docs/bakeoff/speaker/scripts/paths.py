@@ -24,7 +24,7 @@ def path_from_choice(centres, W, H):
 
 def ticks_3hz(n_ticks): return [int(round(i * STEP * FPS)) for i in range(int(n_ticks / FPS / STEP))]
 
-def choose(tr, scores, W, n_ticks, margin=0.12, win=12):
+def choose(tr, scores, W, n_ticks, margin=0.12, win=12, floor=-1e9):
     """Per 1/3 s sample: the track with the best windowed score; switch only when a rival beats the current one by `margin`."""
     out, cur = [], None
     for t in ticks_3hz(n_ticks):
@@ -35,6 +35,9 @@ def choose(tr, scores, W, n_ticks, margin=0.12, win=12):
             m = (x["fr"] >= t - win) & (x["fr"] <= t + win); bs[k] = float(np.mean(s[m])) if m.any() else 0.0; best[k] = c
         if not best: out.append(None); continue
         top = max(bs, key=bs.get)
+        if bs[top] < floor:            # nobody is clearly speaking: keep the current face, else the biggest one
+            if cur not in best: cur = max(best, key=lambda k: float(np.median(tr[k]['box'][:, 2] * tr[k]['box'][:, 3])))
+            out.append(best[cur]); continue
         if cur not in best or bs[top] > bs[cur] + margin: cur = top
         out.append(best[cur])
     return out
@@ -110,10 +113,13 @@ def main():
                 r = F.track(SRC[key], {"start_s": t0, "end_s": t0 + 30}); keys = r[0] if r else [(0.0, 0.5)]; share = H * 9 / 16 / W; sec = time.time() - t
             elif m == "diar":
                 ch, _ = diar_choice(cid, tr, W, n); keys, share = path_from_choice(ch, W, H); sec = time.time() - t
-            elif m in ("lr", "fabu", "asdnb"):
+            elif m in ("lr", "fabu", "asdnb", "fabu_onnx"):
                 p = SC / m / f"{cid}.npz"
                 if not p.exists(): continue
                 z = np.load(p); sc = [z[f"score{k}"] for k in range(len(tr))]; keys, share = path_from_choice(choose(tr, sc, W, n), W, H); sec = time.time() - t
+            elif m in ("lr_f", "fabu_f", "asdnb_f"):
+                src_m = {"lr_f": "lr", "fabu_f": "fabu_onnx", "asdnb_f": "asdnb"}[m]; z = np.load(SC / src_m / f"{cid}.npz"); sc = [z[f"score{k}"] for k in range(len(tr))]
+                keys, share = path_from_choice(choose(tr, sc, W, n, floor=0.0 if m == "lr_f" else 0.5), W, H); sec = 0   # natural threshold: logit 0 / probability 0.5
             elif m in ("diar+lr", "diar+fabu"):
                 p = SC / m.split("+")[1] / f"{cid}.npz"
                 if not p.exists(): continue

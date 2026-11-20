@@ -23,7 +23,7 @@ if method == "lr":
     def infer(a_feat, v):          # v: (T,224,224) -> centre 112
         v = v[:, 56:168, 56:168]; return run_lr(a_feat, v)
     def run_lr(af, vf):
-        length = min((af.shape[0] - af.shape[0] % 4) / 100, vf.shape[0]); af = af[:int(round(length * 100))]; vf = vf[:int(round(length * 25))]
+        length = min((af.shape[0] - af.shape[0] % 4) / 100, vf.shape[0] / 25); af = af[:int(round(length * 100))]; vf = vf[:int(round(length * 25))]
         allS = []
         for dur in (1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6):
             sc = []
@@ -53,14 +53,51 @@ elif method == "fabu":
                     o, _, _ = s.model(vv, aa, None); p = F.softmax(s.lossFA.module.FC(o.squeeze(1)), dim=-1)[:, 1]; part.extend(p.cpu().numpy())
                 sc.append(part)
         m = min(len(x) for x in sc); return np.mean(np.array([x[:m] for x in sc]), axis=0).astype(np.float32)
+elif method == "fabu_onnx":
+    import onnxruntime as ort, cv2
+    sess = ort.InferenceSession(str(DATA / "benchmark/speaker/fabulight_f.onnx"), providers=["CPUExecutionProvider"]); NFFT = 1024
+    def infer(a_feat, v):
+        v = np.stack([cv2.resize(f[40:184, 40:184], (112, 112)) for f in v]).astype(np.float32); n = min(a_feat.shape[0] // 4, v.shape[0]); sc = []
+        for dur in (1, 2, 3):
+            part = []
+            for i in range(0, n, dur * 25):
+                vv = v[i:i + dur*25][None]; T = vv.shape[1]
+                if T == 0: continue
+                aa = a_feat[i*4:(i + T)*4][None].astype(np.float32); part.extend(sess.run(None, {"face": vv, "audio": aa})[0])
+            sc.append(part)
+        m = min(len(x) for x in sc); return np.mean(np.array([x[:m] for x in sc]), axis=0).astype(np.float32)
+elif method == "asdnb":
+    os.chdir(REPOS / "ASDnB"); sys.path.insert(0, str(REPOS / "ASDnB")); from ASDnB import ASDnB
+    import cv2
+    s = ASDnB(); s.loadParameters(str(DATA / "benchmark/speaker/asdnb_x/ASDnB_AVA.model")); s.eval(); NFFT = 512; BODY = {}
+    def infer(a_feat, v):
+        body = BODY["cur"]
+        f = np.stack([cv2.resize(x[40:184, 40:184], (112, 112)) for x in v]); b = body
+        n = min(a_feat.shape[0] // 4, f.shape[0], b.shape[0]); sc = []
+        with torch.no_grad():
+            for dur in (1, 2, 3):
+                part = []
+                for i in range(0, n, dur * 25):
+                    ff = torch.FloatTensor(f[i:i + dur*25][: n - i]).unsqueeze(0).cuda(); bb = torch.FloatTensor(b[i:i + dur*25][: n - i]).unsqueeze(0).cuda()
+                    T = min(ff.shape[1], bb.shape[1]); ff, bb = ff[:, :T], bb[:, :T]
+                    if T == 0: continue
+                    aa = torch.FloatTensor(a_feat[i*4:(i + T)*4]).unsqueeze(0).cuda()
+                    ea = s.model.forward_audio_frontend(aa); ev = s.model.forward_visual_frontend(ff, bb); o = s.model.forward_combination_backend(ea, ev)
+                    part.extend(torch.softmax(s.lossAV.FC(o.squeeze(1)), dim=-1)[:, 1].cpu().numpy())
+                sc.append(part)
+        m = min(len(x) for x in sc); return np.mean(np.array([x[:m] for x in sc]), axis=0).astype(np.float32)
 else:
     raise SystemExit("method not implemented here")
 
 torch.cuda.reset_peak_memory_stats()
+if method == "fabu_onnx": torch.cuda.synchronize = lambda: None
 for cid in ids:
     d = np.load(CACHE / f"{cid}.npz"); audio = d["audio"].astype(np.float64); af = mfcc(audio, NFFT); res = {}; t0 = time.time(); k = 0
     while f"fr{k}" in d:
-        a, v = dense(d, k); sc = infer(af[a * 4:], v); full = np.zeros(len(v), np.float32); full[:len(sc)] = sc
+        a, v = dense(d, k)
+        if method == "asdnb":
+            bz = np.load(CACHE / f"{cid}_body.npz")[f"body{k}"]; fr = d[f"fr{k}"]; j = np.searchsorted(fr, np.arange(a, int(fr[-1]) + 1), side="right") - 1; BODY["cur"] = bz[np.clip(j, 0, None)]
+        sc = infer(af[a * 4:], v); full = np.zeros(len(v), np.float32); full[:len(sc)] = sc
         res[f"score{k}"] = full[d[f"fr{k}"] - a]; k += 1
     torch.cuda.synchronize(); el = time.time() - t0
     np.savez_compressed(OUT / f"{cid}.npz", **res)
