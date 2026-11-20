@@ -8,7 +8,7 @@ import datetime as dt
 
 from . import alerts, brand_checks, campaigns, config, ffmpeg, ledger, moments, ops, pipeline, publish, review, signals
 from .core import AppError, KillSwitchOn, kill_switch_on, set_kill_switch
-from .db import Actor, Database
+from .db import Database
 
 DEMO_NAME = "The Founders Table (sample)"
 

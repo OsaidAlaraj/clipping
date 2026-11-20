@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from clipping import config, core, ffmpeg, pipeline, signals, sources, transcripts
+from clipping import config, ffmpeg, pipeline, signals, sources, transcripts
 from clipping.adapters import audiotag, heatmap
 from clipping.core import AppError
 from clipping.db import Actor
