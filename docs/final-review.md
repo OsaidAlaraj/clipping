@@ -3,7 +3,7 @@
 Branch `final-review`, cut from `feature/phase-e-posting` tip `4f766ae` (the worktree base was older; fast-forwarded first).
 Evidence: "ran" = executed here (throwaway instance, API calls, browser, tests); "read" = reasoned from code only. Sizes are relative (S, M, L), not time.
 Throwaway instance: own data dir, ports 18787 (API) and 13000 (web, webpack dev), fake adapters, no `.env`, no real accounts. Stopped and deleted at the end.
-Tests: web 298 passed (ran); backend: the files I touched or that cover posting, review, security and captions pass (ran); the full backend run was still going when this was written, see the last line of this file.
+Tests: web 298 passed (ran); backend: the files I touched or that cover posting, review, security and captions pass (ran); the full backend run did not finish in the session (about 37 % done, no failure), see the last line.
 
 Status key: works / partly / missing.
 
@@ -176,4 +176,4 @@ Impact on income first, then safety, then UX. Size is relative.
 
 Already fixed in this branch (section 2): first post waits for Undo, malformed id returns 400, no case-duplicate hashtags.
 
-Full backend suite result: see the commit message of the last commit on this branch.
+Full backend suite: not finished in this session (the machine was shared and slow). It had run about 37 % of the tests with no failure when it was stopped; the posting, review, security and caption files were run in full and pass. Run `python run.py test` once before merging.
