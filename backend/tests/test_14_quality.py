@@ -639,3 +639,16 @@ def test_a_clip_that_failed_the_quality_gate_goes_last_in_the_feed_even_with_the
         conn.execute("update clips set render_meta = jsonb_set(render_meta, '{gate}', '{\"status\": \"fail\", \"reasons\": []}') where id = %s", (top,))
         ids = [c["id"] for c in review.feed(conn, produced.owner.operator_id)]
     assert ids[-1] == top and len(ids) == 3
+
+
+def test_priority_is_the_campaign_rate_times_the_chance_to_clear_the_minimum():
+    def card(name, rate, p):
+        return {"id": name, "compliance_status": "pass", "est_net_per_hour": rate, "created_at": NOW,
+                "quality": {"p_clear": p, "weak": False}}
+    sure, risky, no_min = card("sure", 3.0, 0.9), card("risky", 4.0, 0.3), card("no_min", 2.0, None)
+    assert review.expected_rate(sure) == pytest.approx(2.7) and review.expected_rate(risky) == pytest.approx(1.2)
+    assert review.expected_rate(no_min) == 2.0                                      # no minimum: a sure thing
+    assert review.expected_rate({"est_net_per_hour": 5.0}) == 5.0                   # no estimate: rate unchanged
+    ranked = review.rank_feed([risky, no_min, sure], WEIGHTS, NOW)
+    assert [c["id"] for c in ranked] == ["sure", "no_min", "risky"]                  # 2.7 > 2.0 > 1.2, though risky pays most per 1,000 views
+    assert [c["id"] for c in review.rank_feed([sure, no_min, risky], WEIGHTS, NOW)] == ["sure", "no_min", "risky"]   # same answer in any input order

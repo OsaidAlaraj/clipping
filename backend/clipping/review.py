@@ -29,9 +29,17 @@ BASIS_TEXT = {"your posts": "from your own posts", "assumed": "assumed: no view 
 
 # ------------------------------------------------------------------ priority (spec 6.6). Pure functions.
 
+def expected_rate(clip: dict) -> float:
+    """The `net_pay` basis: the campaign's net rate per 1,000 views times the clip's chance of clearing the campaign's view minimum
+    (`quality.p_clear`, from `chance_to_clear`). A campaign with no minimum, or a clip without an estimate, counts as a sure 1.0, so
+    a clip paying twice as much with a 30% chance ranks below a sure one that pays 1.5 times as much. Deterministic: same inputs, same order."""
+    p = (clip.get("quality") or {}).get("p_clear")
+    return float(clip.get("est_net_per_hour") or 0) * (1.0 if p is None else min(max(float(p), 0.0), 1.0))
+
+
 def priority_inputs(clip: dict, now: dt.datetime, max_rate: float) -> dict:
     """Normalise each input to 0..1 (or 0..-1 for the two that push a clip down)."""
-    rate = float(clip.get("est_net_per_hour") or 0)
+    rate = expected_rate(clip)
     deadline = clip.get("deadline")
     hours_left = (deadline - now).total_seconds() / 3600 if deadline else None
     total, remaining = clip.get("budget_total"), clip.get("budget_remaining")
@@ -69,7 +77,7 @@ def rank_feed(clips: list[dict], weights: dict, now: dt.datetime | None = None) 
     Clips marked weak by `quality` go last. Ties break by creation time, oldest first. Each clip gets its score and one-line top reason."""
     now = now or dt.datetime.now(dt.timezone.utc)
     eligible = [c for c in clips if c.get("compliance_status") in ("pass", "review")]
-    max_rate = max((float(c.get("est_net_per_hour") or 0) for c in eligible), default=0.0)
+    max_rate = max((expected_rate(c) for c in eligible), default=0.0)
     for clip in eligible:
         inputs = priority_inputs(clip, now, max_rate)
         clip["priority_score"] = round(sum(inputs[k] * float(weights.get(k, 0)) for k in WEIGHT_KEYS), 6)
@@ -167,7 +175,7 @@ def _decorate(conn, rows: list[dict], operator_id=None) -> list[dict]:
     for row in rows:
         cap = row.pop("account_daily_cap")
         row["account_cap"] = default_cap if cap is None else cap
-        # Ranking proxy until the owner's own data exists: the campaign's net rate per 1,000 views.
+        # Ranking proxy until the owner's own data exists: the campaign's net rate per 1,000 views (`rank_feed` multiplies it by `quality.p_clear`).
         rate = Decimal(str(row["rate_per_1k"] or 0))
         row["est_net_per_hour"] = float(rate * (1 - Decimal(str(row["fee_pct"] or 0)) / 100))
         row["video_url"] = storage.get_signed_url(row["file_path"], 900) if row["file_path"] else None
