@@ -174,3 +174,9 @@ Decided by the owner, with these limits (relayed in the session notes; the owner
 
 ## Decision 31 (2026-11-19): swipe right is the owner's confirm to post
 In the review feed a swipe right accepts the clip AND is the owner's deliberate confirm to post. It shows a bar ("Posts to TikTok and Instagram in 20 minutes", staggered as in Round E) with a 10-second undo. If the account is not connected, it shows "Ready to post manually" with the caption ready to copy. Unchanged: no posting on practice campaigns, every post is recorded, the kill switch stops the queue, the human-gate triggers stay. Reason: the owner wants swipe-right to mean publish, and a visible bar with undo keeps it a conscious owner action.
+
+## Decision 32 (2026-11-20): platforms, music, accounts, Copilot
+- **Platforms:** TikTok and Instagram together from the start; YouTube and Facebook follow. Every platform in the code must be supported (all accounts, niches and languages), no hard-coding to one.
+- **Music:** free sources only, but with paid-library quality and chosen smartly: tracks matched to niche, mood, tempo and the clip's energy; loudness and ducking tuned per platform; a per-clip licence log (source, licence, track, date). Free burned-in sources with clear commercial licences only (see `docs/research-verdicts.md`); platform libraries stay in-app on the manual path.
+- **Copilot:** the owner allows using it for well-specified mechanical work (review, tests, docs, audits) on its own branches; its output is reviewed before merge.
+- **main** is merged (8d7127d) and protected against force-push and deletion.
