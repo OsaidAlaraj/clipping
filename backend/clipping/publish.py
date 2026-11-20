@@ -370,6 +370,35 @@ def confirm_post(conn, actor, clip_id, platforms, ticks, request_id, via: str | 
     return {"targets": [_view(r) for r in made]}
 
 
+def feed_targets(conn, actor, clips: list[dict]) -> None:
+    """Adds `post_targets` to each feed card: where a swipe right would post it (platform, the owner's account, and whether it is
+    connected). The card shows this before the swipe, so the owner always sees the accounts the swipe confirms."""
+    cache: dict = {}
+    for clip in clips:
+        key = str(clip["campaign_id"])
+        if key not in cache:
+            version = conn.execute("select rules_json from campaign_versions where id = %s", (clip["campaign_version_id"],)).fetchone()
+            cache[key] = {"allowed": (version["rules_json"].get("platforms_allowed") or []) if version else [],
+                          "campaign": conn.execute("select category_id from campaigns where id = %s", (clip["campaign_id"],)).fetchone(), "by_platform": {}}
+        info, out = cache[key], []
+        for platform in PLATFORMS:
+            if platform not in info["allowed"] or clip.get("is_practice"):
+                continue
+            own = bool(clip["account_id"] and clip["platform"] == platform)
+            if not own and platform in info["by_platform"]:
+                account = info["by_platform"][platform]
+            else:
+                account = _account_for(conn, actor, clip, info["campaign"], platform)
+                if not own:
+                    info["by_platform"][platform] = account
+            if account is None or account["status"] != "active":
+                continue
+            connection = connections.for_account(conn, account["id"])
+            out.append({"platform": platform, "label": PLATFORM_LABEL[platform], "handle": account["handle"],
+                        "manual": connection is None or connection["state"] == "needs_reconnect"})
+        clip["post_targets"] = out
+
+
 def _compliance_warning(clip: dict) -> str | None:
     """One plain sentence when compliance says "review" (a warning, not a block); None when it passes."""
     if clip["compliance_status"] != "review":

@@ -832,7 +832,9 @@ def device_code(actor: Actor = Depends(current_actor)):
 @app.get("/api/feed")
 def get_feed(campaign_id: str | None = None, actor: Actor = Depends(current_actor)):
     with get_db().session(actor) as conn:
-        return {"clips": review.feed(conn, actor.operator_id, campaign_id), "kill_switch": kill_switch(conn)["active"],
+        clips = review.feed(conn, actor.operator_id, campaign_id)
+        publish.feed_targets(conn, actor, clips)
+        return {"clips": clips, "kill_switch": kill_switch(conn)["active"],
                 "filtered": moments.filtered_list(conn, campaign_id),
                 "undo_window_s": review.get_setting(conn, "undo_window_s", actor.operator_id),
                 "session_length_min": review.get_setting(conn, "session_length_min", actor.operator_id),

@@ -228,3 +228,17 @@ def test_the_posting_screen_confirm_cannot_set_the_swipe_marker(posting):
     reply = client.post(f"/api/clips/{other}/post", json={"platforms": ["tiktok"], "request_id": "x1", "via": "swipe",
                                                          "ticks": {"tiktok": SWIPE}})
     assert reply.status_code == 400
+
+
+def test_the_feed_shows_where_a_swipe_would_post_before_the_swipe(posting):
+    api._owner = posting.owner
+    clips = TestClient(api.app).get("/api/feed").json()["clips"]
+    targets = clips[0]["post_targets"]
+    assert [t["platform"] for t in targets] == ALL and all(t["handle"] and t["manual"] is False for t in targets)
+
+
+def test_the_feed_marks_a_platform_without_a_connection_as_manual(produced, monkeypatch):
+    p = Posting(produced, monkeypatch, connected=("tiktok",))
+    api._owner = p.owner
+    targets = {t["platform"]: t for t in TestClient(api.app).get("/api/feed").json()["clips"][0]["post_targets"]}
+    assert targets["tiktok"]["manual"] is False and targets["instagram_reels"]["manual"] is True
