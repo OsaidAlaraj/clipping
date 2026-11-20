@@ -27,6 +27,20 @@ from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"], allow_credentials=True,  # uploads and screenshots
                    allow_methods=["GET", "POST"], allow_headers=["*"])
 _owner: Actor | None = None
+SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+
+
+@app.middleware("http")
+async def refuse_foreign_origins(request: Request, call_next):
+    """A browser sends `Origin` on every cross-site write. A write from a page that is not this app (CSRF, or DNS rebinding
+    against the local API) is refused before it reaches any handler: nothing posts, disconnects or cancels on a stranger's say-so.
+    Requests with no Origin (the test client, curl, the worker) are not browsers and pass; the session cookie is SameSite=Lax."""
+    origin = request.headers.get("origin")
+    if origin is not None and request.method not in SAFE_METHODS:
+        allowed = {*auth.allowed_origins(), "http://127.0.0.1:3000", "http://127.0.0.1:8787"}
+        if origin.rstrip("/") not in allowed:
+            return JSONResponse({"error": "This request came from another site, so it was refused.", "code": "bad_origin"}, status_code=403)
+    return await call_next(request)
 
 
 def _supabase_actor(token: str) -> Actor:
@@ -840,7 +854,9 @@ def device_code(actor: Actor = Depends(current_actor)):
 @app.get("/api/feed")
 def get_feed(campaign_id: str | None = None, actor: Actor = Depends(current_actor)):
     with get_db().session(actor) as conn:
-        return {"clips": review.feed(conn, actor.operator_id, campaign_id), "kill_switch": kill_switch(conn)["active"],
+        clips = review.feed(conn, actor.operator_id, campaign_id)
+        publish.feed_targets(conn, actor, clips)
+        return {"clips": clips, "kill_switch": kill_switch(conn)["active"],
                 "filtered": moments.filtered_list(conn, campaign_id),
                 "undo_window_s": review.get_setting(conn, "undo_window_s", actor.operator_id),
                 "session_length_min": review.get_setting(conn, "session_length_min", actor.operator_id),
@@ -986,6 +1002,27 @@ def post_options(clip_id: str, actor: Actor = Depends(current_actor)):
 @app.post("/api/clips/{clip_id}/post")
 def post_clip(clip_id: str, body: PostIn, actor: Actor = Depends(current_actor)):
     return run(actor, publish.confirm_post, actor, clip_id, body.platforms, body.ticks, body.request_id)
+
+
+class SwipeIn(BaseModel):
+    request_id: str | None = None
+    session_id: str | None = None
+    client_action_id: str | None = None
+
+
+class SwipeUndoIn(BaseModel):
+    review_id: str
+
+
+@app.post("/api/clips/{clip_id}/swipe")
+def swipe_clip(clip_id: str, body: SwipeIn, actor: Actor = Depends(current_actor)):
+    """Swipe right in the feed: accept and confirm the posts in one owner action (decision 31)."""
+    return run(actor, publish.swipe_confirm, actor, clip_id, body.request_id, body.session_id, body.client_action_id)
+
+
+@app.post("/api/clips/{clip_id}/swipe/undo")
+def swipe_undo(clip_id: str, body: SwipeUndoIn, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.swipe_undo, actor, clip_id, body.review_id)
 
 
 @app.get("/api/clips/{clip_id}/post-status")

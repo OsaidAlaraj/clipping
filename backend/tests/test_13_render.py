@@ -3,6 +3,7 @@ FFmpeg is real; the database is the embedded one; no vendor is called."""
 from __future__ import annotations
 
 import datetime as dt
+import re
 import struct
 from decimal import Decimal
 from pathlib import Path
@@ -91,12 +92,12 @@ class Spy:
 
 def test_DW_5_1_a_clip_is_one_encode_with_captions_and_disclosure_burned_in(tmp_path, footage, monkeypatch):
     spy = Spy(monkeypatch)
-    result = render(tmp_path, Path(footage), clip_for(2.0, 12.0, hook_text="A hook for the title card"), words=WORDS)
+    result = render(tmp_path, Path(footage), clip_for(2.0, 12.0, hook_text="A hook for the title card"), {"tighten": False}, words=WORDS)
     assert result["encodes"] == 1 and len(spy.encodes) == 1               # exactly one encode, counted from the FFmpeg calls
     graph = spy.encodes[0][spy.encodes[0].index("-filter_complex") + 1]
     assert "ass=out.ass" in graph                                          # captions, label and title card ride in that encode
     ass = Path(result["ass_path"]).read_text(encoding="utf-8-sig")
-    assert "Label,,0,0,0,,#ad" in ass and "Dialogue: 3," in ass and "words with punctuation" in ass
+    assert "Label,,0,0,0,,#ad" in ass and "Dialogue: 3," in ass and "with punctuation" in re.sub(r"\{[^}]*\}", "", ass)
     info = ffmpeg.probe(Path(result["path"]))
     assert info["has_audio"] and abs(info["duration_s"] - 10.0) < 0.3 and (info["width"], info["height"]) == (W, H)
     assert result["overlay"] == {"text": "#ad", "start_s": 0.0, "end_s": info["duration_s"]}
@@ -414,7 +415,7 @@ def test_the_encoder_choice_follows_the_setting_and_the_gpu(monkeypatch):
     assert ffmpeg.video_encoder("auto") == "libx264" and ffmpeg.video_encoder("x264") == "libx264" and ffmpeg.video_encoder("nvenc") == "h264_nvenc"
     monkeypatch.setattr(ffmpeg, "nvenc_ready", lambda: True)
     assert ffmpeg.video_encoder("auto") == "h264_nvenc" and ffmpeg.video_encoder("x264") == "libx264"
-    assert "h264_nvenc" in ffmpeg.encoder_args("h264_nvenc") and ffmpeg.encoder_args("libx264", "fast", 20) == ["-c:v", "libx264", "-preset", "fast", "-crf", "20"]
+    assert "h264_nvenc" in ffmpeg.encoder_args("h264_nvenc") and ffmpeg.encoder_args("libx264", "fast", 20) == ["-c:v", "libx264", "-preset", "fast", "-crf", "17"]
 
 
 def test_nvenc_probe_is_cached_and_a_missing_gpu_gives_false(monkeypatch):

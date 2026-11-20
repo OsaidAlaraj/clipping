@@ -1,0 +1,18 @@
+﻿{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "bicubic (current)", "vmaf": 85.42, "vmaf_neg": 83.37, "ssim": 0.976, "psnr": 34.96, "sharpness_vs_truth": 0.975}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "bilinear", "vmaf": 71.7, "vmaf_neg": 71.05, "ssim": 0.973, "psnr": 32.77, "sharpness_vs_truth": 0.87}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "lanczos", "vmaf": 87.18, "vmaf_neg": 84.54, "ssim": 0.9764, "psnr": 35.59, "sharpness_vs_truth": 1.002}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "spline", "vmaf": 86.32, "vmaf_neg": 84.38, "ssim": 0.9766, "psnr": 35.58, "sharpness_vs_truth": 0.99}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "bicubic+unsharp0.5", "vmaf": 91.6, "vmaf_neg": 83.3, "ssim": 0.9753, "psnr": 34.86, "sharpness_vs_truth": 1.055}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "lanczos+unsharp0.4", "vmaf": 91.41, "vmaf_neg": 83.5, "ssim": 0.9749, "psnr": 35.16, "sharpness_vs_truth": 1.07}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "lanczos+unsharp0.8", "vmaf": 93.16, "vmaf_neg": 81.06, "ssim": 0.9726, "psnr": 33.89, "sharpness_vs_truth": 1.126}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "lanczos+cas0.5", "vmaf": 89.42, "vmaf_neg": 84.31, "ssim": 0.9751, "psnr": 35.45, "sharpness_vs_truth": 1.056}
+{"part": "A", "clip": "studio_1080p", "source": "1920x1080", "candidate": "lanczos+cas0.8", "vmaf": 90.8, "vmaf_neg": 83.39, "ssim": 0.9735, "psnr": 35.15, "sharpness_vs_truth": 1.1}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "bicubic (current)", "vmaf": 90.39, "vmaf_neg": 88.12, "ssim": 0.9903, "psnr": 32.39, "sharpness_vs_truth": 0.977}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "bilinear", "vmaf": 69.1, "vmaf_neg": 68.61, "ssim": 0.9821, "psnr": 30.01, "sharpness_vs_truth": 0.846}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "lanczos", "vmaf": 93.41, "vmaf_neg": 89.67, "ssim": 0.9915, "psnr": 32.89, "sharpness_vs_truth": 1.014}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "spline", "vmaf": 91.8, "vmaf_neg": 89.47, "ssim": 0.9918, "psnr": 32.87, "sharpness_vs_truth": 0.996}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "bicubic+unsharp0.5", "vmaf": 98.97, "vmaf_neg": 86.58, "ssim": 0.99, "psnr": 32.07, "sharpness_vs_truth": 1.077}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "lanczos+unsharp0.4", "vmaf": 98.22, "vmaf_neg": 86.46, "ssim": 0.9895, "psnr": 32.3, "sharpness_vs_truth": 1.099}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "lanczos+unsharp0.8", "vmaf": 98.13, "vmaf_neg": 81.38, "ssim": 0.9855, "psnr": 30.77, "sharpness_vs_truth": 1.174}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "lanczos+cas0.5", "vmaf": 94.48, "vmaf_neg": 88.73, "ssim": 0.9895, "psnr": 32.74, "sharpness_vs_truth": 1.069}
+{"part": "A", "clip": "slides_720p", "source": "1280x720", "candidate": "lanczos+cas0.8", "vmaf": 93.93, "vmaf_neg": 86.73, "ssim": 0.9872, "psnr": 32.25, "sharpness_vs_truth": 1.121}

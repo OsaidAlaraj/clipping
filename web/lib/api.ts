@@ -32,6 +32,8 @@ export type Clip = {
   hooks: Hook[];
   park_reason: string | null;
   skip_count?: number;
+  /** Where a swipe right would post this clip (the owner's account per platform, and whether it is connected). */
+  post_targets?: { platform: string; label: string; handle: string; manual: boolean }[];
   deadline: string | null;
   due_at: string | null;
   rate_per_1k: number | null;
@@ -81,6 +83,13 @@ export class ApiError extends Error {
     super(message);
   }
 }
+
+/** The answer to a swipe right: the accepted decision, and one target per platform it queued (or marked manual). */
+export type SwipeResult = {
+  review: Review | null; clip_id: string; practice: boolean; warning: string | null;
+  targets: { id: string; platform: string; label: string; handle: string; manual: boolean; scheduled_at: string; state: string }[];
+  skipped: { platform: string; label: string; reason: string | null }[];
+};
 
 /** True when the request never reached the server (offline, or the server is down). */
 export class NetworkError extends Error {}

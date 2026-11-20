@@ -1,10 +1,9 @@
 """The blur_pad layout: the whole 16:9 picture centred on a blurred, darkened 9:16 copy of itself, chosen by the template."""
 import pytest
 
-from clipping import ffmpeg
 from clipping.adapters import media
 from clipping.core import AppError
-from test_13_render import H, W, adapter, clip_for, flat_source, frame, render
+from test_13_render import H, adapter, clip_for, flat_source, frame, render  # noqa: F401  (adapter is a fixture)
 
 
 def test_blur_pad_is_one_filtergraph_that_keeps_the_whole_picture():

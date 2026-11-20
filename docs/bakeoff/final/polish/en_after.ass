@@ -1,0 +1,187 @@
+﻿[Script Info]
+ScriptType: v4.00+
+PlayResX: 720
+PlayResY: 1280
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,Arial,64,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,5,0,2,60,60,204,1
+Style: Label,Arial,33,&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,6,0,7,30,30,44,1
+Style: Title,Arial,46,&H00101010,&H00FFFFFF,&H0000C4FF,&H0000C4FF,1,0,0,0,100,100,0,0,3,9,0,8,72,72,128,1
+Style: Bar,Arial,20,&H0000C4FF,&H0000C4FF,&H0000C4FF,&H0000C4FF,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 5,0:00:00.00,0:00:38.26,Label,,0,0,0,,#ad
+Dialogue: 3,0:00:00.00,0:00:03.00,Title,,0,0,0,,{\fad(150,200)}Why this changes everything
+Dialogue: 4,0:00:00.00,0:00:38.26,Bar,,0,0,0,,{\an7\pos(0,1273)\fscx0.1\t(0,37255,\fscx100)\p1}m 0 0 l 720 0 720 7 0 7
+Dialogue: 0,0:00:00.00,0:00:00.05,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}and{\1c&H00FFFFFF&} then you
+Dialogue: 0,0:00:00.05,0:00:00.13,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}and {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}then{\1c&H00FFFFFF&} you
+Dialogue: 0,0:00:00.13,0:00:00.25,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}and then {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:00.25,0:00:00.49,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}try{\1c&H00FFFFFF&} it and
+Dialogue: 0,0:00:00.49,0:00:00.69,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}try {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it{\1c&H00FFFFFF&} and
+Dialogue: 0,0:00:00.69,0:00:00.81,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}try it {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}and{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:00.81,0:00:00.95,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it's{\1c&H00FFFFFF&} not really
+Dialogue: 0,0:00:00.95,0:00:01.05,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}it's {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}not{\1c&H00FFFFFF&} really
+Dialogue: 0,0:00:01.05,0:00:01.23,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}it's not {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}really{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:01.23,0:00:01.41,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}what{\1c&H00FFFFFF&} you want
+Dialogue: 0,0:00:01.41,0:00:01.49,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}what {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&} want
+Dialogue: 0,0:00:01.49,0:00:01.79,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}what you {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}want{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:01.79,0:00:02.31,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you're{\1c&H00FFFFFF&} still signing
+Dialogue: 0,0:00:02.31,0:00:02.45,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}still{\1c&H00FFFFFF&} signing
+Dialogue: 0,0:00:02.45,0:00:02.71,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're still {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}signing{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:02.71,0:00:02.83,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}up{\1c&H00FFFFFF&} to netflix
+Dialogue: 0,0:00:02.83,0:00:02.93,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}up {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}to{\1c&H00FFFFFF&} netflix
+Dialogue: 0,0:00:02.93,0:00:03.27,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}up to {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}netflix{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:03.27,0:00:03.65,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}and{\1c&H00FFFFFF&} you're still
+Dialogue: 0,0:00:03.65,0:00:03.77,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}and {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you're{\1c&H00FFFFFF&} still
+Dialogue: 0,0:00:03.77,0:00:03.93,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}and you're {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}still{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:03.93,0:00:04.39,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}and{\1c&H00FFFFFF&} then now
+Dialogue: 0,0:00:04.39,0:00:04.57,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}and {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}then{\1c&H00FFFFFF&} now
+Dialogue: 0,0:00:04.57,0:00:04.75,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}and then {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}now{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:04.75,0:00:04.93,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you're{\1c&H00FFFFFF&} going to
+Dialogue: 0,0:00:04.93,0:00:04.99,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}going{\1c&H00FFFFFF&} to
+Dialogue: 0,0:00:04.99,0:00:05.09,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're going {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}to{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:05.09,0:00:05.25,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}find{\1c&H00FFFFFF&} the thing
+Dialogue: 0,0:00:05.25,0:00:05.43,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}find {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}the{\1c&H00FFFFFF&} thing
+Dialogue: 0,0:00:05.43,0:00:05.51,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}find the {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}thing{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:05.51,0:00:05.63,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}that{\1c&H00FFFFFF&} you do
+Dialogue: 0,0:00:05.63,0:00:05.77,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&} do
+Dialogue: 0,0:00:05.77,0:00:05.87,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that you {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}do{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:05.87,0:00:06.09,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}love{\1c&H00FFFFFF&} so in
+Dialogue: 0,0:00:06.09,0:00:06.51,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}love {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}so{\1c&H00FFFFFF&} in
+Dialogue: 0,0:00:06.51,0:00:06.63,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}love so {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}in{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:06.63,0:00:06.71,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}that{\1c&H00FFFFFF&} regard yeah
+Dialogue: 0,0:00:06.71,0:00:06.95,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}regard{\1c&H00FFFFFF&} yeah
+Dialogue: 0,0:00:06.95,0:00:07.15,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that regard {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}yeah{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:07.15,0:00:07.33,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}no{\1c&H00FFFFFF&} i could
+Dialogue: 0,0:00:07.33,0:00:07.45,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}no {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}i{\1c&H00FFFFFF&} could
+Dialogue: 0,0:00:07.45,0:00:07.55,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}no i {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}could{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:07.55,0:00:07.65,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}i{\1c&H00FFFFFF&} could be
+Dialogue: 0,0:00:07.65,0:00:07.79,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}i {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}could{\1c&H00FFFFFF&} be
+Dialogue: 0,0:00:07.79,0:00:07.89,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}i could {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}be{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:07.89,0:00:08.01,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}on{\1c&H00FFFFFF&} board with
+Dialogue: 0,0:00:08.01,0:00:08.19,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}on {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}board{\1c&H00FFFFFF&} with
+Dialogue: 0,0:00:08.19,0:00:08.35,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}on board {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}with{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:08.35,0:00:08.55,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}that{\1c&H00FFFFFF&} and then
+Dialogue: 0,0:00:08.55,0:00:09.42,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}and{\1c&H00FFFFFF&} then
+Dialogue: 0,0:00:09.42,0:00:09.52,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that and {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}then{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:09.52,0:00:09.66,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}also{\1c&H00FFFFFF&} after the
+Dialogue: 0,0:00:09.66,0:00:09.92,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}also {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}after{\1c&H00FFFFFF&} the
+Dialogue: 0,0:00:09.92,0:00:10.04,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}also after {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}the{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:10.04,0:00:10.14,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}two{\1c&H00FFFFFF&} minutes you
+Dialogue: 0,0:00:10.14,0:00:10.32,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}two {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}minutes{\1c&H00FFFFFF&} you
+Dialogue: 0,0:00:10.32,0:00:10.42,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}two minutes {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:10.42,0:00:10.52,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}have{\1c&H00FFFFFF&} like infinite
+Dialogue: 0,0:00:10.52,0:00:10.64,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}have {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}like{\1c&H00FFFFFF&} infinite
+Dialogue: 0,0:00:10.64,0:00:10.98,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}have like {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}infinite{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:10.98,0:00:11.36,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}options{\1c&H00FFFFFF&} to get
+Dialogue: 0,0:00:11.36,0:00:11.68,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}options {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}to{\1c&H00FFFFFF&} get
+Dialogue: 0,0:00:11.68,0:00:12.12,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}options to {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}get{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:12.12,0:00:12.38,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}out{\1c&H00FFFFFF&} you could
+Dialogue: 0,0:00:12.38,0:00:13.00,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}out {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&} could
+Dialogue: 0,0:00:13.00,0:00:13.14,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}out you {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}could{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:13.14,0:00:13.50,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}view{\1c&H00FFFFFF&} something else
+Dialogue: 0,0:00:13.50,0:00:13.78,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}view {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}something{\1c&H00FFFFFF&} else
+Dialogue: 0,0:00:13.78,0:00:13.98,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}view something {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}else{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:13.98,0:00:14.12,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}so{\1c&H00FFFFFF&} like if
+Dialogue: 0,0:00:14.12,0:00:14.22,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}so {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}like{\1c&H00FFFFFF&} if
+Dialogue: 0,0:00:14.22,0:00:14.38,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}so like {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}if{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:14.38,0:00:14.54,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you're{\1c&H00FFFFFF&} actually like
+Dialogue: 0,0:00:14.54,0:00:14.64,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}actually{\1c&H00FFFFFF&} like
+Dialogue: 0,0:00:14.64,0:00:14.96,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're actually {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}like{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:14.96,0:00:15.36,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}thomas{\1c&H00FFFFFF&} saying if
+Dialogue: 0,0:00:15.36,0:00:15.56,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}thomas {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}saying{\1c&H00FFFFFF&} if
+Dialogue: 0,0:00:15.56,0:00:15.70,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}thomas saying {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}if{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:15.70,0:00:15.78,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&} are sticking
+Dialogue: 0,0:00:15.78,0:00:15.98,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}are{\1c&H00FFFFFF&} sticking
+Dialogue: 0,0:00:15.98,0:00:16.20,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you are {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}sticking{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:16.20,0:00:16.36,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}around{\1c&H00FFFFFF&} for two
+Dialogue: 0,0:00:16.36,0:00:16.46,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}around {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}for{\1c&H00FFFFFF&} two
+Dialogue: 0,0:00:16.46,0:00:16.56,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}around for {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}two{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:16.56,0:00:16.80,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}minutes{\1c&H00FFFFFF&} i mean
+Dialogue: 0,0:00:16.80,0:00:17.48,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}minutes {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}i{\1c&H00FFFFFF&} mean
+Dialogue: 0,0:00:17.48,0:00:17.56,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}minutes i {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}mean{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:17.56,0:00:17.64,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you{\1c&H00FFFFFF&} had the
+Dialogue: 0,0:00:17.64,0:00:17.80,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}had{\1c&H00FFFFFF&} the
+Dialogue: 0,0:00:17.80,0:00:17.90,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you had {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}the{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:17.90,0:00:18.12,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}option{\1c&H00FFFFFF&} to jump
+Dialogue: 0,0:00:18.12,0:00:18.26,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}option {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}to{\1c&H00FFFFFF&} jump
+Dialogue: 0,0:00:18.26,0:00:18.46,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}option to {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}jump{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:18.46,0:00:18.68,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}out{\1c&H00FFFFFF&} already there's
+Dialogue: 0,0:00:18.68,0:00:19.20,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}out {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}already{\1c&H00FFFFFF&} there's
+Dialogue: 0,0:00:19.20,0:00:19.64,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}out already {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}there's{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:19.64,0:00:19.74,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}not{\1c&H00FFFFFF&} like it's
+Dialogue: 0,0:00:19.74,0:00:19.90,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}not {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}like{\1c&H00FFFFFF&} it's
+Dialogue: 0,0:00:19.90,0:00:20.08,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}not like {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it's{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:20.08,0:00:20.48,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}everything's{\1c&H00FFFFFF&} on demand
+Dialogue: 0,0:00:20.48,0:00:20.58,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}everything's {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}on{\1c&H00FFFFFF&} demand
+Dialogue: 0,0:00:20.58,0:00:20.78,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}everything's on {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}demand{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:20.78,0:00:20.98,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}you're{\1c&H00FFFFFF&} choosing to
+Dialogue: 0,0:00:20.98,0:00:21.24,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}choosing{\1c&H00FFFFFF&} to
+Dialogue: 0,0:00:21.24,0:00:21.38,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}you're choosing {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}to{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:21.38,0:00:21.54,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}watch{\1c&H00FFFFFF&} it so
+Dialogue: 0,0:00:21.54,0:00:21.64,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}watch {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it{\1c&H00FFFFFF&} so
+Dialogue: 0,0:00:21.64,0:00:21.80,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}watch it {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}so{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:21.80,0:00:22.22,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}i{\1c&H00FFFFFF&} think that
+Dialogue: 0,0:00:22.22,0:00:22.40,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}i {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}think{\1c&H00FFFFFF&} that
+Dialogue: 0,0:00:22.40,0:00:22.56,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}i think {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}that{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:22.56,0:00:22.90,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}number{\1c&H00FFFFFF&} may not
+Dialogue: 0,0:00:22.90,0:00:23.08,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}number {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}may{\1c&H00FFFFFF&} not
+Dialogue: 0,0:00:23.08,0:00:23.22,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}number may {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}not{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:23.22,0:00:23.50,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}be{\1c&H00FFFFFF&} too great
+Dialogue: 0,0:00:23.50,0:00:24.08,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}be {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}too{\1c&H00FFFFFF&} great
+Dialogue: 0,0:00:24.08,0:00:24.28,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}be too {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}great{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:24.28,0:00:24.46,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}but{\1c&H00FFFFFF&} i'm sure
+Dialogue: 0,0:00:24.46,0:00:24.60,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}but {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}i'm{\1c&H00FFFFFF&} sure
+Dialogue: 0,0:00:24.60,0:00:24.72,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}but i'm {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}sure{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:24.72,0:00:24.90,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}once{\1c&H00FFFFFF&} the numbers
+Dialogue: 0,0:00:24.90,0:00:25.02,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}once {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}the{\1c&H00FFFFFF&} numbers
+Dialogue: 0,0:00:25.02,0:00:25.24,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}once the {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}numbers{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:25.24,0:00:25.38,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}are{\1c&H00FFFFFF&} like if
+Dialogue: 0,0:00:25.38,0:00:25.70,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}are {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}like{\1c&H00FFFFFF&} if
+Dialogue: 0,0:00:25.70,0:00:26.52,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}are like {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}if{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:26.52,0:00:26.84,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}completion{\1c&H00FFFFFF&} rates were
+Dialogue: 0,0:00:26.84,0:00:27.06,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}completion {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}rates{\1c&H00FFFFFF&} were
+Dialogue: 0,0:00:27.06,0:00:27.18,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}completion rates {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}were{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:27.18,0:00:27.38,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}super{\1c&H00FFFFFF&} high it's
+Dialogue: 0,0:00:27.38,0:00:27.66,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}super {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}high{\1c&H00FFFFFF&} it's
+Dialogue: 0,0:00:27.66,0:00:28.12,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}super high {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it's{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:28.12,0:00:28.20,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}so{\1c&H00FFFFFF&} they'd be
+Dialogue: 0,0:00:28.20,0:00:28.46,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}so {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}they'd{\1c&H00FFFFFF&} be
+Dialogue: 0,0:00:28.46,0:00:28.54,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}so they'd {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}be{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:28.54,0:00:28.72,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}talking{\1c&H00FFFFFF&} about that
+Dialogue: 0,0:00:28.72,0:00:28.84,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}talking {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}about{\1c&H00FFFFFF&} that
+Dialogue: 0,0:00:28.84,0:00:28.98,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}talking about {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}that{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:28.98,0:00:29.12,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}too{\1c&H00FFFFFF&} i'm not
+Dialogue: 0,0:00:29.12,0:00:29.78,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}too {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}i'm{\1c&H00FFFFFF&} not
+Dialogue: 0,0:00:29.78,0:00:30.06,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}too i'm {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}not{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:30.06,0:00:30.24,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}trying{\1c&H00FFFFFF&} to argue
+Dialogue: 0,0:00:30.24,0:00:30.36,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}trying {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}to{\1c&H00FFFFFF&} argue
+Dialogue: 0,0:00:30.36,0:00:30.62,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}trying to {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}argue{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:30.62,0:00:30.80,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}that{\1c&H00FFFFFF&} two minutes
+Dialogue: 0,0:00:30.80,0:00:30.96,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}two{\1c&H00FFFFFF&} minutes
+Dialogue: 0,0:00:30.96,0:00:31.20,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}that two {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}minutes{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:31.20,0:00:31.42,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}is{\1c&H00FFFFFF&} like it's
+Dialogue: 0,0:00:31.42,0:00:31.60,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}is {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}like{\1c&H00FFFFFF&} it's
+Dialogue: 0,0:00:31.60,0:00:31.84,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}is like {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it's{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:31.84,0:00:31.94,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}a{\1c&H00FFFFFF&} perfectly great
+Dialogue: 0,0:00:31.94,0:00:32.30,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}a {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}perfectly{\1c&H00FFFFFF&} great
+Dialogue: 0,0:00:32.30,0:00:32.68,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}a perfectly {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}great{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:32.68,0:00:32.96,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}number{\1c&H00FFFFFF&} but it's
+Dialogue: 0,0:00:32.96,0:00:33.22,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}number {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}but{\1c&H00FFFFFF&} it's
+Dialogue: 0,0:00:33.22,0:00:33.58,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}number but {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it's{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:33.58,0:00:33.74,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}probably{\1c&H00FFFFFF&} not as
+Dialogue: 0,0:00:33.74,0:00:33.92,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}probably {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}not{\1c&H00FFFFFF&} as
+Dialogue: 0,0:00:33.92,0:00:34.30,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}probably not {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}as{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:34.30,0:00:34.50,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}bad{\1c&H00FFFFFF&} as it
+Dialogue: 0,0:00:34.50,0:00:34.72,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}bad {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}as{\1c&H00FFFFFF&} it
+Dialogue: 0,0:00:34.72,0:00:34.84,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}bad as {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}it{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:34.84,0:00:35.24,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}sounds{\1c&H00FFFFFF&} is my
+Dialogue: 0,0:00:35.24,0:00:35.58,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}sounds {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}is{\1c&H00FFFFFF&} my
+Dialogue: 0,0:00:35.58,0:00:35.90,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}sounds is {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}my{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:35.90,0:00:36.16,Caption,,0,0,0,,{\an5\pos(360,896)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}guess{\1c&H00FFFFFF&} all right
+Dialogue: 0,0:00:36.16,0:00:37.16,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}guess {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}all{\1c&H00FFFFFF&} right
+Dialogue: 0,0:00:37.16,0:00:37.41,Caption,,0,0,0,,{\an5\pos(360,896)\fs64}guess all {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}right{\1c&H00FFFFFF&}

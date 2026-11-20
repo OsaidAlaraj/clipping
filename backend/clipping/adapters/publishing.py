@@ -19,6 +19,7 @@ import json
 import re
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -36,6 +37,7 @@ TT_API = "https://open.tiktokapis.com/v2/post/publish"
 PRIVACY = ("private", "unlisted", "public")
 ID_RE = re.compile(r"^[A-Za-z0-9_.~:-]{3,128}$")
 BLOCK = 1 << 20
+TIKTOK_HOST = re.compile(r"[a-z0-9-]+(\.[a-z0-9-]+)*\.tiktokapis\.com")
 
 
 def provider_name() -> str:
@@ -65,6 +67,19 @@ def _blocks(path: Path):
     with path.open("rb") as handle:
         while block := handle.read(BLOCK):
             yield block
+
+
+def _tiktok_upload_ok(url) -> bool:
+    """The upload address TikTok returns must be https on TikTok's own API domain. The host is parsed, not split out of the
+    text: `https://evil.example/?x.tiktokapis.com` and `https://evil.example#.tiktokapis.com` must not pass."""
+    try:
+        parts = urlsplit(url) if isinstance(url, str) else None
+        host = (parts.hostname or "").lower() if parts else ""
+        if parts:
+            parts.port                 # a bad port raises ValueError
+    except ValueError:
+        return False
+    return parts is not None and parts.scheme == "https" and not parts.username and bool(TIKTOK_HOST.fullmatch(host))
 
 
 class _Done(Exception):
@@ -400,7 +415,7 @@ class PlatformPublishing(Adapter):
             self._stop(f"the platform answered: {_clean(error.get('message') or error.get('code') or 'no reason given')}")
         body = data.get("data") if isinstance(data.get("data"), dict) else {}
         publish_id, url = self._id(body.get("publish_id"), "publish id"), body.get("upload_url")
-        if not (isinstance(url, str) and url.startswith("https://") and url.split("/")[2].endswith(".tiktokapis.com")):
+        if not _tiktok_upload_ok(url):
             self._bad("upload address")
         self._post_id = publish_id
         self._upload_started("tiktok", connection_id)

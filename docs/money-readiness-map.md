@@ -22,10 +22,10 @@ Status: DONE (built and reviewed) / PARTLY / MISSING (not built) / OWNER (only t
 
 ## 3. Rights, policy and compliance
 - Written permission per source, kept with the clip: PARTLY (rules and audit log exist; permission letter template MISSING)
-- Originality: permission is not enough; add real value (commentary, structure, framing): MISSING (originality layer: minimal version DONE on branch caption-lab, on-screen part MISSING)
+- Originality: permission is not enough; add real value (commentary, structure, framing): MISSING (originality layer)
 - One source moment to one account, never the same moment on several: RULE ADDED
 - Disclosure (#ad or paid-partnership label) top of caption and in the clip: DONE
-- Music licensing: royalty-free burned-in with a per-clip log, platform libraries in-app only: MISSING (music bed stage)
+- Music licensing: royalty-free burned-in with a per-clip log, platform libraries in-app only: DONE with 37 free CC0 beds (no credit lines), per-clip licence log; thin spots listed in docs/bakeoff/final/music
 - Captions that match the video (no misleading descriptions): RULE ADDED, caption checker DONE (caption lab, branch caption-lab)
 - Brand and adult safety flags: PARTLY
 - Privacy and terms pages: DONE (clipmind.app); kill switch and human gates: DONE

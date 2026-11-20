@@ -63,9 +63,9 @@ describe("feed card", () => {
 });
 
 describe("accept and reject gestures", () => {
-  it("swipe right accepts and moves on to the next clip", async () => {
+  it("accepting (the A key or the check button) records the decision and moves on to the next clip", async () => {
     const { mock, card } = await open(feedRoutes(three()));
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     await waitFor(() => expect(mock.posts("/accept")).toHaveLength(1));
     expect(mock.posts("/accept")[0].path).toBe("/api/clips/c1/accept");
     expect(mock.posts("/accept")[0].body.session_id).toBe("s1");
@@ -152,7 +152,7 @@ describe("accept and reject gestures", () => {
 
   it("a refused accept puts the clip back and says why", async () => {
     const { card } = await open(feedRoutes(three(), { "POST /api/clips/c1/accept": { __status: 403, body: { error: "This clip failed compliance." } } }));
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     await screen.findByText("This clip failed compliance.");
     expect(screen.getByText("1 of 3")).toBeTruthy();
   });
@@ -236,7 +236,7 @@ describe("offline and right-to-left", () => {
   it("saves review actions on the device while offline and sends them once later", async () => {
     const { mock, card } = await open(feedRoutes(three()));
     mock.state.offline = true;
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     await waitFor(() => expect(readOutbox()).toHaveLength(1));
     expect(readOutbox()[0].path).toBe("/api/clips/c1/accept");
     await screen.findByText("1 of 2"); // the clip still leaves the feed at once
@@ -265,7 +265,7 @@ describe("offline and right-to-left", () => {
     expect(document.documentElement.lang).toBe("ar");
     expect(screen.getByRole("button", { name: "قبول" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "رفض" })).toBeTruthy();
-    swipe(card, [100, 300], [260, 300]); // right still accepts
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     await waitFor(() => expect(mock.posts("/accept")).toHaveLength(1));
     swipe(screen.getByTestId("clip-card"), [260, 300], [100, 300]); // left still rejects
     await screen.findByRole("dialog");

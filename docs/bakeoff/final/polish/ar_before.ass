@@ -1,0 +1,47 @@
+﻿[Script Info]
+ScriptType: v4.00+
+PlayResX: 720
+PlayResY: 1280
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,Arial,53,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,4,0,2,60,60,204,1
+Style: Label,Arial,33,&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,6,0,9,30,30,44,1
+Style: Title,Arial,46,&H00101010,&H00FFFFFF,&H0000C4FF,&H0000C4FF,1,0,0,0,100,100,0,0,3,9,0,8,72,72,128,1
+Style: Bar,Arial,20,&H0000C4FF,&H0000C4FF,&H0000C4FF,&H0000C4FF,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 5,0:00:00.00,0:00:37.77,Label,,0,0,0,,#إعلان
+Dialogue: 3,0:00:00.00,0:00:03.00,Title,,0,0,0,,{\fad(150,200)}لماذا هذا يغير كل شيء
+Dialogue: 4,0:00:00.00,0:00:37.77,Bar,,0,0,0,,{\an7\pos(0,1273)\fscx0.1\t(0,36770,\fscx100)\p1}m 0 0 l 720 0 720 7 0 7
+Dialogue: 0,0:00:00.05,0:00:01.39,Caption,,0,0,0,,يعتبر نسبته كام
+Dialogue: 0,0:00:02.77,0:00:04.39,Caption,,0,0,0,,على كام؟
+Dialogue: 0,0:00:04.39,0:00:06.05,Caption,,0,0,0,,الخمسة وعشرين في
+Dialogue: 0,0:00:06.05,0:00:06.95,Caption,,0,0,0,,المية دي تمثل {\1c&H0000C4FF&}كام{\r}
+Dialogue: 0,0:00:06.95,0:00:07.53,Caption,,0,0,0,,{\1c&H0000C4FF&}من{\r} كام؟
+Dialogue: 0,0:00:07.53,0:00:09.19,Caption,,0,0,0,,{\1c&H0000C4FF&}45{\r} من {\1c&H0000C4FF&}39{\r}
+Dialogue: 0,0:00:09.71,0:00:10.49,Caption,,0,0,0,,اقان كده شغاله من
+Dialogue: 0,0:00:10.49,0:00:10.75,Caption,,0,0,0,,اخون
+Dialogue: 0,0:00:11.91,0:00:13.61,Caption,,0,0,0,,ده {\1c&H0000C4FF&}معناه{\r} انه
+Dialogue: 0,0:00:13.61,0:00:14.69,Caption,,0,0,0,,لما ياخد خمسة وستين
+Dialogue: 0,0:00:14.69,0:00:15.67,Caption,,0,0,0,,في المية يرقى {\1c&H0000C4FF&}بيزيب{\r}
+Dialogue: 0,0:00:15.67,0:00:16.83,Caption,,0,0,0,,{\1c&H0000C4FF&}كام{\r} باقي؟
+Dialogue: 0,0:00:16.83,0:00:18.47,Caption,,0,0,0,,خمسة وتلاتين في المية
+Dialogue: 0,0:00:18.47,0:00:19.43,Caption,,0,0,0,,اللي هم {\1c&H0000C4FF&}السابع{\r} عمللي
+Dialogue: 0,0:00:19.43,0:00:20.23,Caption,,0,0,0,,لكل ايه؟
+Dialogue: 0,0:00:20.23,0:00:21.25,Caption,,0,0,0,,ميزي دي
+Dialogue: 0,0:00:21.39,0:00:21.85,Caption,,0,0,0,,صح?
+Dialogue: 0,0:00:22.13,0:00:23.61,Caption,,0,0,0,,ده هو اسمه low
+Dialogue: 0,0:00:23.61,0:00:24.87,Caption,,0,0,0,,venus
+Dialogue: 0,0:00:24.87,0:00:26.39,Caption,,0,0,0,,{\1c&H0000C4FF&}oxygen{\r} reserve
+Dialogue: 0,0:00:26.53,0:00:27.71,Caption,,0,0,0,,طبعا في الامتحات مو
+Dialogue: 0,0:00:27.71,0:00:28.43,Caption,,0,0,0,,كي بس سؤال هايف
+Dialogue: 0,0:00:28.43,0:00:29.39,Caption,,0,0,0,,جدا ليس على قدر
+Dialogue: 0,0:00:29.39,0:00:30.23,Caption,,0,0,0,,الشرح ده كله
+Dialogue: 0,0:00:30.51,0:00:31.63,Caption,,0,0,0,,ويجي يقولك ايه?
+Dialogue: 0,0:00:33.41,0:00:34.71,Caption,,0,0,0,,ومن ضمن الاجابات
+Dialogue: 0,0:00:34.71,0:00:36.27,Caption,,0,0,0,,very low venus oxygen
+Dialogue: 0,0:00:36.27,0:00:36.67,Caption,,0,0,0,,reserve

@@ -1,7 +1,7 @@
 """Quality gate v1: each check, the verdict, and a failed clip sinking in the feed."""
 import datetime as dt
 
-from clipping import quality_gate as g, review
+from clipping import quality_gate as g
 
 WORDS = [{"text": "Hello", "start": 10.0, "end": 10.4}, {"text": "there", "start": 10.5, "end": 10.9}, {"text": "friend.", "start": 11.0, "end": 11.5}]
 
@@ -42,7 +42,8 @@ def test_reasons_are_plain_in_both_languages_and_fails_come_first():
 
 def test_a_failed_gate_sinks_the_clip_below_the_rest():
     now = dt.datetime.now(dt.timezone.utc)
-    mk = lambda i, status, score: {"id": i, "compliance_status": "pass", "created_at": now, "priority_score": score, "render_meta": {"gate": {"status": status}}}
+    def mk(i, status, score):
+        return {"id": i, "compliance_status": "pass", "created_at": now, "priority_score": score, "render_meta": {"gate": {"status": status}}}
     clips = [mk(1, "fail", 0.9), mk(2, "pass", 0.1), mk(3, "warn", 0.2)]
     weak_first = sorted(clips, key=lambda c: (bool((c.get("quality") or {}).get("weak")) or c["render_meta"]["gate"]["status"] == "fail", -c["priority_score"]))
     assert [c["id"] for c in weak_first] == [3, 2, 1]

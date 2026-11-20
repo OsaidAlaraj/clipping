@@ -51,6 +51,8 @@ SECRET_NAMES = [
     "DEEPGRAM_API_KEY", "VIZARD_API_KEY", "KLAP_API_KEY", "OPUSCLIP_API_KEY", "BUFFER_ACCESS_TOKEN",
     "R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "CLIPPING_MEDIA_SECRET",
     "CLIPPING_LOCAL_TOKEN",
+    # Posting (phase E): the vault key and the OAuth client secrets must never reach an alert, a job error or an audit row.
+    "TOKEN_VAULT_KEY", "GOOGLE_CLIENT_SECRET", "INSTAGRAM_APP_SECRET", "TIKTOK_CLIENT_SECRET",
 ]
 
 

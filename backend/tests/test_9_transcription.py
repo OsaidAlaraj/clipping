@@ -15,7 +15,7 @@ import httpx
 import psycopg
 import pytest
 
-from clipping import alerts, campaigns, config, core, ffmpeg, pipeline, transcripts
+from clipping import alerts, campaigns, config, ffmpeg, pipeline, transcripts
 from clipping.adapters import transcription
 from clipping.adapters.base import AdapterError, activate
 from clipping.core import AppError

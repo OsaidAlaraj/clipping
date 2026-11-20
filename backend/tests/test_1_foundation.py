@@ -221,7 +221,7 @@ def test_jobs_are_idempotent_and_need_an_approved_campaign(db, owner):
 # ------------------------------------------------------------------ adapters
 
 STAGES = ["source", "discovery", "audience", "llm", "transcription", "moments", "render", "captions", "scheduler", "storage", "database", "alerts",
-          "metrics", "payouts", "oauth", "publishing"]
+          "metrics", "payouts", "oauth", "publishing", "music"]
 
 
 def test_every_adapter_has_the_common_interface_and_every_external_service_has_a_fake(db, owner):

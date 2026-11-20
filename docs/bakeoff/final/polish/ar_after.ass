@@ -1,0 +1,100 @@
+﻿[Script Info]
+ScriptType: v4.00+
+PlayResX: 720
+PlayResY: 1280
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,Arial,64,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,5,0,2,60,60,204,1
+Style: Label,Arial,33,&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,6,0,9,30,30,44,1
+Style: Title,Arial,46,&H00101010,&H00FFFFFF,&H0000C4FF,&H0000C4FF,1,0,0,0,100,100,0,0,3,9,0,8,72,72,128,1
+Style: Bar,Arial,20,&H0000C4FF,&H0000C4FF,&H0000C4FF,&H0000C4FF,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 5,0:00:00.00,0:00:34.37,Label,,0,0,0,,#إعلان
+Dialogue: 3,0:00:00.00,0:00:03.00,Title,,0,0,0,,{\fad(150,200)}لماذا هذا يغير كل شيء
+Dialogue: 4,0:00:00.00,0:00:34.37,Bar,,0,0,0,,{\an7\pos(0,1273)\fscx0.1\t(0,33366,\fscx100)\p1}m 0 0 l 720 0 720 7 0 7
+Dialogue: 0,0:00:00.05,0:00:00.71,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}يعتبر{\1c&H00FFFFFF&} نسبته كام
+Dialogue: 0,0:00:00.71,0:00:01.07,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}يعتبر {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}نسبته{\1c&H00FFFFFF&} كام
+Dialogue: 0,0:00:01.07,0:00:01.54,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}يعتبر نسبته {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كام{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:01.70,0:00:02.36,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}على{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:02.36,0:00:03.32,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كام؟{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:03.32,0:00:04.88,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}الخمسة{\1c&H00FFFFFF&} وعشرين
+Dialogue: 0,0:00:04.88,0:00:04.90,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}الخمسة {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}وعشرين{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:04.90,0:00:04.98,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}في{\1c&H00FFFFFF&} المية دي
+Dialogue: 0,0:00:04.98,0:00:05.14,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}في {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}المية{\1c&H00FFFFFF&} دي
+Dialogue: 0,0:00:05.14,0:00:05.28,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}في المية {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}دي{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:05.28,0:00:05.66,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}تمثل{\1c&H00FFFFFF&} كام من
+Dialogue: 0,0:00:05.66,0:00:05.88,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}تمثل {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كام{\1c&H00FFFFFF&} من
+Dialogue: 0,0:00:05.88,0:00:05.98,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}تمثل كام {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}من{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:05.98,0:00:06.46,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كام؟{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:06.46,0:00:06.94,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}45{\1c&H00FFFFFF&} من
+Dialogue: 0,0:00:06.94,0:00:07.22,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}45 {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}من{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:07.22,0:00:08.27,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}39{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:08.64,0:00:08.80,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}اقان{\1c&H00FFFFFF&} كده شغاله
+Dialogue: 0,0:00:08.80,0:00:09.04,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}اقان {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كده{\1c&H00FFFFFF&} شغاله
+Dialogue: 0,0:00:09.04,0:00:09.36,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}اقان كده {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}شغاله{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:09.36,0:00:09.42,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}من{\1c&H00FFFFFF&} اخون ده
+Dialogue: 0,0:00:09.42,0:00:09.90,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}من {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}اخون{\1c&H00FFFFFF&} ده
+Dialogue: 0,0:00:09.90,0:00:10.56,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}من اخون {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ده{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:10.56,0:00:11.06,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}معناه{\1c&H00FFFFFF&} انه لما
+Dialogue: 0,0:00:11.06,0:00:11.60,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}معناه {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}انه{\1c&H00FFFFFF&} لما
+Dialogue: 0,0:00:11.60,0:00:11.76,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}معناه انه {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}لما{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:11.76,0:00:12.02,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ياخد{\1c&H00FFFFFF&} خمسة وستين
+Dialogue: 0,0:00:12.02,0:00:12.34,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ياخد {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}خمسة{\1c&H00FFFFFF&} وستين
+Dialogue: 0,0:00:12.34,0:00:12.68,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ياخد خمسة {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}وستين{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:12.68,0:00:12.80,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}في{\1c&H00FFFFFF&} المية يرقى
+Dialogue: 0,0:00:12.80,0:00:13.08,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}في {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}المية{\1c&H00FFFFFF&} يرقى
+Dialogue: 0,0:00:13.08,0:00:13.30,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}في المية {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}يرقى{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:13.30,0:00:13.66,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}بيزيب{\1c&H00FFFFFF&} كام باقي؟
+Dialogue: 0,0:00:13.66,0:00:13.88,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}بيزيب {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كام{\1c&H00FFFFFF&} باقي؟
+Dialogue: 0,0:00:13.88,0:00:14.82,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}بيزيب كام {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}باقي؟{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:14.82,0:00:15.76,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}خمسة{\1c&H00FFFFFF&} وتلاتين في
+Dialogue: 0,0:00:15.76,0:00:16.14,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}خمسة {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}وتلاتين{\1c&H00FFFFFF&} في
+Dialogue: 0,0:00:16.14,0:00:16.26,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}خمسة وتلاتين {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}في{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:16.26,0:00:16.46,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}المية{\1c&H00FFFFFF&} اللي هم
+Dialogue: 0,0:00:16.46,0:00:16.60,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}المية {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}اللي{\1c&H00FFFFFF&} هم
+Dialogue: 0,0:00:16.60,0:00:16.70,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}المية اللي {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}هم{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:16.70,0:00:17.06,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}السابع{\1c&H00FFFFFF&} عمللي لكل
+Dialogue: 0,0:00:17.06,0:00:17.42,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}السابع {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}عمللي{\1c&H00FFFFFF&} لكل
+Dialogue: 0,0:00:17.42,0:00:17.82,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}السابع عمللي {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}لكل{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:17.82,0:00:18.22,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ايه؟{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:18.22,0:00:19.06,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ميزي{\1c&H00FFFFFF&} دي
+Dialogue: 0,0:00:19.06,0:00:19.38,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ميزي {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}دي{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:19.38,0:00:19.99,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}صح?{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:20.12,0:00:20.68,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ده{\1c&H00FFFFFF&} هو اسمه
+Dialogue: 0,0:00:20.68,0:00:20.86,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ده {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}هو{\1c&H00FFFFFF&} اسمه
+Dialogue: 0,0:00:20.86,0:00:21.26,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ده هو {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}اسمه{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:21.26,0:00:21.60,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}low{\1c&H00FFFFFF&} venus
+Dialogue: 0,0:00:21.60,0:00:22.86,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}low {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}venus{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:22.86,0:00:23.74,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}oxygen{\1c&H00FFFFFF&} reserve
+Dialogue: 0,0:00:23.74,0:00:24.52,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}oxygen {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}reserve{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:24.52,0:00:24.90,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}طبعا{\1c&H00FFFFFF&} في الامتحات
+Dialogue: 0,0:00:24.90,0:00:25.00,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}طبعا {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}في{\1c&H00FFFFFF&} الامتحات
+Dialogue: 0,0:00:25.00,0:00:25.50,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}طبعا في {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}الامتحات{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:25.50,0:00:25.70,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}مو{\1c&H00FFFFFF&} كي بس
+Dialogue: 0,0:00:25.70,0:00:25.80,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}مو {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كي{\1c&H00FFFFFF&} بس
+Dialogue: 0,0:00:25.80,0:00:25.98,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}مو كي {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}بس{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:25.98,0:00:26.16,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}سؤال{\1c&H00FFFFFF&} هايف جدا
+Dialogue: 0,0:00:26.16,0:00:26.42,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}سؤال {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}هايف{\1c&H00FFFFFF&} جدا
+Dialogue: 0,0:00:26.42,0:00:26.68,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}سؤال هايف {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}جدا{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:26.68,0:00:26.94,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ليس{\1c&H00FFFFFF&} على قدر
+Dialogue: 0,0:00:26.94,0:00:27.08,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ليس {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}على{\1c&H00FFFFFF&} قدر
+Dialogue: 0,0:00:27.08,0:00:27.38,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ليس على {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}قدر{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:27.38,0:00:27.66,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}الشرح{\1c&H00FFFFFF&} ده كله
+Dialogue: 0,0:00:27.66,0:00:27.82,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}الشرح {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ده{\1c&H00FFFFFF&} كله
+Dialogue: 0,0:00:27.82,0:00:28.37,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}الشرح ده {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}كله{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:28.50,0:00:28.78,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ويجي{\1c&H00FFFFFF&} يقولك ايه?
+Dialogue: 0,0:00:28.78,0:00:29.16,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ويجي {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}يقولك{\1c&H00FFFFFF&} ايه?
+Dialogue: 0,0:00:29.16,0:00:29.77,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ويجي يقولك {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ايه?{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:30.01,0:00:30.57,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ومن{\1c&H00FFFFFF&} ضمن الاجابات
+Dialogue: 0,0:00:30.57,0:00:30.79,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ومن {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}ضمن{\1c&H00FFFFFF&} الاجابات
+Dialogue: 0,0:00:30.79,0:00:31.31,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}ومن ضمن {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}الاجابات{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:31.31,0:00:31.91,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}very{\1c&H00FFFFFF&} low venus
+Dialogue: 0,0:00:31.91,0:00:32.21,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}very {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}low{\1c&H00FFFFFF&} venus
+Dialogue: 0,0:00:32.21,0:00:32.61,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}very low {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}venus{\1c&H00FFFFFF&}
+Dialogue: 0,0:00:32.61,0:00:32.87,Caption,,0,0,0,,{\an5\pos(360,857)\fs64\fad(80,0)}{\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}oxygen{\1c&H00FFFFFF&} reserve
+Dialogue: 0,0:00:32.87,0:00:33.42,Caption,,0,0,0,,{\an5\pos(360,857)\fs64}oxygen {\1c&H00FFFFFF&\t(0,70,\1c&H0000C4FF&)}reserve{\1c&H00FFFFFF&}

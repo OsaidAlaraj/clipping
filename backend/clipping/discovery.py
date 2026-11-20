@@ -10,7 +10,7 @@ from psycopg.types.json import Jsonb
 from . import campaigns as campaigns_mod
 from .adapters import discovery as feed  # noqa: F401  (registers providers)
 from .alerts import registry
-from .core import AppError, audit, get_setting
+from .core import AppError, audit
 from .db import Database
 
 PLATFORM_NAMES = {"tiktok": "TikTok", "instagram": "Instagram Reels", "youtube": "YouTube Shorts", "x": "X (Twitter)",

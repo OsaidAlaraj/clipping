@@ -1,0 +1,32 @@
+{
+ "kubz_a": {
+  "layout": "stack",
+  "cam_rect": [
+   0.0,
+   0.06481481481481481,
+   0.14166666666666666,
+   0.1685185185185185
+  ],
+  "plan_s": 8.2,
+  "reframe": "centre_crop",
+  "face_share": 1.0,
+  "lufs": -14.5,
+  "gate": "pass",
+  "reasons": []
+ },
+ "kubz_b": {
+  "layout": "stack",
+  "cam_rect": [
+   0.0,
+   0.07592592592592592,
+   0.1375,
+   0.16296296296296298
+  ],
+  "plan_s": 7.8,
+  "reframe": "centre_crop",
+  "face_share": 1.0,
+  "lufs": -13.8,
+  "gate": "pass",
+  "reasons": []
+ }
+}

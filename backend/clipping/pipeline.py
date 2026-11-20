@@ -10,7 +10,9 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, language_check, packaging, quality_gate, signals, templates, transcripts
+from . import brand_checks, config, ffmpeg, language_check, music, packaging, quality_gate, signals, templates, transcripts
+from .adapters import media
+from .adapters import music as _music_adapters  # noqa: F401  (registers the music stage providers)
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -384,7 +386,8 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
     style = (candidate or {}).get("style") or {}
     start, end = float(clip["start_s"]), float(clip["end_s"])
     request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
-               "audio": style.get("audio"), "hook_text": hook_text, "emphasis": []}
+               "audio": style.get("audio"), "hook_text": hook_text, "emphasis": [],
+               "min_s": float(get_setting(conn, "clip_min_duration_s"))}      # tightening never takes the clip below the campaign minimum
     measured = signals.load(conn, source["id"])
     if measured:
         first, last = int(start), math.ceil(end)
@@ -392,6 +395,35 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
         request["emphasis"] = templates.emphasis_times(series.get("loudness") or [], start, end)
         request["signals"] = {"first_s": first, **{k: (series.get(k) or [])[first:last] for k in ("face", "laughter", "scene", "loudness")}}
     return request
+
+
+MUSIC_NICHE = {"podcast": "podcasts", "gaming": "gaming"}   # every other category (lifestyle, reddit stories) takes the business beds
+RECENT_TRACKS = 5
+
+
+def _pick_music(conn, clip: dict, campaign: dict, render_clip: dict, words: list[dict], platform: str | None) -> dict | None:
+    """The bed for this clip: the music stage's choice (niche, the clip's mood and energy, the owner's most recent tracks avoided),
+    as {"path", "offset_s", "gain_db", "record"} for the render. A bed is a nicety: a failure or no usable track gives None and
+    the clip renders without one."""
+    try:
+        category = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone()
+        niche = MUSIC_NICHE.get(category["name"] if category else None, "business")
+        start, end = float(clip["start_s"]), float(clip["end_s"])
+        profile = music.clip_profile(words, start, end, render_clip.get("signals"))
+        recent = [r["track"] for r in conn.execute(
+            """select render_meta->'music'->>'track_id' as track from clips where owner_operator_id = %s and id <> %s
+               and render_meta->'music'->>'track_id' is not null
+               order by updated_at desc limit %s""", (clip["owner_operator_id"], clip["id"], RECENT_TRACKS)).fetchall()]
+        decision, _ = registry.call(conn, "music", "choose", {"niche": niche, "profile": profile, "duration_s": end - start, "platform": platform,
+                                                              "recent": recent, "seed": str(clip["id"])}, clip["owner_operator_id"])
+    except Exception as exc:
+        return {"record": None, "skipped": f"music stage failed: {config.redact(f'{type(exc).__name__}: {exc}')[:200]}"}
+    if not decision.get("use"):
+        return {"record": None, "skipped": decision.get("reason"), "profile": profile}
+    track = decision["track"]
+    record = music.licence_record(track, decision["offset_s"], platform)
+    record.update(mood=profile["mood"], energy=profile["energy"], score=decision["score"], reason=decision["reason"], gain_db=decision["gain_db"])
+    return {"path": track["path"], "offset_s": decision["offset_s"], "gain_db": decision["gain_db"], "record": record, "profile": profile}
 
 
 def stage_render(conn, job: dict) -> Decimal:
@@ -411,8 +443,12 @@ def stage_render(conn, job: dict) -> Decimal:
     key = f"clips/{clip['id']}/final.mp4"
     out = storage.path(key)
     words = _words(conn, source)
+    render_clip = _render_request(conn, clip, source, platform, meta.get("hook_text"))
+    bed = _pick_music(conn, clip, campaign, render_clip, words, platform)
+    if bed and bed.get("path"):
+        render_clip["music"] = bed
     result, cost = registry.call(conn, "render", "render_clip", {
-        "src": str(storage.path(source["stored_path"])), "clip": _render_request(conn, clip, source, platform, meta.get("hook_text")),
+        "src": str(storage.path(source["stored_path"])), "clip": render_clip,
         "words": words, "template": template["spec"], "label": disclosure["overlay_text"], "out": str(out)}, owner)
     storage.put(key, str(out))
     cover_key = None
@@ -424,11 +460,16 @@ def stage_render(conn, job: dict) -> Decimal:
     if not (meta.get("caption_edited") and caption):
         caption, hashtags, mentions = build_caption(disclosure["caption_text"], meta.get("hook_text") or "", version["rules_json"])
     try:   # the gate only reports: a failure here must never stop the render
-        gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=clip["caption_text"],
-                                disclosure=disclosure.get("caption_text"))
+        gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=caption,
+                                disclosure=disclosure.get("caption_text"), niche=media.NICHE_OF_CROP.get(render_clip.get("crop")))
     except Exception:
         gate = None
     meta["gate"] = gate
+    credit = music.credit_line(result.get("music"))
+    if credit and credit not in caption and not meta.get("caption_edited"):
+        caption = caption + "\n" + credit
+    meta["music"] = result.get("music") or ({"track_id": None, "skipped": bed.get("skipped")} if bed else None)
+    meta.update(loudness_target_lufs=result.get("loudness_target"), music_credit_in_caption=bool(credit and credit in caption))
     meta.update(template_id=template["id"], template_version=template["version"], encoder=result["encoder"], encodes=result["encodes"],
                 reframe=result["reframe"], loudness_normalised=result["loudness_normalised"], overlay_burned=True,
                 captions=result["captions"], zooms=result.get("zooms", 0), caption_language=clip["language"],

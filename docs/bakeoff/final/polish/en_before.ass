@@ -1,0 +1,62 @@
+﻿[Script Info]
+ScriptType: v4.00+
+PlayResX: 720
+PlayResY: 1280
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,Arial,53,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,4,0,2,60,60,204,1
+Style: Label,Arial,33,&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,6,0,7,30,30,44,1
+Style: Title,Arial,46,&H00101010,&H00FFFFFF,&H0000C4FF,&H0000C4FF,1,0,0,0,100,100,0,0,3,9,0,8,72,72,128,1
+Style: Bar,Arial,20,&H0000C4FF,&H0000C4FF,&H0000C4FF,&H0000C4FF,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 5,0:00:00.00,0:00:38.89,Label,,0,0,0,,#ad
+Dialogue: 3,0:00:00.00,0:00:03.00,Title,,0,0,0,,{\fad(150,200)}Why this changes everything
+Dialogue: 4,0:00:00.00,0:00:38.89,Bar,,0,0,0,,{\an7\pos(0,1273)\fscx0.1\t(0,37889,\fscx100)\p1}m 0 0 l 720 0 720 7 0 7
+Dialogue: 0,0:00:00.00,0:00:00.49,Caption,,0,0,0,,and then you try
+Dialogue: 0,0:00:00.49,0:00:01.05,Caption,,0,0,0,,it and it's not
+Dialogue: 0,0:00:01.05,0:00:01.79,Caption,,0,0,0,,really what you want
+Dialogue: 0,0:00:01.79,0:00:02.83,Caption,,0,0,0,,you're still signing up
+Dialogue: 0,0:00:02.83,0:00:03.77,Caption,,0,0,0,,to netflix and {\1c&H0000C4FF&}you're{\r}
+Dialogue: 0,0:00:03.77,0:00:04.75,Caption,,0,0,0,,still {\1c&H0000C4FF&}and{\r} then now
+Dialogue: 0,0:00:04.75,0:00:05.25,Caption,,0,0,0,,you're going to find
+Dialogue: 0,0:00:05.25,0:00:05.77,Caption,,0,0,0,,the thing that you
+Dialogue: 0,0:00:05.77,0:00:06.63,Caption,,0,0,0,,do love so in
+Dialogue: 0,0:00:06.63,0:00:07.33,Caption,,0,0,0,,that regard yeah {\1c&H0000C4FF&}no{\r}
+Dialogue: 0,0:00:07.33,0:00:07.79,Caption,,0,0,0,,{\1c&H0000C4FF&}i{\r} could i could
+Dialogue: 0,0:00:07.79,0:00:08.35,Caption,,0,0,0,,be on board with
+Dialogue: 0,0:00:08.35,0:00:10.05,Caption,,0,0,0,,that and
+Dialogue: 0,0:00:10.05,0:00:10.67,Caption,,0,0,0,,then also after the
+Dialogue: 0,0:00:10.67,0:00:11.15,Caption,,0,0,0,,two minutes you have
+Dialogue: 0,0:00:11.15,0:00:12.31,Caption,,0,0,0,,like infinite options to
+Dialogue: 0,0:00:12.31,0:00:13.77,Caption,,0,0,0,,get out you could
+Dialogue: 0,0:00:13.77,0:00:14.75,Caption,,0,0,0,,view something else so
+Dialogue: 0,0:00:14.75,0:00:15.27,Caption,,0,0,0,,like if you're actually
+Dialogue: 0,0:00:15.27,0:00:16.33,Caption,,0,0,0,,like thomas saying if
+Dialogue: 0,0:00:16.33,0:00:16.99,Caption,,0,0,0,,you are sticking around
+Dialogue: 0,0:00:16.99,0:00:18.11,Caption,,0,0,0,,for two minutes i
+Dialogue: 0,0:00:18.11,0:00:18.53,Caption,,0,0,0,,mean you had the
+Dialogue: 0,0:00:18.53,0:00:19.31,Caption,,0,0,0,,option to jump out
+Dialogue: 0,0:00:19.31,0:00:20.53,Caption,,0,0,0,,already there's not like
+Dialogue: 0,0:00:20.53,0:00:21.41,Caption,,0,0,0,,it's everything's on demand
+Dialogue: 0,0:00:21.41,0:00:22.17,Caption,,0,0,0,,you're choosing to watch
+Dialogue: 0,0:00:22.17,0:00:23.03,Caption,,0,0,0,,it so i think
+Dialogue: 0,0:00:23.03,0:00:23.85,Caption,,0,0,0,,that number may not
+Dialogue: 0,0:00:23.85,0:00:25.09,Caption,,0,0,0,,be too great but
+Dialogue: 0,0:00:25.09,0:00:25.65,Caption,,0,0,0,,i'm sure once the
+Dialogue: 0,0:00:25.65,0:00:27.15,Caption,,0,0,0,,numbers are like if
+Dialogue: 0,0:00:27.15,0:00:28.01,Caption,,0,0,0,,completion rates were super
+Dialogue: 0,0:00:28.01,0:00:29.09,Caption,,0,0,0,,high it's so they'd
+Dialogue: 0,0:00:29.09,0:00:29.61,Caption,,0,0,0,,be talking about that
+Dialogue: 0,0:00:29.61,0:00:30.87,Caption,,0,0,0,,too i'm not trying
+Dialogue: 0,0:00:30.87,0:00:31.59,Caption,,0,0,0,,to argue that two
+Dialogue: 0,0:00:31.59,0:00:32.47,Caption,,0,0,0,,minutes is like it's
+Dialogue: 0,0:00:32.47,0:00:33.59,Caption,,0,0,0,,a perfectly great number
+Dialogue: 0,0:00:33.59,0:00:34.55,Caption,,0,0,0,,but it's probably not
+Dialogue: 0,0:00:34.55,0:00:35.47,Caption,,0,0,0,,as bad as it
+Dialogue: 0,0:00:35.47,0:00:36.79,Caption,,0,0,0,,sounds is my guess
+Dialogue: 0,0:00:36.79,0:00:37.89,Caption,,0,0,0,,all right

@@ -1,0 +1,18 @@
+﻿{"part": "B", "clip": "studio_1080p", "variant": "nvenc p5 cq24 (current)", "vmaf": 84.41, "vmaf_neg": 82.73, "ssim": 0.9561, "psnr": 39.95, "sharpness_vs_ref": 0.994, "mb_per_min": 28.5, "encode_s": 2.6}
+{"part": "B", "clip": "studio_1080p", "variant": "nvenc p5 cq20", "vmaf": 84.91, "vmaf_neg": 83.4, "ssim": 0.9564, "psnr": 40.95, "sharpness_vs_ref": 1.0, "mb_per_min": 46.6, "encode_s": 2.1}
+{"part": "B", "clip": "studio_1080p", "variant": "nvenc p7 hq cq22 aq", "vmaf": 84.82, "vmaf_neg": 83.29, "ssim": 0.9564, "psnr": 40.71, "sharpness_vs_ref": 1.0, "mb_per_min": 47.3, "encode_s": 2.8}
+{"part": "B", "clip": "studio_1080p", "variant": "nvenc p7 hq cq19 aq", "vmaf": 85.01, "vmaf_neg": 83.56, "ssim": 0.9564, "psnr": 41.35, "sharpness_vs_ref": 1.002, "mb_per_min": 69.0, "encode_s": 2.8}
+{"part": "B", "clip": "studio_1080p", "variant": "x264 veryfast crf23 (fallback now)", "vmaf": 81.12, "vmaf_neg": 78.91, "ssim": 0.9555, "psnr": 37.35, "sharpness_vs_ref": 0.984, "mb_per_min": 14.1, "encode_s": 1.7}
+{"part": "B", "clip": "studio_1080p", "variant": "x264 veryfast crf20", "vmaf": 82.81, "vmaf_neg": 80.78, "ssim": 0.956, "psnr": 38.32, "sharpness_vs_ref": 0.992, "mb_per_min": 20.2, "encode_s": 1.8}
+{"part": "B", "clip": "studio_1080p", "variant": "x264 medium crf20", "vmaf": 84.12, "vmaf_neg": 82.28, "ssim": 0.9562, "psnr": 39.23, "sharpness_vs_ref": 1.001, "mb_per_min": 23.1, "encode_s": 4.8}
+{"part": "B", "clip": "studio_1080p", "variant": "x264 slow crf20", "vmaf": 84.17, "vmaf_neg": 82.33, "ssim": 0.9562, "psnr": 39.28, "sharpness_vs_ref": 1.002, "mb_per_min": 22.4, "encode_s": 6.2}
+{"part": "B", "clip": "studio_1080p", "variant": "x264 medium crf18", "vmaf": 84.47, "vmaf_neg": 82.75, "ssim": 0.9563, "psnr": 39.76, "sharpness_vs_ref": 1.003, "mb_per_min": 28.6, "encode_s": 4.5}
+{"part": "B", "clip": "slides_720p", "variant": "nvenc p5 cq24 (current)", "vmaf": 96.54, "vmaf_neg": 95.49, "ssim": 0.999, "psnr": 48.86, "sharpness_vs_ref": 0.996, "mb_per_min": 19.2, "encode_s": 2.3}
+{"part": "B", "clip": "slides_720p", "variant": "nvenc p5 cq20", "vmaf": 97.09, "vmaf_neg": 96.3, "ssim": 0.9996, "psnr": 51.17, "sharpness_vs_ref": 1.002, "mb_per_min": 33.1, "encode_s": 2.3}
+{"part": "B", "clip": "slides_720p", "variant": "nvenc p7 hq cq22 aq", "vmaf": 96.75, "vmaf_neg": 95.77, "ssim": 0.9996, "psnr": 49.9, "sharpness_vs_ref": 1.004, "mb_per_min": 31.9, "encode_s": 2.5}
+{"part": "B", "clip": "slides_720p", "variant": "nvenc p7 hq cq19 aq", "vmaf": 97.06, "vmaf_neg": 96.23, "ssim": 0.9998, "psnr": 51.41, "sharpness_vs_ref": 1.005, "mb_per_min": 46.8, "encode_s": 2.4}
+{"part": "B", "clip": "slides_720p", "variant": "x264 veryfast crf23 (fallback now)", "vmaf": 92.51, "vmaf_neg": 90.54, "ssim": 0.9984, "psnr": 43.47, "sharpness_vs_ref": 0.992, "mb_per_min": 10.0, "encode_s": 1.2}
+{"part": "B", "clip": "slides_720p", "variant": "x264 veryfast crf20", "vmaf": 94.6, "vmaf_neg": 92.93, "ssim": 0.9991, "psnr": 45.44, "sharpness_vs_ref": 1.0, "mb_per_min": 14.9, "encode_s": 1.4}
+{"part": "B", "clip": "slides_720p", "variant": "x264 medium crf20", "vmaf": 96.06, "vmaf_neg": 94.83, "ssim": 0.9995, "psnr": 47.66, "sharpness_vs_ref": 1.007, "mb_per_min": 19.0, "encode_s": 3.9}
+{"part": "B", "clip": "slides_720p", "variant": "x264 slow crf20", "vmaf": 95.99, "vmaf_neg": 94.82, "ssim": 0.9995, "psnr": 47.8, "sharpness_vs_ref": 1.006, "mb_per_min": 18.4, "encode_s": 4.9}
+{"part": "B", "clip": "slides_720p", "variant": "x264 medium crf18", "vmaf": 96.47, "vmaf_neg": 95.41, "ssim": 0.9996, "psnr": 48.82, "sharpness_vs_ref": 1.008, "mb_per_min": 23.9, "encode_s": 3.6}

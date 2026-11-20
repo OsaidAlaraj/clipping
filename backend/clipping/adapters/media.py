@@ -10,18 +10,31 @@ import math
 import re
 from pathlib import Path
 
-from .. import faces, ffmpeg
+from .. import faces, ffmpeg, gaming_layout, music, polish
 from ..core import AppError
 from .base import Adapter, register
 
 # ------------------------------------------------------------------ the template: what makes an account's clips look like its own
 
 TEMPLATE_DEFAULTS: dict = {"layout": "auto", "font": "Arial", "primary": "#FFFFFF", "accent": "#FFC400", "caption_position": "lower",
-                           "title_card": True, "progress_bar": True, "zooms": True, "font_size": 4.2, "cover": "band"}
+                           "title_card": True, "progress_bar": True, "zooms": True, "font_size": 5.0, "cover": "band",
+                           "tighten": True, "karaoke": True}
 CAPTION_POSITIONS = ("lower", "middle")
 COVER_STYLES = ("band", "outline")
-LAYOUTS = ("auto", "blur_pad")   # auto: the profile crop decides; blur_pad: the whole picture centred on a blurred, darkened 9:16 copy
-FLAGS = ("title_card", "progress_bar", "zooms")
+NICHE_OF_CROP = {"facecam_over_game": "gaming", "follow_speaker": "podcast"}   # the profile's crop style tells the niche
+
+
+def niche_defaults(niche: str | None) -> dict:
+    """Per-niche render defaults (layout, caption position), from the measured market study; a template's own fields win."""
+    import json
+    try:
+        return json.loads((Path(__file__).resolve().parent.parent / "assets" / "render-profile-defaults.json").read_text(encoding="utf-8")).get(niche or "", {})
+    except (OSError, ValueError):
+        return {}
+
+
+LAYOUTS = ("auto", "blur_pad", "gaming_stack")   # auto: the profile crop decides; blur_pad: the whole picture centred on a blurred, darkened 9:16 copy
+FLAGS = ("title_card", "progress_bar", "zooms", "tighten", "karaoke")
 FONT_SIZE_RANGE = (2.5, 6.5)          # caption size as a percentage of the frame height
 _FONT = re.compile(r"^\w[\w .\-]{0,59}$")
 _COLOUR = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -40,7 +53,7 @@ def _checked(key: str, value):
     if key == "caption_position" and value not in CAPTION_POSITIONS:
         raise _bad("The caption position must be lower or middle.")
     if key == "layout" and value not in LAYOUTS:
-        raise _bad("The layout must be auto or blur_pad.")
+        raise _bad("The layout must be auto, blur_pad or gaming_stack.")
     if key == "cover" and value not in COVER_STYLES:
         raise _bad("The cover style must be band or outline.")
     if key in FLAGS and not isinstance(value, bool):
@@ -84,7 +97,7 @@ def crop_filter(src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float |
     else:
         crop_h = int(round(src_w / target / 2) * 2)
         crop = f"crop={src_w}:{min(crop_h, src_h)}:0:{max((src_h - crop_h) // 2, 0)}"
-    return f"{crop},scale={out_w}:{out_h},setsar=1"
+    return f"{crop},scale={out_w}:{out_h}:flags=lanczos,setsar=1"
 
 
 def path_expr(path: list[tuple[float, float]], src_w: int, crop_w: int) -> str:
@@ -101,16 +114,19 @@ FOLLOW_STYLES = ("follow_speaker", "follow_action")
 FACE_MIN_SHARE = 0.02          # skin-toned share of the frame below which nobody is taken to be there
 
 
-def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay", path: list[tuple[float, float]] | None = None) -> str:
+def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, focus_x: float | None, label: str = "lay", path: list[tuple[float, float]] | None = None, stack: dict | None = None) -> str:
     """The reframing part of the filter graph, ending at the pad `[label]`. `facecam_over_game` keeps the whole picture (the
     facecam stays in it) fitted to the width over a blurred fill; every other style is a 9:16 crop."""
+    if style == "gaming_stack" and stack and stack.get("layout") == "stack":
+        from .. import gaming_layout
+        return gaming_layout.stack_graph(stack, src_w, src_h, out_w, out_h, label)
     if style == "blur_pad":
         return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
-                f"boxblur=luma_radius=30:luma_power=2,eq=brightness=-0.18[bg];[fga]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease[fg];"
+                f"boxblur=luma_radius=30:luma_power=2,eq=brightness=-0.18[bg];[fga]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease:flags=lanczos[fg];"
                 f"[bg][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,setsar=1[{label}]")
     if style == "facecam_over_game" and src_w / src_h > out_w / out_h:
         return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
-                f"boxblur=luma_radius=24:luma_power=2[bg];[fga]scale={out_w}:-2[fg];"
+                f"boxblur=luma_radius=24:luma_power=2[bg];[fga]scale={out_w}:-2:flags=lanczos[fg];"
                 f"[bg][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,setsar=1[{label}]")
     return f"[0:v]{crop_filter(src_w, src_h, out_w, out_h, focus_x if style in FOLLOW_STYLES else None, path if style in FOLLOW_STYLES else None)}[{label}]"
 
@@ -161,6 +177,61 @@ def zoom_graph(times: list[float], out_w: int, out_h: int, source: str = "lay", 
     bumps = "+".join(f"max(0,1-abs(t-{t:.2f})/{ZOOM_HALF_S})" for t in times)
     z = f"(1+{ZOOM_DEPTH}*({bumps}))"
     return (f"[{source}]scale=w='trunc({out_w}*{z}/2)*2':h='trunc({out_h}*{z}/2)*2':eval=frame,crop={out_w}:{out_h}[{label}]")
+
+
+ZOOM_IN_S, ZOOM_HOLD_S, ZOOM_OUT_S = 0.40, 0.80, 0.70     # punch-in: ease in, hold, ease back out
+ZOOM_FLAT_STYLES = ("facecam_over_game", "stacked_facecam_over_gameplay", "stacked")   # the gameplay half never zooms
+
+
+def _smoother(x: str) -> str:
+    """ffmpeg expression of the smootherstep curve (zero slope and zero curvature at both ends) of a 0..1 expression."""
+    return f"(st(0,clip({x},0,1))*ld(0)*ld(0)*ld(0)*(ld(0)*(ld(0)*6-15)+10))"
+
+
+def punch_factor(t: float, moments: list[tuple[float, float]]) -> float:
+    """The zoom factor at clip time t (python twin of `punch_graph`, used by the measurements and the tests)."""
+    def ss(x: float) -> float:
+        x = min(max(x, 0.0), 1.0)
+        return x * x * x * (x * (x * 6 - 15) + 10)
+    return 1 + sum((d - 1) * (ss((t - t0) / ZOOM_IN_S) - ss((t - t0 - ZOOM_IN_S - ZOOM_HOLD_S) / ZOOM_OUT_S)) for t0, d in moments)
+
+
+def punch_graph(moments: list[tuple[float, float]], out_w: int, out_h: int, source: str = "lay", label: str = "zm") -> str:
+    """Punch-in zooms: at each (time, factor) the picture eases in to `factor` (1.05 to 1.12) over ZOOM_IN_S, holds, and eases back
+    out, on a smootherstep curve so speed and acceleration start and end at zero (no jerk). The frame is scaled up and cropped
+    back around its centre (sizes stay even, so the crop offset is a whole pixel); it runs before the subtitles, so text never zooms."""
+    terms = []
+    for t0, d in moments:
+        up = _smoother(f"(t-{t0:.2f})/{ZOOM_IN_S}")
+        down = _smoother(f"(t-{t0 + ZOOM_IN_S + ZOOM_HOLD_S:.2f})/{ZOOM_OUT_S}")
+        terms.append(f"{d - 1:.3f}*({up}-{down})")
+    z = "(1+" + "+".join(terms) + ")"
+    return f"[{source}]scale=w='trunc({out_w}*{z}/2)*2':h='trunc({out_h}*{z}/2)*2':eval=frame:flags=lanczos,crop={out_w}:{out_h}[{label}]"
+
+
+def tighten_graphs(plan, source: str, has_audio: bool, fps: float) -> str:
+    """Video and audio graph that keep only the planned stretches and join them: video by trim and concat, audio by trim and a
+    20 ms crossfade at every join (each audio piece reaches half a fade into the cut, so the audio stays exactly as long as the
+    video). Ends at [cutv] and, with audio, [cuta]."""
+    keeps = plan.keeps
+    n = len(keeps)
+    half = polish.XFADE_S / 2
+    half_frame = 0.5 / fps
+    parts = [f"[{source}]split={n}" + "".join(f"[tv{i}]" for i in range(n))]
+    parts += [f"[tv{i}]trim=start={max(a - half_frame, 0) if i else 0:.4f}:end={b - half_frame:.4f},"
+              f"setpts=PTS-STARTPTS[cv{i}]" for i, (a, b) in enumerate(keeps)]
+    parts.append("".join(f"[cv{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=0[cutv]")
+    if has_audio:
+        parts.append(f"[0:a:0]asplit={n}" + "".join(f"[ta{i}]" for i in range(n)))
+        parts += [f"[ta{i}]atrim=start={max(a - (half if i else 0), 0):.4f}:end={b + (half if i < n - 1 else 0):.4f},asetpts=PTS-STARTPTS[ca{i}]"
+                  for i, (a, b) in enumerate(keeps)]
+        chain, prev = [], "ca0"
+        for i in range(1, n):
+            out = "cuta" if i == n - 1 else f"ax{i}"
+            chain.append(f"[{prev}][ca{i}]acrossfade=d={polish.XFADE_S}:c1=tri:c2=tri[{out}]")
+            prev = out
+        parts += chain if n > 1 else ["[ca0]anull[cuta]"]
+    return ";".join(parts)
 
 
 # ------------------------------------------------------------------ captions and overlay (ASS subtitles)
@@ -243,6 +314,41 @@ def caption_events(words: list[dict], clip_start: float, clip_end: float, social
             parts.append(text)
         if parts:
             events.append({"start": chunk["start"], "end": chunk["end"], "text": " ".join(parts)})
+    return events
+
+
+CAPTION_Y = {"en": 0.70, "ar": 0.67}       # centre of the caption block as a share of the frame height (market-style defaults: 0.70, Arabic 0.67)
+CAPTION_MAX_W = 0.78                        # share of the width a caption line may use: clear of TikTok's right-hand buttons and the frame edge
+KARAOKE_WORDS, KARAOKE_MAX_S, KARAOKE_HOLD_S = 3, 1.6, 0.15
+
+
+def karaoke_events(words: list[dict], clip_start: float, clip_end: float, social: bool, accent: str, width: int, height: int,
+                   cap: int, rtl: bool, position: str = "lower") -> list[dict]:
+    """Word-by-word captions: a short line (up to 3 words) is on screen while it is spoken, and the word being said turns to the
+    accent colour (a 70 ms blend from white). Each word has its own subtitle event with the whole line in it, so the line never
+    reflows and an Arabic line keeps its right-to-left order and letter joining (the colour changes sit only between words).
+    The block is centred at CAPTION_Y of the height and at most CAPTION_MAX_W wide: inside the TikTok and Reels safe zone."""
+    events = []
+    chunks = caption_chunks(words, clip_start, clip_end, KARAOKE_WORDS, KARAOKE_MAX_S)
+    white, hot = _ass_colour("#FFFFFF"), _ass_colour(accent)
+    y = int(height * (CAPTION_Y["ar" if rtl else "en"] if position == "lower" else 0.5))
+    for ci, chunk in enumerate(chunks):
+        shown = [(w, _esc(w["text"].translate(_LIGHT) if social else w["text"])) for w in chunk["words"]]
+        shown = [(w, text) for w, text in shown if text]
+        if not shown:
+            continue
+        size = fit_size(" ".join(t for _, t in shown), width * CAPTION_MAX_W, cap, max_lines=2)
+        head = f"{{\\an5\\pos({width // 2},{y})\\fs{size}"
+        stop = chunk["end"] + KARAOKE_HOLD_S
+        if ci + 1 < len(chunks):
+            stop = min(stop, chunks[ci + 1]["start"])
+        for k, (word, _) in enumerate(shown):
+            start = chunk["start"] if k == 0 else max(word["start"] - clip_start, chunk["start"])
+            end = stop if k == len(shown) - 1 else max(shown[k + 1][0]["start"] - clip_start, start + 0.04)
+            if end <= start:
+                continue
+            body = " ".join((f"{{\\1c{white}&\\t(0,70,\\1c{hot}&)}}{t}{{\\1c{white}&}}" if j == k else t) for j, (_, t) in enumerate(shown))
+            events.append({"start": start, "end": end, "text": head + ("\\fad(80,0)" if k == 0 else "") + "}" + body})
     return events
 
 
@@ -405,37 +511,76 @@ class FFmpegRender(Adapter):
         width, height = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
         start, end = float(clip["start_s"]), float(clip["end_s"])
         duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
-        if tpl["layout"] == "blur_pad" and self.force_crop is None:
-            style = "blur_pad"
+        niche = NICHE_OF_CROP.get(style)
+        wanted = tpl["layout"] if (isinstance(template, dict) and "layout" in template) else niche_defaults(niche).get("layout", "auto")
+        if self.force_crop is None and wanted in ("blur_pad", "gaming_stack"):
+            style = wanted
+        stack = None
+        if style in ("gaming_stack", "facecam_over_game"):
+            style = "gaming_stack"
+            stack = gaming_layout.plan(src_path, clip, info["width"], info["height"], width, height)
+            style = {"stack": "gaming_stack", "fullbleed": "follow_speaker"}.get(stack["layout"], "blur_pad")   # no face-cam: the whole picture on a blurred pad
+        if not (isinstance(template, dict) and "caption_position" in template) and niche_defaults(niche).get("caption_position") in CAPTION_POSITIONS:
+            tpl["caption_position"] = niche_defaults(niche)["caption_position"]
         tracked = faces.track(src_path, clip) if style in FOLLOW_STYLES else None   # YuNet path; None falls back to the old single-point focus
         path, focus = (tracked if tracked else (None, face_focus(src_path, clip) if style in FOLLOW_STYLES else None))
-        events = caption_events(words, start, end, clip.get("platform") in SOCIAL_PLATFORMS, clip.get("emphasis") or [], tpl["accent"])
-        ass = build_ass(width, height, duration, events, label, clip.get("language") == "ar", tpl, clip.get("hook_text"))
+        language, has_audio = clip.get("language") or "en", info["has_audio"]
+        env = polish.envelope(src_path, start, duration) if has_audio and self.force_crop is None and (tpl["tighten"] or tpl["zooms"]) else None
+        plan = None
+        if tpl["tighten"] and self.force_crop is None and words:
+            plan = polish.plan_tighten(words, start, end, language, env, info.get("fps") or 30.0, min_s=float(clip.get("min_s") or 0.0))
+            plan = plan if plan.cuts else None
+        shown_words, c0, c1 = (plan.words(words, start, end), 0.0, plan.new_duration) if plan else (words, start, end)
+        shown_emphasis = [plan.map(float(e) - start) for e in clip.get("emphasis") or []] if plan else clip.get("emphasis") or []
+        social, rtl = clip.get("platform") in SOCIAL_PLATFORMS, language == "ar"
+        if tpl["karaoke"]:
+            events = karaoke_events(shown_words, c0, c1, social, tpl["accent"], width, height, int(height * tpl["font_size"] / 100), rtl, tpl["caption_position"])
+        else:
+            events = caption_events(shown_words, c0, c1, social, shown_emphasis, tpl["accent"])
+        ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"))
         out_path.parent.mkdir(parents=True, exist_ok=True)
         ass_path = out_path.with_suffix(".ass")
         ass_path.write_text(ass, encoding="utf-8-sig")
-        zooms = zoom_times(clip.get("emphasis") or [], start, duration) if tpl["zooms"] and self.force_crop is None else []
-        graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path)
-        graph += (";" + zoom_graph(zooms, width, height)) if zooms else ""
-        graph += f";[{'zm' if zooms else 'lay'}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
-        loudness = "loudnorm=I=-14:TP=-1.5:LRA=" + ("18" if clip.get("audio") == "natural" else "11")
+        moments: list[tuple[float, float]] = []
+        if tpl["zooms"] and self.force_crop is None and style not in ZOOM_FLAT_STYLES and niche != "gaming":
+            moments = polish.stress_moments(words, start, end, env, plan) if env is not None and words else []
+            if not moments:    # no words or no audio: the loud moments the pipeline found, at a middle depth
+                moments = [(max(t - 0.25, 0.0), 1.08) for t in zoom_times(clip.get("emphasis") or [], start, duration)]
+        graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path, stack=stack)
+        graph += (";" + punch_graph(moments, width, height)) if moments else ""
+        last = "zm" if moments else "lay"
+        if plan:
+            graph += ";" + tighten_graphs(plan, last, has_audio, info.get("fps") or 30.0)
+            last = "cutv"
+        graph += f";[{last}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
+        bed = clip.get("music") if has_audio else None      # {"path", "offset_s", "gain_db"}: the chosen, licence-checked bed
+        if bed and not Path(bed["path"]).is_file():
+            bed = None
+        audio = music.audio_graph(bed, clip.get("platform"), clip.get("audio") == "natural", speech_in="cuta" if plan else "0:a:0", duration_s=c1 - c0) if has_audio else None
+        if audio:
+            graph += ";" + audio
 
         def args_for(encoder: str) -> list[str]:
-            args = ["-ss", f"{start:.3f}", "-i", str(src_path), "-t", f"{duration:.3f}", "-filter_complex", graph, "-map", "[v]"]
-            if info["has_audio"]:
-                args += ["-map", "0:a:0", "-af", loudness, "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
-            return [*args, *ffmpeg.encoder_args(encoder, str(self.cfg.get("preset", "veryfast")), int(self.cfg.get("crf", 23))),
+            args = ["-ss", f"{start:.3f}", "-i", str(src_path)]
+            if bed:   # looped from the chosen bar line, so a track shorter than the clip still fills it
+                args += ["-stream_loop", "-1", "-ss", f"{float(bed['offset_s']):.3f}", "-i", str(Path(bed["path"]).resolve())]
+            args += ["-t", f"{duration:.3f}", "-filter_complex", graph, "-map", "[v]"]
+            if has_audio:
+                args += ["-map", "[a]", "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
+            return [*args, *ffmpeg.encoder_args(encoder, str(self.cfg.get("preset", "medium")), int(self.cfg.get("crf", 23))),
                     "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_path)]
 
         encoder = self._encode(args_for, out_path.parent)
         finished = ffmpeg.probe(out_path)
-        cover = self._cover(src_path, clip, tpl, style, info, (width, height), focus, out_path.with_name("cover.png"))
+        cover = self._cover(src_path, clip, tpl, style, info, (width, height), focus, out_path.with_name("cover.png"), stack)
         return {"path": str(out_path), "ass_path": str(ass_path), "encodes": 1, "encoder": encoder, "cover_path": cover,
-                "duration_s": finished["duration_s"], "captions": len(events), "zooms": len(zooms),
+                "duration_s": finished["duration_s"], "captions": len(events), "zooms": len(moments),
+                "tightened": {"removed_s": round(plan.removed, 2), "cuts": plan.cuts} if plan else None,
                 "reframe": "face" if focus is not None else "centre_crop", "loudness_normalised": bool(info["has_audio"]),
+                "music": bed["record"] if bed and bed.get("record") else None, "loudness_target": music.target_loudness(clip.get("platform"))[0],
                 "overlay": {"text": label, "start_s": 0.0, "end_s": finished["duration_s"]}, "width": width, "height": height}
 
-    def _cover(self, src: Path, clip: dict, tpl: dict, style: str, info: dict, size: tuple[int, int], focus, out: Path) -> str | None:
+    def _cover(self, src: Path, clip: dict, tpl: dict, style: str, info: dict, size: tuple[int, int], focus, out: Path, stack: dict | None = None) -> str | None:
         """The cover PNG: the sharpest of the best candidate frames, reframed like the clip, with the short hook line. A cover is a
         nicety, so any failure leaves the clip without one and never blocks it."""
         width, height = size
@@ -443,7 +588,7 @@ class FFmpegRender(Adapter):
             at = sharpest_time(src, cover_times(clip))
             ass_path = out.with_suffix(".ass")
             ass_path.write_text(build_cover_ass(width, height, clip.get("hook_text"), tpl), encoding="utf-8-sig")
-            graph = layout_graph(style, info["width"], info["height"], width, height, focus) + f";[lay]ass={ass_path.name}[v]"
+            graph = layout_graph(style, info["width"], info["height"], width, height, focus, stack=stack) + f";[lay]ass={ass_path.name}[v]"
             ffmpeg.run(["-ss", f"{at:.3f}", "-i", str(src), "-filter_complex", graph, "-map", "[v]", "-frames:v", "1", str(out)], cwd=out.parent)
         except Exception:
             return None

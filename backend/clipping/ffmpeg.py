@@ -48,14 +48,16 @@ def probe(path: Path) -> dict:
     if not m:
         raise FFmpegError(f"cannot read media file: {path.name}")
     duration = int(m.group(1)) * 3600 + int(m.group(2)) * 60 + float(m.group(3))
-    width = height = None
+    width = height = fps = None
     for line in err.splitlines():
         if "Video:" in line:
+            f = re.search(r"([\d.]+) fps", line)
+            fps = float(f.group(1)) if f else None
             v = re.search(r",\s*(\d{2,5})x(\d{2,5})[\s,\[]", line + " ")
             if v:
                 width, height = int(v.group(1)), int(v.group(2))
             break
-    return {"duration_s": round(duration, 3), "width": width, "height": height, "has_audio": "Audio:" in err}
+    return {"duration_s": round(duration, 3), "width": width, "height": height, "fps": fps, "has_audio": "Audio:" in err}
 
 
 def sha256_file(path: Path) -> str:
@@ -126,11 +128,14 @@ def video_encoder(choice: str = "auto") -> str:
     return "h264_nvenc" if choice == "nvenc" or (choice == "auto" and nvenc_ready()) else "libx264"
 
 
-def encoder_args(encoder: str, preset: str = "veryfast", crf: int = 23) -> list[str]:
+X264_CRF_OFFSET = 3     # measured (docs/bakeoff/final/polish): x264 medium at crf-3 matches NVENC p5 at cq crf+1 (VMAF-NEG within 0.5, similar size)
+
+
+def encoder_args(encoder: str, preset: str = "medium", crf: int = 23) -> list[str]:
     """Output arguments of one video encoder (same quality target on both)."""
     if encoder == "h264_nvenc":
         return ["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr", "-cq", str(crf + 1), "-b:v", "0", "-profile:v", "high"]
-    return ["-c:v", "libx264", "-preset", preset, "-crf", str(crf)]
+    return ["-c:v", "libx264", "-preset", preset, "-crf", str(max(crf - X264_CRF_OFFSET, 0))]
 
 
 # ------------------------------------------------------------------ one-pass analysis (signals)

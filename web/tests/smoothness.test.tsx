@@ -145,7 +145,7 @@ describe("DW-7.1 screens answer at once", () => {
 describe("DW-7.2 optimistic actions", () => {
   it("accept and save for later update the screen before the server answers", async () => {
     const { card } = await open(feedRoutes(feedOf(4)), () => { hold("/accept"); hold("/later"); });
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     expect(await screen.findByText("1 of 3")).toBeTruthy(); // c1 left while its request is still open
     expect(screen.getByText("Show 2")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Review later" }));
@@ -155,7 +155,7 @@ describe("DW-7.2 optimistic actions", () => {
 
   it("accept offers Undo too, and Undo puts the clip back at once", async () => {
     const { mock, card } = await open(feedRoutes(feedOf(3)));
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     expect(await screen.findByText("Accepted")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
     expect(await screen.findByText("1 of 3")).toBeTruthy();
@@ -193,7 +193,7 @@ describe("DW-7.2 optimistic actions", () => {
   it("Undo pressed before the server has answered still works once it does", async () => {
     let answer: () => void = () => undefined;
     const { mock, card } = await open(feedRoutes(feedOf(3)), () => { answer = hold("/accept"); });
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     fireEvent.click(await screen.findByRole("button", { name: "Undo" }));
     expect(await screen.findByText("1 of 3")).toBeTruthy(); // back at once
     expect(mock.posts("/api/reviews/undo")).toHaveLength(0); // waits for the decision to exist
@@ -203,7 +203,7 @@ describe("DW-7.2 optimistic actions", () => {
 
   it("a refused Undo takes the clip out again with the reason", async () => {
     const { card } = await open(feedRoutes(feedOf(3), { "POST /api/reviews/undo": { __status: 400, body: { error: "The 10-second Undo window has passed." } } }));
-    swipe(card, [100, 300], [260, 300]);
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     fireEvent.click(await screen.findByRole("button", { name: "Undo" }));
     await screen.findByText("The 10-second Undo window has passed.");
     expect(screen.getByText("1 of 2")).toBeTruthy();
@@ -267,7 +267,7 @@ describe("DW-7.3 the feed plays the next clip with no visible load", () => {
     const { card } = await open(feedRoutes(feedOf(5)));
     const nextVideo = videos()[1];
     const play = vi.spyOn(nextVideo, "play");
-    swipe(card, [100, 300], [260, 300]); // accept: c1 leaves
+    fireEvent.keyDown(window, { key: "a" });   // the accept key: a swipe right now also posts (decision 31)
     await screen.findByText("Show 2");
     const now = screen.getByTestId("clip-card").querySelector("video");
     expect(now).toBe(nextVideo); // the same element: it was already buffered
@@ -331,7 +331,8 @@ describe("DW-7.3 the feed plays the next clip with no visible load", () => {
     mockApi(feedRoutes(feedOf(9)));
     const release = hold("/api/feed", "GET");
     render(<LangProvider initial="en"><Feed /></LangProvider>);
-    swipe(await screen.findByTestId("clip-card"), [100, 300], [260, 300]);
+    await screen.findByTestId("clip-card");
+    fireEvent.keyDown(window, { key: "a" });
     await screen.findByText("1 of 2");
     release(); // the fresh 9-clip list arrives only now
     await tick(60);
