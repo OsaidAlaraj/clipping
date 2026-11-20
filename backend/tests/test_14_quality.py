@@ -25,7 +25,11 @@ ASSUMED = {"median": 2500.0, "sigma": 1.2, "basis": "assumed"}
 
 
 def feed(produced, **kw):
+    """These tests are about the chance-to-clear weakness only. The fixture clips are synthetic (no face, no disclosure in the
+    caption), so the quality gate (test_quality_gate.py) would fail all of them and sink them together; its stored result is
+    removed here so the two rules are tested apart."""
     with produced.db.session(produced.owner) as conn:
+        conn.execute("update clips set render_meta = render_meta - 'gate'")
         return review.feed(conn, produced.owner.operator_id, **kw)
 
 
@@ -626,3 +630,12 @@ def test_DW_6_3_with_fakes_off_and_no_keys_the_demo_still_completes(tmp_path, mo
                           encoding="utf-8", timeout=900)
     assert done.returncode == 0, done.stdout[-2000:] + done.stderr[-2000:]
     assert "Render: " in done.stdout and "Accepted the top clip" in done.stdout and "Adapter switched on" not in done.stdout
+
+
+def test_a_clip_that_failed_the_quality_gate_goes_last_in_the_feed_even_with_the_best_score(produced):
+    set_threshold(produced, 0)
+    top = feed(produced)[0]["id"]
+    with produced.db.session(produced.owner) as conn:
+        conn.execute("update clips set render_meta = jsonb_set(render_meta, '{gate}', '{\"status\": \"fail\", \"reasons\": []}') where id = %s", (top,))
+        ids = [c["id"] for c in review.feed(conn, produced.owner.operator_id)]
+    assert ids[-1] == top and len(ids) == 3
