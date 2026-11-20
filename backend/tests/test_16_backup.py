@@ -58,6 +58,7 @@ def test_failed_backup_raises_alert_and_housekeeping_continues(db, monkeypatch):
         raise RuntimeError("pg_dump exploded")
 
     monkeypatch.setattr(backup, "create", boom)
+    monkeypatch.setattr(backup, "due", lambda: True)   # a dump made by a parallel test must not make this one "not due"
     monkeypatch.setattr(ops, "_audience_checked", {"at": time.time()})   # skip the network-backed audience refresh
     continued = []
     from clipping import campaigns
