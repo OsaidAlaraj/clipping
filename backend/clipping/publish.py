@@ -21,6 +21,7 @@ from .core import AppError, GateError, KillSwitchOn, audit, enqueue, get_setting
 from .db import Database
 
 OWNER_TICKS = ["account_and_platform_correct", "disclosure_toggle_on", "caption_pasted", "hashtags_and_tags_checked"]
+SWIPE_TICKS = ["account_and_platform_correct", "caption_pasted", "hashtags_and_tags_checked"]   # what a swipe right stands in for (decision 31); never the disclosure toggle
 ENDED = ("cancelled", "failed")                       # a target in one of these no longer holds its platform slot
 LINKABLE = ("scheduled", "processing", "draft", "private", "needs_check")
 HOSTS = {"youtube_shorts": ("youtube.com", "youtu.be"), "instagram_reels": ("instagram.com", "instagr.am"), "tiktok": ("tiktok.com",)}
@@ -111,17 +112,22 @@ def checklist(conn, actor, clip_id, platform: str | None = None) -> dict:
     }
 
 
-def _checklist_record(state: dict, ticks: dict) -> dict:
-    """The record kept with a gate-3 approval. Refuses unless every server check passed and every owner tick is ticked."""
+def _checklist_record(state: dict, ticks: dict, via: str | None = None) -> dict:
+    """The record kept with a gate-3 approval. Refuses unless every server check passed and every owner tick is ticked.
+    A swipe (`via='swipe'`) stands in for the account, caption and hashtag ticks only; it never claims the disclosure toggle."""
     ticks = ticks if isinstance(ticks, dict) else {}
+    needed = SWIPE_TICKS if via == "swipe" else OWNER_TICKS
     failed = [item["label"] for item in state["server"].values() if not item["ok"]]
-    missing = [name for name in OWNER_TICKS if ticks.get(name) is not True]
+    missing = [name for name in needed if ticks.get(name) is not True]
     if failed or missing:
         raise AppError("The checklist is not complete: " + "; ".join(failed + [m.replace("_", " ") for m in missing]) + ".",
                        "checklist_incomplete")
-    return {"ticks": {name: True for name in OWNER_TICKS}, "server": {k: v["ok"] for k, v in state["server"].items()},
-            "warnings": state["warnings"], "file_hash": state["clip"]["file_hash"],
-            "approved_at": dt.datetime.now(dt.timezone.utc).isoformat()}
+    record = {"ticks": {name: True for name in needed}, "server": {k: v["ok"] for k, v in state["server"].items()},
+              "warnings": state["warnings"], "file_hash": state["clip"]["file_hash"],
+              "approved_at": dt.datetime.now(dt.timezone.utc).isoformat()}
+    if via == "swipe":
+        record["confirm_via"] = "swipe"
+    return record
 
 
 def approve_publish(conn, actor, clip_id, ticks: dict) -> dict:
@@ -304,7 +310,7 @@ def _idempotency_key(clip_id, platform: str, request_id: str) -> str:
     return stable_hash([str(clip_id), platform, request_id])
 
 
-def confirm_post(conn, actor, clip_id, platforms, ticks, request_id) -> dict:
+def confirm_post(conn, actor, clip_id, platforms, ticks, request_id, via: str | None = None) -> dict:
     """Gate 3 for several platforms at once: ONE owner tap queues one post per platform, spaced out on each account's own window.
     All or nothing. A replayed `request_id` returns the targets it already made and creates none."""
     if actor.kind != "operator" or actor.role not in ("admin", "operator"):
@@ -335,7 +341,7 @@ def confirm_post(conn, actor, clip_id, platforms, ticks, request_id) -> dict:
         if not states[platform]["platform_allowed"]:
             raise AppError(f"This campaign does not allow {PLATFORM_LABEL[platform]} posts.", "platform_not_allowed")
         try:
-            records[platform] = _checklist_record(states[platform], ticks.get(platform))
+            records[platform] = _checklist_record(states[platform], ticks.get(platform), via)
         except AppError as exc:
             raise AppError(f"{PLATFORM_LABEL[platform]}: {exc}", exc.code) from None
     times = plan_times(conn, actor, [states[p]["account"] for p in platforms], _now())
@@ -359,8 +365,111 @@ def confirm_post(conn, actor, clip_id, platforms, ticks, request_id) -> dict:
         made.append(row)
         if not manual:
             enqueue(conn, "publish", {"target_id": str(row["id"])}, actor.operator_id, campaign_version_id=clip["campaign_version_id"], run_after=when)
-        audit(conn, "post.confirmed", "post_targets", row["id"], {"platform": platform, "manual": manual}, rule_version_id=clip["campaign_version_id"])
+        audit(conn, "post.confirmed", "post_targets", row["id"], {"platform": platform, "manual": manual, **({"via": via} if via else {})},
+              rule_version_id=clip["campaign_version_id"])
     return {"targets": [_view(r) for r in made]}
+
+
+def feed_targets(conn, actor, clips: list[dict]) -> None:
+    """Adds `post_targets` to each feed card: where a swipe right would post it (platform, the owner's account, and whether it is
+    connected). The card shows this before the swipe, so the owner always sees the accounts the swipe confirms."""
+    cache: dict = {}
+    for clip in clips:
+        key = str(clip["campaign_id"])
+        if key not in cache:
+            version = conn.execute("select rules_json from campaign_versions where id = %s", (clip["campaign_version_id"],)).fetchone()
+            cache[key] = {"allowed": (version["rules_json"].get("platforms_allowed") or []) if version else [],
+                          "campaign": conn.execute("select category_id from campaigns where id = %s", (clip["campaign_id"],)).fetchone(), "by_platform": {}}
+        info, out = cache[key], []
+        for platform in PLATFORMS:
+            if platform not in info["allowed"] or clip.get("is_practice"):
+                continue
+            own = bool(clip["account_id"] and clip["platform"] == platform)
+            if not own and platform in info["by_platform"]:
+                account = info["by_platform"][platform]
+            else:
+                account = _account_for(conn, actor, clip, info["campaign"], platform)
+                if not own:
+                    info["by_platform"][platform] = account
+            if account is None or account["status"] != "active":
+                continue
+            connection = connections.for_account(conn, account["id"])
+            out.append({"platform": platform, "label": PLATFORM_LABEL[platform], "handle": account["handle"],
+                        "manual": connection is None or connection["state"] == "needs_reconnect"})
+        clip["post_targets"] = out
+
+
+def _compliance_warning(clip: dict) -> str | None:
+    """One plain sentence when compliance says "review" (a warning, not a block); None when it passes."""
+    if clip["compliance_status"] != "review":
+        return None
+    report = clip.get("compliance_report") or {}
+    names = [str(c.get("check", "")).replace("_", " ") for c in report.get("deterministic", []) if c.get("status") != "pass"]
+    names += [str(r.get("rule", ""))[:60] for r in report.get("rules", []) if r.get("status") != "pass"]
+    return "Compliance needs a look" + (": " + ", ".join(n for n in names if n) if any(names) else "") + "."
+
+
+def swipe_confirm(conn, actor, clip_id, request_id, session_id=None, client_action_id=None) -> dict:
+    """Decision 31: a swipe right in the review feed accepts the clip AND is the owner's confirm to post, one tap for every platform
+    the clip can go to. It stands in for the account, caption and hashtag ticks (the card showed them); the disclosure toggle is never
+    part of it. A clip that failed compliance does not post (the screen opens the report). A practice campaign accepts the clip and
+    queues nothing. Everything is one transaction: a refusal anywhere leaves the clip in the feed, not accepted."""
+    if actor.kind != "operator" or actor.role not in ("admin", "operator"):
+        raise GateError("Posting needs the owner's own confirm.")
+    clip_id = _id(clip_id, "clip")
+    with conn.transaction():
+        if request_id and (replayed := _targets_of(conn, clip_id, request_id)):          # a repeated tap: the same answer, nothing new
+            first = conn.execute("select * from reviews where clip_id = %s and decision = 'accept' order by created_at desc limit 1", (clip_id,)).fetchone()
+            handles = {str(a["id"]): a["handle"] for a in conn.execute("select id, handle from accounts where id = any(%s)", ([t["account_id"] for t in replayed],)).fetchall()}
+            return {"review": first, "clip_id": clip_id, "practice": False, "warning": None, "skipped": [],
+                    "targets": [{**t, "label": PLATFORM_LABEL[t["platform"]], "handle": handles.get(t["account_id"])} for t in replayed]}
+        clip = review.get_clip(conn, clip_id)
+        if clip["compliance_status"] not in ("pass", "review"):
+            raise AppError("This clip did not pass the compliance check. Open the report before posting.", "compliance_blocked")
+        if clip["status"] not in ("ready_for_review", "accepted"):
+            raise AppError(f"A clip that is {clip['status']} cannot be posted from a swipe.", "bad_status")
+        decision = review.accept(conn, actor, clip_id, session_id, client_action_id) if clip["status"] == "ready_for_review" else None
+        base = {"review": decision, "clip_id": clip_id, "practice": bool(clip["is_practice"]), "warning": _compliance_warning(clip),
+                "targets": [], "skipped": []}
+        if clip["is_practice"]:
+            return base                                  # accepted, never queued: the existing refusal stays in force
+        require_kill_switch_off(conn)
+        options = post_options(conn, actor, clip_id)["platforms"]
+        chosen = [o["platform"] for o in options if o["allowed"]]
+        base["skipped"] = [{"platform": o["platform"], "label": o["label"], "reason": o["blocked_reason"]} for o in options if not o["allowed"]]
+        if not chosen:
+            return base
+        made = confirm_post(conn, actor, clip_id, chosen, {p: {t: True for t in SWIPE_TICKS} for p in chosen},
+                            request_id or client_action_id, via="swipe")["targets"]
+        handles = {str(a["id"]): a["handle"] for a in conn.execute("select id, handle from accounts where id = any(%s)",
+                                                                 ([t["account_id"] for t in made],)).fetchall()}
+        base["targets"] = [{**t, "label": PLATFORM_LABEL[t["platform"]], "handle": handles.get(t["account_id"])} for t in made]
+        from .core import stable_hash
+
+        audit(conn, "post.swipe_confirmed", "clips", clip_id,
+              {"via": "swipe", "caption_hash": stable_hash(clip["caption_text"] or ""), "at": dt.datetime.now(dt.timezone.utc).isoformat(),
+               "targets": [{"platform": t["platform"], "manual": t["manual"]} for t in made]},
+              rule_version_id=clip["campaign_version_id"])
+        return base
+
+
+def swipe_undo(conn, actor, clip_id, review_id) -> dict:
+    """Undo a swipe inside the Undo window: its queued posts are cancelled and the clip goes back to the feed as it was.
+    Refused once the window has passed or any post has started sending."""
+    if actor.kind != "operator" or actor.role not in ("admin", "operator"):
+        raise GateError("Only the owner can do this.")
+    clip_id = _id(clip_id, "clip")
+    with conn.transaction():
+        targets = conn.execute("select * from post_targets where clip_id = %s and state <> all(%s) for update", (clip_id, list(ENDED))).fetchall()
+        busy = [t for t in targets if t["state"] != "scheduled"]
+        if busy:
+            raise AppError("A post has already started sending, so this cannot be undone. Check the platform.", "not_cancellable")
+        for target in targets:
+            conn.execute("update post_targets set state = 'cancelled', reason = 'You undid the swipe.' where id = %s", (target["id"],))
+            audit(conn, "post.cancelled", "post_targets", target["id"], {"platform": target["platform"], "was": "scheduled", "via": "swipe_undo"})
+        conn.execute("update clips set status = 'accepted' where id = %s and status in ('ready_to_post', 'queued')", (clip_id,))
+        undone = review.undo(conn, actor, review_id)
+    return {"review": undone, "cancelled": len(targets)}
 
 
 def _owned_target(conn, actor, target_id) -> dict:

@@ -846,7 +846,9 @@ def device_code(actor: Actor = Depends(current_actor)):
 @app.get("/api/feed")
 def get_feed(campaign_id: str | None = None, actor: Actor = Depends(current_actor)):
     with get_db().session(actor) as conn:
-        return {"clips": review.feed(conn, actor.operator_id, campaign_id), "kill_switch": kill_switch(conn)["active"],
+        clips = review.feed(conn, actor.operator_id, campaign_id)
+        publish.feed_targets(conn, actor, clips)
+        return {"clips": clips, "kill_switch": kill_switch(conn)["active"],
                 "filtered": moments.filtered_list(conn, campaign_id),
                 "undo_window_s": review.get_setting(conn, "undo_window_s", actor.operator_id),
                 "session_length_min": review.get_setting(conn, "session_length_min", actor.operator_id),
@@ -980,6 +982,27 @@ def post_options(clip_id: str, actor: Actor = Depends(current_actor)):
 @app.post("/api/clips/{clip_id}/post")
 def post_clip(clip_id: str, body: PostIn, actor: Actor = Depends(current_actor)):
     return run(actor, publish.confirm_post, actor, clip_id, body.platforms, body.ticks, body.request_id)
+
+
+class SwipeIn(BaseModel):
+    request_id: str | None = None
+    session_id: str | None = None
+    client_action_id: str | None = None
+
+
+class SwipeUndoIn(BaseModel):
+    review_id: str
+
+
+@app.post("/api/clips/{clip_id}/swipe")
+def swipe_clip(clip_id: str, body: SwipeIn, actor: Actor = Depends(current_actor)):
+    """Swipe right in the feed: accept and confirm the posts in one owner action (decision 31)."""
+    return run(actor, publish.swipe_confirm, actor, clip_id, body.request_id, body.session_id, body.client_action_id)
+
+
+@app.post("/api/clips/{clip_id}/swipe/undo")
+def swipe_undo(clip_id: str, body: SwipeUndoIn, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.swipe_undo, actor, clip_id, body.review_id)
 
 
 @app.get("/api/clips/{clip_id}/post-status")
