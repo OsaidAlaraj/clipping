@@ -25,7 +25,7 @@ Status: DONE (built and reviewed) / PARTLY / MISSING (not built) / OWNER (only t
 - Originality: permission is not enough; add real value (commentary, structure, framing): MISSING (originality layer)
 - One source moment to one account, never the same moment on several: RULE ADDED
 - Disclosure (#ad or paid-partnership label) top of caption and in the clip: DONE
-- Music licensing: royalty-free burned-in with a per-clip log, platform libraries in-app only: DONE for free CC BY beds (18 Kevin MacLeod tracks, per-clip licence log, credit in caption); owner to decide Content ID risk, see docs/bakeoff/final/music
+- Music licensing: royalty-free burned-in with a per-clip log, platform libraries in-app only: DONE with 37 free CC0 beds (no credit lines), per-clip licence log; thin spots listed in docs/bakeoff/final/music
 - Captions that match the video (no misleading descriptions): RULE ADDED, caption checker MISSING
 - Brand and adult safety flags: PARTLY
 - Privacy and terms pages: DONE (clipmind.app); kill switch and human gates: DONE

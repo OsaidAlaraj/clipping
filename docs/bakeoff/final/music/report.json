@@ -1,16 +1,16 @@
 {
  "target_lufs": -14.0,
- "reference_track": "mm-backbay-lounge",
+ "reference_track": "hz-203072",
  "winner": {
   "mix": {
-   "music_lufs": -19.0,
+   "music_lufs": -22.0,
    "ratio": 14.0,
    "threshold": 0.06,
    "release_ms": 350
   },
-  "smr_db": 28.5,
-  "gap_smr_db": 15.3,
-  "duck_db": 13.2,
+  "smr_db": 25.9,
+  "gap_smr_db": 10.0,
+  "duck_db": 16.0,
   "speech_share": 0.6,
   "lufs": -14.1,
   "lufs_err": -0.1,
@@ -21,114 +21,34 @@
   {
    "mix": {
     "music_lufs": -19.0,
-    "ratio": 4.0,
-    "threshold": 0.01,
+    "ratio": 8.0,
+    "threshold": 0.03,
     "release_ms": 350
    },
-   "smr_db": 37.4,
-   "gap_smr_db": 19.8,
-   "duck_db": 17.7,
+   "smr_db": 27.0,
+   "gap_smr_db": 7.6,
+   "duck_db": 19.4,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
    "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -19.0,
-    "ratio": 4.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 30.5,
-   "gap_smr_db": 15.9,
-   "duck_db": 14.6,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -19.0,
-    "ratio": 4.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 26.1,
-   "gap_smr_db": 15.3,
-   "duck_db": 10.8,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
+   "feasible": false
   },
   {
    "mix": {
     "music_lufs": -19.0,
     "ratio": 8.0,
-    "threshold": 0.01,
+    "threshold": 0.06,
     "release_ms": 350
    },
-   "smr_db": 40.9,
-   "gap_smr_db": 20.5,
-   "duck_db": 20.4,
+   "smr_db": 22.3,
+   "gap_smr_db": 7.0,
+   "duck_db": 15.3,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
    "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -19.0,
-    "ratio": 8.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 32.9,
-   "gap_smr_db": 16.0,
-   "duck_db": 16.9,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -19.0,
-    "ratio": 8.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 27.8,
-   "gap_smr_db": 15.3,
-   "duck_db": 12.4,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -19.0,
-    "ratio": 14.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 42.4,
-   "gap_smr_db": 20.8,
-   "duck_db": 21.6,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
+   "feasible": false
   },
   {
    "mix": {
@@ -137,14 +57,14 @@
     "threshold": 0.03,
     "release_ms": 350
    },
-   "smr_db": 33.9,
-   "gap_smr_db": 16.1,
-   "duck_db": 17.8,
+   "smr_db": 27.9,
+   "gap_smr_db": 7.6,
+   "duck_db": 20.3,
    "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
    "peak_db": -1.5,
-   "feasible": true
+   "feasible": false
   },
   {
    "mix": {
@@ -153,25 +73,25 @@
     "threshold": 0.06,
     "release_ms": 350
    },
-   "smr_db": 28.5,
-   "gap_smr_db": 15.3,
-   "duck_db": 13.2,
+   "smr_db": 22.9,
+   "gap_smr_db": 7.0,
+   "duck_db": 16.0,
    "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
    "peak_db": -1.5,
-   "feasible": true
+   "feasible": false
   },
   {
    "mix": {
     "music_lufs": -22.0,
-    "ratio": 4.0,
-    "threshold": 0.01,
+    "ratio": 8.0,
+    "threshold": 0.03,
     "release_ms": 350
    },
-   "smr_db": 40.4,
-   "gap_smr_db": 22.8,
-   "duck_db": 17.6,
+   "smr_db": 30.0,
+   "gap_smr_db": 10.6,
+   "duck_db": 19.4,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
@@ -181,29 +101,13 @@
   {
    "mix": {
     "music_lufs": -22.0,
-    "ratio": 4.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 33.4,
-   "gap_smr_db": 18.9,
-   "duck_db": 14.5,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -22.0,
-    "ratio": 4.0,
+    "ratio": 8.0,
     "threshold": 0.06,
     "release_ms": 350
    },
-   "smr_db": 29.1,
-   "gap_smr_db": 18.3,
-   "duck_db": 10.8,
+   "smr_db": 25.3,
+   "gap_smr_db": 10.0,
+   "duck_db": 15.3,
    "speech_share": 0.6,
    "lufs": -14.1,
    "lufs_err": -0.1,
@@ -213,12 +117,12 @@
   {
    "mix": {
     "music_lufs": -22.0,
-    "ratio": 8.0,
-    "threshold": 0.01,
+    "ratio": 14.0,
+    "threshold": 0.03,
     "release_ms": 350
    },
-   "smr_db": 43.8,
-   "gap_smr_db": 23.5,
+   "smr_db": 30.9,
+   "gap_smr_db": 10.6,
    "duck_db": 20.3,
    "speech_share": 0.6,
    "lufs": -14.0,
@@ -229,77 +133,13 @@
   {
    "mix": {
     "music_lufs": -22.0,
-    "ratio": 8.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 35.8,
-   "gap_smr_db": 19.0,
-   "duck_db": 16.8,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -22.0,
-    "ratio": 8.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 30.7,
-   "gap_smr_db": 18.3,
-   "duck_db": 12.4,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -22.0,
-    "ratio": 14.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 45.3,
-   "gap_smr_db": 23.8,
-   "duck_db": 21.4,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -22.0,
-    "ratio": 14.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 36.8,
-   "gap_smr_db": 19.1,
-   "duck_db": 17.8,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -22.0,
     "ratio": 14.0,
     "threshold": 0.06,
     "release_ms": 350
    },
-   "smr_db": 31.4,
-   "gap_smr_db": 18.3,
-   "duck_db": 13.1,
+   "smr_db": 25.9,
+   "gap_smr_db": 10.0,
+   "duck_db": 16.0,
    "speech_share": 0.6,
    "lufs": -14.1,
    "lufs_err": -0.1,
@@ -309,29 +149,13 @@
   {
    "mix": {
     "music_lufs": -25.0,
-    "ratio": 4.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 43.3,
-   "gap_smr_db": 25.8,
-   "duck_db": 17.5,
-   "speech_share": 0.6,
-   "lufs": -13.9,
-   "lufs_err": 0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -25.0,
-    "ratio": 4.0,
+    "ratio": 8.0,
     "threshold": 0.03,
     "release_ms": 350
    },
-   "smr_db": 36.4,
-   "gap_smr_db": 21.9,
-   "duck_db": 14.5,
+   "smr_db": 33.0,
+   "gap_smr_db": 13.6,
+   "duck_db": 19.4,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
@@ -341,62 +165,30 @@
   {
    "mix": {
     "music_lufs": -25.0,
-    "ratio": 4.0,
+    "ratio": 8.0,
     "threshold": 0.06,
     "release_ms": 350
    },
-   "smr_db": 32.0,
-   "gap_smr_db": 21.3,
-   "duck_db": 10.7,
+   "smr_db": 28.3,
+   "gap_smr_db": 13.0,
+   "duck_db": 15.3,
    "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
    "peak_db": -1.5,
    "feasible": true
   },
   {
    "mix": {
     "music_lufs": -25.0,
-    "ratio": 8.0,
-    "threshold": 0.01,
+    "ratio": 14.0,
+    "threshold": 0.03,
     "release_ms": 350
    },
-   "smr_db": 46.7,
-   "gap_smr_db": 26.5,
+   "smr_db": 33.9,
+   "gap_smr_db": 13.6,
    "duck_db": 20.2,
    "speech_share": 0.6,
-   "lufs": -13.9,
-   "lufs_err": 0.1,
-   "peak_db": -1.5,
-   "feasible": false
-  },
-  {
-   "mix": {
-    "music_lufs": -25.0,
-    "ratio": 8.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 38.8,
-   "gap_smr_db": 22.0,
-   "duck_db": 16.8,
-   "speech_share": 0.6,
-   "lufs": -13.9,
-   "lufs_err": 0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -25.0,
-    "ratio": 8.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 33.7,
-   "gap_smr_db": 21.3,
-   "duck_db": 12.4,
-   "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
    "peak_db": -1.5,
@@ -406,200 +198,79 @@
    "mix": {
     "music_lufs": -25.0,
     "ratio": 14.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 48.1,
-   "gap_smr_db": 26.8,
-   "duck_db": 21.3,
-   "speech_share": 0.6,
-   "lufs": -13.9,
-   "lufs_err": 0.1,
-   "peak_db": -1.5,
-   "feasible": false
-  },
-  {
-   "mix": {
-    "music_lufs": -25.0,
-    "ratio": 14.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 39.8,
-   "gap_smr_db": 22.1,
-   "duck_db": 17.7,
-   "speech_share": 0.6,
-   "lufs": -13.9,
-   "lufs_err": 0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -25.0,
-    "ratio": 14.0,
     "threshold": 0.06,
     "release_ms": 350
    },
-   "smr_db": 34.4,
-   "gap_smr_db": 21.3,
-   "duck_db": 13.1,
+   "smr_db": 28.9,
+   "gap_smr_db": 13.0,
+   "duck_db": 15.9,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 4.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 46.2,
-   "gap_smr_db": 28.8,
-   "duck_db": 17.4,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": false
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 4.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 39.3,
-   "gap_smr_db": 24.9,
-   "duck_db": 14.4,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 4.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 35.0,
-   "gap_smr_db": 24.3,
-   "duck_db": 10.7,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 8.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 49.5,
-   "gap_smr_db": 29.5,
-   "duck_db": 20.0,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": false
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 8.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 41.7,
-   "gap_smr_db": 25.0,
-   "duck_db": 16.7,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 8.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 36.7,
-   "gap_smr_db": 24.3,
-   "duck_db": 12.3,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 14.0,
-    "threshold": 0.01,
-    "release_ms": 350
-   },
-   "smr_db": 50.9,
-   "gap_smr_db": 29.8,
-   "duck_db": 21.1,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": false
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 14.0,
-    "threshold": 0.03,
-    "release_ms": 350
-   },
-   "smr_db": 42.7,
-   "gap_smr_db": 25.1,
-   "duck_db": 17.6,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "mix": {
-    "music_lufs": -28.0,
-    "ratio": 14.0,
-    "threshold": 0.06,
-    "release_ms": 350
-   },
-   "smr_db": 37.4,
-   "gap_smr_db": 24.3,
-   "duck_db": 13.0,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
    "peak_db": -1.5,
    "feasible": true
   }
  ],
  "per_track": [
   {
-   "track": "mm-backbay-lounge",
-   "smr_db": 28.5,
-   "gap_smr_db": 15.3,
+   "track": "hz-243306",
+   "smr_db": 28.6,
+   "gap_smr_db": 15.7,
+   "duck_db": 12.8,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-208290",
+   "smr_db": 25.4,
+   "gap_smr_db": 12.5,
+   "duck_db": 12.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204495",
+   "smr_db": 32.8,
+   "gap_smr_db": 21.4,
+   "duck_db": 11.4,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-201276",
+   "smr_db": 28.3,
+   "gap_smr_db": 15.7,
+   "duck_db": 12.6,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-205360",
+   "smr_db": 28.8,
+   "gap_smr_db": 16.7,
+   "duck_db": 12.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212604",
+   "smr_db": 27.7,
+   "gap_smr_db": 14.5,
    "duck_db": 13.2,
    "speech_share": 0.6,
    "lufs": -14.1,
@@ -608,10 +279,10 @@
    "feasible": true
   },
   {
-   "track": "mm-wallpaper",
-   "smr_db": 28.0,
-   "gap_smr_db": 14.2,
-   "duck_db": 13.8,
+   "track": "hz-212880",
+   "smr_db": 26.9,
+   "gap_smr_db": 12.0,
+   "duck_db": 14.9,
    "speech_share": 0.6,
    "lufs": -14.1,
    "lufs_err": -0.1,
@@ -619,32 +290,32 @@
    "feasible": true
   },
   {
-   "track": "mm-dream-culture",
-   "smr_db": 20.8,
-   "gap_smr_db": 7.9,
-   "duck_db": 12.9,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-local-forecast-elevator",
-   "smr_db": 23.3,
-   "gap_smr_db": 12.8,
-   "duck_db": 10.5,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-impact-moderato",
+   "track": "hz-205354",
    "smr_db": 27.6,
-   "gap_smr_db": 15.9,
-   "duck_db": 11.7,
+   "gap_smr_db": 12.1,
+   "duck_db": 15.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-208282",
+   "smr_db": 30.0,
+   "gap_smr_db": 16.4,
+   "duck_db": 13.6,
+   "speech_share": 0.6,
+   "lufs": -14.2,
+   "lufs_err": -0.2,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212884",
+   "smr_db": 31.4,
+   "gap_smr_db": 16.8,
+   "duck_db": 14.6,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
@@ -652,130 +323,20 @@
    "feasible": true
   },
   {
-   "track": "mm-carefree",
-   "smr_db": 24.2,
-   "gap_smr_db": 12.4,
-   "duck_db": 11.8,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-volatile-reaction",
-   "smr_db": 21.7,
-   "gap_smr_db": 6.0,
-   "duck_db": 15.7,
-   "speech_share": 0.6,
-   "lufs": -13.8,
-   "lufs_err": 0.2,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-faster-does-it",
-   "smr_db": 36.9,
-   "gap_smr_db": 25.5,
-   "duck_db": 11.5,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-bit-quest",
-   "smr_db": 15.1,
-   "gap_smr_db": 2.8,
-   "duck_db": 12.3,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": false
-  },
-  {
-   "track": "mm-heroic-age",
-   "smr_db": 27.3,
-   "gap_smr_db": 16.1,
-   "duck_db": 11.3,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-cipher",
-   "smr_db": 27.6,
-   "gap_smr_db": 14.6,
+   "track": "hz-217330",
+   "smr_db": 31.4,
+   "gap_smr_db": 18.4,
    "duck_db": 13.0,
    "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-night-in-venice",
-   "smr_db": 25.3,
-   "gap_smr_db": 9.7,
-   "duck_db": 15.6,
-   "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
    "peak_db": -1.5,
    "feasible": true
   },
   {
-   "track": "mm-sunshine",
-   "smr_db": 21.8,
-   "gap_smr_db": 9.2,
-   "duck_db": 12.5,
-   "speech_share": 0.6,
-   "lufs": -14.1,
-   "lufs_err": -0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-investigations",
-   "smr_db": 31.2,
-   "gap_smr_db": 21.6,
-   "duck_db": 9.6,
-   "speech_share": 0.6,
-   "lufs": -13.9,
-   "lufs_err": 0.1,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-kool-kats",
-   "smr_db": 24.6,
-   "gap_smr_db": 11.2,
-   "duck_db": 13.4,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-thinking-music",
-   "smr_db": 27.6,
-   "gap_smr_db": 16.2,
-   "duck_db": 11.4,
-   "speech_share": 0.6,
-   "lufs": -14.0,
-   "lufs_err": 0.0,
-   "peak_db": -1.5,
-   "feasible": true
-  },
-  {
-   "track": "mm-digital-lemonade",
-   "smr_db": 23.1,
-   "gap_smr_db": 9.1,
+   "track": "hz-204044",
+   "smr_db": 26.5,
+   "gap_smr_db": 12.5,
    "duck_db": 14.0,
    "speech_share": 0.6,
    "lufs": -14.1,
@@ -784,29 +345,293 @@
    "feasible": true
   },
   {
-   "track": "mm-funky-chunk",
-   "smr_db": 23.6,
-   "gap_smr_db": 11.9,
+   "track": "hz-267053",
+   "smr_db": 25.7,
+   "gap_smr_db": 12.5,
+   "duck_db": 13.2,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-243511",
+   "smr_db": 21.0,
+   "gap_smr_db": 9.3,
    "duck_db": 11.7,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203072",
+   "smr_db": 25.9,
+   "gap_smr_db": 10.0,
+   "duck_db": 16.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-202142",
+   "smr_db": 28.3,
+   "gap_smr_db": 15.0,
+   "duck_db": 13.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203691",
+   "smr_db": 28.6,
+   "gap_smr_db": 13.1,
+   "duck_db": 15.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204258",
+   "smr_db": 26.6,
+   "gap_smr_db": 14.7,
+   "duck_db": 11.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204255",
+   "smr_db": 24.5,
+   "gap_smr_db": 14.2,
+   "duck_db": 10.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-265835",
+   "smr_db": 26.5,
+   "gap_smr_db": 10.6,
+   "duck_db": 15.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-245667",
+   "smr_db": 22.4,
+   "gap_smr_db": 11.3,
+   "duck_db": 11.1,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-243304",
+   "smr_db": 24.2,
+   "gap_smr_db": 9.9,
+   "duck_db": 14.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-238388",
+   "smr_db": 30.0,
+   "gap_smr_db": 19.7,
+   "duck_db": 10.3,
    "speech_share": 0.6,
    "lufs": -14.0,
    "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203443",
+   "smr_db": 27.8,
+   "gap_smr_db": 13.8,
+   "duck_db": 14.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203444",
+   "smr_db": 27.1,
+   "gap_smr_db": 12.5,
+   "duck_db": 14.6,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-201835",
+   "smr_db": 24.8,
+   "gap_smr_db": 12.4,
+   "duck_db": 12.4,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203700",
+   "smr_db": 32.0,
+   "gap_smr_db": 21.0,
+   "duck_db": 11.0,
+   "speech_share": 0.6,
+   "lufs": -14.2,
+   "lufs_err": -0.2,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203699",
+   "smr_db": 32.3,
+   "gap_smr_db": 18.8,
+   "duck_db": 13.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203701",
+   "smr_db": 31.8,
+   "gap_smr_db": 18.4,
+   "duck_db": 13.4,
+   "speech_share": 0.6,
+   "lufs": -13.9,
+   "lufs_err": 0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-205383",
+   "smr_db": 31.5,
+   "gap_smr_db": 16.4,
+   "duck_db": 15.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-266597",
+   "smr_db": 26.0,
+   "gap_smr_db": 12.7,
+   "duck_db": 13.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-266596",
+   "smr_db": 26.5,
+   "gap_smr_db": 14.9,
+   "duck_db": 11.6,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212608",
+   "smr_db": 30.9,
+   "gap_smr_db": 18.2,
+   "duck_db": 12.6,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204023",
+   "smr_db": 24.3,
+   "gap_smr_db": 10.8,
+   "duck_db": 13.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204025",
+   "smr_db": 20.8,
+   "gap_smr_db": 8.2,
+   "duck_db": 12.7,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-265888",
+   "smr_db": 22.9,
+   "gap_smr_db": 9.8,
+   "duck_db": 13.1,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-238366",
+   "smr_db": 20.9,
+   "gap_smr_db": 8.1,
+   "duck_db": 12.7,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
    "peak_db": -1.5,
    "feasible": true
   }
  ],
  "proof": {
   "track": {
-   "track_id": "mm-dream-culture",
-   "title": "Dream Culture",
-   "artist": "Kevin MacLeod",
-   "source_url": "https://incompetech.com/music/royalty-free/music.html",
-   "licence": "CC-BY-4.0",
-   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "track_id": "hz-245667",
+   "title": "Still Life",
+   "artist": "HoliznaCC0",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/still-life-lofi-chill-nostalgic/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
    "licence_checked": "2026-11-20",
-   "attribution_required": true,
-   "attribution_text": "Music: \"Dream Culture\" by Kevin MacLeod (https://incompetech.com/music/royalty-free/music.html), CC-BY-4.0",
-   "offset_s": 99.429,
+   "attribution_required": false,
+   "attribution_text": null,
+   "offset_s": 47.368,
    "platform": "tiktok"
   },
   "before": {

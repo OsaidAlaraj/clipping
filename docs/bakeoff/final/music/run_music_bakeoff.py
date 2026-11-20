@@ -8,7 +8,7 @@ Listening proxies, all measured on decoded stems (voice and ducked bed separatel
   duck_db     how far the compressor pulls the bed down when the voice starts (gap level minus speaking level)
   lufs_err    final clip integrated loudness minus the platform target
   peak_db     sample peak of the final clip (must stay under -1 dBFS)
-A setting is feasible when smr >= 18, gap_smr <= 26, |lufs_err| <= 1 and peak <= -1; the winner has the lowest gap_smr (the most
+A mix setting is feasible when smr >= 18, 10 <= gap_smr <= 26 (a track is only gated on smr >= 18 and gap_smr <= 26), |lufs_err| <= 1 and peak <= -1; the winner has the lowest gap_smr (the most
 present bed) among the feasible ones."""
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ from clipping.adapters import media  # noqa: E402
 
 SRC = HERE.parent / "interview_en_new_yunet.mp4"
 WORK = ROOT / ".data" / "tmp" / "music-bakeoff"   # drive L, git-ignored
-MUSIC_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("L:/Projects/Clipping/.data/music")
+MUSIC_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("L:/Projects/Clipping/.data/music")   # the CC0 tracks
 RATE = 16000
 TARGET = music.target_loudness("tiktok")[0]
 
@@ -102,20 +102,20 @@ def final_metrics(mix: dict, track: dict, offset: float, seconds: float = 24.0) 
     return {"lufs": lufs, "lufs_err": round(lufs - TARGET, 2), "peak_db": peak}
 
 
-def feasible(m: dict) -> bool:
-    return m["smr_db"] >= 18 and m["gap_smr_db"] <= 26 and abs(m["lufs_err"]) <= 1.0 and m["peak_db"] <= -1.0
+def feasible(m: dict, gap_min: float = 0.0) -> bool:
+    return m["smr_db"] >= 18 and gap_min <= m["gap_smr_db"] <= 26 and abs(m["lufs_err"]) <= 1.0 and m["peak_db"] <= -1.0
 
 
 def main() -> None:
     tracks = {t["id"]: t for t in music.tracks(MUSIC_DIR)}
-    ref = tracks.get("mm-backbay-lounge") or next(iter(tracks.values()))
+    ref = tracks.get("hz-203072") or next(iter(tracks.values()))
     # 1. the mix grid on one reference track
     grid = []
-    for lufs, ratio, thr, rel in itertools.product((-19.0, -22.0, -25.0, -28.0), (4.0, 8.0, 14.0), (0.01, 0.03, 0.06), (350,)):
+    for lufs, ratio, thr, rel in itertools.product((-19.0, -22.0, -25.0), (8.0, 14.0), (0.03, 0.06), (350,)):
         mix = {**music.MIX, "music_lufs": lufs, "ratio": ratio, "threshold": thr, "release_ms": rel}
         voice, bed = stems(mix, ref, 20.0)
         row = {"mix": {"music_lufs": lufs, "ratio": ratio, "threshold": thr, "release_ms": rel}, **metrics(voice, bed), **final_metrics(mix, ref, 20.0)}
-        row["feasible"] = feasible(row)
+        row["feasible"] = feasible(row, gap_min=10.0)   # the reference bed must not dominate the pauses either
         grid.append(row)
         print(row, flush=True)
     ok = [r for r in grid if r["feasible"]]

@@ -181,7 +181,7 @@ In the review feed a swipe right accepts the clip AND is the owner's deliberate 
 - **Copilot:** the owner allows using it for well-specified mechanical work (review, tests, docs, audits) on its own branches; its output is reviewed before merge.
 - **main** is merged (8d7127d) and protected against force-push and deletion.
 
-## Decision 32 follow-up (2026-11-20): music bed stage built
-- **Catalog:** 17 free tracks by Kevin MacLeod, CC BY 4.0 (commercial, burned-in and adapted use allowed with credit), file list and SHA-256 in `backend/clipping/assets/music-catalog.json`, files under `.data/music` (not in git). The credit line goes into the caption and `render_meta.music`. Rejected: freepd.com (closed), platform libraries, unreviewed own-licence sites, any NC or SA licence, and `Bit Quest` (measured masking).
-- **Selector and mix:** niche, the clip's mood and energy, tempo; the last tracks are avoided; podcasts that are speech-heavy get no bed. Sidechain ducking, -14 LUFS (TikTok, Instagram), peak limiter, all inside the clip's one encode. Mix settings chosen by measurement (docs/bakeoff/final/music).
-- **Owner decision open:** Kevin MacLeod tracks are widely re-used, so another uploader can have them registered in a platform's copyright matching; a match is a claim to dispute with the CC BY licence page, not something to evade.
+## Decision 32 follow-up (2026-11-20): music bed stage built, CC0 only
+- **Owner rule:** CC0 / no-attribution tracks only (no credit lines in captions), and music that fits short-form feeds. Catalog: 37 instrumental tracks by HoliznaCC0 on Free Music Archive, licence and Instrumental tag checked per track page; files under `.data/music` (not in git); fit criteria and a `fit_why` per track are in `backend/clipping/assets/music-catalog.json`.
+- **Selector and mix:** niche, mood, tempo vs the clip's energy and cut pace, no vocals, start past the intro on a bar line, no repeat on consecutive clips; speech-heavy podcasts get no bed. Sidechain ducking, -14 LUFS (TikTok, Instagram), peak limiter, inside the clip's one encode. Settings chosen by measurement (docs/bakeoff/final/music).
+- **Thin spots (owner may buy a library later):** one artist, no current trending pop/EDM or corporate beds, nothing regional, few high-energy business beds.

@@ -36,7 +36,8 @@ def test_every_catalog_track_is_valid_and_carries_a_clear_licence():
     for track in cat["tracks"]:
         assert music.validate_track(track) == [], track["id"]
         assert track["licence_url"].startswith("https://") and track["source_url"].startswith("https://")
-        assert cat["accepted_licences"][track["licence"]]["burned_in_commercial"] is True
+        assert track["licence"] == "CC0-1.0" and cat["accepted_licences"][track["licence"]]["attribution_required"] is False   # owner: no credit lines
+        assert track["vocals"] == "none" and track["fit_why"] and track["source_url"].startswith("https://freemusicarchive.org/")
         assert len(track["sha256"]) == 64
     assert {n for t in cat["tracks"] for n in t["niches"]} == set(music.NICHES)   # every niche has beds
     assert all(sum(1 for t in cat["tracks"] if n in t["niches"]) >= 4 for n in music.NICHES)
@@ -45,6 +46,8 @@ def test_every_catalog_track_is_valid_and_carries_a_clear_licence():
 def test_an_unclear_licence_or_a_missing_field_makes_a_track_unusable():
     base = dict(music.catalog()["tracks"][0])
     assert music.validate_track({**base, "licence": "CC-BY-NC-4.0"}) == ["licence not accepted"]
+    assert music.validate_track({**base, "licence": "CC-BY-4.0"}) == ["licence not accepted"]          # attribution licences are out
+    assert "track has vocals or the tag is missing" in music.validate_track({**base, "vocals": "sung"})
     assert "missing source_url" in music.validate_track({**base, "source_url": ""})
     assert "unknown niche" in music.validate_track({**base, "niches": ["politics"]})
 
@@ -77,6 +80,27 @@ def test_the_selector_matches_energy_and_mood():
     calm = music.choose("business", {"mood": "calm", "energy": 0.2, "speech_share": 0.5}, 20, pool=pool())
     hot = music.choose("business", {"mood": "driving", "energy": 0.85, "speech_share": 0.5}, 20, pool=pool())
     assert calm["track"]["id"] == "fake-a" and hot["track"]["id"] == "fake-b"
+
+
+def test_a_track_with_vocals_is_never_chosen_and_the_pool_of_vocal_tracks_gives_no_bed():
+    sung = [{**t, "vocals": "sung"} for t in pool()]
+    assert music.choose("business", {"mood": "calm", "energy": 0.2, "speech_share": 0.3}, 20, pool=sung)["use"] is False
+    mixed = [sung[0], *pool()[1:]]
+    assert music.choose("business", {"mood": "calm", "energy": 0.2, "speech_share": 0.3}, 20, pool=mixed)["track"]["id"] != "fake-a"
+
+
+def test_tempo_fit_counts_half_and_double_time_and_the_offset_skips_the_intro():
+    assert music.tempo_gap(75, 150) == 0 and music.tempo_gap(120, 60) == 0 and music.tempo_gap(100, 130) == 30
+    slow_intro = {**pool()[0], "intro_s": 10.0, "duration_s": 120}
+    bar = 4 * 60 / slow_intro["bpm"]
+    assert all(music.offset_for(slow_intro, 20, str(i)) >= 10.0 for i in range(8)) and bar > 0
+
+
+def test_a_fast_cut_edit_raises_the_energy_the_selector_matches():
+    words = [{"text": "so", "start": i * 0.8, "end": i * 0.8 + 0.4} for i in range(15)]
+    slow = music.clip_profile(words, 0, 12, {"scene": [0] * 12})
+    fast = music.clip_profile(words, 0, 12, {"scene": [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]})
+    assert fast["cuts_per_10s"] > 4 and fast["energy"] > slow["energy"] + 0.1
 
 
 def test_the_selector_never_repeats_the_previous_track_while_another_fits():
@@ -123,9 +147,10 @@ def test_no_track_means_no_bed_and_the_offset_sits_on_a_bar_line_inside_the_trac
 
 # ------------------------------------------------------------------ the licence record and the caption credit
 
-def test_the_licence_record_names_track_source_licence_and_the_credit_a_by_licence_needs():
-    by = [t for t in pool() if t["licence"] == "CC-BY-4.0"][0]
-    cc0 = [t for t in pool() if t["licence"] == "CC0-1.0"][0]
+def test_the_licence_record_names_track_source_licence_and_the_credit_a_by_licence_needs(monkeypatch):
+    monkeypatch.setitem(music.catalog()["accepted_licences"], "CC-BY-4.0", {"attribution_required": True, "burned_in_commercial": True})
+    by = {**pool()[2], "licence": "CC-BY-4.0", "licence_url": "https://creativecommons.org/licenses/by/4.0/"}
+    cc0 = pool()[0]
     rec, free = music.licence_record(by, 12.0, "tiktok"), music.licence_record(cc0, 0.0, "instagram")
     assert rec["track_id"] == "fake-c" and rec["licence_url"].endswith("/by/4.0/") and rec["attribution_required"]
     assert "Fake C" in music.credit_line(rec) and "CC-BY-4.0" in music.credit_line(rec) and rec["licence_checked"]
@@ -218,10 +243,9 @@ def test_every_rendered_clip_logs_its_track_and_licence_and_no_track_repeats_bac
         m = clip["render_meta"]["music"]
         assert m["track_id"], m
         assert m["track_id"].startswith("fake-") and m["licence"] and m["licence_url"] and m["source_url"] and m["mood"] and "offset_s" in m
-        assert m["attribution_required"] == (m["licence"] == "CC-BY-4.0")
+        assert m["licence"] == "CC0-1.0" and m["attribution_required"] is False and m["attribution_text"] is None
         assert clip["render_meta"]["encodes"] == 1 and clip["render_meta"]["loudness_target_lufs"] == -14.0
-        if m["attribution_required"]:                                      # the credit is in the caption
-            assert m["attribution_text"] in clip["caption_text"] and clip["render_meta"]["music_credit_in_caption"] is True
+        assert clip["render_meta"]["music_credit_in_caption"] is False and "Music:" not in clip["caption_text"]   # CC0: no credit line
         ids.append(m["track_id"])
     assert all(a != b for a, b in zip(ids, ids[1:])), (ids, music_adapters.FAKE_MUSIC["calls"])
 

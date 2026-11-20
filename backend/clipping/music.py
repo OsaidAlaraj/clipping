@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import zlib
 from functools import lru_cache
 from pathlib import Path
@@ -25,7 +26,7 @@ DEFAULT_LOUDNESS = (-14.0, -1.5)
 
 # Mix settings. Chosen by the measured bake-off in docs/bakeoff/final/music (speech-to-music ratio while someone talks, music lift in
 # the gaps, final loudness error): the music sits at `music_lufs` and the compressor pulls it further down whenever speech is present.
-MIX = {"music_lufs": -19.0, "threshold": 0.06, "ratio": 14.0, "attack_ms": 15, "release_ms": 350, "makeup": 1.0,
+MIX = {"music_lufs": -22.0, "threshold": 0.06, "ratio": 14.0, "attack_ms": 15, "release_ms": 350, "makeup": 1.0,
        "fade_in_s": 0.6, "fade_out_s": 1.2}
 
 # Podcasts are speech: the bed stays off unless there is room for it (speech fills less than this share of the clip).
@@ -51,7 +52,7 @@ def catalog() -> dict:
 def validate_track(track: dict) -> list[str]:
     """What is wrong with one catalog entry (empty when it is acceptable). A track without a clear licence is never usable."""
     problems = []
-    for key in ("id", "title", "artist", "file", "source_url", "licence", "licence_url", "bpm", "energy", "moods", "niches", "duration_s"):
+    for key in ("id", "title", "artist", "file", "source_url", "licence", "licence_url", "bpm", "energy", "moods", "niches", "duration_s", "fit_why"):
         if track.get(key) in (None, "", []):
             problems.append(f"missing {key}")
     if track.get("licence") not in _raw_catalog().get("accepted_licences", {}):
@@ -60,6 +61,10 @@ def validate_track(track: dict) -> list[str]:
         problems.append("unknown niche")
     if not set(track.get("moods") or []) <= set(MOODS):
         problems.append("unknown mood")
+    if track.get("vocals") != "none":
+        problems.append("track has vocals or the tag is missing")   # a bed under speech must not carry a competing voice
+    if track.get("intro_s") is None:
+        problems.append("missing intro_s")
     if not 0 <= float(track.get("energy") or 0) <= 1:
         problems.append("energy outside 0..1")
     return problems
@@ -122,7 +127,8 @@ def clip_profile(words: list[dict], start_s: float, end_s: float, signals: dict 
     loud = [v for v in ((signals or {}).get("loudness") or []) if v > -60]
     spread = (max(loud) - min(loud)) / 30 if len(loud) > 2 else 0.0
     laughter = max(((signals or {}).get("laughter") or [0]), default=0)
-    energy = min(max(0.15 + 0.22 * (rate - 1.5) + 0.25 * min(spread, 1.0) + 0.05 * min(bangs, 4) + 0.2 * laughter, 0.0), 1.0)
+    cuts = sum(1 for v in ((signals or {}).get("scene") or []) if v and v > 0.5) / span * 10      # picture cuts per 10 s: the edit's pace
+    energy = min(max(0.15 + 0.22 * (rate - 1.5) + 0.25 * min(spread, 1.0) + 0.05 * min(bangs, 4) + 0.2 * laughter + 0.04 * min(cuts, 6), 0.0), 1.0)
     up, tense, play = len(tokens & (_UPBEAT | _UPBEAT_AR)), len(tokens & (_TENSE | _TENSE_AR)), len(tokens & _PLAYFUL)
     if laughter > 0.5 or play:
         mood = "playful"
@@ -132,7 +138,7 @@ def clip_profile(words: list[dict], start_s: float, end_s: float, signals: dict 
         mood = "upbeat" if energy < 0.75 else "driving"
     else:
         mood = "calm"
-    return {"mood": mood, "energy": round(energy, 2), "speech_share": round(speech_share(inside, start_s, end_s), 2), "words_per_s": round(rate, 2)}
+    return {"mood": mood, "energy": round(energy, 2), "speech_share": round(speech_share(inside, start_s, end_s), 2), "words_per_s": round(rate, 2), "cuts_per_10s": round(cuts, 1)}
 
 
 # ------------------------------------------------------------------ the selector
@@ -144,25 +150,35 @@ def wants_music(niche: str | None, profile: dict, platform: str | None = None) -
     return True, "bed fits the clip" if niche != "podcasts" else f"podcast clip has room ({profile['speech_share']:.0%} speech)"
 
 
+def tempo_gap(bpm: float, target: float) -> float:
+    """Distance in BPM between a track and the wanted tempo, where half and double time count as the same feel (a 75 BPM beat
+    reads as 150 on a fast edit)."""
+    return min(abs(bpm - target), abs(bpm * 2 - target), abs(bpm / 2 - target))
+
+
 def score(track: dict, niche: str, profile: dict) -> float:
-    """How well a track fits (higher is better): energy and tempo closeness, mood match, niche priority."""
+    """How well a track fits the clip (higher is better): energy and tempo closeness (tempo is matched to the energy of the speech
+    and the pace of the cuts), mood match, niche priority, and a small cost for a slow intro (it only matters when the clip cannot
+    start past it). Vocal tracks never reach this point."""
     target_bpm = 70 + 80 * profile["energy"]
     s = 3.0 * (1 - abs(track["energy"] - profile["energy"]))
-    s += 1.0 * (1 - min(abs(track["bpm"] - target_bpm) / 80, 1.0))
+    s += 1.5 * (1 - min(tempo_gap(track["bpm"], target_bpm) / 60, 1.0))
     s += 2.0 if profile["mood"] == track["moods"][0] else (1.0 if profile["mood"] in track["moods"] else 0.0)
     s += 1.0 if track["niches"][0] == niche else 0.0
+    s -= 0.4 if float(track.get("intro_s", 0)) > 8 else 0.0
     return s
 
 
 def offset_for(track: dict, duration_s: float, seed: str) -> float:
-    """Where in the track to start: on a bar line (four beats), after the intro, varied by the clip so two clips on one track do not
-    start alike. Tracks shorter than the clip start at 0 and loop."""
+    """Where in the track to start: on a bar line (four beats), after the intro so the bed opens at full strength, varied by the clip
+    so two clips on one track do not start alike. A track too short for that starts at 0 and loops."""
     bar = 4 * 60.0 / track["bpm"]
-    room = float(track["duration_s"]) - duration_s - 1.0
+    first = math.ceil(float(track.get("intro_s", 0)) / bar) * bar
+    room = float(track["duration_s"]) - duration_s - 1.0 - first
     if room <= bar:
         return 0.0
     bars = int(room // bar)
-    return round((zlib.crc32(seed.encode()) % (bars + 1)) * bar, 3)
+    return round(first + (zlib.crc32(seed.encode()) % (bars + 1)) * bar, 3)
 
 
 def choose(niche: str | None, profile: dict, duration_s: float, platform: str | None = None, recent: list[str] | None = None,
@@ -173,7 +189,7 @@ def choose(niche: str | None, profile: dict, duration_s: float, platform: str | 
     ok, reason = wants_music(niche, profile, platform)
     if not ok:
         return {"use": False, "reason": reason}
-    pool = tracks() if pool is None else pool
+    pool = [t for t in (tracks() if pool is None else pool) if t.get("vocals", "none") == "none"]
     fitting = [t for t in pool if niche in t["niches"]] or pool
     if not fitting:
         return {"use": False, "reason": "no licensed track is available"}

@@ -1,11 +1,17 @@
-# Music bed bake-off (decision 32)
+# Music bed bake-off (decision 32, CC0 only)
 
-Real speech (30 s English interview clip, `../interview_en_new_yunet.mp4`, first 24 s), TikTok target -14 LUFS. `run_music_bakeoff.py` decodes the voice and the ducked bed as separate stems and measures them; `report.json` has every row.
+Owner rule (2026-11-20): CC0 / no-attribution tracks only, and music that suits short-form feeds. All 37 catalog tracks are by HoliznaCC0 on Free Music Archive; each track's own page was checked live for the CC0 1.0 licence link and the "Instrumental" genre. The earlier CC BY set (Kevin MacLeod) is gone.
 
-**Proof clips:** `before_no_music.mp4` (voice only) and `after_with_music.mp4` (track `mm-dream-culture`, chosen by the selector, mixed in the same single encode). Both are 24 s, 540x960, one encode each, loudness -14 LUFS, peak under -1 dBFS.
+**Fit criteria** (listed in the catalog under `fit_criteria`, with a `fit_why` line per track): instrumental; clear pulse (3.4+ onsets/s) and tempo 70-135 BPM, matched to the clip's energy and cut pace (half and double time count as a match); steady level (swing 17 dB or less) so ducking follows speech; the bed starts on a bar line after the measured intro, so the first 1-2 s are the track at full strength; tagged per niche and mood; never the same track on two clips in a row. Refused on measurement: Bouncing (under 90 s), Fresh Fit (weak pulse), Sky Scrapers (tempo), ONLY HUMAN (level swings 167 dB), Doodles, Mutant Club, Side Quest to Nowhere (no Instrumental tag).
 
-**Mix grid (36 settings: bed level x compressor ratio x threshold).** Feasible = speech-to-music ratio while speaking >= 18 dB (speech band 300-3400 Hz), pauses <= 26 dB, final loudness within 1 LU of target, peak <= -1 dBFS. 31 of 36 passed. Winner = the most present bed that still passes: bed at -19 LUFS, ratio 14, threshold 0.06, release 350 ms. Result: 28.5 dB speech-to-music while speaking, 15.3 dB in the pauses, ducking depth 13.2 dB, final -14.1 LUFS, peak -1.5 dBFS. The winner sits on the edge of the grid (loudest bed, strongest ratio): a wider grid may find a bed that is a little louder still, but ducking already runs at the intelligibility floor's safe side, so it was not widened.
+**Selector score** = energy closeness (energy comes from the speech rate, loudness spread, laughter and cuts per 10 s) + tempo fit to the wanted BPM + mood match + niche priority - a small cost for a long intro. Podcasts get no bed when speech fills more than 62 % of the clip.
 
-**Per-track check under the winning mix (17 tracks kept):** all but one keep the voice 20 dB or more above the bed while speaking. `Bit Quest` fell to 15.1 dB (busy mid-band) and was removed from the catalog. `Faster Does It` and `Investigations` are the quietest in the pauses (25.5 and 21.6 dB), i.e. their bed is the least present.
+**Mix settings by measurement** (real speech, 24 s of `../interview_en_new_yunet.mp4`, TikTok -14 LUFS; 12 settings on reference track `Morning Coffee`): feasible = voice 18 dB or more above the bed while speaking, 10-26 dB above it in the pauses, final loudness within 1 LU, peak under -1 dBFS. Winner: bed at -22 LUFS, ratio 14, threshold 0.06, release 350 ms: 25.9 dB speech-to-music while speaking, 10.0 dB in the pauses, ducking depth 16 dB, final -14.1 LUFS, peak -1.5 dBFS.
 
-**Limits (honest):** the proxies are numbers, not ears: the owner should listen to the two proof clips once. The speech source is one interview; a gaming clip with loud game audio is not covered (the bed is mixed under the clip's whole original audio, so game sound is not ducked separately). Platform loudness is -14 LUFS for TikTok, Instagram and YouTube and -16 for Facebook: an assumption, not a measurement of each platform.
+**Per-track check under that mix:** all 37 tracks keep the voice 20.8 dB or more above the bed while speaking (`report.json`).
+
+**Proof clips:** `before_no_music.mp4` (voice only) and `after_with_music.mp4` (`Still Life`, picked by the selector), 24 s, one encode each.
+
+**Where the free catalog is thin:** one artist only; no current pop/EDM-style or bright corporate beds, nothing regional or Arabic in feel; business has 4 high-energy tracks, podcasts none; only gaming has tense or mysterious beds. "Sounds current on TikTok or Instagram" is the curator's judgement, not a measurement. A paid library with trend tags would cover these gaps: the owner decides later.
+
+**Limits:** the proxies are numbers, not ears: listen to the proof clips once. One speech source; game audio in a gaming clip is not ducked separately. Platform loudness (-14 LUFS TikTok/Instagram/YouTube, -16 Facebook) is an assumption.
