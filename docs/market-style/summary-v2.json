@@ -1,0 +1,1058 @@
+{
+ "business_en": {
+  "n": 8,
+  "length_s": [
+   41.2,
+   31.95,
+   68.67
+  ],
+  "hard_per_10s": [
+   0.0,
+   0.0,
+   0.75
+  ],
+  "cuts_per_10s": [
+   1.9,
+   0.7,
+   3.25
+  ],
+  "shot_len_median_s": [
+   2.65,
+   2.12,
+   4.53
+  ],
+  "cuts_first_3s": [
+   0.5,
+   0.0,
+   1.25
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.22,
+   0.19,
+   0.34
+  ],
+  "lufs": [
+   -22.25,
+   -24.85,
+   -14.85
+  ],
+  "music_floor": [
+   0.34,
+   0.21,
+   0.4
+  ],
+  "cap_mid_y": [
+   0.55,
+   0.48,
+   0.6
+  ],
+  "caption_band_h": [
+   0.03,
+   0.03,
+   0.03
+  ],
+  "words_per_caption_est": [
+   4.4,
+   3.98,
+   4.77
+  ],
+  "caption_changes_per_s": [
+   1.35,
+   0.79,
+   1.5
+  ],
+  "punch_per_min": [
+   3.65,
+   2.05,
+   5.1
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   0.85
+  ],
+  "share_word_captions": 0.88,
+  "share_static_title": 0.12,
+  "share_music_bed": 0.75,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.12,
+  "share_len_30_60": 0.5,
+  "share_len_gt_60": 0.38,
+  "share_open_cut_le3s": 0.5,
+  "share_hard_cut_free": 0.62,
+  "share_ad_tag": 0.0
+ },
+ "business_ar": {
+  "n": 5,
+  "length_s": [
+   82.4,
+   76.5,
+   91.2
+  ],
+  "hard_per_10s": [
+   0.13,
+   0.12,
+   0.16
+  ],
+  "cuts_per_10s": [
+   0.92,
+   0.16,
+   1.7
+  ],
+  "shot_len_median_s": [
+   5.2,
+   3.4,
+   7.3
+  ],
+  "cuts_first_3s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.36,
+   0.26,
+   0.36
+  ],
+  "lufs": [
+   -18.8,
+   -20.4,
+   -16.4
+  ],
+  "music_floor": [
+   0.05,
+   0.0,
+   0.06
+  ],
+  "cap_mid_y": [
+   0.62,
+   0.47,
+   0.64
+  ],
+  "caption_band_h": [
+   0.02,
+   0.02,
+   0.02
+  ],
+  "words_per_caption_est": [
+   6.5,
+   6.3,
+   8.2
+  ],
+  "caption_changes_per_s": [
+   0.28,
+   0.23,
+   0.37
+  ],
+  "punch_per_min": [
+   3.1,
+   0.0,
+   4.4
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "share_word_captions": 0.2,
+  "share_static_title": 0.4,
+  "share_music_bed": 0.0,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.0,
+  "share_len_30_60": 0.2,
+  "share_len_gt_60": 0.8,
+  "share_open_cut_le3s": 0.2,
+  "share_hard_cut_free": 0.0,
+  "share_ad_tag": 0.0
+ },
+ "business_all": {
+  "n": 13,
+  "length_s": [
+   68.2,
+   35.5,
+   82.4
+  ],
+  "hard_per_10s": [
+   0.12,
+   0.0,
+   0.33
+  ],
+  "cuts_per_10s": [
+   1.19,
+   0.62,
+   3.05
+  ],
+  "shot_len_median_s": [
+   3.4,
+   2.2,
+   7.3
+  ],
+  "cuts_first_3s": [
+   0.0,
+   0.0,
+   1.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.26,
+   0.22,
+   0.36
+  ],
+  "lufs": [
+   -20.4,
+   -24.7,
+   -14.9
+  ],
+  "music_floor": [
+   0.07,
+   0.04,
+   0.38
+  ],
+  "cap_mid_y": [
+   0.57,
+   0.47,
+   0.6
+  ],
+  "caption_band_h": [
+   0.03,
+   0.02,
+   0.03
+  ],
+  "words_per_caption_est": [
+   5.3,
+   4.3,
+   6.3
+  ],
+  "caption_changes_per_s": [
+   0.84,
+   0.28,
+   1.45
+  ],
+  "punch_per_min": [
+   3.4,
+   1.9,
+   4.5
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   0.7
+  ],
+  "share_word_captions": 0.62,
+  "share_static_title": 0.23,
+  "share_music_bed": 0.46,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.08,
+  "share_len_30_60": 0.38,
+  "share_len_gt_60": 0.54,
+  "share_open_cut_le3s": 0.38,
+  "share_hard_cut_free": 0.38,
+  "share_ad_tag": 0.0
+ },
+ "gaming_en": {
+  "n": 7,
+  "length_s": [
+   25.1,
+   17.15,
+   27.55
+  ],
+  "hard_per_10s": [
+   2.05,
+   0.34,
+   2.5
+  ],
+  "cuts_per_10s": [
+   5.67,
+   5.5,
+   8.28
+  ],
+  "shot_len_median_s": [
+   0.8,
+   0.8,
+   1.0
+  ],
+  "cuts_first_3s": [
+   2.0,
+   1.5,
+   2.5
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.5
+  ],
+  "face_width_share": [
+   0.17,
+   0.15,
+   0.19
+  ],
+  "lufs": [
+   -13.1,
+   -14.65,
+   -12.25
+  ],
+  "music_floor": [
+   0.36,
+   0.24,
+   0.44
+  ],
+  "cap_mid_y": [
+   0.44,
+   0.32,
+   0.54
+  ],
+  "caption_band_h": [
+   0.04,
+   0.03,
+   0.05
+  ],
+  "words_per_caption_est": [
+   4.8,
+   4.0,
+   7.55
+  ],
+  "caption_changes_per_s": [
+   0.8,
+   0.08,
+   1.08
+  ],
+  "punch_per_min": [
+   12.3,
+   9.7,
+   17.65
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   2.2
+  ],
+  "share_word_captions": 0.43,
+  "share_static_title": 0.43,
+  "share_music_bed": 0.71,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.86,
+  "share_len_30_60": 0.14,
+  "share_len_gt_60": 0.0,
+  "share_open_cut_le3s": 0.86,
+  "share_hard_cut_free": 0.29,
+  "share_ad_tag": 0.29
+ },
+ "gaming_ar": {
+  "n": 7,
+  "length_s": [
+   41.8,
+   29.75,
+   55.7
+  ],
+  "hard_per_10s": [
+   2.59,
+   1.77,
+   4.86
+  ],
+  "cuts_per_10s": [
+   5.88,
+   4.94,
+   6.75
+  ],
+  "shot_len_median_s": [
+   1.4,
+   0.9,
+   1.7
+  ],
+  "cuts_first_3s": [
+   1.0,
+   1.0,
+   2.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.32,
+   0.16,
+   0.46
+  ],
+  "lufs": [
+   -14.3,
+   -16.4,
+   -6.25
+  ],
+  "music_floor": [
+   0.24,
+   0.17,
+   0.34
+  ],
+  "cap_mid_y": [
+   0.63,
+   0.51,
+   0.69
+  ],
+  "caption_band_h": [
+   0.04,
+   0.03,
+   0.06
+  ],
+  "words_per_caption_est": [
+   4.4,
+   3.25,
+   5.8
+  ],
+  "caption_changes_per_s": [
+   1.56,
+   0.79,
+   2.0
+  ],
+  "punch_per_min": [
+   2.2,
+   1.65,
+   12.35
+  ],
+  "zoom_per_min": [
+   2.7,
+   0.7,
+   3.1
+  ],
+  "share_word_captions": 0.86,
+  "share_static_title": 0.0,
+  "share_music_bed": 0.43,
+  "share_caption_in_ui_zone": 0.14,
+  "share_len_le_30": 0.29,
+  "share_len_30_60": 0.43,
+  "share_len_gt_60": 0.29,
+  "share_open_cut_le3s": 0.86,
+  "share_hard_cut_free": 0.0,
+  "share_ad_tag": 0.0
+ },
+ "gaming_all": {
+  "n": 14,
+  "length_s": [
+   29.3,
+   25.1,
+   43.67
+  ],
+  "hard_per_10s": [
+   2.26,
+   1.23,
+   2.76
+  ],
+  "cuts_per_10s": [
+   5.78,
+   5.48,
+   7.61
+  ],
+  "shot_len_median_s": [
+   1.0,
+   0.8,
+   1.38
+  ],
+  "cuts_first_3s": [
+   2.0,
+   1.0,
+   2.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.19,
+   0.15,
+   0.4
+  ],
+  "lufs": [
+   -13.65,
+   -15.03,
+   -9.82
+  ],
+  "music_floor": [
+   0.28,
+   0.2,
+   0.4
+  ],
+  "cap_mid_y": [
+   0.54,
+   0.41,
+   0.63
+  ],
+  "caption_band_h": [
+   0.04,
+   0.03,
+   0.05
+  ],
+  "words_per_caption_est": [
+   4.6,
+   3.52,
+   6.5
+  ],
+  "caption_changes_per_s": [
+   1.01,
+   0.49,
+   1.48
+  ],
+  "punch_per_min": [
+   9.9,
+   3.17,
+   15.8
+  ],
+  "zoom_per_min": [
+   1.7,
+   0.0,
+   2.7
+  ],
+  "share_word_captions": 0.64,
+  "share_static_title": 0.21,
+  "share_music_bed": 0.57,
+  "share_caption_in_ui_zone": 0.07,
+  "share_len_le_30": 0.57,
+  "share_len_30_60": 0.29,
+  "share_len_gt_60": 0.14,
+  "share_open_cut_le3s": 0.86,
+  "share_hard_cut_free": 0.14,
+  "share_ad_tag": 0.14
+ },
+ "podcast_en": {
+  "n": 7,
+  "length_s": [
+   28.4,
+   20.55,
+   42.6
+  ],
+  "hard_per_10s": [
+   1.54,
+   1.18,
+   1.86
+  ],
+  "cuts_per_10s": [
+   4.41,
+   3.78,
+   4.52
+  ],
+  "shot_len_median_s": [
+   1.8,
+   1.55,
+   2.05
+  ],
+  "cuts_first_3s": [
+   0.0,
+   0.0,
+   1.5
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.5
+  ],
+  "face_width_share": [
+   0.32,
+   0.29,
+   0.34
+  ],
+  "lufs": [
+   -14.6,
+   -15.6,
+   -14.05
+  ],
+  "music_floor": [
+   0.16,
+   0.11,
+   0.34
+  ],
+  "cap_mid_y": [
+   0.57,
+   0.52,
+   0.59
+  ],
+  "caption_band_h": [
+   0.03,
+   0.03,
+   0.04
+  ],
+  "words_per_caption_est": [
+   3.4,
+   2.55,
+   4.9
+  ],
+  "caption_changes_per_s": [
+   1.93,
+   0.95,
+   2.73
+  ],
+  "punch_per_min": [
+   8.4,
+   2.35,
+   11.7
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   2.0
+  ],
+  "share_word_captions": 0.71,
+  "share_static_title": 0.0,
+  "share_music_bed": 0.43,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.57,
+  "share_len_30_60": 0.29,
+  "share_len_gt_60": 0.14,
+  "share_open_cut_le3s": 0.43,
+  "share_hard_cut_free": 0.0,
+  "share_ad_tag": 0.0
+ },
+ "podcast_ar": {
+  "n": 5,
+  "length_s": [
+   24.7,
+   23.2,
+   57.2
+  ],
+  "hard_per_10s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "cuts_per_10s": [
+   0.0,
+   0.0,
+   1.26
+  ],
+  "shot_len_median_s": [
+   23.17,
+   3.8,
+   24.67
+  ],
+  "cuts_first_3s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.33,
+   0.3,
+   0.33
+  ],
+  "lufs": [
+   -9.5,
+   -14.1,
+   -9.2
+  ],
+  "music_floor": [
+   0.25,
+   0.24,
+   0.26
+  ],
+  "cap_mid_y": [
+   0.6,
+   0.53,
+   0.67
+  ],
+  "caption_band_h": [
+   0.02,
+   0.01,
+   0.03
+  ],
+  "words_per_caption_est": [
+   6.0,
+   5.8,
+   7.1
+  ],
+  "caption_changes_per_s": [
+   1.3,
+   1.26,
+   1.73
+  ],
+  "punch_per_min": [
+   0.0,
+   0.0,
+   3.1
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "share_word_captions": 0.8,
+  "share_static_title": 0.0,
+  "share_music_bed": 0.6,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.6,
+  "share_len_30_60": 0.2,
+  "share_len_gt_60": 0.2,
+  "share_open_cut_le3s": 0.2,
+  "share_hard_cut_free": 1.0,
+  "share_ad_tag": 0.0
+ },
+ "podcast_all": {
+  "n": 12,
+  "length_s": [
+   26.55,
+   21.52,
+   48.27
+  ],
+  "hard_per_10s": [
+   0.85,
+   0.0,
+   1.56
+  ],
+  "cuts_per_10s": [
+   2.5,
+   0.95,
+   4.42
+  ],
+  "shot_len_median_s": [
+   2.58,
+   1.75,
+   8.69
+  ],
+  "cuts_first_3s": [
+   0.0,
+   0.0,
+   1.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.25
+  ],
+  "face_width_share": [
+   0.33,
+   0.3,
+   0.34
+  ],
+  "lufs": [
+   -14.15,
+   -15.12,
+   -12.65
+  ],
+  "music_floor": [
+   0.24,
+   0.15,
+   0.33
+  ],
+  "cap_mid_y": [
+   0.57,
+   0.52,
+   0.62
+  ],
+  "caption_band_h": [
+   0.03,
+   0.02,
+   0.03
+  ],
+  "words_per_caption_est": [
+   4.9,
+   2.62,
+   6.2
+  ],
+  "caption_changes_per_s": [
+   1.52,
+   0.97,
+   2.08
+  ],
+  "punch_per_min": [
+   3.15,
+   0.0,
+   8.97
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   1.0
+  ],
+  "share_word_captions": 0.75,
+  "share_static_title": 0.0,
+  "share_music_bed": 0.5,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.58,
+  "share_len_30_60": 0.25,
+  "share_len_gt_60": 0.17,
+  "share_open_cut_le3s": 0.33,
+  "share_hard_cut_free": 0.42,
+  "share_ad_tag": 0.0
+ },
+ "all_en": {
+  "n": 22,
+  "length_s": [
+   30.3,
+   23.15,
+   46.5
+  ],
+  "hard_per_10s": [
+   1.18,
+   0.0,
+   2.09
+  ],
+  "cuts_per_10s": [
+   4.36,
+   2.18,
+   5.43
+  ],
+  "shot_len_median_s": [
+   1.7,
+   1.02,
+   2.42
+  ],
+  "cuts_first_3s": [
+   1.0,
+   0.0,
+   2.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.23,
+   0.18,
+   0.33
+  ],
+  "lufs": [
+   -14.8,
+   -19.95,
+   -13.75
+  ],
+  "music_floor": [
+   0.32,
+   0.16,
+   0.4
+  ],
+  "cap_mid_y": [
+   0.54,
+   0.46,
+   0.6
+  ],
+  "caption_band_h": [
+   0.03,
+   0.03,
+   0.04
+  ],
+  "words_per_caption_est": [
+   4.4,
+   3.67,
+   5.2
+  ],
+  "caption_changes_per_s": [
+   1.08,
+   0.68,
+   1.59
+  ],
+  "punch_per_min": [
+   7.25,
+   3.25,
+   11.9
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   1.82
+  ],
+  "share_word_captions": 0.68,
+  "share_static_title": 0.18,
+  "share_music_bed": 0.64,
+  "share_caption_in_ui_zone": 0.0,
+  "share_len_le_30": 0.5,
+  "share_len_30_60": 0.32,
+  "share_len_gt_60": 0.18,
+  "share_open_cut_le3s": 0.59,
+  "share_hard_cut_free": 0.32,
+  "share_ad_tag": 0.09
+ },
+ "all_ar": {
+  "n": 17,
+  "length_s": [
+   53.4,
+   28.6,
+   76.5
+  ],
+  "hard_per_10s": [
+   0.16,
+   0.0,
+   2.19
+  ],
+  "cuts_per_10s": [
+   1.75,
+   0.16,
+   5.67
+  ],
+  "shot_len_median_s": [
+   3.05,
+   1.4,
+   7.3
+  ],
+  "cuts_first_3s": [
+   0.0,
+   0.0,
+   1.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.33,
+   0.24,
+   0.36
+  ],
+  "lufs": [
+   -14.3,
+   -18.0,
+   -9.2
+  ],
+  "music_floor": [
+   0.2,
+   0.07,
+   0.26
+  ],
+  "cap_mid_y": [
+   0.62,
+   0.51,
+   0.69
+  ],
+  "caption_band_h": [
+   0.03,
+   0.02,
+   0.05
+  ],
+  "words_per_caption_est": [
+   6.0,
+   4.4,
+   6.6
+  ],
+  "caption_changes_per_s": [
+   1.26,
+   0.37,
+   1.73
+  ],
+  "punch_per_min": [
+   2.2,
+   0.0,
+   4.5
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   2.2
+  ],
+  "share_word_captions": 0.65,
+  "share_static_title": 0.12,
+  "share_music_bed": 0.35,
+  "share_caption_in_ui_zone": 0.06,
+  "share_len_le_30": 0.29,
+  "share_len_30_60": 0.29,
+  "share_len_gt_60": 0.41,
+  "share_open_cut_le3s": 0.47,
+  "share_hard_cut_free": 0.29,
+  "share_ad_tag": 0.0
+ },
+ "all": {
+  "n": 39,
+  "length_s": [
+   35.5,
+   25.1,
+   64.15
+  ],
+  "hard_per_10s": [
+   0.82,
+   0.0,
+   2.15
+  ],
+  "cuts_per_10s": [
+   3.75,
+   1.23,
+   5.5
+  ],
+  "shot_len_median_s": [
+   2.0,
+   1.2,
+   3.7
+  ],
+  "cuts_first_3s": [
+   1.0,
+   0.0,
+   2.0
+  ],
+  "cuts_first_1s": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "face_width_share": [
+   0.3,
+   0.18,
+   0.35
+  ],
+  "lufs": [
+   -14.7,
+   -18.55,
+   -12.4
+  ],
+  "music_floor": [
+   0.25,
+   0.09,
+   0.37
+  ],
+  "cap_mid_y": [
+   0.55,
+   0.49,
+   0.63
+  ],
+  "caption_band_h": [
+   0.03,
+   0.02,
+   0.04
+  ],
+  "words_per_caption_est": [
+   4.9,
+   3.75,
+   6.4
+  ],
+  "caption_changes_per_s": [
+   1.16,
+   0.42,
+   1.73
+  ],
+  "punch_per_min": [
+   4.4,
+   1.85,
+   10.1
+  ],
+  "zoom_per_min": [
+   0.0,
+   0.0,
+   2.1
+  ],
+  "share_word_captions": 0.67,
+  "share_static_title": 0.15,
+  "share_music_bed": 0.51,
+  "share_caption_in_ui_zone": 0.03,
+  "share_len_le_30": 0.41,
+  "share_len_30_60": 0.31,
+  "share_len_gt_60": 0.28,
+  "share_open_cut_le3s": 0.54,
+  "share_hard_cut_free": 0.31,
+  "share_ad_tag": 0.05
+ }
+}
