@@ -47,3 +47,13 @@ def test_a_post_link_from_the_platform_answer_must_be_on_that_platforms_own_site
     off = publish._clean_outcome({**good, "url": "https://evil.example/shorts/abc"}, "youtube_shorts")
     assert off["state"] == "needs_check" and off["url"] is None
     assert publish._clean_outcome({**good, "url": "https://youtube.com.evil.example/x"}, "youtube_shorts")["url"] is None
+
+
+def test_a_malformed_clip_id_is_a_plain_refusal_on_every_posting_endpoint(db, owner):
+    api._owner = owner
+    client = TestClient(api.app, raise_server_exceptions=False)
+    calls = [client.get("/api/clips/not-a-uuid/checklist"), client.get("/api/clips/not-a-uuid/post-options"),
+             client.post("/api/clips/not-a-uuid/publish-approve", json={"ticks": {}}),
+             client.post("/api/clips/not-a-uuid/schedule", json={"scheduled_at": "2026-01-01T10:00", "channel_id": "c", "confirm": True}),
+             client.post("/api/clips/not-a-uuid/posted", json={"post_url": "https://youtube.com/x", "confirm": True, "disclosure_toggle_on": True})]
+    assert [r.status_code for r in calls] == [400] * 5 and all(r.json()["code"] == "not_found" for r in calls)

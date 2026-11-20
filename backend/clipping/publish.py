@@ -78,7 +78,7 @@ def _account_for(conn, actor, clip: dict, campaign: dict, platform: str) -> dict
 
 def checklist(conn, actor, clip_id, platform: str | None = None) -> dict:
     """FR-40. Server-checked items cannot be ticked by hand. With `platform`, the checklist for that platform's account."""
-    clip = review.get_clip(conn, clip_id)
+    clip = review.get_clip(conn, _id(clip_id, "clip"))
     campaign = campaigns.get_campaign(conn, clip["campaign_id"])
     version = conn.execute("select * from campaign_versions where id = %s", (clip["campaign_version_id"],)).fetchone()
     if platform is None:
@@ -147,7 +147,7 @@ def schedule(conn, actor, clip_id, scheduled_at: str, channel_id: str, confirm: 
     if not confirm:
         raise AppError("Scheduling needs an explicit confirm.", "confirm_required")
     require_kill_switch_off(conn)
-    clip = review.get_clip(conn, clip_id)
+    clip = review.get_clip(conn, _id(clip_id, "clip"))
     campaigns.refuse_practice(conn, clip["campaign_id"], "scheduling")
     if clip["status"] != "ready_to_post":
         raise AppError("Approve the publish checklist first.", "bad_status")
@@ -180,7 +180,7 @@ def mark_posted(conn, actor, clip_id, post_url: str, confirm: bool, disclosure_t
     if not disclosure_toggle_on:
         raise AppError("Switch the paid-partnership toggle on in the platform app, then confirm it here.", "toggle_required")
     require_kill_switch_off(conn)
-    clip = review.get_clip(conn, clip_id)
+    clip = review.get_clip(conn, _id(clip_id, "clip"))
     campaigns.refuse_practice(conn, clip["campaign_id"], "marking a clip posted")
     if clip["status"] not in ("ready_to_post", "queued"):
         raise AppError("Approve the publish checklist first.", "bad_status")
