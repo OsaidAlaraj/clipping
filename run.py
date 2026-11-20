@@ -1,7 +1,9 @@
 """One command for the whole system.
 
-    python run.py          ONE command for everything: install what is missing, start the API, the worker and the review app,
-                           wait until they answer, open the browser, and print the phone address (or double-click start.cmd)
+    python run.py          ONE command for everything: install what is missing, start the API, the worker and the review app
+                           (a production build, rebuilt only when the web sources changed), wait until they answer, open the
+                           browser, and print the phone address (or double-click start.cmd)
+    python run.py --dev    the same with the hot-reload dev server (`next dev`) for working on the web app
     python run.py test     run the backend and web test suites
     python run.py demo     run the sample-campaign demo (all fakes) against a fresh throwaway database and print the run log
     python run.py demo --no-keys   the same flow with fakes off and every key blanked: it runs on the declared fallbacks
@@ -57,6 +59,34 @@ def bootstrap() -> None:
     if not (WEB / "node_modules").exists():
         print("Installing web packages ...")
         subprocess.check_call([node_tool(), "install"], cwd=WEB)
+
+
+WEB_SOURCES = ("app", "components", "lib", "public", "package.json", "pnpm-lock.yaml", "next.config.mjs", "tsconfig.json")
+
+
+def web_build_is_stale(web: Path = WEB) -> bool:
+    """True when there is no production build, or any web source is newer than it (so `next build` must run again)."""
+    marker = web / ".next" / "BUILD_ID"
+    if not marker.exists():
+        return True
+    built = marker.stat().st_mtime
+    for name in WEB_SOURCES:
+        path = web / name
+        files = [path] if path.is_file() else [f for f in path.rglob("*") if f.is_file()] if path.is_dir() else []
+        if any(f.stat().st_mtime > built for f in files):
+            return True
+    return False
+
+
+def ensure_web_build() -> bool:
+    """Build the review app once and again only when its sources changed. Returns False when the build failed."""
+    if not web_build_is_stale():
+        return True
+    print("Building the review app (first start, or the web code changed) ...")
+    if subprocess.call([node_tool(), "run", "build"], cwd=WEB, env=env()) != 0:
+        print("The web build failed. Fix the errors above, or run  python run.py --dev  to use the dev server.")
+        return False
+    return True
 
 
 def phone_setup() -> int:
@@ -153,7 +183,9 @@ def wait_and_open() -> None:
 
 
 def main() -> int:
-    command = sys.argv[1] if len(sys.argv) > 1 else "start"
+    args = [a for a in sys.argv[1:] if a != "--dev"]
+    dev_server = "--dev" in sys.argv[1:]
+    command = args[0] if args else "start"
     bootstrap()
     if command == "test":
         backend = subprocess.call([str(PY), "-m", "pytest", "-n", "auto"], cwd=BACKEND, env=env())   # parallel workers
@@ -174,11 +206,14 @@ def main() -> int:
     if command not in ("start", "up"):
         print(__doc__)
         return 2
-    print("Starting the API and worker on http://127.0.0.1:8787 and the review app on http://localhost:3000")
+    if not dev_server and not ensure_web_build():
+        return 1
+    print("Starting the API and worker on http://127.0.0.1:8787 and the review app on http://localhost:3000"
+          + (" (dev server)" if dev_server else ""))
     print("First start seeds the sample campaign, which takes about a minute. Ctrl+C stops everything.\n")
     wait_and_open()
     api = subprocess.Popen([str(PY), "-m", "clipping", "dev"], cwd=BACKEND, env=env())
-    web = subprocess.Popen([node_tool(), "run", "dev"], cwd=WEB, env=env())
+    web = subprocess.Popen([node_tool(), "run", "dev" if dev_server else "start"], cwd=WEB, env=env())
     try:
         while api.poll() is None and web.poll() is None:
             try:
