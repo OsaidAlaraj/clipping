@@ -968,6 +968,27 @@ def post_clip(clip_id: str, body: PostIn, actor: Actor = Depends(current_actor))
     return run(actor, publish.confirm_post, actor, clip_id, body.platforms, body.ticks, body.request_id)
 
 
+class SwipeIn(BaseModel):
+    request_id: str | None = None
+    session_id: str | None = None
+    client_action_id: str | None = None
+
+
+class SwipeUndoIn(BaseModel):
+    review_id: str
+
+
+@app.post("/api/clips/{clip_id}/swipe")
+def swipe_clip(clip_id: str, body: SwipeIn, actor: Actor = Depends(current_actor)):
+    """Swipe right in the feed: accept and confirm the posts in one owner action (decision 31)."""
+    return run(actor, publish.swipe_confirm, actor, clip_id, body.request_id, body.session_id, body.client_action_id)
+
+
+@app.post("/api/clips/{clip_id}/swipe/undo")
+def swipe_undo(clip_id: str, body: SwipeUndoIn, actor: Actor = Depends(current_actor)):
+    return run(actor, publish.swipe_undo, actor, clip_id, body.review_id)
+
+
 @app.get("/api/clips/{clip_id}/post-status")
 def post_status(clip_id: str, actor: Actor = Depends(current_actor)):
     return run(actor, publish.post_status, clip_id)
