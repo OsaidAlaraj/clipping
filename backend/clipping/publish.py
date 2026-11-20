@@ -13,7 +13,7 @@ from urllib.parse import urlsplit
 import psycopg
 from psycopg.types.json import Jsonb
 
-from . import campaigns, config, connections, ffmpeg, review
+from . import campaigns, config, connections, ffmpeg, packaging, review
 from .adapters import publishing
 from .adapters.oauth import PLATFORM_LABEL, PLATFORMS
 from .alerts import raise_alert, registry
@@ -540,9 +540,9 @@ def stage_publish(conn, job: dict) -> Decimal:
     if claimed is None:
         return ZERO                 # cancelled (or taken) a moment ago
     Database.checkpoint(conn)       # `sending` is now durable
-    clip = conn.execute("select file_path, caption_text from clips where id = %s", (target["clip_id"],)).fetchone()
+    clip = conn.execute("select file_path, caption_text, render_meta from clips where id = %s", (target["clip_id"],)).fetchone()
     request = {"connection_id": target["connection_id"], "platform": target["platform"],
-               "file_path": str(registry.get(conn, "storage").path(clip["file_path"])), "caption": clip["caption_text"] or "",
+               "file_path": str(registry.get(conn, "storage").path(clip["file_path"])), "caption": packaging.caption_for(clip, target["platform"]),
                "options": {"privacy": "public", "paid_partnership": True}}
     cost = ZERO
     try:

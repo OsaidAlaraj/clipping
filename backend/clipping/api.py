@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, moments, ops, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
+from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -151,6 +151,14 @@ class EditIn(BaseModel):
     trim: dict | None = None
     hook_id: str | None = None
     caption: str | None = None
+
+
+class CaptionVariantIn(BaseModel):
+    kind: str
+
+
+class CommentaryTemplateIn(BaseModel):
+    template: dict | None = None
 
 
 class RecheckIn(BaseModel):
@@ -914,6 +922,18 @@ def undo(body: UndoIn, actor: Actor = Depends(current_actor)):
 @app.post("/api/clips/{clip_id}/edit")
 def edit(clip_id: str, body: EditIn, actor: Actor = Depends(current_actor)):
     return run(actor, review.edit, actor, clip_id, body.trim, body.hook_id, body.caption)
+
+
+@app.post("/api/clips/{clip_id}/caption-variant")
+def caption_variant(clip_id: str, body: CaptionVariantIn, actor: Actor = Depends(current_actor)):
+    """Choose the matched or the curiosity caption (only a variant that passed the match check)."""
+    return run(actor, packaging.choose_variant, actor, clip_id, body.kind)
+
+
+@app.put("/api/accounts/{account_id}/commentary-template")
+def commentary_template(account_id: str, body: CommentaryTemplateIn, actor: Actor = Depends(current_actor)):
+    """The account's intro line per language (and style note) used by the originality layer. null clears it."""
+    return run(actor, originality.set_template, actor, account_id, body.template)
 
 
 @app.get("/api/review-later")

@@ -120,13 +120,17 @@ export function PostManual({ clip, target, withFile, onLinked }: { clip: Clip; t
   const { t, rtl } = usePostText();
   const [busy, setBusy] = useState(false);
   const canShare = canShareFiles();
-  const hashtags = (clip.hashtags ?? []).join(" ");
+  // The packaging made for this platform (caption lab), unless the owner edited the caption by hand.
+  const pack = (clip.render_meta?.packaging as Record<string, { caption?: string; hashtags?: string[] }> | undefined)?.[target.platform];
+  const edited = !!clip.render_meta?.caption_edited;
+  const caption = (!edited && pack?.caption) || clip.caption_text || "";
+  const hashtags = ((!edited && pack?.hashtags) || clip.hashtags || []).join(" ");
 
   const send = async () => {
     if (!clip.video_url) return;
     setBusy(true);
     try {
-      const result = await shareOrDownload(clip.video_url, clip.caption_text ?? "", `clip-${clip.id}.mp4`);
+      const result = await shareOrDownload(clip.video_url, caption, `clip-${clip.id}.mp4`);
       if (result === "downloaded") showToast(t(canShare ? "shareFailed" : "downloadStarted"), { tone: canShare ? "error" : "info" });   // sharing was possible but failed
     } finally {
       setBusy(false);
@@ -137,7 +141,7 @@ export function PostManual({ clip, target, withFile, onLinked }: { clip: Clip; t
     <div className="stack" dir={rtl ? "rtl" : "ltr"}>
       <div className="post-actions">
         {withFile && clip.video_url && <button type="button" className="btn dark" disabled={busy} onClick={send}>{canShare ? t("share") : t("download")}</button>}
-        <CopyButton text={clip.caption_text ?? ""} label={t("copyCaption")} />
+        <CopyButton text={caption} label={t("copyCaption")} />
         <CopyButton text={hashtags} label={t("copyHashtags")} empty={t("noHashtags")} />
       </div>
       <LinkField target={target} onLinked={onLinked} />

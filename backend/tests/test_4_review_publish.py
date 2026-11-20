@@ -196,7 +196,7 @@ def test_each_edit_creates_a_new_clip_version(produced):
     with produced.db.session(produced.owner) as conn:
         v3 = review.get_clip(conn, v3["id"])
         assert v3["status"] == "ready_for_review" and v3["hook_text"] == other_hook["text"]
-        assert other_hook["text"] in v3["caption_text"] and v3["file_hash"] != target["file_hash"]
+        assert v3["caption_text"].startswith("#ad") and v3["file_hash"] != target["file_hash"]   # the caption now comes from the caption lab (matched to the transcript), not from the hook line
         assert float(v3["duration_s"]) < float(target["duration_s"])
         assert conn.execute("select count(*) as n from audit_log where action = 'clip.edited'").fetchone()["n"] == 2
 

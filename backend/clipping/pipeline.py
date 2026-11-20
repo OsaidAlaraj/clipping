@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, language_check, quality_gate, signals, templates, transcripts
+from . import brand_checks, config, ffmpeg, language_check, packaging, quality_gate, signals, templates, transcripts
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
 from .agents import compliance as agent_c
@@ -505,10 +505,40 @@ def stage_package(conn, job: dict) -> Decimal:
         account = pick_account(conn, clip["owner_operator_id"], version["rules_json"].get("platforms_allowed") or [],
                                niche_row["name"] if niche_row else None)
         account_id, platform = (account["id"], account["platform"]) if account else (None, None)
-    conn.execute("update clips set account_id = %s, platform = %s, due_at = %s, status = 'ready_for_review' where id = %s",
+    conn.execute("update clips set account_id = %s, platform = %s, due_at = %s where id = %s",
                  (account_id, platform, campaign["deadline"], clip["id"]))
+    cost = _package_text(conn, clip["id"], source, campaign, version)
+    conn.execute("update clips set status = 'ready_for_review' where id = %s", (clip["id"],))
     audit(conn, "clip.packaged", "clips", clip["id"], {"compliance_status": clip["compliance_status"]},
           rule_version_id=version["id"])
+    return cost
+
+
+def _package_text(conn, clip_id, source: dict, campaign: dict, version: dict) -> Decimal:
+    """Caption lab, per-platform packaging and the originality record (packaging.py). The text is checked against the campaign's rules
+    again: if the new caption fails compliance, the earlier one is put back. A failure here never stops the clip."""
+    clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
+    disclosure = disclosure_template(conn, campaign["category_id"], clip["language"])
+    if disclosure is None:
+        return Decimal("0")
+    before = {k: clip[k] for k in ("caption_text", "hashtags", "mentions", "render_meta")}
+    try:
+        with conn.transaction():
+            cost = Decimal(str(packaging.package_clip(conn, registry, clip, source, campaign, version, disclosure)))
+            fresh = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
+            report, extra = run_compliance(conn, fresh, campaign, version)
+            cost += extra
+            if report["status"] == "fail":
+                raise AppError("The new caption failed compliance.", "caption_lab_compliance")
+        return cost
+    except AppError as exc:
+        reason = str(exc)
+    except Exception as exc:   # a model or database problem: keep the caption the render built
+        reason = f"{type(exc).__name__}: {exc}"
+    meta = dict(before["render_meta"] or {}, caption_lab_error=reason[:300])
+    conn.execute("update clips set caption_text = %s, hashtags = %s, mentions = %s, render_meta = %s where id = %s",
+                 (before["caption_text"], before["hashtags"], before["mentions"], Jsonb(meta), clip_id))
+    run_compliance(conn, conn.execute("select * from clips where id = %s", (clip_id,)).fetchone(), campaign, version)
     return Decimal("0")
 
 

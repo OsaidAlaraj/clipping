@@ -22,11 +22,11 @@ Status: DONE (built and reviewed) / PARTLY / MISSING (not built) / OWNER (only t
 
 ## 3. Rights, policy and compliance
 - Written permission per source, kept with the clip: PARTLY (rules and audit log exist; permission letter template MISSING)
-- Originality: permission is not enough; add real value (commentary, structure, framing): MISSING (originality layer)
+- Originality: permission is not enough; add real value (commentary, structure, framing): MISSING (originality layer: minimal version DONE on branch caption-lab, on-screen part MISSING)
 - One source moment to one account, never the same moment on several: RULE ADDED
 - Disclosure (#ad or paid-partnership label) top of caption and in the clip: DONE
 - Music licensing: royalty-free burned-in with a per-clip log, platform libraries in-app only: MISSING (music bed stage)
-- Captions that match the video (no misleading descriptions): RULE ADDED, caption checker MISSING
+- Captions that match the video (no misleading descriptions): RULE ADDED, caption checker DONE (caption lab, branch caption-lab)
 - Brand and adult safety flags: PARTLY
 - Privacy and terms pages: DONE (clipmind.app); kill switch and human gates: DONE
 - Policy changes (YouTube Oct 2026, Meta Mar 2026): VERIFIED by reports, read official pages: OPEN
@@ -38,7 +38,7 @@ Status: DONE (built and reviewed) / PARTLY / MISSING (not built) / OWNER (only t
 - Sentence-end snap: DONE; cold open, dead-air and filler tightening, punch-in zooms: MISSING
 - Animated word-by-word captions, Arabic RTL tested: PARTLY
 - Sharpness of 720p sources (upscale or sharpen), clean audio, loudness target: MISSING
-- Best cover frame, per-platform packaging (title, caption, hashtags, length): MISSING
+- Best cover frame: MISSING; per-platform packaging (title, caption, hashtags): DONE (branch caption-lab)
 - Pre-review quality gate with measured standards: MISSING
 - Contact sheet and fixed test videos for before/after checks: PARTLY
 - Arabic dialect hooks with native check, dialect ASR bake-off: OPEN

@@ -260,6 +260,86 @@ def moment_compare(payload: dict) -> dict:
     return {"results": results}
 
 
+# The caption lab's three tasks (caption_lab, caption_check, commentary). Tests set "lab" / "check" / "commentary" to a raw reply (or a
+# function of the payload) to simulate a model, and read "calls" for every payload received.
+FAKE_CAPTION_LAB: dict = {"lab": None, "check": None, "commentary": None, "calls": []}
+
+
+def _topic(text: str, language: str, n: int = 2) -> str:
+    """The first meaningful words of the text, as they were said."""
+    from ..caption_text import WORD, content_stems, stem
+
+    words = WORD.findall(text)
+    longest = sorted(dict.fromkeys(content_stems(text, language)), key=len, reverse=True)[:n]   # the longest words tend to be the topic
+    order = {w: i for i, w in enumerate(dict.fromkeys(content_stems(text, language)))}
+    picked = [next((x for x in words if stem(x) == w), w) for w in sorted(longest, key=order.get)]
+    return (" و" if language == "ar" else " and ").join(picked)
+
+
+def _best_sentence(text: str) -> str:
+    sents = [s for s in sentences(text) if len(s.split()) >= 4] or sentences(text) or [text]
+    return max(sents[:3], key=len)
+
+
+def caption_lab(payload: dict) -> dict:
+    from ..caption_text import clip_to
+
+    FAKE_CAPTION_LAB["calls"].append(("lab", payload))
+    answer = FAKE_CAPTION_LAB["lab"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    language, text, dialect = payload["language"], payload["transcript"], (payload.get("dialect") or "").lower()
+    best = _best_sentence(text).strip().rstrip(".!؟?")
+    topic = _topic(text, language) or "this"
+    if language == "ar":
+        frame = ("شو بصير مع {t}؟ الجواب بالفيديو" if "jo" in dialect
+                 else "وش صار مع {t}؟ شوفوا الفيديو للآخر" if any(k in dialect for k in ("sa", "ae", "kw", "qa", "gulf", "bh", "om"))
+                 else "ليش {t}؟ الجواب بالفيديو")
+    else:
+        frame = "What actually happens with {t}? Watch to the end."
+    tags = ["#" + w for w in _topic(text, language, 3).replace(" and ", " ").replace(" و", " ").split()]
+    return {"variants": [
+        {"kind": "matched", "caption": clip_to(best, 110), "title": clip_to(best, 60), "cover_text": " ".join(best.split()[:5]), "hashtags": tags},
+        {"kind": "curiosity", "caption": frame.format(t=topic), "title": clip_to(frame.format(t=topic), 60),
+         "cover_text": " ".join(best.split()[:4]), "hashtags": []}]}
+
+
+def caption_check(payload: dict) -> dict:
+    """For each sentence of the caption, quotes the transcript sentence that shares the most meaningful words with it."""
+    from ..caption_match import FRAME_STEMS
+    from ..caption_text import content_stems, strip_tags
+
+    FAKE_CAPTION_LAB["calls"].append(("check", payload))
+    answer = FAKE_CAPTION_LAB["check"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    language, spoken = payload["language"], sentences(payload["transcript"])
+    claims = []
+    for claim in sentences(strip_tags(payload["caption"])):
+        mine = set(content_stems(claim, language)) - FRAME_STEMS.get(language, set())
+        if not mine:
+            continue   # a call to action ("watch to the end") states nothing about the clip
+        best = max(spoken, key=lambda s: len(mine & set(content_stems(s, language))), default="")
+        shared = len(mine & set(content_stems(best, language)))
+        claims.append({"claim": claim, "supported": bool(mine) and shared / len(mine) >= 0.4, "quote": best})
+    return {"claims": claims}
+
+
+def commentary(payload: dict) -> dict:
+    FAKE_CAPTION_LAB["calls"].append(("commentary", payload))
+    answer = FAKE_CAPTION_LAB["commentary"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    language, dialect = payload["language"], (payload.get("dialect") or "").lower()
+    topic = _topic(payload["transcript"], language) or "this"
+    if language == "ar":
+        text = f"برأيي {topic} هي الأهم بهالمقطع" if "jo" in dialect else f"رأيي: {topic} أهم نقطة في هذا المقطع"
+    else:
+        text = f"My take: {topic} is the part worth thinking about here."
+    return {"commentary": text}
+
+
 def complete(task: str, payload: dict) -> dict:
     return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments,
-            "moment_score": moment_score, "moment_compare": moment_compare}[task](payload)
+            "moment_score": moment_score, "moment_compare": moment_compare, "caption_lab": caption_lab,
+            "caption_check": caption_check, "commentary": commentary}[task](payload)
