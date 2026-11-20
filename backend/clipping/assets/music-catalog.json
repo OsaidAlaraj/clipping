@@ -1,0 +1,459 @@
+{
+ "version": 1,
+ "licences_checked": "2026-11-20",
+ "licence_page": "https://incompetech.com/music/royalty-free/licenses/",
+ "accepted_licences": {
+  "CC0-1.0": {
+   "attribution_required": false,
+   "burned_in_commercial": true,
+   "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "CC-BY-4.0": {
+   "attribution_required": true,
+   "burned_in_commercial": true,
+   "url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+ },
+ "rejected": [
+  {
+   "source": "freepd.com",
+   "reason": "site closed (checked 2026-11-20)"
+  },
+  {
+   "source": "YouTube Audio Library",
+   "reason": "not cleared for burned-in use on TikTok or Instagram (research-verdicts: platform libraries stay in-app); not verified, so not used"
+  },
+  {
+   "source": "Pixabay / Mixkit style licences",
+   "reason": "own licences, not a standard text; not reviewed for burned-in use on other platforms, so not adopted"
+  },
+  {
+   "source": "CC BY-NC / CC BY-SA tracks",
+   "reason": "non-commercial or share-alike terms do not fit a monetised, burned-in clip"
+  },
+  {
+   "source": "Kevin MacLeod - Bit Quest",
+   "reason": "measured masking: speech-to-music ratio 15.1 dB under the winning mix, below the 18 dB intelligibility gate (docs/bakeoff/final/music/report.json)"
+  }
+ ],
+ "tracks": [
+  {
+   "id": "mm-backbay-lounge",
+   "title": "Backbay Lounge",
+   "artist": "Kevin MacLeod",
+   "file": "Backbay Lounge.mp3",
+   "sha256": "9567e71a213b0026341b2c0ecd226950e7653abd235cf520fb9aee4247d74d96",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1700068",
+   "bpm": 120,
+   "energy": 0.35,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 266.55,
+   "lufs": -21.2,
+   "feel": "Bright, Grooving, Relaxed",
+   "instruments": "Piano, Guitar, Drums, Bass"
+  },
+  {
+   "id": "mm-wallpaper",
+   "title": "Wallpaper",
+   "artist": "Kevin MacLeod",
+   "file": "Wallpaper.mp3",
+   "sha256": "9fa810e5193c88f1b360537366f210f16c2588106d5292f0659e9957fa274f96",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100843",
+   "bpm": 92,
+   "energy": 0.3,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 220.06,
+   "lufs": -11.2,
+   "feel": "Bouncy, Bright, Calming, Uplifting",
+   "instruments": "Synths, Drum Kit, Guitar"
+  },
+  {
+   "id": "mm-dream-culture",
+   "title": "Dream Culture",
+   "artist": "Kevin MacLeod",
+   "file": "Dream Culture.mp3",
+   "sha256": "f12cbb52bd4b92bd6cf8a343645567c119627e9cbf98108a3eb6ac2cc275ee46",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1300046",
+   "bpm": 70,
+   "energy": 0.2,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 214.36,
+   "lufs": -17.2,
+   "feel": "Calming, Relaxed, Uplifting",
+   "instruments": "Piano, Percussion"
+  },
+  {
+   "id": "mm-local-forecast-elevator",
+   "title": "Local Forecast - Elevator",
+   "artist": "Kevin MacLeod",
+   "file": "Local Forecast - Elevator.mp3",
+   "sha256": "8c46b44e65324bc339fbbc3e770611d671f6c74a40f3ec8dd50332c082b25cc9",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1300012",
+   "bpm": 82,
+   "energy": 0.4,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 189.2,
+   "lufs": -19.2,
+   "feel": "Bouncy, Bright, Grooving",
+   "instruments": "Piano, Bass, Drum Kit, Electric Piano, Flute, Trumpet, Percussion, Guitar"
+  },
+  {
+   "id": "mm-impact-moderato",
+   "title": "Impact Moderato",
+   "artist": "Kevin MacLeod",
+   "file": "Impact Moderato.mp3",
+   "sha256": "a85d378af027d75014be4a95b43007b19e03b06693c4b4ad72594cf392f4bc1c",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100618",
+   "bpm": 100,
+   "energy": 0.3,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 75.68,
+   "lufs": -16.0,
+   "feel": "Calming, Grooving",
+   "instruments": "Percussion, Guitar, Synths"
+  },
+  {
+   "id": "mm-carefree",
+   "title": "Carefree",
+   "artist": "Kevin MacLeod",
+   "file": "Carefree.mp3",
+   "sha256": "8433b770a630d9b1594fd484442c677907ece899a4d149954cd2e74fd733e311",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1400037",
+   "bpm": 96,
+   "energy": 0.45,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business"
+   ],
+   "duration_s": 205.14,
+   "lufs": -20.2,
+   "feel": "Bouncy, Bright, Calming, Uplifting",
+   "instruments": "Ukulele, Guitar, Marimba, Glockenspiel, Percussion"
+  },
+  {
+   "id": "mm-volatile-reaction",
+   "title": "Volatile Reaction",
+   "artist": "Kevin MacLeod",
+   "file": "Volatile Reaction.mp3",
+   "sha256": "ced1148df201a6c69062a96b7ef49c49924572ca5023c2ac5a2d6c5828ecb218",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1400039",
+   "bpm": 155,
+   "energy": 0.9,
+   "moods": [
+    "tense",
+    "driving"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 165.36,
+   "lufs": -7.9,
+   "feel": "Action, Aggressive, Dark, Intense",
+   "instruments": "Brass, Trombone, French Horn, Tuba, Contrabassoon, Bassoon, Bass Clarinet, Clarinet, Flute, Piccolo, Violin, Viola, Cello, Bass, Percussion"
+  },
+  {
+   "id": "mm-faster-does-it",
+   "title": "Faster Does It",
+   "artist": "Kevin MacLeod",
+   "file": "Faster Does It.mp3",
+   "sha256": "752ce1d8573254888a370639de303af0ba091fa080b71e1d61a0cdf6efb760d8",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100794",
+   "bpm": 135,
+   "energy": 0.8,
+   "moods": [
+    "driving",
+    "tense"
+   ],
+   "niches": [
+    "gaming",
+    "business"
+   ],
+   "duration_s": 181.84,
+   "lufs": -12.1,
+   "feel": "Grooving, Intense",
+   "instruments": "Bass, Drum Kit"
+  },
+  {
+   "id": "mm-heroic-age",
+   "title": "Heroic Age",
+   "artist": "Kevin MacLeod",
+   "file": "Heroic Age.mp3",
+   "sha256": "d0bbd367ab8c6d744e18f317df12de67e1b40f8b5d1c3812d7025eec9e9a0e7b",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100848",
+   "bpm": 129,
+   "energy": 0.75,
+   "moods": [
+    "driving",
+    "upbeat"
+   ],
+   "niches": [
+    "gaming",
+    "business"
+   ],
+   "duration_s": 97.46,
+   "lufs": -12.1,
+   "feel": "Action, Bright, Driving, Epic",
+   "instruments": "Flutes, Clarinets, Oboes, Trombones, Tuba, Cellos, Basses, Percussion, Celesta"
+  },
+  {
+   "id": "mm-cipher",
+   "title": "Cipher",
+   "artist": "Kevin MacLeod",
+   "file": "Cipher2.mp3",
+   "sha256": "d3d0614535a61d748e2fd8d5117fc4d781022a7624794802a2462d8af3fdd522",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100844",
+   "bpm": 150,
+   "energy": 0.7,
+   "moods": [
+    "upbeat",
+    "driving"
+   ],
+   "niches": [
+    "gaming",
+    "business"
+   ],
+   "duration_s": 231.26,
+   "lufs": -15.9,
+   "feel": "Bright, Grooving, Uplifting",
+   "instruments": "Synths, Electric Piano, Percussion, Strings"
+  },
+  {
+   "id": "mm-night-in-venice",
+   "title": "Night in Venice",
+   "artist": "Kevin MacLeod",
+   "file": "Night in Venice.mp3",
+   "sha256": "c61435f6f86853b5aefcf4479f3a1266f8887da97d8022c8f1137798076129e4",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1900056",
+   "bpm": 114,
+   "energy": 0.25,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts"
+   ],
+   "duration_s": 218.15,
+   "lufs": -11.6,
+   "feel": "Calming, Grooving, Relaxed",
+   "instruments": "Alto Sax, Electric Piano, Bass, Drums"
+  },
+  {
+   "id": "mm-sunshine",
+   "title": "Sunshine",
+   "artist": "Kevin MacLeod",
+   "file": "Sunshine A.mp3",
+   "sha256": "f1dda20ed1577c034644bf50209e7f216eb1ebb9cf4399fa4d34ebad2f8b935e",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100517",
+   "bpm": 88,
+   "energy": 0.25,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 201.87,
+   "lufs": -11.8,
+   "feel": "Bright, Calming, Relaxed",
+   "instruments": "Guitar, Bass, Drum Kit, Piano"
+  },
+  {
+   "id": "mm-investigations",
+   "title": "Investigations",
+   "artist": "Kevin MacLeod",
+   "file": "Investigations.mp3",
+   "sha256": "699f7a3cd227dfe5c1e88099b45af57202bfe9d56f86b8b43e4252b65dd96768",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100646",
+   "bpm": 94,
+   "energy": 0.35,
+   "moods": [
+    "mysterious",
+    "playful"
+   ],
+   "niches": [
+    "podcasts"
+   ],
+   "duration_s": 93.54,
+   "lufs": -18.7,
+   "feel": "Humorous, Mysterious",
+   "instruments": "Pizzicato Strings, English Horn, Bassoon, Marimba, Glockenspiel, Cowbells"
+  },
+  {
+   "id": "mm-kool-kats",
+   "title": "Kool Kats",
+   "artist": "Kevin MacLeod",
+   "file": "Kool Kats.mp3",
+   "sha256": "019ba5f2ebb617b35a1302b4907ca0b25ba5eda5a150b2f9ee33dc48b032cfcf",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1100601",
+   "bpm": 113,
+   "energy": 0.45,
+   "moods": [
+    "mysterious",
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 200.78,
+   "lufs": -15.9,
+   "feel": "Grooving, Mysterious",
+   "instruments": "Piano, Drum Kit, Guitar, Organs"
+  },
+  {
+   "id": "mm-thinking-music",
+   "title": "Thinking Music",
+   "artist": "Kevin MacLeod",
+   "file": "Thinking Music.mp3",
+   "sha256": "891d3ea47e443e590a6562a1e2bff37c8830817b3cdf604091f92bfe87e5cc4f",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1600060",
+   "bpm": 125,
+   "energy": 0.4,
+   "moods": [
+    "mysterious",
+    "tense"
+   ],
+   "niches": [
+    "podcasts",
+    "gaming"
+   ],
+   "duration_s": 195.89,
+   "lufs": -20.5,
+   "feel": "Dark, Humorous, Suspenseful",
+   "instruments": "Cello, Viola, Violin, Harp"
+  },
+  {
+   "id": "mm-digital-lemonade",
+   "title": "Digital Lemonade",
+   "artist": "Kevin MacLeod",
+   "file": "Digital Lemonade.mp3",
+   "sha256": "be9f665efd035dea23a1e9539c534ba905f44144f7dda05a0a663ccecda1ab21",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1700010",
+   "bpm": 120,
+   "energy": 0.5,
+   "moods": [
+    "upbeat",
+    "playful"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 180.06,
+   "lufs": -14.0,
+   "feel": "Bouncy, Bright, Relaxed",
+   "instruments": "Synths, Percussion"
+  },
+  {
+   "id": "mm-funky-chunk",
+   "title": "Funky Chunk",
+   "artist": "Kevin MacLeod",
+   "file": "Funky Chunk.mp3",
+   "sha256": "e6203c8c8fddbae0d9790da391a6ea73ef765fc3eec08bd87441e63037dc3c9c",
+   "source_url": "https://incompetech.com/music/royalty-free/music.html",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "isrc": "USUAN1500054",
+   "bpm": 115,
+   "energy": 0.6,
+   "moods": [
+    "upbeat",
+    "driving"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 239.02,
+   "lufs": -13.4,
+   "feel": "Bright, Grooving, Uplifting",
+   "instruments": "Bass, Electric Piano, Drums, Guitar, Synth, Horns"
+  }
+ ]
+}

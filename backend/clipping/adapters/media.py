@@ -10,7 +10,7 @@ import math
 import re
 from pathlib import Path
 
-from .. import faces, ffmpeg, gaming_layout
+from .. import faces, ffmpeg, gaming_layout, music
 from ..core import AppError
 from .base import Adapter, register
 
@@ -442,12 +442,20 @@ class FFmpegRender(Adapter):
         graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path, stack=stack)
         graph += (";" + zoom_graph(zooms, width, height)) if zooms else ""
         graph += f";[{'zm' if zooms else 'lay'}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
-        loudness = "loudnorm=I=-14:TP=-1.5:LRA=" + ("18" if clip.get("audio") == "natural" else "11")
+        bed = clip.get("music") if info["has_audio"] else None      # {"path", "offset_s", "gain_db"}: the chosen, licence-checked bed
+        if bed and not Path(bed["path"]).is_file():
+            bed = None
+        audio = music.audio_graph(bed, clip.get("platform"), clip.get("audio") == "natural", duration_s=duration) if info["has_audio"] else None
+        if audio:
+            graph += ";" + audio
 
         def args_for(encoder: str) -> list[str]:
-            args = ["-ss", f"{start:.3f}", "-i", str(src_path), "-t", f"{duration:.3f}", "-filter_complex", graph, "-map", "[v]"]
+            args = ["-ss", f"{start:.3f}", "-i", str(src_path)]
+            if bed:   # looped from the chosen bar line, so a track shorter than the clip still fills it
+                args += ["-stream_loop", "-1", "-ss", f"{float(bed['offset_s']):.3f}", "-i", str(Path(bed["path"]).resolve())]
+            args += ["-t", f"{duration:.3f}", "-filter_complex", graph, "-map", "[v]"]
             if info["has_audio"]:
-                args += ["-map", "0:a:0", "-af", loudness, "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
+                args += ["-map", "[a]", "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
             return [*args, *ffmpeg.encoder_args(encoder, str(self.cfg.get("preset", "veryfast")), int(self.cfg.get("crf", 23))),
                     "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_path)]
 
@@ -457,6 +465,7 @@ class FFmpegRender(Adapter):
         return {"path": str(out_path), "ass_path": str(ass_path), "encodes": 1, "encoder": encoder, "cover_path": cover,
                 "duration_s": finished["duration_s"], "captions": len(events), "zooms": len(zooms),
                 "reframe": "face" if focus is not None else "centre_crop", "loudness_normalised": bool(info["has_audio"]),
+                "music": bed["record"] if bed and bed.get("record") else None, "loudness_target": music.target_loudness(clip.get("platform"))[0],
                 "overlay": {"text": label, "start_s": 0.0, "end_s": finished["duration_s"]}, "width": width, "height": height}
 
     def _cover(self, src: Path, clip: dict, tpl: dict, style: str, info: dict, size: tuple[int, int], focus, out: Path, stack: dict | None = None) -> str | None:
