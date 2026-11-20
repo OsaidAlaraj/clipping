@@ -57,3 +57,11 @@ def test_a_malformed_clip_id_is_a_plain_refusal_on_every_posting_endpoint(db, ow
              client.post("/api/clips/not-a-uuid/schedule", json={"scheduled_at": "2026-01-01T10:00", "channel_id": "c", "confirm": True}),
              client.post("/api/clips/not-a-uuid/posted", json={"post_url": "https://youtube.com/x", "confirm": True, "disclosure_toggle_on": True})]
     assert [r.status_code for r in calls] == [400] * 5 and all(r.json()["code"] == "not_found" for r in calls)
+
+
+def test_a_malformed_id_in_the_address_is_a_400_not_a_server_error(db, owner):
+    api._owner = owner
+    client = TestClient(api.app)
+    for path in ("/api/clips/not-an-id", "/api/campaigns/zzz"):
+        reply = client.get(path)
+        assert reply.status_code == 400 and reply.json()["code"] == "bad_value"

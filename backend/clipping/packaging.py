@@ -38,8 +38,13 @@ def _fit_tags(required: list[str], candidates: list[str], norm: dict, language: 
 
     tags = list(dict.fromkeys(required))
     lo, hi = norm["tags"]
-    pool = [t for t in dict.fromkeys(candidates) if t.lower() not in {x.lower() for x in tags}
-            and hashtag_supported(t, transcript, niche_words)]
+    seen = {x.lower() for x in tags}
+    pool = []
+    for t in candidates:   # one tag per spelling, letter case aside: "#Everyone" and "#everyone" are the same hashtag
+        if t.lower() not in seen:
+            seen.add(t.lower())
+            if hashtag_supported(t, transcript, niche_words):
+                pool.append(t)
     for tag in pool:
         if len(tags) >= hi:
             break

@@ -103,6 +103,12 @@ async def rls_refusal(_: Request, exc):
     return JSONResponse({"error": "You are not allowed to do that.", "code": "forbidden"}, status_code=403)
 
 
+@app.exception_handler(psycopg.errors.DataError)
+async def bad_value(_: Request, exc):
+    """A malformed id or value in the address or body (for example /api/clips/abc) is the caller's mistake, not a server fault."""
+    return JSONResponse({"error": "That id or value is not valid.", "code": "bad_value"}, status_code=400)
+
+
 def run(actor: Actor, fn, *args, **kwargs) -> Any:
     with get_db().session(actor) as conn:
         return fn(conn, *args, **kwargs)

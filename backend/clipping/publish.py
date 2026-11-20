@@ -344,7 +344,10 @@ def confirm_post(conn, actor, clip_id, platforms, ticks, request_id, via: str | 
             records[platform] = _checklist_record(states[platform], ticks.get(platform), via)
         except AppError as exc:
             raise AppError(f"{PLATFORM_LABEL[platform]}: {exc}", exc.code) from None
-    times = plan_times(conn, actor, [states[p]["account"] for p in platforms], _now())
+    earliest = _now()
+    if via == "swipe":   # the first post must not leave before the owner's Undo window (and its grace) has passed
+        earliest += dt.timedelta(seconds=float(get_setting(conn, "undo_window_s", actor.operator_id)) + review.UNDO_GRACE_S + 2)
+    times = plan_times(conn, actor, [states[p]["account"] for p in platforms], earliest)
     if clip["status"] == "accepted":
         meta = dict(clip["render_meta"] or {}, checklist=records[platforms[0]])
         conn.execute("update clips set status = 'ready_to_post', render_meta = %s where id = %s", (Jsonb(meta), clip_id))

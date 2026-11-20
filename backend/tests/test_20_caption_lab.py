@@ -362,3 +362,8 @@ def test_a_failing_model_leaves_the_render_caption_and_records_why(produced, foo
     assert clips
     for clip in clips:
         assert "caption_lab_error" in clip["render_meta"] and "packaging" not in clip["render_meta"] and clip["caption_text"].startswith("#ad")
+
+
+def test_a_hashtag_is_not_repeated_in_another_letter_case():
+    tags = _pack("tiktok", extra_tags=["#Launch", "#LAUNCH", "#launch"])["hashtags"]
+    assert len({t.lower() for t in tags}) == len(tags)

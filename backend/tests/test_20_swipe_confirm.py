@@ -125,6 +125,13 @@ def test_a_disconnected_account_becomes_a_manual_target_and_connected_ones_are_q
     assert manual_jobs == 1                                                            # only the connected account is sent by the worker
 
 
+def test_the_first_post_waits_for_the_undo_window_so_an_undo_can_still_stop_it(posting):
+    """A swipe inside the posting window used to schedule the first post for "now"; the worker (2 s poll) could send it before Undo."""
+    first = min(t["scheduled_at"] for t in swipe(posting)["targets"])
+    window = 10 + review.UNDO_GRACE_S                                                  # undo_window_s default is 10
+    assert (first - posting._pin()).total_seconds() >= window
+
+
 def test_both_tiktok_and_instagram_go_through_the_same_path(posting):
     result = swipe(posting)
     assert {"tiktok", "instagram_reels"} <= {t["platform"] for t in result["targets"]}
