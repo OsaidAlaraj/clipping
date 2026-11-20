@@ -384,7 +384,8 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
     style = (candidate or {}).get("style") or {}
     start, end = float(clip["start_s"]), float(clip["end_s"])
     request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
-               "audio": style.get("audio"), "hook_text": hook_text, "emphasis": []}
+               "audio": style.get("audio"), "hook_text": hook_text, "emphasis": [],
+               "min_s": float(get_setting(conn, "clip_min_duration_s"))}      # tightening never takes the clip below the campaign minimum
     measured = signals.load(conn, source["id"])
     if measured:
         first, last = int(start), math.ceil(end)

@@ -341,6 +341,6 @@ def test_worker_cannot_pass_a_human_gate(produced):
 
 
 def test_crop_filter_is_nine_by_sixteen():
-    assert media.crop_filter(1920, 1080, 1080, 1920) == "crop=608:1080:656:0,scale=1080:1920,setsar=1"
+    assert media.crop_filter(1920, 1080, 1080, 1920) == "crop=608:1080:656:0,scale=1080:1920:flags=lanczos,setsar=1"
     assert media.crop_filter(1920, 1080, 1080, 1920, focus_x=0.0).startswith("crop=608:1080:0:0")
     assert media.crop_filter(1080, 1920, 1080, 1920).startswith("crop=1080:1920:0:0")

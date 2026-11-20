@@ -1,0 +1,2 @@
+﻿{"label": "old", "en": {"events": 43, "font_px": 80, "widest_line": {"x": [0.256, 0.745], "y": [0.764, 0.832], "width_share": 0.49, "height_px": 131}}, "ar": {"events": 28, "font_px": 80, "widest_line": {"x": [0.378, 0.619], "y": [0.806, 0.834], "width_share": 0.242, "height_px": 54}}}
+{"label": "new", "en": {"events": 168, "font_px": 96, "widest_line": {"x": [0.222, 0.777], "y": [0.658, 0.749], "width_share": 0.555, "height_px": 175}}, "ar": {"events": 81, "font_px": 96, "widest_line": {"x": [0.279, 0.72], "y": [0.646, 0.693], "width_share": 0.442, "height_px": 89}}}
