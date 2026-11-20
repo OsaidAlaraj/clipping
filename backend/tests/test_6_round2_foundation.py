@@ -66,13 +66,52 @@ def test_link_rules(db, owner, monkeypatch):
         assert conn.execute("select type from jobs").fetchall() == [{"type": "fetch_source"}]
 
 
+@pytest.mark.parametrize("url", [
+    "http://cdn.example.com/a.mp4", "https://127.0.0.1:18787/api/health", "https://localhost/a.mp4", "https://[::1]/a.mp4",
+    "https://169.254.169.254/latest/meta-data/", "https://10.0.0.5/a.mp4", "https://192.168.1.2/a.mp4", "https://100.64.0.1/a.mp4",
+    "https://printer.local/a.mp4", "https://user:pw@cdn.example.com/a.mp4", "https://[::ffff:127.0.0.1]/a.mp4", "https://0.0.0.0/a.mp4",
+])
+def test_link_intake_refuses_non_https_and_private_hosts(url):
+    with pytest.raises(AppError) as err:
+        sources.check_public_https(url)
+    assert err.value.code in ("bad_link", "private_address")
+
+
+def test_a_name_that_resolves_to_a_private_address_is_refused(monkeypatch):
+    import socket
+    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: [(2, 1, 6, "", ("10.1.2.3", 443))])
+    with pytest.raises(AppError) as err:
+        sources.check_public_https("https://rebind.example.com/a.mp4")
+    assert err.value.code == "private_address"
+    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: [(2, 1, 6, "", ("93.184.216.34", 443))])
+    sources.check_public_https("https://cdn.example.com/a.mp4")
+
+
+def test_a_redirect_to_an_internal_address_is_refused_per_hop(monkeypatch, tmp_path):
+    import httpx
+    import socket
+    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: [(2, 1, 6, "", ("93.184.216.34", 443))])
+    seen = []
+
+    def handler(request):
+        seen.append(str(request.url))
+        return httpx.Response(302, headers={"location": "https://169.254.169.254/latest/meta-data/"})
+
+    real = httpx.Client
+    monkeypatch.setattr(httpx, "Client", lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    with pytest.raises(AppError) as err:
+        sources.download_to("https://cdn.example.com/a.mp4", tmp_path / "x.mp4")
+    assert err.value.code == "private_address" and seen == ["https://cdn.example.com/a.mp4"]
+
+
 class _Files(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
 
 @pytest.fixture
-def file_server(tmp_path):
+def file_server(tmp_path, monkeypatch):
+    monkeypatch.setenv("CLIPPING_ALLOW_LOCAL_FETCH", "1")   # the test server is http on loopback, which the SSRF guard refuses
     video = ffmpeg.make_fixture(tmp_path / "clip.mp4", seconds=6)
     (tmp_path / "page.html").write_text("<html>sign in</html>", encoding="utf-8")
     handler = lambda *a, **k: _Files(*a, directory=str(tmp_path), **k)  # noqa: E731

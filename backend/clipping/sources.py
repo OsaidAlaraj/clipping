@@ -3,12 +3,14 @@ Dropbox or direct link. YouTube only when the owner confirms the brief permits c
 YouTube's terms forbid downloads; it also needs the optional yt-dlp package."""
 from __future__ import annotations
 
+import ipaddress
 import re
 import shutil
+import socket
 import uuid
 from decimal import Decimal
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse
 
 from . import campaigns, config, ffmpeg, language_check, signals
 from .adapters import heatmap
@@ -28,6 +30,50 @@ def link_kind(url: str) -> str:
     if host.endswith("dropbox.com") or host.endswith("dropboxusercontent.com"):
         return "dropbox"
     return "direct"
+
+
+def _public_ip(text: str) -> bool:
+    try:
+        ip = ipaddress.ip_address(text.split("%")[0])
+    except ValueError:
+        return False
+    if getattr(ip, "ipv4_mapped", None):
+        ip = ip.ipv4_mapped
+    return ip.is_global and not (ip.is_multicast or ip.is_reserved)
+
+
+def check_public_https(url: str, *, resolve: bool = True) -> None:
+    """Refuse anything but an https link to a public host (SSRF guard). Loopback, private, link-local (including the
+    cloud metadata address), carrier-grade NAT, `.local`/`.internal` names and names that resolve to such addresses are
+    refused. An unresolvable name passes here and simply fails in the fetch. `resolve=False` skips the DNS step."""
+    if config.allow_local_fetch():
+        return
+    parsed = urlparse(url or "")
+    host = (parsed.hostname or "").lower().rstrip(".")
+    if parsed.scheme.lower() != "https" or not host:
+        raise AppError("Paste a full link that starts with https://", "bad_link")
+    if parsed.username or parsed.password:
+        raise AppError("The link must not contain a user name or password.", "bad_link")
+    blocked = AppError("That link points to a private or internal address, which is not allowed.", "private_address")
+    if host == "localhost" or host.endswith((".localhost", ".local", ".internal", ".lan", ".home.arpa")):
+        raise blocked
+    try:
+        ipaddress.ip_address(host)
+        literal = True
+    except ValueError:
+        literal = False
+    if literal:
+        if not _public_ip(host):
+            raise blocked
+        return
+    if not resolve:
+        return
+    try:
+        infos = socket.getaddrinfo(host, parsed.port or 443, proto=socket.IPPROTO_TCP)
+    except socket.gaierror:
+        return
+    if any(not _public_ip(info[4][0]) for info in infos):
+        raise blocked
 
 
 def direct_download_url(url: str) -> str:
@@ -91,8 +137,7 @@ def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref
         raise AppError("Language must be en or ar.", "bad_language")
     if not (permission_ref and permission_ref.strip()):
         raise AppError("Permitted footage only: give a licence or written-permission reference.", "no_permission")
-    if not re.match(r"^https?://", url or "", re.I):
-        raise AppError("Paste a full link that starts with https://", "bad_link")
+    check_public_https(url)
     kind = link_kind(url)
     if kind == "youtube":
         if not youtube_permitted:
@@ -119,19 +164,26 @@ def download_to(url: str, dest: Path) -> Path:
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     size = 0
-    with httpx.Client(timeout=httpx.Timeout(60, read=300), follow_redirects=True) as client:
-        with client.stream("GET", direct_download_url(url), headers={"User-Agent": "clipping-footage-fetch/1.0"}) as response:
-            if response.status_code >= 400:
-                raise AppError(f"The link returned HTTP {response.status_code}.", "fetch_failed")
-            if response.headers.get("content-type", "").startswith("text/html"):
-                raise AppError("The link opened a web page, not a video. Make the file viewable by anyone with the link.", "not_a_file")
-            with open(dest, "wb") as fh:
-                for chunk in response.iter_bytes(1 << 20):
-                    size += len(chunk)
-                    if size > MAX_SOURCE_BYTES:
-                        raise AppError("The file is larger than 10 GB.", "too_large")
-                    fh.write(chunk)
-    return dest
+    with httpx.Client(timeout=httpx.Timeout(60, read=300), follow_redirects=False) as client:
+        target = direct_download_url(url)
+        for _hop in range(6):   # redirects are followed by hand so every hop is checked again
+            check_public_https(target)
+            with client.stream("GET", target, headers={"User-Agent": "clipping-footage-fetch/1.0"}) as response:
+                if response.is_redirect and response.headers.get("location"):
+                    target = urljoin(target, response.headers["location"])
+                    continue
+                if response.status_code >= 400:
+                    raise AppError(f"The link returned HTTP {response.status_code}.", "fetch_failed")
+                if response.headers.get("content-type", "").startswith("text/html"):
+                    raise AppError("The link opened a web page, not a video. Make the file viewable by anyone with the link.", "not_a_file")
+                with open(dest, "wb") as fh:
+                    for chunk in response.iter_bytes(1 << 20):
+                        size += len(chunk)
+                        if size > MAX_SOURCE_BYTES:
+                            raise AppError("The file is larger than 10 GB.", "too_large")
+                        fh.write(chunk)
+                return dest
+        raise AppError("The link redirected too many times.", "fetch_failed")
 
 
 def download_youtube(url: str, folder: Path, info_out: dict | None = None) -> Path:

@@ -40,6 +40,18 @@ def use_fakes() -> bool:
     return env("CLIPPING_USE_FAKES", "1") != "0"
 
 
+def backup_copy_dir() -> Path | None:
+    """Optional second folder (another drive or a synced cloud folder) that gets a copy of each database dump. Off unless set.
+    Only the dump is copied: never `.env`, the token vault key or the media secret."""
+    value = env("CLIPPING_BACKUP_COPY_DIR")
+    return Path(value) if value else None
+
+
+def allow_local_fetch() -> bool:
+    """Test-only opt-in: lets link intake use http and loopback/private hosts (a local test server)."""
+    return env("CLIPPING_ALLOW_LOCAL_FETCH", "0") == "1"
+
+
 def api_port() -> int:
     return int(env("CLIPPING_API_PORT", "8787"))
 
