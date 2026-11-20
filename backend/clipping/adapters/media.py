@@ -17,20 +17,22 @@ from .base import Adapter, register
 # ------------------------------------------------------------------ the template: what makes an account's clips look like its own
 
 TEMPLATE_DEFAULTS: dict = {"layout": "auto", "font": "Arial", "primary": "#FFFFFF", "accent": "#FFC400", "caption_position": "lower",
-                           "title_card": True, "progress_bar": True, "zooms": True, "font_size": 5.0, "cover": "band",
+                           "title_card": True, "progress_bar": True, "zooms": True, "font_size": 3.7, "cover": "band",
                            "tighten": True, "karaoke": True}
 CAPTION_POSITIONS = ("lower", "middle")
 COVER_STYLES = ("band", "outline")
 NICHE_OF_CROP = {"facecam_over_game": "gaming", "follow_speaker": "podcast"}   # the profile's crop style tells the niche
 
 
-def niche_defaults(niche: str | None) -> dict:
-    """Per-niche render defaults (layout, caption position), from the measured market study; a template's own fields win."""
+def niche_defaults(niche: str | None, language: str | None = None) -> dict:
+    """Per-niche render defaults (layout, caption position, caption centre and size, caption words), from the measured market
+    studies; a template's own fields win. A cell for the niche and language (`podcast_ar`) refines the niche's entry (`podcast`)."""
     import json
     try:
-        return json.loads((Path(__file__).resolve().parent.parent / "assets" / "render-profile-defaults.json").read_text(encoding="utf-8")).get(niche or "", {})
+        data = json.loads((Path(__file__).resolve().parent.parent / "assets" / "render-profile-defaults.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+    return {**data.get(niche or "", {}), **data.get(f"{niche}_{language}", {})} if niche else {}
 
 
 LAYOUTS = ("auto", "blur_pad", "gaming_stack")   # auto: the profile crop decides; blur_pad: the whole picture centred on a blurred, darkened 9:16 copy
@@ -317,21 +319,22 @@ def caption_events(words: list[dict], clip_start: float, clip_end: float, social
     return events
 
 
-CAPTION_Y = {"en": 0.70, "ar": 0.67}       # centre of the caption block as a share of the frame height (market-style defaults: 0.70, Arabic 0.67)
+CAPTION_Y_MAX = 0.72                        # never lower: the TikTok and Reels bottom interface zone starts near 0.78
+CAPTION_Y = {"en": 0.58, "ar": 0.60}       # centre of the caption block as a share of the frame height (market-style defaults: 0.70, Arabic 0.67)
 CAPTION_MAX_W = 0.78                        # share of the width a caption line may use: clear of TikTok's right-hand buttons and the frame edge
 KARAOKE_WORDS, KARAOKE_MAX_S, KARAOKE_HOLD_S = 3, 1.6, 0.15
 
 
 def karaoke_events(words: list[dict], clip_start: float, clip_end: float, social: bool, accent: str, width: int, height: int,
-                   cap: int, rtl: bool, position: str = "lower") -> list[dict]:
+                   cap: int, rtl: bool, position: str = "lower", y_share: float | None = None, max_words: int = KARAOKE_WORDS) -> list[dict]:
     """Word-by-word captions: a short line (up to 3 words) is on screen while it is spoken, and the word being said turns to the
     accent colour (a 70 ms blend from white). Each word has its own subtitle event with the whole line in it, so the line never
     reflows and an Arabic line keeps its right-to-left order and letter joining (the colour changes sit only between words).
     The block is centred at CAPTION_Y of the height and at most CAPTION_MAX_W wide: inside the TikTok and Reels safe zone."""
     events = []
-    chunks = caption_chunks(words, clip_start, clip_end, KARAOKE_WORDS, KARAOKE_MAX_S)
+    chunks = caption_chunks(words, clip_start, clip_end, max_words, KARAOKE_MAX_S)
     white, hot = _ass_colour("#FFFFFF"), _ass_colour(accent)
-    y = int(height * (CAPTION_Y["ar" if rtl else "en"] if position == "lower" else 0.5))
+    y = int(height * (min(y_share or CAPTION_Y["ar" if rtl else "en"], CAPTION_Y_MAX) if position == "lower" else 0.5))
     for ci, chunk in enumerate(chunks):
         shown = [(w, _esc(w["text"].translate(_LIGHT) if social else w["text"])) for w in chunk["words"]]
         shown = [(w, text) for w, text in shown if text]
@@ -520,8 +523,12 @@ class FFmpegRender(Adapter):
             style = "gaming_stack"
             stack = gaming_layout.plan(src_path, clip, info["width"], info["height"], width, height)
             style = {"stack": "gaming_stack", "fullbleed": "follow_speaker"}.get(stack["layout"], "blur_pad")   # no face-cam: the whole picture on a blurred pad
-        if not (isinstance(template, dict) and "caption_position" in template) and niche_defaults(niche).get("caption_position") in CAPTION_POSITIONS:
-            tpl["caption_position"] = niche_defaults(niche)["caption_position"]
+        cell = niche_defaults(niche, clip.get("language"))
+        if not (isinstance(template, dict) and "caption_position" in template) and cell.get("caption_position") in CAPTION_POSITIONS:
+            tpl["caption_position"] = cell["caption_position"]
+        size = cell.get("caption_font_pct")
+        if not (isinstance(template, dict) and "font_size" in template) and isinstance(size, (int, float)) and FONT_SIZE_RANGE[0] <= size <= FONT_SIZE_RANGE[1]:
+            tpl["font_size"] = float(size)
         tracked = faces.track(src_path, clip) if style in FOLLOW_STYLES else None   # YuNet path; None falls back to the old single-point focus
         path, focus = (tracked if tracked else (None, face_focus(src_path, clip) if style in FOLLOW_STYLES else None))
         language, has_audio = clip.get("language") or "en", info["has_audio"]
@@ -534,7 +541,8 @@ class FFmpegRender(Adapter):
         shown_emphasis = [plan.map(float(e) - start) for e in clip.get("emphasis") or []] if plan else clip.get("emphasis") or []
         social, rtl = clip.get("platform") in SOCIAL_PLATFORMS, language == "ar"
         if tpl["karaoke"]:
-            events = karaoke_events(shown_words, c0, c1, social, tpl["accent"], width, height, int(height * tpl["font_size"] / 100), rtl, tpl["caption_position"])
+            events = karaoke_events(shown_words, c0, c1, social, tpl["accent"], width, height, int(height * tpl["font_size"] / 100), rtl, tpl["caption_position"],
+                                    cell.get("caption_y") if isinstance(cell.get("caption_y"), (int, float)) else None, max(1, math.ceil(float(cell.get("caption_words") or KARAOKE_WORDS))))
         else:
             events = caption_events(shown_words, c0, c1, social, shown_emphasis, tpl["accent"])
         ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"))

@@ -27,7 +27,10 @@ def lines(lang: str):
     start, end = (OFFSET[lang] + SEG[lang][0], OFFSET[lang] + SEG[lang][1])
     tpl = media.normalize_template({"progress_bar": False, "title_card": False})
     if NEW:
-        ev = media.karaoke_events(words, start, end, True, tpl["accent"], W, H, int(H * tpl["font_size"] / 100), lang == "ar", "lower")
+        cell = media.niche_defaults("podcast", lang) if os.environ.get("CELL") else {}      # CELL=1: the market study 2 cell for the podcast crop
+        tpl["font_size"] = cell.get("caption_font_pct", tpl["font_size"])
+        ev = media.karaoke_events(words, start, end, True, tpl["accent"], W, H, int(H * tpl["font_size"] / 100), lang == "ar", "lower",
+                                  cell.get("caption_y"), max(1, int(-(-cell.get("caption_words", 3) // 1))))
     else:
         ev = media.caption_events(words, start, end, True, [], tpl["accent"])
     return ev, tpl

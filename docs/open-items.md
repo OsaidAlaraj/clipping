@@ -148,3 +148,6 @@ Phase E is built and pushed on `feature/phase-e-posting`. Everything was tested 
 Done in small commits (see `docs/owner-notes.md`): Home layout, Review wording and chips, Review Later, Profile tidy-up.
 - **Review order** ("scroll without deciding; decided clips never return, skipped ones come back after a few"). Waiting for the owner to confirm the rule. Priority: high. Size: 1–2 h, touches the review queue logic.
 - **Profile full redesign**, if the tidy-up is not enough. Priority: low. Size: 2 h.
+
+## Per-niche clip length from market study 2 (2026-11-20)
+The study (docs/market-style/render-profile-defaults.md) suggests podcast 15 to 45 s EN and 15 to 60 s AR, gaming 12 to 30 s EN and 25 to 55 s AR, business 30 to 70 s EN and 45 to 90 s AR. The code's only knob is the profile's `length_min_s` / `length_max_s` (`content_profiles.config`, seeded in migration 012: podcast 30 to 60, stream 20 to 45), which has no language dimension, so nothing was changed. Options: a language-aware length in `Profile.length_for`, or a data migration of the seeds after the owner picks a range. The v2 numbers sit in `backend/clipping/assets/render-profile-defaults.json` (`clip_length_s`) as guidance only. Priority: low. Size: 1 h.

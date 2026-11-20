@@ -226,7 +226,7 @@ def test_each_word_gets_its_own_event_with_the_whole_line_and_one_highlight():
 
 
 def test_captions_sit_in_the_safe_zone_for_english_and_arabic():
-    for rtl, y in ((False, 0.70), (True, 0.67)):
+    for rtl, y in ((False, 0.58), (True, 0.60)):
         event = media.karaoke_events(LINE, 0.0, 6.0, False, "#FFC400", 1080, 1920, 96, rtl)[0]["text"]
         assert f"\\an5\\pos(540,{int(1920 * y)})" in event
         assert int(re.search(r"\\fs(\d+)", event).group(1)) <= 96
@@ -254,7 +254,7 @@ def test_karaoke_render_burns_the_highlight_and_stays_one_encode(tmp_path):
     result = render(tmp_path, src, clip_for(6.0), [w("hello", 1.0, 1.4), w("world", 1.5, 2.0)], {"progress_bar": False, "title_card": False}, "k")
     assert result["encodes"] == 1 and result["captions"] == 2
     ass = Path(result["ass_path"]).read_text(encoding="utf-8-sig")
-    assert "\\1c&H0000C4FF&" in ass and "\\an5\\pos(135,336)" in ass
+    assert "\\1c&H0000C4FF&" in ass and "\\an5\\pos(135,278)" in ass
 
 
 def test_the_final_scale_is_lanczos():
@@ -279,3 +279,34 @@ def test_tightening_zooms_karaoke_and_the_music_bed_work_together_in_one_encode(
     assert result["encodes"] == 1 and result["tightened"] and result["captions"] > 0
     info = ffmpeg.probe(Path(result["path"]))
     assert info["has_audio"] and abs(info["duration_s"] - (8.0 - result["tightened"]["removed_s"])) < 0.15
+
+
+def test_the_niche_and_language_cell_sets_caption_centre_size_and_words():
+    podcast_ar = media.niche_defaults("podcast", "ar")
+    assert podcast_ar["caption_y"] == 0.6 and podcast_ar["caption_font_pct"] == 4.5 and podcast_ar["caption_words"] == 1.5 and podcast_ar["layout"] == "auto"
+    gaming_en = media.niche_defaults("gaming", "en")
+    assert gaming_en["caption_y"] == 0.55 and gaming_en["layout"] == "gaming_stack"            # the plain niche entry still supplies the layout
+    assert media.niche_defaults("gaming", "fr")["layout"] == "gaming_stack" and media.niche_defaults(None) == {} and media.niche_defaults("nothing", "en") == {}
+
+
+def test_a_caption_never_sits_below_the_safe_limit():
+    event = media.karaoke_events(LINE, 0.0, 6.0, False, "#FFC400", 1080, 1920, 70, False, "lower", 0.9)[0]["text"]
+    assert f"\\pos(540,{int(1920 * media.CAPTION_Y_MAX)})" in event
+    assert "\\pos(540,1113)" in media.karaoke_events(LINE, 0.0, 6.0, False, "#FFC400", 1080, 1920, 70, False, "lower", 0.58)[0]["text"]
+    two = media.karaoke_events(LINE, 0.0, 6.0, False, "#FFC400", 1080, 1920, 70, True, "lower", None, 2)
+    assert max(len(re.sub(r"\{[^}]*\}", "", e["text"]).split()) for e in two) == 2
+
+
+def test_the_cell_drives_the_render_but_the_templates_own_fields_win(tmp_path):
+    src = beep_source(tmp_path)
+    words = [w("one", 0.9, 1.3), w("two", 1.4, 1.8)]
+    cell = render(tmp_path, src, clip_for(6.0, crop="follow_speaker", language="ar"), words, PLAIN | {"tighten": False}, "c")
+    ass = Path(cell["ass_path"]).read_text(encoding="utf-8-sig")
+    assert "\\pos(135,288)" in ass and "\\fs" in ass                   # Arabic podcast cell: centre 0.60 of 480
+    own = render(tmp_path, src, clip_for(6.0, crop="follow_speaker", language="ar"), words, PLAIN | {"tighten": False, "font_size": 5.0, "caption_position": "middle"}, "d")
+    assert "\\pos(135,240)" in Path(own["ass_path"]).read_text(encoding="utf-8-sig")
+
+
+def test_loudness_target_is_minus_14_on_every_platform():
+    from clipping import music
+    assert {music.target_loudness(p)[0] for p in ("tiktok", "instagram", "youtube", "facebook", None)} == {-14.0}

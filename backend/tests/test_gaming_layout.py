@@ -73,6 +73,6 @@ def test_portrait_sources_and_failures_mean_no_stacked_layout():
 
 
 def test_niche_defaults_apply_unless_the_template_says_otherwise():
-    assert media.niche_defaults("gaming")["layout"] == "gaming_stack" and media.niche_defaults("business")["layout"] == "blur_pad"
+    assert media.niche_defaults("gaming")["layout"] == "gaming_stack" and media.niche_defaults("business")["layout"] == "auto"
     assert media.niche_defaults("nothing") == {}
     assert media.normalize_template({"layout": "gaming_stack"})["layout"] == "gaming_stack"

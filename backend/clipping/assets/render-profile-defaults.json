@@ -1,5 +1,5 @@
 {
- "_note": "Per-niche render defaults from docs/market-style-study.md (measured on 9 reference Shorts at 144p: a first guess). Layout and caption_position are used by the render stage; the rest is guidance. A template's own fields win.",
+ "_note": "Per-niche render defaults. Version 2: docs/market-style/render-profile-defaults-v2.json (market study 2, 39 vertical Shorts at 720p+). The render reads layout, caption_position, caption_y (caption centre as a share of the frame height, never below 0.72), caption_font_pct and caption_words; the rest is guidance. A cell <niche>_<lang> refines the plain niche entry; a template's own fields win.",
  "gaming": {
   "layout": "gaming_stack",
   "caption_position": "lower",
@@ -21,7 +21,7 @@
   "hook_s": 3
  },
  "business": {
-  "layout": "blur_pad",
+  "layout": "auto",
   "caption_position": "lower",
   "clip_length_s": [
    30,
@@ -39,5 +39,95 @@
   ],
   "cuts_per_10s": 1.7,
   "hook_s": 3
+ },
+ "business_en": {
+  "caption_position": "lower",
+  "clip_length_s": [
+   30,
+   70
+  ],
+  "cuts_per_10s": 2,
+  "hard_cuts_per_10s": 0,
+  "cuts_in_first_3s": 1,
+  "caption_y": 0.58,
+  "caption_font_pct": 3.4,
+  "caption_words": 3,
+  "loudness_lufs": -14,
+  "layout_advice": "full_frame_9x16_on_speaker"
+ },
+ "business_ar": {
+  "caption_position": "lower",
+  "clip_length_s": [
+   45,
+   90
+  ],
+  "cuts_per_10s": 1,
+  "hard_cuts_per_10s": 0.1,
+  "cuts_in_first_3s": 0,
+  "caption_y": 0.6,
+  "caption_font_pct": 3.6,
+  "caption_words": 3,
+  "loudness_lufs": -14,
+  "layout_advice": "full_frame_9x16_on_speaker"
+ },
+ "gaming_en": {
+  "caption_position": "lower",
+  "clip_length_s": [
+   12,
+   30
+  ],
+  "cuts_per_10s": 6,
+  "hard_cuts_per_10s": 2,
+  "cuts_in_first_3s": 2,
+  "caption_y": 0.55,
+  "caption_font_pct": 3.8,
+  "caption_words": 3,
+  "loudness_lufs": -14,
+  "layout_advice": "full_frame_reaction_or_stacked_facecam_over_gameplay"
+ },
+ "gaming_ar": {
+  "caption_position": "lower",
+  "clip_length_s": [
+   25,
+   55
+  ],
+  "cuts_per_10s": 6,
+  "hard_cuts_per_10s": 2.5,
+  "cuts_in_first_3s": 1,
+  "caption_y": 0.63,
+  "caption_font_pct": 4.0,
+  "caption_words": 2,
+  "loudness_lufs": -14,
+  "layout_advice": "full_frame_reaction_or_scene"
+ },
+ "podcast_en": {
+  "caption_position": "lower",
+  "clip_length_s": [
+   15,
+   45
+  ],
+  "cuts_per_10s": 4,
+  "hard_cuts_per_10s": 1.5,
+  "cuts_in_first_3s": 1,
+  "caption_y": 0.57,
+  "caption_font_pct": 3.6,
+  "caption_words": 3,
+  "loudness_lufs": -14,
+  "layout_advice": "full_frame_9x16_or_two_person_stacked_split"
+ },
+ "podcast_ar": {
+  "caption_position": "lower",
+  "clip_length_s": [
+   15,
+   60
+  ],
+  "cuts_per_10s": 1,
+  "hard_cuts_per_10s": 0,
+  "cuts_in_first_3s": 0,
+  "caption_y": 0.6,
+  "caption_font_pct": 4.5,
+  "caption_words": 1.5,
+  "loudness_lufs": -14,
+  "layout_advice": "full_frame_9x16_on_speaker"
  }
 }

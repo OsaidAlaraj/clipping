@@ -21,7 +21,7 @@ MOODS = ("calm", "upbeat", "playful", "tense", "driving", "mysterious")
 
 # Loudness of the finished clip per platform (integrated LUFS, true peak dBTP). Both are the commonly used short-video target;
 # kept as a table so a measured platform difference changes one line.
-PLATFORM_LOUDNESS = {"tiktok": (-14.0, -1.5), "instagram": (-14.0, -1.5), "youtube": (-14.0, -1.5), "facebook": (-16.0, -1.5)}
+PLATFORM_LOUDNESS = {"tiktok": (-14.0, -1.5), "instagram": (-14.0, -1.5), "youtube": (-14.0, -1.5), "facebook": (-14.0, -1.5)}
 DEFAULT_LOUDNESS = (-14.0, -1.5)
 
 # Mix settings. Chosen by the measured bake-off in docs/bakeoff/final/music (speech-to-music ratio while someone talks, music lift in

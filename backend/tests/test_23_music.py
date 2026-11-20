@@ -163,7 +163,7 @@ def test_the_audio_graph_ducks_the_bed_under_the_voice_and_limits_peaks():
     graph = music.audio_graph({"gain_db": -3.0}, "tiktok", False, duration_s=10)
     assert "sidechaincompress" in graph and "amix=inputs=2" in graph and "alimiter" in graph and "loudnorm=I=-14.0" in graph
     assert "loudnorm" in music.audio_graph(None, "instagram", True) and "sidechain" not in music.audio_graph(None, "instagram", True)
-    assert "I=-16.0" in music.audio_graph(None, "facebook", False)
+    assert "I=-14.0" in music.audio_graph(None, "facebook", False)
     assert music.target_loudness("nowhere") == music.DEFAULT_LOUDNESS
 
 
