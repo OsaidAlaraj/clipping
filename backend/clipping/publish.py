@@ -450,7 +450,15 @@ def _end(conn, target: dict, state: str, reason: str, alert: bool = True) -> Non
                     f"{PLATFORM_LABEL[target['platform']]} post {state}: {reason}"[:300])
 
 
-def _clean_outcome(result) -> dict:
+def _on_platform_host(platform: str, url: str) -> bool:
+    try:
+        host = (urlsplit(url).hostname or "").lower()
+    except ValueError:
+        return False
+    return any(host == h or host.endswith("." + h) for h in HOSTS.get(platform, ()))
+
+
+def _clean_outcome(result, platform: str | None = None) -> dict:
     """The adapter's answer is untrusted: keep only well-formed fields, and turn anything odd into needs_check (never a guess)."""
     good = isinstance(result, dict) and result.get("state") in STATES
     out = {"state": result["state"] if good else "needs_check", "post_id": None, "url": None,
@@ -459,6 +467,8 @@ def _clean_outcome(result) -> dict:
         pid, url, why = result.get("platform_post_id"), result.get("url"), result.get("reason")
         out["post_id"] = pid if isinstance(pid, str) and 0 < len(pid) <= 128 else None
         out["url"] = url if isinstance(url, str) and url.lower().startswith(("http://", "https://")) and len(url) <= 500 else None
+        if out["url"] and platform and not _on_platform_host(platform, out["url"]):
+            out["url"] = None          # a link off the platform's own site is never recorded as the post (see _link_ok)
         out["reason"] = config.redact(why)[:300] if isinstance(why, str) and why else out["reason"]
     if out["state"] == "published" and out["url"] is None:
         out.update(state="needs_check", reason="It posted, but the platform gave no link. Paste the post link to record it.")
@@ -467,7 +477,7 @@ def _clean_outcome(result) -> dict:
 
 def _apply(conn, target: dict, result) -> None:
     """Record one outcome on the target. A public link also writes the post (see _publish); nothing else does."""
-    out = _clean_outcome(result)
+    out = _clean_outcome(result, target["platform"])
     state = out["state"]
     if state == "published":
         try:

@@ -27,6 +27,20 @@ from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"], allow_credentials=True,  # uploads and screenshots
                    allow_methods=["GET", "POST"], allow_headers=["*"])
 _owner: Actor | None = None
+SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+
+
+@app.middleware("http")
+async def refuse_foreign_origins(request: Request, call_next):
+    """A browser sends `Origin` on every cross-site write. A write from a page that is not this app (CSRF, or DNS rebinding
+    against the local API) is refused before it reaches any handler: nothing posts, disconnects or cancels on a stranger's say-so.
+    Requests with no Origin (the test client, curl, the worker) are not browsers and pass; the session cookie is SameSite=Lax."""
+    origin = request.headers.get("origin")
+    if origin is not None and request.method not in SAFE_METHODS:
+        allowed = {*auth.allowed_origins(), "http://127.0.0.1:3000", "http://127.0.0.1:8787"}
+        if origin.rstrip("/") not in allowed:
+            return JSONResponse({"error": "This request came from another site, so it was refused.", "code": "bad_origin"}, status_code=403)
+    return await call_next(request)
 
 
 def _supabase_actor(token: str) -> Actor:
