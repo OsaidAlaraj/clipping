@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Clip, SwipeResult } from "@/lib/api";
 import { LabelKey, useLang } from "@/lib/i18n";
@@ -38,14 +38,16 @@ export default function PostBar({ result, clip, seconds, onUndo, onClose }: {
   const [copied, setCopied] = useState(false);
   const [undoable, setUndoable] = useState(true);
   const manual = !!result && result.targets.some((x) => x.manual);
+  const closeRef = useRef(onClose);          // the parent passes a new function every render; the timers must not restart for that
+  closeRef.current = onClose;
 
   useEffect(() => {
     if (!result) return;
     const closeUndo = setTimeout(() => setUndoable(false), seconds * 1000);
-    const close = manual ? undefined : setTimeout(onClose, seconds * 1000 + 600);
-    const closeManual = manual ? setTimeout(onClose, 45_000) : undefined;
+    const close = manual ? undefined : setTimeout(() => closeRef.current(), seconds * 1000 + 600);
+    const closeManual = manual ? setTimeout(() => closeRef.current(), 45_000) : undefined;
     return () => { clearTimeout(closeUndo); if (close) clearTimeout(close); if (closeManual) clearTimeout(closeManual); };
-  }, [result, seconds, manual, onClose]);
+  }, [result, seconds, manual]);
 
   const lines = result ? postBarLines(result, now, t) : null;
   const copy = async () => {

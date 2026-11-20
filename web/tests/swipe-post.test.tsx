@@ -23,8 +23,8 @@ const result = (over: Partial<SwipeResult> = {}): SwipeResult => ({
   ], ...over,
 });
 
-async function open(clips: any[], extra: Record<string, any> = {}, lang: "en" | "ar" = "en") {
-  const mock = mockApi(feedRoutes(clips, extra));
+async function open(clips: any[], extra: Record<string, any> = {}, lang: "en" | "ar" = "en", config: Record<string, any> = {}) {
+  const mock = mockApi(feedRoutes(clips, extra, config));
   render(<LangProvider initial={lang}><Feed onExit={() => undefined} /></LangProvider>);
   const card = await screen.findByTestId("clip-card");
   await waitFor(() => expect(mock.posts("/api/sessions")).toHaveLength(1));
@@ -89,6 +89,18 @@ describe("swipe right: accept and confirm to post (decision 31)", () => {
     const download = within(bar).getByRole("link", { name: "Download video" });
     expect(download.getAttribute("href")).toContain("/api/media/c1.mp4");
     expect(download.hasAttribute("download")).toBe(true);
+  });
+
+  it("a second swipe while the first manual bar is still open gets its own Undo (the bar is per clip)", async () => {
+    const manual = (id: string) => result({ review: { id: `r-${id}`, clip_id: id, decision: "accept" }, clip_id: id, targets: [
+      { id: `t-${id}`, platform: "tiktok", label: "TikTok", handle: "own_tt", manual: true, scheduled_at: when(0), state: "scheduled" }] });
+    const { card } = await open([withTargets("c1"), withTargets("c2"), withTargets("c3")],
+      { "POST /api/clips/c1/swipe": manual("c1"), "POST /api/clips/c2/swipe": manual("c2") }, "en", { undo_window_s: 1 });
+    right(card);
+    await waitFor(() => expect(within(screen.getByTestId("post-bar")).queryByRole("button", { name: "Undo" })).toBeTruthy());
+    await waitFor(() => expect(within(screen.getByTestId("post-bar")).queryByRole("button", { name: "Undo" })).toBeNull(), { timeout: 3000 });
+    right(screen.getAllByTestId("clip-card")[0]);
+    await waitFor(() => expect(within(screen.getByTestId("post-bar")).queryByRole("button", { name: "Undo" })).toBeTruthy(), { timeout: 3000 });
   });
 
   it("a practice clip is accepted and the bar says nothing is posted", async () => {

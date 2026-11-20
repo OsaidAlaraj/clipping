@@ -636,7 +636,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
           <button className="btn ghost" onClick={() => { setMessage(""); setRolledBack(false); }}>Dismiss</button>
         </div>
       )}
-      {bar && <PostBar result={bar.result} clip={bar.clip} seconds={config.undo} onUndo={undoSwipe} onClose={() => setBar(null)} />}
+      {bar && <PostBar key={bar.clip.id} result={bar.result} clip={bar.clip} seconds={config.undo} onUndo={undoSwipe} onClose={() => setBar(null)} />}
       {undo && <UndoToast seconds={config.undo} onUndo={doUndo} label={`${t(undo.kind === "accept" ? "accepted" : undo.kind === "reject" ? "rejected" : "parked")}${undo.queued ? " · saved" : ""}`} />}
       {sheet === "reject" && <RejectSheet onSubmit={reject} onClose={() => setSheet(null)} />}
       {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} />}
