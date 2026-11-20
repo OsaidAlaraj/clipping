@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { api, ApiError, Clip, FilteredMoment, money, PLATFORM_LABEL, Review, reviewAction, undoReview } from "@/lib/api";
+import { api, ApiError, Clip, FilteredMoment, money, NetworkError, newActionId, PLATFORM_LABEL, Review, reviewAction, SwipeResult, undoReview } from "@/lib/api";
 import { fetchData, invalidate, mutate, peek } from "@/lib/data";
 import { qualityText, useLang } from "@/lib/i18n";
 import { useSwipe } from "@/lib/useSwipe";
+import PostBar from "./PostBar";
 import { FeedSkeleton } from "./Skeleton";
 import { Icon } from "./Shell";
 
@@ -255,8 +256,8 @@ export function SessionSummary({ summary, onDone }: { summary: Summary; onDone: 
 
 // ------------------------------------------------------------------ one clip, full screen
 
-function ClipCard({ clip, active, preload, onAccept, onReject, onNext, onPrev, onOpen, showPay }: {
-  clip: Clip; active: boolean; preload: "auto" | "metadata"; onAccept: () => void; onReject: () => void; onNext: () => void; onPrev: () => void;
+function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onNext, onPrev, onOpen, showPay }: {
+  clip: Clip; active: boolean; preload: "auto" | "metadata"; onAccept: () => void; onSwipeRight: () => void; onReject: () => void; onNext: () => void; onPrev: () => void;
   onOpen: (sheet: Sheet | "later") => void; showPay: boolean;
 }) {
   const { t, lang } = useLang();
@@ -264,7 +265,7 @@ function ClipCard({ clip, active, preload, onAccept, onReject, onNext, onPrev, o
   const [muted, setMuted] = useState(true); // iOS blocks sound autoplay: clips start muted, a tap turns sound on
   const [progress, setProgress] = useState(0);
   const [textHidden, setTextHidden] = useState(false); // the caption block can be hidden to see the whole picture
-  const { ref, intent, bind } = useSwipe(active ? { onRight: onAccept, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setMuted((value) => !value) } : {}, { tilt: true });
+  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setMuted((value) => !value) } : {}, { tilt: true });
 
   // Only the clip on screen plays; the buffered ones wait and start from their first frame the moment they are shown.
   useEffect(() => {
@@ -297,7 +298,7 @@ function ClipCard({ clip, active, preload, onAccept, onReject, onNext, onPrev, o
         <i style={{ width: `${progress}%` }} />
       </div>
       {player}
-      {intent === "right" && <div className="swipe-flag yes">{t("accept")}</div>}
+      {intent === "right" && <div className="swipe-flag yes">{t("acceptPost")}</div>}
       {intent === "left" && <div className="swipe-flag no">{t("reject")}</div>}
       {muted && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
       <div className={`bottom${textHidden ? " text-hidden" : ""}`} aria-hidden={textHidden || undefined}>
@@ -307,6 +308,11 @@ function ClipCard({ clip, active, preload, onAccept, onReject, onNext, onPrev, o
           <span>{clip.language === "ar" ? "Arabic" : "English"}</span>
           <span>{clip.duration_s ? `${Math.round(Number(clip.duration_s))} s` : ""}</span>
         </div>
+        {(clip.post_targets?.length ?? 0) > 0 && (
+          <div className="reason" data-testid="targets" dir="auto">
+            {t("swipePostsTo")} {clip.post_targets!.map((x) => `${x.label} @${x.handle}${x.manual ? ` (${t("manualWord")})` : ""}`).join(", ")}
+          </div>
+        )}
         <div className="caption" dir="auto">{clip.caption_text}</div>
         {clip.moment_reason && <div className="reason" dir="auto">Why this moment: {clip.moment_reason}</div>}
         {clip.quality && <div className={`quality${clip.quality.weak ? " weak" : ""}`} data-testid="quality" dir="auto">{qualityText(clip.quality, lang)}</div>}
@@ -339,6 +345,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
   const [summary, setSummary] = useState<Summary | null>(null);
   const [filtered, setFiltered] = useState<FilteredMoment[]>(cached?.filtered ?? []);
   const [message, setMessage] = useState("");
+  const [bar, setBar] = useState<{ clip: Clip; index: number; result: SwipeResult | null } | null>(null);
   const [rolledBack, setRolledBack] = useState(false);
   const [config, setConfig] = useState(configOf(cached));
   const session = useRef<string | null>(null);
@@ -444,6 +451,49 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
   }, [removeCurrent, reinsert, config.undo]);
 
   const accept = useCallback(() => decide("accept"), [decide]);
+
+  /** Swipe right (decision 31): accepts the clip AND is the owner's confirm to post. The clip leaves at once and the bar says what was queued;
+   *  Undo (inside the Undo window) cancels the posts and puts the clip back. Posting needs the server, so offline nothing happens. */
+  const swipeRight = useCallback(async () => {
+    const { clips: list, index: at } = state.current;
+    const current = list[at];
+    if (!current) return;
+    if (current.compliance_status === "fail") { setSheet("report"); return; }       // a failed clip never posts: show why
+    removeCurrent();
+    setUndo(null);
+    setBar({ clip: current, index: at, result: null });
+    mutate<{ to_review: number; alerts: number }>("/api/counts", (c) => (c ? { ...c, to_review: Math.max(c.to_review - 1, 0) } : c as any));
+    const back = () => {
+      reinsert(current, at);
+      setBar(null);
+      mutate<{ to_review: number; alerts: number }>("/api/counts", (c) => (c ? { ...c, to_review: c.to_review + 1 } : c as any));
+    };
+    try {
+      const result = await api<SwipeResult>(`/api/clips/${current.id}/swipe`, { body: { request_id: newActionId(), session_id: session.current } });
+      setBar({ clip: current, index: at, result });
+      for (const path of ["/api/home", "/api/counts", "/api/queue", "/api/review-later"]) invalidate(path);
+    } catch (error) {
+      back();
+      if (error instanceof ApiError && error.code === "compliance_blocked") setSheet("report");
+      else if (error instanceof NetworkError) setMessage(t("noConnection"));
+      else fail(error, true);
+    }
+  }, [removeCurrent, reinsert, t]);
+
+  const undoSwipe = useCallback(async () => {
+    const pending = bar;
+    if (!pending?.result?.review) return;
+    try {
+      await api(`/api/clips/${pending.clip.id}/swipe/undo`, { body: { review_id: pending.result.review.id } });
+      setBar(null);
+      reinsert(pending.clip, pending.index);
+      mutate<{ to_review: number; alerts: number }>("/api/counts", (c) => (c ? { ...c, to_review: c.to_review + 1 } : c as any));
+      for (const path of ["/api/home", "/api/counts", "/api/queue", "/api/review-later"]) invalidate(path);
+      setMessage(t("swipeUndone"));
+    } catch (error) {
+      fail(error);
+    }
+  }, [bar, reinsert, t]);
   const later = useCallback(() => decide("later"), [decide]);
   const reject = useCallback((reason: string, notes: string) => {
     if (!state.current.clips[state.current.index] || !reason) return; // a rejection always needs a reason
@@ -568,7 +618,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
           </div>
           {visible.map((item) => (
             <ClipCard key={item.id} clip={item} active={item.id === clip.id} preload={item.id === clip.id || item.id === clips[at + 1]?.id ? "auto" : "metadata"}
-              showPay={showPay} onAccept={accept} onReject={() => setSheet("reject")} onNext={next} onPrev={prev}
+              showPay={showPay} onAccept={accept} onSwipeRight={swipeRight} onReject={() => setSheet("reject")} onNext={next} onPrev={prev}
               onOpen={(which) => (which === "later" ? later() : setSheet(which))} />
           ))}
         </div>
@@ -586,6 +636,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
           <button className="btn ghost" onClick={() => { setMessage(""); setRolledBack(false); }}>Dismiss</button>
         </div>
       )}
+      {bar && <PostBar result={bar.result} clip={bar.clip} seconds={config.undo} onUndo={undoSwipe} onClose={() => setBar(null)} />}
       {undo && <UndoToast seconds={config.undo} onUndo={doUndo} label={`${t(undo.kind === "accept" ? "accepted" : undo.kind === "reject" ? "rejected" : "parked")}${undo.queued ? " · saved" : ""}`} />}
       {sheet === "reject" && <RejectSheet onSubmit={reject} onClose={() => setSheet(null)} />}
       {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} />}
