@@ -148,6 +148,38 @@ describe("swipe right: accept and confirm to post (decision 31)", () => {
     expect(screen.getByText("1 of 2")).toBeTruthy();
   });
 
+  it("a stale brief check offers Re-check brief on the refusal and the owner can swipe again", async () => {
+    const { mock, card } = await open([withTargets("c1"), withTargets("c2")], {
+      "POST /api/clips/c1/swipe": { __status: 400, body: { error: "stale", code: "brief_stale" } }, "POST /api/campaigns/camp-1/recheck": { changed: false } });
+    right(card);
+    await screen.findByText("The brief check is older than 6 hours. Re-check it, then swipe again.");
+    fireEvent.click(screen.getByRole("button", { name: "Re-check brief" }));
+    await screen.findByText("Brief re-checked. Swipe right again to post.");
+    expect(mock.posts("/api/campaigns/camp-1/recheck")[0].body).toEqual({});
+    expect(screen.getByText("1 of 2")).toBeTruthy();       // the clip is back in the feed
+  });
+
+  it("when the owner must read the brief, the second step confirms it is unchanged (Arabic strings too)", async () => {
+    const { mock, card } = await open([withTargets("c1"), withTargets("c2")], {
+      "POST /api/clips/c1/swipe": { __status: 400, body: { error: "stale", code: "brief_stale" } },
+      "POST /api/campaigns/camp-1/recheck": (body: any) => body.unchanged_confirmed ? { changed: false } : { __status: 400, body: { error: "Open the brief", code: "recheck_needed" } } }, "ar");
+    right(card);
+    fireEvent.click(await screen.findByRole("button", { name: "أعد فحص الملخّص" }));
+    await screen.findByText("افتح الملخّص واقرأه، ثم أكّد أنه لم يتغيّر.");
+    fireEvent.click(screen.getByRole("button", { name: "قرأته من جديد: لم يتغيّر" }));
+    await waitFor(() => expect(mock.posts("/api/campaigns/camp-1/recheck")).toHaveLength(2));
+    expect(mock.posts("/api/campaigns/camp-1/recheck")[1].body).toEqual({ unchanged_confirmed: true });
+  });
+
+  it("a clip whose gate failed on disclosure or language shows why and a swipe right sends nothing", async () => {
+    const { mock, card } = await open([withTargets("c1", { quality: { p_clear: 0.5, label: "x", basis: "assumed", weak: true, swipe_blockers: ["no_disclosure"] } }), withTargets("c2")]);
+    expect(screen.getByTestId("gate-blocked").textContent).toContain("Quality check failed");
+    right(card);
+    await screen.findByRole("alert");
+    expect(mock.posts("/swipe")).toHaveLength(0);
+    expect(screen.getByText("1 of 2")).toBeTruthy();
+  });
+
   it("the accept button and the A key still accept without posting", async () => {
     const { mock } = await open([withTargets("c1"), withTargets("c2")]);
     fireEvent.keyDown(window, { key: "a" });

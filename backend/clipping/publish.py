@@ -13,7 +13,7 @@ from urllib.parse import urlsplit
 import psycopg
 from psycopg.types.json import Jsonb
 
-from . import campaigns, config, connections, ffmpeg, packaging, review
+from . import campaigns, config, connections, ffmpeg, packaging, quality_gate, review
 from .adapters import publishing
 from .adapters.oauth import PLATFORM_LABEL, PLATFORMS
 from .alerts import raise_alert, registry
@@ -119,6 +119,9 @@ def _checklist_record(state: dict, ticks: dict, via: str | None = None) -> dict:
     needed = SWIPE_TICKS if via == "swipe" else OWNER_TICKS
     failed = [item["label"] for item in state["server"].values() if not item["ok"]]
     missing = [name for name in needed if ticks.get(name) is not True]
+    if via == "swipe" and not missing and [k for k, v in state["server"].items() if not v["ok"]] == ["brief_rechecked"]             and not state["campaign_needs_reapproval"]:
+        # Only the 6-hour brief re-check is stale: a distinct code so the card can offer "Re-check brief" instead of a dead end.
+        raise AppError("The brief check is older than 6 hours. Re-check the brief, then swipe again.", "brief_stale")
     if failed or missing:
         raise AppError("The checklist is not complete: " + "; ".join(failed + [m.replace("_", " ") for m in missing]) + ".",
                        "checklist_incomplete")
@@ -429,6 +432,9 @@ def swipe_confirm(conn, actor, clip_id, request_id, session_id=None, client_acti
         clip = review.get_clip(conn, clip_id)
         if clip["compliance_status"] not in ("pass", "review"):
             raise AppError("This clip did not pass the compliance check. Open the report before posting.", "compliance_blocked")
+        if blockers := quality_gate.swipe_blockers((clip.get("render_meta") or {}).get("gate")):
+            raise AppError("The quality check failed on this clip: " + " ".join(b["en"] for b in blockers)
+                           + " Fix it before posting; it cannot be posted by swipe.", "gate_blocked")
         if clip["status"] not in ("ready_for_review", "accepted"):
             raise AppError(f"A clip that is {clip['status']} cannot be posted from a swipe.", "bad_status")
         decision = review.accept(conn, actor, clip_id, session_id, client_action_id) if clip["status"] == "ready_for_review" else None

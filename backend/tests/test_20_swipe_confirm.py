@@ -8,7 +8,7 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
-from clipping import api, publish, review
+from clipping import api, campaigns, publish, review
 from clipping.core import AppError, KillSwitchOn
 from clipping.db import Actor
 from test_18_post_targets import ALL, PLATFORMS, Posting, posting  # noqa: F401  (the fixture)
@@ -189,6 +189,42 @@ def test_a_clip_that_failed_compliance_does_not_post_and_is_not_accepted(posting
         swipe(posting, clip)
     assert err.value.code == "compliance_blocked"
     assert posting.rows("select status from clips where id = %s", clip)[0]["status"] == "ready_for_review"
+
+
+@pytest.mark.parametrize("code", ["no_disclosure", "language_mismatch"])
+def test_a_clip_whose_gate_failed_on_disclosure_or_language_cannot_be_swiped_to_post(posting, code):
+    clip = swipe_clip(posting)
+    gate = {"status": "fail", "reasons": [{"code": code, "level": "fail", "en": "Gate says no.", "ar": "لا"}]}
+    system(posting, "update clips set render_meta = coalesce(render_meta, '{}'::jsonb) || %s::jsonb where id = %s", json.dumps({"gate": gate}), clip)
+    with pytest.raises(AppError) as err:
+        swipe(posting, clip)
+    assert err.value.code == "gate_blocked" and "Gate says no." in str(err.value)
+    assert posting.rows("select status from clips where id = %s", clip)[0]["status"] == "ready_for_review"
+    assert posting.rows("select count(*) as n from post_targets")[0]["n"] == 0
+    with posting.db.session(posting.owner) as conn:
+        card = next(c for c in review.feed(conn, posting.owner.operator_id) if str(c["id"]) == clip)
+    assert card["quality"]["swipe_blockers"] == [code]
+
+
+def test_other_gate_failures_still_post_by_swipe(posting):
+    clip = swipe_clip(posting)
+    gate = {"status": "fail", "reasons": [{"code": "thin_speech", "level": "fail", "en": "Thin.", "ar": "ر"}]}
+    system(posting, "update clips set render_meta = coalesce(render_meta, '{}'::jsonb) || %s::jsonb where id = %s", json.dumps({"gate": gate}), clip)
+    assert swipe(posting, clip)["targets"]
+
+
+def test_a_stale_brief_check_refuses_the_swipe_with_its_own_code_and_a_recheck_lets_the_next_swipe_through(posting):
+    clip = swipe_clip(posting)
+    posting.monkeypatch.setattr(campaigns, "RECHECK_VALID_HOURS", 0)   # every earlier check counts as older than the window
+    with pytest.raises(AppError) as err:
+        swipe(posting, clip)
+    assert err.value.code == "brief_stale"
+    assert posting.rows("select status from clips where id = %s", clip)[0]["status"] == "ready_for_review"
+    campaign = posting.rows("select campaign_id from clips where id = %s", clip)[0]["campaign_id"]
+    with posting.db.session(posting.owner) as conn:
+        assert campaigns.recheck_brief(conn, posting.owner, campaign, unchanged_confirmed=True)["changed"] is False
+    posting.monkeypatch.setattr(campaigns, "RECHECK_VALID_HOURS", 6)
+    assert len(swipe(posting, clip)["targets"]) == 3
 
 
 def test_a_compliance_warning_posts_and_comes_back_as_text_for_the_bar(posting):

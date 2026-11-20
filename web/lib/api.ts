@@ -7,6 +7,8 @@ export type Hook = { id: string; text: string; hook_type: string; chosen: boolea
 export type Quality = {
   p_clear: number | null; label: string; basis: "your posts" | "assumed"; weak?: boolean; min_views?: number | null;
   moment_percentile?: number | null; threshold?: number;
+  /** Codes of failed quality-gate checks that forbid a swipe-post (no_disclosure, language_mismatch). */
+  swipe_blockers?: string[];
 };
 
 /** One compliance check. Brand checks (from a marketplace's rejection) also carry the brand, a readable rule and their severity. */

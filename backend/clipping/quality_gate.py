@@ -117,3 +117,14 @@ def run(video: Path, words: list[dict], start: float, end: float, *, language: s
     for k in ("lufs", "face_share"):
         m[k] = None if m[k] is None else round(m[k], 2 if k == "face_share" else 1)
     return evaluate(m)
+
+
+# Gate failures that must stop a swipe-post: posting these breaks a platform or campaign rule, not just looks.
+SWIPE_BLOCKING = ("no_disclosure", "language_mismatch")
+
+
+def swipe_blockers(gate: dict | None) -> list[dict]:
+    """The failed reasons of a stored gate result that forbid a swipe-post (empty when none)."""
+    if not gate or gate.get("status") != "fail":
+        return []
+    return [r for r in gate.get("reasons", []) if r.get("level") == "fail" and r.get("code") in SWIPE_BLOCKING]

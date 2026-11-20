@@ -315,6 +315,7 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
         )}
         <div className="caption" dir="auto">{clip.caption_text}</div>
         {clip.moment_reason && <div className="reason" dir="auto">Why this moment: {clip.moment_reason}</div>}
+        {clip.quality?.swipe_blockers?.length ? <div className="quality weak" data-testid="gate-blocked" dir="auto">{t("gateBlocked")}</div> : null}
         {clip.quality && <div className={`quality${clip.quality.weak ? " weak" : ""}`} data-testid="quality" dir="auto">{qualityText(clip.quality, lang)}</div>}
         <div className="reason">{clip.priority_reason}{showPay && clip.rate_per_1k ? ` · ${money(clip.rate_per_1k)} per 1,000 views` : ""}</div>
       </div>
@@ -347,6 +348,8 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
   const [message, setMessage] = useState("");
   const [bar, setBar] = useState<{ clip: Clip; index: number; result: SwipeResult | null } | null>(null);
   const [rolledBack, setRolledBack] = useState(false);
+  /** A swipe refused because the brief check is stale: the toast offers "Re-check brief" for that campaign. */
+  const [recheck, setRecheck] = useState<{ campaignId: string; confirm: boolean } | null>(null);
   const [config, setConfig] = useState(configOf(cached));
   const session = useRef<string | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -459,6 +462,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
     const current = list[at];
     if (!current) return;
     if (current.compliance_status === "fail") { setSheet("report"); return; }       // a failed clip never posts: show why
+    if (current.quality?.swipe_blockers?.length) { setRecheck(null); setMessage(t("gateBlocked")); return; }   // disclosure or language failed the gate
     removeCurrent();
     setUndo(null);
     setBar({ clip: current, index: at, result: null });
@@ -475,10 +479,28 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
     } catch (error) {
       back();
       if (error instanceof ApiError && error.code === "compliance_blocked") setSheet("report");
+      else if (error instanceof ApiError && error.code === "brief_stale") { setRecheck({ campaignId: current.campaign_id, confirm: false }); setRolledBack(true); setMessage(t("briefStale")); }
+      else if (error instanceof ApiError && error.code === "gate_blocked") fail(error, true);
       else if (error instanceof NetworkError) setMessage(t("noConnection"));
       else fail(error, true);
     }
   }, [removeCurrent, reinsert, t]);
+
+  /** Re-runs the brief check from the refusal toast. Campaigns that can be read by the system recheck on their own; otherwise the owner
+   *  reads the brief and confirms it is unchanged (the second step), exactly as on the posting screen. */
+  const recheckBrief = useCallback(async (confirmed: boolean) => {
+    if (!recheck) return;
+    try {
+      const out = await api<{ changed: boolean }>(`/api/campaigns/${recheck.campaignId}/recheck`, { body: confirmed ? { unchanged_confirmed: true } : {} });
+      setRecheck(null);
+      setRolledBack(false);
+      setMessage(out.changed ? t("briefChanged") : t("briefRechecked"));
+    } catch (error) {
+      if (error instanceof ApiError && error.code === "recheck_needed") { setRecheck({ ...recheck, confirm: true }); setMessage(t("briefOpenFirst")); }
+      else if (error instanceof NetworkError) setMessage(t("noConnection"));
+      else fail(error);
+    }
+  }, [recheck, t]);
 
   const undoSwipe = useCallback(async () => {
     const pending = bar;
@@ -633,7 +655,8 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       {message && (
         <div className="toast" role="alert" style={{ bottom: undo ? "calc(var(--tab-h) + 84px)" : undefined }}>
           <span className="msg">{message}{rolledBack && <><br /><span className="small">The clip is back in your feed.</span></>}</span>
-          <button className="btn ghost" onClick={() => { setMessage(""); setRolledBack(false); }}>Dismiss</button>
+          {recheck && <button className="btn" onClick={() => recheckBrief(recheck.confirm)}>{t(recheck.confirm ? "briefUnchanged" : "recheckBrief")}</button>}
+          <button className="btn ghost" onClick={() => { setMessage(""); setRolledBack(false); setRecheck(null); }}>Dismiss</button>
         </div>
       )}
       {bar && <PostBar key={bar.clip.id} result={bar.result} clip={bar.clip} seconds={config.undo} onUndo={undoSwipe} onClose={() => setBar(null)} />}

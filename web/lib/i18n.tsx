@@ -20,6 +20,10 @@ const LABELS = {
     manualReady: "Ready to post manually", copyCaption: "Copy caption", copied: "Copied", downloadVideo: "Download video",
     practiceNoPost: "Accepted. Practice clips are never posted.", noAccountsToPost: "Accepted. No account to post to.",
     confirming: "Confirming…", swipeUndone: "Undone. The posts were cancelled.", manualWord: "manual", noConnection: "No connection. Nothing was posted.",
+    gateBlocked: "Quality check failed: cannot post by swipe. Fix the caption or language first.",
+    briefStale: "The brief check is older than 6 hours. Re-check it, then swipe again.", recheckBrief: "Re-check brief",
+    briefOpenFirst: "Open the brief and read it, then confirm it is unchanged.", briefUnchanged: "I re-read it: unchanged",
+    briefRechecked: "Brief re-checked. Swipe right again to post.", briefChanged: "The brief changed. Re-approve the campaign before posting.",
   },
   ar: {
     home: "الرئيسية", feed: "المراجعة", queue: "قائمة النشر", more: "المزيد",
@@ -36,6 +40,10 @@ const LABELS = {
     manualReady: "جاهز للنشر يدوياً", copyCaption: "انسخ الوصف", copied: "تم النسخ", downloadVideo: "نزّل الفيديو",
     practiceNoPost: "تم القبول. مقاطع التجربة لا تُنشر أبداً.", noAccountsToPost: "تم القبول. لا يوجد حساب للنشر عليه.",
     confirming: "جارٍ التأكيد…", swipeUndone: "تم التراجع. أُلغيت المنشورات.", manualWord: "يدوي", noConnection: "لا يوجد اتصال. لم يُنشر شيء.",
+    gateBlocked: "فشل فحص الجودة: لا يمكن النشر بالسحب. أصلح الوصف أو اللغة أولاً.",
+    briefStale: "مضى على فحص الملخّص أكثر من 6 ساعات. أعد فحصه ثم اسحب مجدداً.", recheckBrief: "أعد فحص الملخّص",
+    briefOpenFirst: "افتح الملخّص واقرأه، ثم أكّد أنه لم يتغيّر.", briefUnchanged: "قرأته من جديد: لم يتغيّر",
+    briefRechecked: "أُعيد فحص الملخّص. اسحب لليمين مجدداً للنشر.", briefChanged: "تغيّر الملخّص. أعد اعتماد الحملة قبل النشر.",
   },
 } as const;
 
