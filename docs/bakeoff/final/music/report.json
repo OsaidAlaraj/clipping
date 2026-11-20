@@ -1,0 +1,646 @@
+{
+ "target_lufs": -14.0,
+ "reference_track": "hz-203072",
+ "winner": {
+  "mix": {
+   "music_lufs": -22.0,
+   "ratio": 14.0,
+   "threshold": 0.06,
+   "release_ms": 350
+  },
+  "smr_db": 25.9,
+  "gap_smr_db": 10.0,
+  "duck_db": 16.0,
+  "speech_share": 0.6,
+  "lufs": -14.1,
+  "lufs_err": -0.1,
+  "peak_db": -1.5,
+  "feasible": true
+ },
+ "grid": [
+  {
+   "mix": {
+    "music_lufs": -19.0,
+    "ratio": 8.0,
+    "threshold": 0.03,
+    "release_ms": 350
+   },
+   "smr_db": 27.0,
+   "gap_smr_db": 7.6,
+   "duck_db": 19.4,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": false
+  },
+  {
+   "mix": {
+    "music_lufs": -19.0,
+    "ratio": 8.0,
+    "threshold": 0.06,
+    "release_ms": 350
+   },
+   "smr_db": 22.3,
+   "gap_smr_db": 7.0,
+   "duck_db": 15.3,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": false
+  },
+  {
+   "mix": {
+    "music_lufs": -19.0,
+    "ratio": 14.0,
+    "threshold": 0.03,
+    "release_ms": 350
+   },
+   "smr_db": 27.9,
+   "gap_smr_db": 7.6,
+   "duck_db": 20.3,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": false
+  },
+  {
+   "mix": {
+    "music_lufs": -19.0,
+    "ratio": 14.0,
+    "threshold": 0.06,
+    "release_ms": 350
+   },
+   "smr_db": 22.9,
+   "gap_smr_db": 7.0,
+   "duck_db": 16.0,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": false
+  },
+  {
+   "mix": {
+    "music_lufs": -22.0,
+    "ratio": 8.0,
+    "threshold": 0.03,
+    "release_ms": 350
+   },
+   "smr_db": 30.0,
+   "gap_smr_db": 10.6,
+   "duck_db": 19.4,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -22.0,
+    "ratio": 8.0,
+    "threshold": 0.06,
+    "release_ms": 350
+   },
+   "smr_db": 25.3,
+   "gap_smr_db": 10.0,
+   "duck_db": 15.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -22.0,
+    "ratio": 14.0,
+    "threshold": 0.03,
+    "release_ms": 350
+   },
+   "smr_db": 30.9,
+   "gap_smr_db": 10.6,
+   "duck_db": 20.3,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -22.0,
+    "ratio": 14.0,
+    "threshold": 0.06,
+    "release_ms": 350
+   },
+   "smr_db": 25.9,
+   "gap_smr_db": 10.0,
+   "duck_db": 16.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -25.0,
+    "ratio": 8.0,
+    "threshold": 0.03,
+    "release_ms": 350
+   },
+   "smr_db": 33.0,
+   "gap_smr_db": 13.6,
+   "duck_db": 19.4,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -25.0,
+    "ratio": 8.0,
+    "threshold": 0.06,
+    "release_ms": 350
+   },
+   "smr_db": 28.3,
+   "gap_smr_db": 13.0,
+   "duck_db": 15.3,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -25.0,
+    "ratio": 14.0,
+    "threshold": 0.03,
+    "release_ms": 350
+   },
+   "smr_db": 33.9,
+   "gap_smr_db": 13.6,
+   "duck_db": 20.2,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "mix": {
+    "music_lufs": -25.0,
+    "ratio": 14.0,
+    "threshold": 0.06,
+    "release_ms": 350
+   },
+   "smr_db": 28.9,
+   "gap_smr_db": 13.0,
+   "duck_db": 15.9,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  }
+ ],
+ "per_track": [
+  {
+   "track": "hz-243306",
+   "smr_db": 28.6,
+   "gap_smr_db": 15.7,
+   "duck_db": 12.8,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-208290",
+   "smr_db": 25.4,
+   "gap_smr_db": 12.5,
+   "duck_db": 12.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204495",
+   "smr_db": 32.8,
+   "gap_smr_db": 21.4,
+   "duck_db": 11.4,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-201276",
+   "smr_db": 28.3,
+   "gap_smr_db": 15.7,
+   "duck_db": 12.6,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-205360",
+   "smr_db": 28.8,
+   "gap_smr_db": 16.7,
+   "duck_db": 12.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212604",
+   "smr_db": 27.7,
+   "gap_smr_db": 14.5,
+   "duck_db": 13.2,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212880",
+   "smr_db": 26.9,
+   "gap_smr_db": 12.0,
+   "duck_db": 14.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-205354",
+   "smr_db": 27.6,
+   "gap_smr_db": 12.1,
+   "duck_db": 15.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-208282",
+   "smr_db": 30.0,
+   "gap_smr_db": 16.4,
+   "duck_db": 13.6,
+   "speech_share": 0.6,
+   "lufs": -14.2,
+   "lufs_err": -0.2,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212884",
+   "smr_db": 31.4,
+   "gap_smr_db": 16.8,
+   "duck_db": 14.6,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-217330",
+   "smr_db": 31.4,
+   "gap_smr_db": 18.4,
+   "duck_db": 13.0,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204044",
+   "smr_db": 26.5,
+   "gap_smr_db": 12.5,
+   "duck_db": 14.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-267053",
+   "smr_db": 25.7,
+   "gap_smr_db": 12.5,
+   "duck_db": 13.2,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-243511",
+   "smr_db": 21.0,
+   "gap_smr_db": 9.3,
+   "duck_db": 11.7,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203072",
+   "smr_db": 25.9,
+   "gap_smr_db": 10.0,
+   "duck_db": 16.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-202142",
+   "smr_db": 28.3,
+   "gap_smr_db": 15.0,
+   "duck_db": 13.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203691",
+   "smr_db": 28.6,
+   "gap_smr_db": 13.1,
+   "duck_db": 15.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204258",
+   "smr_db": 26.6,
+   "gap_smr_db": 14.7,
+   "duck_db": 11.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204255",
+   "smr_db": 24.5,
+   "gap_smr_db": 14.2,
+   "duck_db": 10.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-265835",
+   "smr_db": 26.5,
+   "gap_smr_db": 10.6,
+   "duck_db": 15.9,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-245667",
+   "smr_db": 22.4,
+   "gap_smr_db": 11.3,
+   "duck_db": 11.1,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-243304",
+   "smr_db": 24.2,
+   "gap_smr_db": 9.9,
+   "duck_db": 14.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-238388",
+   "smr_db": 30.0,
+   "gap_smr_db": 19.7,
+   "duck_db": 10.3,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203443",
+   "smr_db": 27.8,
+   "gap_smr_db": 13.8,
+   "duck_db": 14.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203444",
+   "smr_db": 27.1,
+   "gap_smr_db": 12.5,
+   "duck_db": 14.6,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-201835",
+   "smr_db": 24.8,
+   "gap_smr_db": 12.4,
+   "duck_db": 12.4,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203700",
+   "smr_db": 32.0,
+   "gap_smr_db": 21.0,
+   "duck_db": 11.0,
+   "speech_share": 0.6,
+   "lufs": -14.2,
+   "lufs_err": -0.2,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203699",
+   "smr_db": 32.3,
+   "gap_smr_db": 18.8,
+   "duck_db": 13.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-203701",
+   "smr_db": 31.8,
+   "gap_smr_db": 18.4,
+   "duck_db": 13.4,
+   "speech_share": 0.6,
+   "lufs": -13.9,
+   "lufs_err": 0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-205383",
+   "smr_db": 31.5,
+   "gap_smr_db": 16.4,
+   "duck_db": 15.0,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-266597",
+   "smr_db": 26.0,
+   "gap_smr_db": 12.7,
+   "duck_db": 13.3,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-266596",
+   "smr_db": 26.5,
+   "gap_smr_db": 14.9,
+   "duck_db": 11.6,
+   "speech_share": 0.6,
+   "lufs": -14.0,
+   "lufs_err": 0.0,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-212608",
+   "smr_db": 30.9,
+   "gap_smr_db": 18.2,
+   "duck_db": 12.6,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204023",
+   "smr_db": 24.3,
+   "gap_smr_db": 10.8,
+   "duck_db": 13.5,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-204025",
+   "smr_db": 20.8,
+   "gap_smr_db": 8.2,
+   "duck_db": 12.7,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-265888",
+   "smr_db": 22.9,
+   "gap_smr_db": 9.8,
+   "duck_db": 13.1,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  },
+  {
+   "track": "hz-238366",
+   "smr_db": 20.9,
+   "gap_smr_db": 8.1,
+   "duck_db": 12.7,
+   "speech_share": 0.6,
+   "lufs": -14.1,
+   "lufs_err": -0.1,
+   "peak_db": -1.5,
+   "feasible": true
+  }
+ ],
+ "proof": {
+  "track": {
+   "track_id": "hz-245667",
+   "title": "Still Life",
+   "artist": "HoliznaCC0",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/still-life-lofi-chill-nostalgic/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "licence_checked": "2026-11-20",
+   "attribution_required": false,
+   "attribution_text": null,
+   "offset_s": 47.368,
+   "platform": "tiktok"
+  },
+  "before": {
+   "encodes": 1,
+   "duration_s": 24.0
+  },
+  "after": {
+   "encodes": 1,
+   "duration_s": 24.0
+  }
+ }
+}

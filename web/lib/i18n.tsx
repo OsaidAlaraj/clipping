@@ -16,6 +16,10 @@ const LABELS = {
     saveReason: "Save the reason", saving: "Saving…", brandSaved: "Saved. The brand's next clips will be checked:",
     brandReminder: "Saved as a reminder. It was too general to check, so it never blocks a clip.", reasonNeeded: "Write the reason the marketplace gave.",
     brandNote: "Brand note", close: "Close",
+    acceptPost: "Accept and post", swipePostsTo: "Swipe right posts to", postsTo: "Posts to", postNow: "now", postIn: "in", minShort: "min",
+    manualReady: "Ready to post manually", copyCaption: "Copy caption", copied: "Copied", downloadVideo: "Download video",
+    practiceNoPost: "Accepted. Practice clips are never posted.", noAccountsToPost: "Accepted. No account to post to.",
+    confirming: "Confirming…", swipeUndone: "Undone. The posts were cancelled.", manualWord: "manual", noConnection: "No connection. Nothing was posted.",
   },
   ar: {
     home: "الرئيسية", feed: "المراجعة", queue: "قائمة النشر", more: "المزيد",
@@ -28,6 +32,10 @@ const LABELS = {
     saveReason: "احفظ السبب", saving: "جارٍ الحفظ…", brandSaved: "تم الحفظ. ستُفحص مقاطع هذه العلامة القادمة:",
     brandReminder: "حُفظ كتذكير. السبب عام جداً للفحص، لذلك لا يمنع أي مقطع.", reasonNeeded: "اكتب السبب الذي ذكرته المنصّة.",
     brandNote: "ملاحظة العلامة", close: "إغلاق",
+    acceptPost: "قبول ونشر", swipePostsTo: "السحب لليمين ينشر على", postsTo: "سيُنشر على", postNow: "الآن", postIn: "بعد", minShort: "دقيقة",
+    manualReady: "جاهز للنشر يدوياً", copyCaption: "انسخ الوصف", copied: "تم النسخ", downloadVideo: "نزّل الفيديو",
+    practiceNoPost: "تم القبول. مقاطع التجربة لا تُنشر أبداً.", noAccountsToPost: "تم القبول. لا يوجد حساب للنشر عليه.",
+    confirming: "جارٍ التأكيد…", swipeUndone: "تم التراجع. أُلغيت المنشورات.", manualWord: "يدوي", noConnection: "لا يوجد اتصال. لم يُنشر شيء.",
   },
 } as const;
 

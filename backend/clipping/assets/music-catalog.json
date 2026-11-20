@@ -1,0 +1,1457 @@
+{
+ "version": 2,
+ "licences_checked": "2026-11-20",
+ "policy": "CC0 only; no attribution lines (owner, 2026-11-20)",
+ "accepted_licences": {
+  "CC0-1.0": {
+   "attribution_required": false,
+   "burned_in_commercial": true,
+   "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  }
+ },
+ "fit_criteria": [
+  "instrumental (no vocals under speech)",
+  "clear pulse and tempo 70-135 BPM, matched to the clip's energy and cut pace (half/double time counts)",
+  "steady level, so ducking can follow speech",
+  "full strength within the first 1-2 s of where the bed starts (start is on a bar line after the measured intro)",
+  "tagged per niche and mood; no repeats on consecutive clips"
+ ],
+ "thin_spots": [
+  "One artist for all 37 tracks (HoliznaCC0): across many accounts the beds will start to sound alike. Free CC0 sources with several artists are rare.",
+  "Styles are lo-fi, synth-pop, hip-hop beats, phonk, chiptune and retro-game. Missing: current trending pop/EDM-style beds, bright corporate/explainer beds, and anything regional or Arabic in feel.",
+  "Business has 4 high-energy tracks and podcasts have none above energy 0.65; podcasts and business have no tense or mysterious bed (only gaming does).",
+  "Fit is measured (tempo, pulse, intro, level swing, speech clarity) but 'sounds current on TikTok or Instagram' is the curator's judgement: no free tool measures it. A paid library with trend tags would cover this."
+ ],
+ "rejected": [
+  {
+   "title": "Bouncing",
+   "reason": "shorter than 90 s"
+  },
+  {
+   "title": "Fresh Fit",
+   "reason": "pulse too weak"
+  },
+  {
+   "title": "Sky Scrapers",
+   "reason": "tempo outside 70-135"
+  },
+  {
+   "title": "Doodles ( LoFi , Happy ).mp3",
+   "reason": "page does not list the Instrumental genre"
+  },
+  {
+   "title": "ONLY HUMAN",
+   "reason": "level swings too much under speech"
+  },
+  {
+   "title": "Mutant Club",
+   "reason": "page does not list the Instrumental genre"
+  },
+  {
+   "title": "Side Quest to Nowhere",
+   "reason": "page does not list the Instrumental genre"
+  }
+ ],
+ "tracks": [
+  {
+   "id": "hz-243306",
+   "title": "Funky Pop",
+   "artist": "HoliznaCC0",
+   "file": "243306.mp3",
+   "sha256": "f4ece98b361ba68fdfa5c94c8856e639c64459f10b10c5294e523e3c00d9bbcf",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/power-pop/funky-pop/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Instrumental",
+    "Pop",
+    "Synth_Pop"
+   ],
+   "bpm": 121,
+   "energy": 0.61,
+   "moods": [
+    "upbeat",
+    "playful"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 142.76,
+   "intro_s": 0.5,
+   "onsets_per_s": 4.32,
+   "dynamic_db": 2.4,
+   "lufs": -10.7,
+   "fit_why": "bright synth-pop with a steady kick; 121 BPM with a 4.32/s pulse; instrumental (page genre tag); level swing 2.4 dB; full strength after 0.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-208290",
+   "title": "Happy Dance",
+   "artist": "HoliznaCC0",
+   "file": "208290.mp3",
+   "sha256": "75d7247e6025a9a0372a2069a0634301d94e92793a03f90a2f082acffcf3851a",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/power-pop/happy-dance-2/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Bigbeat",
+    "Chill-out",
+    "Chip_Music",
+    "Disco",
+    "Easy_Listening",
+    "Electronic",
+    "Europe",
+    "Experimental_Pop",
+    "Instrumental",
+    "Lo-fi-Electronic",
+    "Lo-fi-Instrumental",
+    "New_Age",
+    "Pop",
+    "Power-Pop",
+    "Synth_Pop",
+    "Techno",
+    "Unclassifiable"
+   ],
+   "bpm": 120,
+   "energy": 0.77,
+   "moods": [
+    "upbeat",
+    "playful"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 155.96,
+   "intro_s": 7.25,
+   "onsets_per_s": 5.51,
+   "dynamic_db": 2.9,
+   "lufs": -13.0,
+   "fit_why": "bright synth-pop with a steady kick; 120 BPM with a 5.51/s pulse; instrumental (page genre tag); level swing 2.9 dB; full strength after 7.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-204495",
+   "title": "Retro Synths",
+   "artist": "HoliznaCC0",
+   "file": "204495.mp3",
+   "sha256": "0aba9efcd8b2d6b127ac69676e15c7364ba5e2ed0adc811a19aa2da2eb2ed1d7",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/power-pop/retro-synths/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Bigbeat",
+    "Chill-out",
+    "Dance",
+    "Deep_Funk",
+    "Disco",
+    "Easy_Listening",
+    "Electronic",
+    "Europe",
+    "House",
+    "Instrumental",
+    "International",
+    "New_Age",
+    "Pop",
+    "Power-Pop",
+    "Soundtrack",
+    "Synth_Pop",
+    "Techno",
+    "vaporwave"
+   ],
+   "bpm": 120,
+   "energy": 0.69,
+   "moods": [
+    "upbeat",
+    "playful"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 222.95,
+   "intro_s": 15.5,
+   "onsets_per_s": 4.94,
+   "dynamic_db": 12.5,
+   "lufs": -10.3,
+   "fit_why": "bright synth-pop with a steady kick; 120 BPM with a 4.94/s pulse; instrumental (page genre tag); level swing 12.5 dB; full strength after 15.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-201276",
+   "title": "Make Money",
+   "artist": "HoliznaCC0",
+   "file": "201276.mp3",
+   "sha256": "3f10f346e5ab4c4c63977bd0157926075e0bba768bc48e89515669b1a9c8fe90",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/bassic/make-money/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Funk",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Jazz",
+    "hiphop"
+   ],
+   "bpm": 128,
+   "energy": 0.8,
+   "moods": [
+    "driving",
+    "upbeat"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 223.94,
+   "intro_s": 0.75,
+   "onsets_per_s": 5.19,
+   "dynamic_db": 6.0,
+   "lufs": -10.2,
+   "fit_why": "bass-led groove, fast opening; 128 BPM with a 5.19/s pulse; instrumental (page genre tag); level swing 6.0 dB; full strength after 0.75 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-205360",
+   "title": "Make Funk",
+   "artist": "HoliznaCC0",
+   "file": "205360.mp3",
+   "sha256": "4631f55b7fc2a021f24b22f60ec87735cf9163638b3a79ac1719ea3515949f9c",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/bassic/make-funk/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Blues",
+    "Deep_Funk",
+    "Disco",
+    "Drum_amp_Bass",
+    "Easy_Listening",
+    "Funk",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Jazz",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lounge",
+    "Pop",
+    "Rock",
+    "hiphop"
+   ],
+   "bpm": 99,
+   "energy": 0.69,
+   "moods": [
+    "driving",
+    "upbeat"
+   ],
+   "niches": [
+    "business",
+    "gaming"
+   ],
+   "duration_s": 163.02,
+   "intro_s": 0.5,
+   "onsets_per_s": 6.16,
+   "dynamic_db": 2.0,
+   "lufs": -8.8,
+   "fit_why": "bass-led groove, fast opening; 99 BPM with a 6.16/s pulse; instrumental (page genre tag); level swing 2.0 dB; full strength after 0.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-212604",
+   "title": "Day Trips",
+   "artist": "HoliznaCC0",
+   "file": "212604.mp3",
+   "sha256": "df08e2678602c88d9b2fbcc939fc7cf6977722d0bf7c7c387a2fe996ae914850",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/city-slacker/day-trips/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Funk",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Experimental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Soul-RB",
+    "hiphop"
+   ],
+   "bpm": 90,
+   "energy": 0.56,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 183.95,
+   "intro_s": 10.0,
+   "onsets_per_s": 5.74,
+   "dynamic_db": 5.7,
+   "lufs": -10.8,
+   "fit_why": "laid-back hip-hop drums, relaxed but rhythmic; 90 BPM with a 5.74/s pulse; instrumental (page genre tag); level swing 5.7 dB; full strength after 10.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-212880",
+   "title": "Moving Forward",
+   "artist": "HoliznaCC0",
+   "file": "212880.mp3",
+   "sha256": "f50e307ca88ff29b4294cf5f39f77b0d0c76043eebe7411fb1b6501013cd1184",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/city-slacker/moving-forward/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Pop",
+    "hiphop"
+   ],
+   "bpm": 80,
+   "energy": 0.21,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 128.94,
+   "intro_s": 10.75,
+   "onsets_per_s": 3.9,
+   "dynamic_db": 11.2,
+   "lufs": -11.2,
+   "fit_why": "laid-back hip-hop drums, relaxed but rhythmic; 80 BPM with a 3.9/s pulse; instrumental (page genre tag); level swing 11.2 dB; full strength after 10.75 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-205354",
+   "title": "Hooptie With The Windows Down",
+   "artist": "HoliznaCC0",
+   "file": "205354.mp3",
+   "sha256": "a66f728a0739677bd4c21b2e26b4f0c8d88c5d1192a7bc6b240c3dd02c9e4f6b",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/city-slacker/hooptie-with-the-windows-down/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Jazz",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Lounge",
+    "Minimalism_1456",
+    "Pop",
+    "Soul-RB",
+    "Sound_Art",
+    "hiphop"
+   ],
+   "bpm": 80,
+   "energy": 0.28,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 233.96,
+   "intro_s": 8.5,
+   "onsets_per_s": 4.37,
+   "dynamic_db": 15.9,
+   "lufs": -13.8,
+   "fit_why": "laid-back hip-hop drums, relaxed but rhythmic; 80 BPM with a 4.37/s pulse; instrumental (page genre tag); level swing 15.9 dB; full strength after 8.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-208282",
+   "title": "Good Vibes",
+   "artist": "HoliznaCC0",
+   "file": "208282.mp3",
+   "sha256": "193203f1b28aa7432289bdbe71d19b6afd62e068c59e3d654be581f746e3ec3a",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/left-overs/good-vibes/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Disco",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Minimalism_1456",
+    "New_Age",
+    "Pop",
+    "Synth_Pop",
+    "hiphop"
+   ],
+   "bpm": 90,
+   "energy": 0.3,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 191.96,
+   "intro_s": 10.0,
+   "onsets_per_s": 3.9,
+   "dynamic_db": 9.8,
+   "lufs": -10.7,
+   "fit_why": "mid-tempo beat, positive; 90 BPM with a 3.9/s pulse; instrumental (page genre tag); level swing 9.8 dB; full strength after 10.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-212884",
+   "title": "Never Giving Up",
+   "artist": "HoliznaCC0",
+   "file": "212884.mp3",
+   "sha256": "7cd6f694bb7004674e8c80dde447a9c04487991a2b1f2c5f9f8b473fe124c4c9",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/left-overs/never-giving-up/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Minimalism_1456",
+    "hiphop"
+   ],
+   "bpm": 80,
+   "energy": 0.16,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 211.43,
+   "intro_s": 11.25,
+   "onsets_per_s": 3.52,
+   "dynamic_db": 13.9,
+   "lufs": -13.6,
+   "fit_why": "mid-tempo beat, positive; 80 BPM with a 3.52/s pulse; instrumental (page genre tag); level swing 13.9 dB; full strength after 11.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-217330",
+   "title": "Movement",
+   "artist": "HoliznaCC0",
+   "file": "217330.mp3",
+   "sha256": "b5e226ee3c96d58653895b34cc4429b301444447fbb92f750a04628edd4e4528",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/left-overs/movement-1/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental"
+   ],
+   "bpm": 72,
+   "energy": 0.25,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 172.88,
+   "intro_s": 0.0,
+   "onsets_per_s": 4.61,
+   "dynamic_db": 9.8,
+   "lufs": -13.1,
+   "fit_why": "mid-tempo beat, positive; 72 BPM with a 4.61/s pulse; instrumental (page genre tag); level swing 9.8 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-204044",
+   "title": "Unwind",
+   "artist": "HoliznaCC0",
+   "file": "204044.mp3",
+   "sha256": "db3a05ecefc1c5ac14f0e65d509b7f20ec54840aa7148e92919780b03acd5545",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/kick-it-laid-back-hiphop/unwind/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Blues",
+    "Chill-out",
+    "Easy_Listening",
+    "Funk",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "International",
+    "Jazz",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Modern_Jazz",
+    "Pop",
+    "Soul-RB"
+   ],
+   "bpm": 95,
+   "energy": 0.42,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 250.69,
+   "intro_s": 10.25,
+   "onsets_per_s": 4.46,
+   "dynamic_db": 7.5,
+   "lufs": -10.9,
+   "fit_why": "laid-back hip-hop; 95 BPM with a 4.46/s pulse; instrumental (page genre tag); level swing 7.5 dB; full strength after 10.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-267053",
+   "title": "Roof Tops",
+   "artist": "HoliznaCC0",
+   "file": "267053.mp3",
+   "sha256": "f6e619fbfdc0898c409494d5c810d34d9cd29be2b75bb2d8c197e1edb37155b5",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/summer-air-lo-fi/roof-tops/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Instrumental",
+    "Lo-fi-Hip-Hop"
+   ],
+   "bpm": 80,
+   "energy": 0.21,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 214.45,
+   "intro_s": 0.0,
+   "onsets_per_s": 3.88,
+   "dynamic_db": 8.6,
+   "lufs": -14.9,
+   "fit_why": "warm lo-fi beat; 80 BPM with a 3.88/s pulse; instrumental (page genre tag); level swing 8.6 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-243511",
+   "title": "Bubbles",
+   "artist": "HoliznaCC0",
+   "file": "243511.mp3",
+   "sha256": "73efb557d8cfcca0f5cf3b435d3a0157bf9a702115b55266b8a2529f3997b542",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/bubbles-lofi-bright-relaxed/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Pop"
+   ],
+   "bpm": 128,
+   "energy": 0.59,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 147.64,
+   "intro_s": 5.5,
+   "onsets_per_s": 3.71,
+   "dynamic_db": 7.3,
+   "lufs": -13.7,
+   "fit_why": "lo-fi beat; 128 BPM with a 3.71/s pulse; instrumental (page genre tag); level swing 7.3 dB; full strength after 5.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203072",
+   "title": "Morning Coffee",
+   "artist": "HoliznaCC0",
+   "file": "203072.mp3",
+   "sha256": "91de2d8f409730a7fa9b0d94f52d5637d7f913e8cee11d54e462a99b06a86758",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/lo-fi-and-chill/morning-coffee/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Minimalism_1456",
+    "Pop",
+    "hiphop"
+   ],
+   "bpm": 85,
+   "energy": 0.33,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 191.96,
+   "intro_s": 4.75,
+   "onsets_per_s": 4.42,
+   "dynamic_db": 8.5,
+   "lufs": -12.2,
+   "fit_why": "lo-fi chill beat; 85 BPM with a 4.42/s pulse; instrumental (page genre tag); level swing 8.5 dB; full strength after 4.75 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-202142",
+   "title": "Vintage",
+   "artist": "HoliznaCC0",
+   "file": "202142.mp3",
+   "sha256": "42039b4362a0c8fac40fabba2c63de75e7e21d092b58ba00a701283824f3ebf7",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/lo-fi-and-chill/vintagemp3/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Ambient",
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Pop",
+    "Soul-RB"
+   ],
+   "bpm": 80,
+   "energy": 0.25,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 173.96,
+   "intro_s": 11.25,
+   "onsets_per_s": 4.2,
+   "dynamic_db": 16.7,
+   "lufs": -11.3,
+   "fit_why": "lo-fi chill beat; 80 BPM with a 4.2/s pulse; instrumental (page genre tag); level swing 16.7 dB; full strength after 11.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203691",
+   "title": "A Little Shade",
+   "artist": "HoliznaCC0",
+   "file": "203691.mp3",
+   "sha256": "89958d422cac586da882319e9129ce0b737a6aa65839970002df0cbb1cdced8f",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/lo-fi-and-chill/a-little-shade/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Experimental_Pop",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Jazz",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Lounge",
+    "Minimalism_1456",
+    "New_Age",
+    "Pop",
+    "Soul-RB",
+    "hiphop"
+   ],
+   "bpm": 86,
+   "energy": 0.24,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 178.55,
+   "intro_s": 2.25,
+   "onsets_per_s": 3.78,
+   "dynamic_db": 11.3,
+   "lufs": -11.0,
+   "fit_why": "lo-fi chill beat; 86 BPM with a 3.78/s pulse; instrumental (page genre tag); level swing 11.3 dB; full strength after 2.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-204258",
+   "title": "Windows Down",
+   "artist": "HoliznaCC0",
+   "file": "204258.mp3",
+   "sha256": "54dc5dfb84c8ea71fa16866c4ad14d10ae4063e68d03f0f284156826ad882fac",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/lazy-summer-lofi-1/windows-downmp3/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Ambient",
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Lounge",
+    "Minimalism_1456",
+    "Pop",
+    "Soul-RB",
+    "Soundtrack",
+    "hiphop",
+    "novelty"
+   ],
+   "bpm": 110,
+   "energy": 0.4,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 165.78,
+   "intro_s": 6.25,
+   "onsets_per_s": 3.48,
+   "dynamic_db": 9.1,
+   "lufs": -13.8,
+   "fit_why": "lo-fi chill beat; 110 BPM with a 3.48/s pulse; instrumental (page genre tag); level swing 9.1 dB; full strength after 6.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-204255",
+   "title": "Blue Skies",
+   "artist": "HoliznaCC0",
+   "file": "204255.mp3",
+   "sha256": "1b5916797fe6341663a7172d8f653e95691d9462be51537c56ebfaabd81b8696",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/lazy-summer-lofi-1/blue-skiesmp3/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Minimalism_1456",
+    "New_Age",
+    "Pop",
+    "Soul-RB",
+    "Soundtrack",
+    "hiphop",
+    "novelty"
+   ],
+   "bpm": 82,
+   "energy": 0.35,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 175.57,
+   "intro_s": 11.25,
+   "onsets_per_s": 4.78,
+   "dynamic_db": 9.7,
+   "lufs": -11.4,
+   "fit_why": "lo-fi chill beat; 82 BPM with a 4.78/s pulse; instrumental (page genre tag); level swing 9.7 dB; full strength after 11.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-265835",
+   "title": "Calm Currents",
+   "artist": "HoliznaCC0",
+   "file": "265835.mp3",
+   "sha256": "2dcb297376cfe0cb8a547ce74e4d10f406649e007ff01d6e2edb573996d23dc4",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/calm-currents-lofi-relax-calm/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Instrumental",
+    "Lo-fi-Hip-Hop"
+   ],
+   "bpm": 78,
+   "energy": 0.24,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 147.64,
+   "intro_s": 12.0,
+   "onsets_per_s": 4.18,
+   "dynamic_db": 12.1,
+   "lufs": -15.0,
+   "fit_why": "lo-fi beat; 78 BPM with a 4.18/s pulse; instrumental (page genre tag); level swing 12.1 dB; full strength after 12.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-245667",
+   "title": "Still Life",
+   "artist": "HoliznaCC0",
+   "file": "245667.mp3",
+   "sha256": "f33eb15592fac175217781fc976df2f6a4336eb716b57887b57691e5fc572c47",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/still-life-lofi-chill-nostalgic/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental"
+   ],
+   "bpm": 76,
+   "energy": 0.12,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 134.84,
+   "intro_s": 0.0,
+   "onsets_per_s": 3.45,
+   "dynamic_db": 11.0,
+   "lufs": -12.1,
+   "fit_why": "lo-fi beat; 76 BPM with a 3.45/s pulse; instrumental (page genre tag); level swing 11.0 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-243304",
+   "title": "Tranquil Mindscape",
+   "artist": "HoliznaCC0",
+   "file": "243304.mp3",
+   "sha256": "488d9693c13e44c5213c0647ee89ea91b21e17d9ac602225a78ee089720134c0",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/tranquil-mindscape-lofi-happy-reflection/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Pop"
+   ],
+   "bpm": 71,
+   "energy": 0.18,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 153.54,
+   "intro_s": 0.0,
+   "onsets_per_s": 4.2,
+   "dynamic_db": 7.4,
+   "lufs": -13.8,
+   "fit_why": "lo-fi beat; 71 BPM with a 4.2/s pulse; instrumental (page genre tag); level swing 7.4 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-238388",
+   "title": "Waiting Around",
+   "artist": "HoliznaCC0",
+   "file": "238388.mp3",
+   "sha256": "72abc343c2a33388d59f8ac15c6d0f5961cedb43a8db06e599b1fb3dfb28311d",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/waiting-around-lofi-calm/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop"
+   ],
+   "bpm": 95,
+   "energy": 0.27,
+   "moods": [
+    "calm",
+    "upbeat"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 151.76,
+   "intro_s": 9.25,
+   "onsets_per_s": 3.46,
+   "dynamic_db": 16.0,
+   "lufs": -10.9,
+   "fit_why": "lo-fi beat; 95 BPM with a 3.46/s pulse; instrumental (page genre tag); level swing 16.0 dB; full strength after 9.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203443",
+   "title": "Busking In the SunLight",
+   "artist": "HoliznaCC0",
+   "file": "203443.mp3",
+   "sha256": "a11baac282a8858cbaf74a1291b57fc83360af310763b4ed49857d5182808287",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/city-slacker/busking-in-the-sunlight/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Jazz",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Minimalism_1456",
+    "Modern_Jazz",
+    "Soul-RB",
+    "hiphop"
+   ],
+   "bpm": 95,
+   "energy": 0.56,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 262.69,
+   "intro_s": 9.5,
+   "onsets_per_s": 5.48,
+   "dynamic_db": 2.2,
+   "lufs": -9.7,
+   "fit_why": "laid-back hip-hop drums, relaxed but rhythmic; 95 BPM with a 5.48/s pulse; instrumental (page genre tag); level swing 2.2 dB; full strength after 9.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203444",
+   "title": "Bus Stop",
+   "artist": "HoliznaCC0",
+   "file": "203444.mp3",
+   "sha256": "d1431cad111f7f90c9855eef1c7207e7bd18fb1772cfcf8e5833653dfa238c1c",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/city-slacker/bus-stop/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Chill-out",
+    "Easy_Listening",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Jazz",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental",
+    "Lo-fi-Soul-RnB",
+    "Lounge",
+    "Minimalism_1456",
+    "Modern_Jazz",
+    "Soul-RB",
+    "hiphop"
+   ],
+   "bpm": 88,
+   "energy": 0.46,
+   "moods": [
+    "upbeat",
+    "calm"
+   ],
+   "niches": [
+    "business",
+    "podcasts"
+   ],
+   "duration_s": 196.31,
+   "intro_s": 9.25,
+   "onsets_per_s": 5.19,
+   "dynamic_db": 3.3,
+   "lufs": -11.5,
+   "fit_why": "laid-back hip-hop drums, relaxed but rhythmic; 88 BPM with a 5.19/s pulse; instrumental (page genre tag); level swing 3.3 dB; full strength after 9.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-201835",
+   "title": "Mundane",
+   "artist": "HoliznaCC0",
+   "file": "201835.mp3",
+   "sha256": "fd30c4d94e07073aa6ddbde9964a5f29ee001c4db57e98bd60e9684efe8c4184",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/lo-fi-and-chill/mundane/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chill-out",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Hip-Hop",
+    "Lo-fi-Instrumental"
+   ],
+   "bpm": 85,
+   "energy": 0.39,
+   "moods": [
+    "calm"
+   ],
+   "niches": [
+    "podcasts",
+    "business"
+   ],
+   "duration_s": 158.08,
+   "intro_s": 2.5,
+   "onsets_per_s": 4.84,
+   "dynamic_db": 9.6,
+   "lufs": -14.6,
+   "fit_why": "lo-fi chill beat; 85 BPM with a 4.84/s pulse; instrumental (page genre tag); level swing 9.6 dB; full strength after 2.5 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203700",
+   "title": "Final Level",
+   "artist": "HoliznaCC0",
+   "file": "203700.mp3",
+   "sha256": "ffc078c965f49128d5c18b740399afa9a2847e911c0a6cbeb90f0b373469ea45",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/gamer-beats/final-level/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Chill-out",
+    "Chip_Music",
+    "Chiptune",
+    "Experimental_Pop",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Minimal_Electronic",
+    "Pop",
+    "Trip-Hop",
+    "hiphop",
+    "novelty"
+   ],
+   "bpm": 128,
+   "energy": 0.96,
+   "moods": [
+    "driving",
+    "tense"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 239.96,
+   "intro_s": 14.0,
+   "onsets_per_s": 6.31,
+   "dynamic_db": 7.6,
+   "lufs": -12.8,
+   "fit_why": "gaming beats; 128 BPM with a 6.31/s pulse; instrumental (page genre tag); level swing 7.6 dB; full strength after 14.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203699",
+   "title": "Coins",
+   "artist": "HoliznaCC0",
+   "file": "203699.mp3",
+   "sha256": "276a4854073c6cc176998d68e345dd93815013df78ff609168904fd4c2b6d3ed",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/gamer-beats/coins/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Chip_Music",
+    "Experimental_Pop",
+    "Glitch",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Pop",
+    "Sound_Art",
+    "Synth_Pop",
+    "Trip-Hop",
+    "Unclassifiable",
+    "hiphop",
+    "novelty"
+   ],
+   "bpm": 80,
+   "energy": 0.22,
+   "moods": [
+    "driving",
+    "tense"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 254.96,
+   "intro_s": 0.0,
+   "onsets_per_s": 3.98,
+   "dynamic_db": 7.0,
+   "lufs": -11.9,
+   "fit_why": "gaming beats; 80 BPM with a 3.98/s pulse; instrumental (page genre tag); level swing 7.0 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-203701",
+   "title": "Legends",
+   "artist": "HoliznaCC0",
+   "file": "203701.mp3",
+   "sha256": "8b1767800c4d5047edd2e59dea96c071c3e313be7536f6954c7bab2a9d5b041c",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/gamer-beats/legends/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chip_Music",
+    "Chiptune",
+    "Experimental_Pop",
+    "Hip-Hop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Minimal_Electronic",
+    "Pop",
+    "Power-Pop",
+    "Synth_Pop",
+    "Trip-Hop",
+    "Unclassifiable",
+    "hiphop",
+    "novelty",
+    "vaporwave"
+   ],
+   "bpm": 128,
+   "energy": 0.82,
+   "moods": [
+    "driving",
+    "tense"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 210.42,
+   "intro_s": 14.25,
+   "onsets_per_s": 5.3,
+   "dynamic_db": 8.4,
+   "lufs": -11.2,
+   "fit_why": "gaming beats; 128 BPM with a 5.3/s pulse; instrumental (page genre tag); level swing 8.4 dB; full strength after 14.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-205383",
+   "title": "Hard Mode",
+   "artist": "HoliznaCC0",
+   "file": "205383.mp3",
+   "sha256": "280c17c6dbb5b37224d5e96e992876f785a78f42835ed51012253818881db544",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/gamer-beats/hard-mode/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Alternative_Hip-Hop",
+    "Bigbeat",
+    "Chip_Music",
+    "Chiptune",
+    "Electronic",
+    "Experimental_Pop",
+    "Hip-Hop_Beats",
+    "Instrumental",
+    "Lo-fi-Electronic",
+    "Lo-fi-Instrumental",
+    "Pop",
+    "vaporwave"
+   ],
+   "bpm": 75,
+   "energy": 0.2,
+   "moods": [
+    "driving",
+    "tense"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 179.56,
+   "intro_s": 0.0,
+   "onsets_per_s": 4.1,
+   "dynamic_db": 4.1,
+   "lufs": -10.7,
+   "fit_why": "gaming beats; 75 BPM with a 4.1/s pulse; instrumental (page genre tag); level swing 4.1 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-266597",
+   "title": "Phonk ish",
+   "artist": "HoliznaCC0",
+   "file": "266597.mp3",
+   "sha256": "1b9f5f16caf1e3db60a731eb78bc854b049bce5fc89093ee202da6da15966817",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/phonk-aura-farming/phonk-ish/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Electronic",
+    "Hip-Hop_Beats",
+    "Instrumental"
+   ],
+   "bpm": 75,
+   "energy": 0.3,
+   "moods": [
+    "tense",
+    "driving"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 145.55,
+   "intro_s": 8.0,
+   "onsets_per_s": 4.8,
+   "dynamic_db": 9.3,
+   "lufs": -14.3,
+   "fit_why": "phonk, a current short-form gaming sound; 75 BPM with a 4.8/s pulse; instrumental (page genre tag); level swing 9.3 dB; full strength after 8.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-266596",
+   "title": "Pantheon",
+   "artist": "HoliznaCC0",
+   "file": "266596.mp3",
+   "sha256": "91f12bcbab2a774933f0beef26fccf92911d5da1c09588558374d31962fd9ee1",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/phonk-aura-farming/pantheon/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Electronic",
+    "Hip-Hop_Beats",
+    "Instrumental"
+   ],
+   "bpm": 106,
+   "energy": 0.56,
+   "moods": [
+    "tense",
+    "driving"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 192.42,
+   "intro_s": 1.75,
+   "onsets_per_s": 4.88,
+   "dynamic_db": 4.5,
+   "lufs": -10.9,
+   "fit_why": "phonk, a current short-form gaming sound; 106 BPM with a 4.88/s pulse; instrumental (page genre tag); level swing 4.5 dB; full strength after 1.75 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-212608",
+   "title": "Level 2",
+   "artist": "HoliznaCC0",
+   "file": "212608.mp3",
+   "sha256": "091d033b00270d1a6875d609628126e430910bd361f9ac6ce877c09cc70f57fc",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/chiptunes/level-2/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chip_Music",
+    "Chiptune",
+    "Electronic",
+    "Instrumental",
+    "Lo-fi-Electronic",
+    "Pop",
+    "Soundtrack"
+   ],
+   "bpm": 110,
+   "energy": 0.62,
+   "moods": [
+    "playful",
+    "driving"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 122.15,
+   "intro_s": 8.0,
+   "onsets_per_s": 5.03,
+   "dynamic_db": 5.0,
+   "lufs": -11.4,
+   "fit_why": "chiptune, the classic gaming bed; 110 BPM with a 5.03/s pulse; instrumental (page genre tag); level swing 5.0 dB; full strength after 8.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-204023",
+   "title": "Dance Till You Die",
+   "artist": "HoliznaCC0",
+   "file": "204023.mp3",
+   "sha256": "ba41656a41ff4a052da03dfbeb850b60473c457f67b7fe6106bf40b5018aa11e",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/chiptunes/dance-till-you-die/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chip_Music",
+    "Chiptune",
+    "Electronic",
+    "Instrumental",
+    "Lo-fi-Electronic",
+    "Lo-fi-Instrumental",
+    "Pop"
+   ],
+   "bpm": 75,
+   "energy": 0.52,
+   "moods": [
+    "playful",
+    "driving"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 129.56,
+   "intro_s": 0.0,
+   "onsets_per_s": 6.37,
+   "dynamic_db": 2.2,
+   "lufs": -8.2,
+   "fit_why": "chiptune, the classic gaming bed; 75 BPM with a 6.37/s pulse; instrumental (page genre tag); level swing 2.2 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-204025",
+   "title": "Rising Hero",
+   "artist": "HoliznaCC0",
+   "file": "204025.mp3",
+   "sha256": "38122e8acb9f3da329ea991d49e4e403b9e67367163e7ce907ea165fbdae63e9",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/chiptunes/rising-hero/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chip_Music",
+    "Chiptune",
+    "Electronic",
+    "Instrumental",
+    "Lo-fi-Electronic",
+    "Lo-fi-Instrumental",
+    "Pop"
+   ],
+   "bpm": 120,
+   "energy": 0.76,
+   "moods": [
+    "playful",
+    "driving"
+   ],
+   "niches": [
+    "gaming"
+   ],
+   "duration_s": 162.47,
+   "intro_s": 7.25,
+   "onsets_per_s": 5.46,
+   "dynamic_db": 2.9,
+   "lufs": -7.2,
+   "fit_why": "chiptune, the classic gaming bed; 120 BPM with a 5.46/s pulse; instrumental (page genre tag); level swing 2.9 dB; full strength after 7.25 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-265888",
+   "title": "F F S HURRY UP",
+   "artist": "HoliznaCC0",
+   "file": "265888.mp3",
+   "sha256": "84ef55430e57a544265d4351ffbc7f71498847cf3222a04f004f7a0443cf6319",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/retro-gamer-soundtrack/f-f-s-hurry-up/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chiptune",
+    "Instrumental",
+    "Soundtrack"
+   ],
+   "bpm": 90,
+   "energy": 0.26,
+   "moods": [
+    "driving",
+    "mysterious"
+   ],
+   "niches": [
+    "gaming",
+    "business"
+   ],
+   "duration_s": 151.81,
+   "intro_s": 0.0,
+   "onsets_per_s": 3.66,
+   "dynamic_db": 2.8,
+   "lufs": -14.1,
+   "fit_why": "retro game soundtrack; 90 BPM with a 3.66/s pulse; instrumental (page genre tag); level swing 2.8 dB; full strength after 0.0 s, so the bed starts on a bar line past the intro"
+  },
+  {
+   "id": "hz-238366",
+   "title": "Starships",
+   "artist": "HoliznaCC0",
+   "file": "238366.mp3",
+   "sha256": "1ece0aa32db619f2b3b7ace237fc4114e36425934e31c0ef5f1acdaa7d542229",
+   "source_url": "https://freemusicarchive.org/music/holiznacc0/retro-gamer-soundtrack/starships/",
+   "licence": "CC0-1.0",
+   "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "vocals": "none",
+   "genres": [
+    "Chiptune",
+    "Instrumental",
+    "Soundtrack"
+   ],
+   "bpm": 85,
+   "energy": 0.43,
+   "moods": [
+    "driving",
+    "mysterious"
+   ],
+   "niches": [
+    "gaming",
+    "business"
+   ],
+   "duration_s": 304.91,
+   "intro_s": 16.0,
+   "onsets_per_s": 5.16,
+   "dynamic_db": 5.4,
+   "lufs": -12.7,
+   "fit_why": "retro game soundtrack; 85 BPM with a 5.16/s pulse; instrumental (page genre tag); level swing 5.4 dB; full strength after 16.0 s, so the bed starts on a bar line past the intro"
+  }
+ ]
+}

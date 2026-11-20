@@ -267,3 +267,15 @@ def test_tightening_never_takes_a_clip_below_the_campaign_minimum():
     kept = polish.plan_tighten(words, 0.0, 20.0, "en", None, 25.0, min_s=19.0)
     assert free.new_duration < 19.0 <= kept.new_duration + 1e-6 or kept.new_duration >= 19.0 - 1e-6
     assert kept.new_duration >= 19.0 - 1e-6
+
+
+def test_tightening_zooms_karaoke_and_the_music_bed_work_together_in_one_encode(tmp_path):
+    src = beep_source(tmp_path)
+    bed = tmp_path / "bed.wav"
+    ffmpeg.run(["-f", "lavfi", "-i", "sine=frequency=110:sample_rate=44100", "-t", "3", str(bed)])
+    words = [w("one", 0.9, 1.3), w("two", 2.9, 3.3), w("three", 4.9, 5.3), w("four", 6.9, 7.3)]
+    clip = clip_for(music={"path": str(bed), "offset_s": 0.0, "gain_db": -18.0})
+    result = render(tmp_path, src, clip, words, {"progress_bar": False})
+    assert result["encodes"] == 1 and result["tightened"] and result["captions"] > 0
+    info = ffmpeg.probe(Path(result["path"]))
+    assert info["has_audio"] and abs(info["duration_s"] - (8.0 - result["tightened"]["removed_s"])) < 0.15

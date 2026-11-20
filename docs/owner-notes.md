@@ -27,3 +27,4 @@ Classes: bug, small, big (goes to `open-items.md`), question.
 | 2026-11-19 | Add objective clip standards, market calibration benchmark (all platforms, anonymous), decision recorded | big | planned in quality-diagnosis.md sections 7 to 9; no download yet | see git log |
 | 2026-11-19 | Benchmark: up to 1000 videos, LLM allowed, make training smart | big | plan written in `docs/benchmark-plan.md`; no downloads until owner OK | see git log |
 | 2026-11-19 | Review order: decided never returns; skipped returns after ~5 clips, twice at most, then Review Later (server side) | big | built: migration 018, `review.skip`, `/api/clips/{id}/skip`, feed screen skips | see git log |
+| 2026-11-20 | Decision 31: swipe right accepts and confirms the posts; bar with 10 s undo; manual fallback | big | built: migration 019, publish.swipe_confirm/undo, PostBar | see git log |

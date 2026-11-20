@@ -74,8 +74,8 @@ def _means(vectors: list[dict]) -> dict[str, float]:
 
 def _fit(conn, owner, profile: str, labels: list[dict]) -> dict:
     default = profiles.Profile.build(profile, (conn.execute("select config from content_profiles where name = %s", (profile,)).fetchone() or {}).get("config")).weights
-    liked = [l["features"] for l in labels if l["kind"] in POSITIVE and l["features"]]
-    disliked = [l["features"] for l in labels if l["kind"] not in POSITIVE and l["features"]]
+    liked = [label["features"] for label in labels if label["kind"] in POSITIVE and label["features"]]
+    disliked = [label["features"] for label in labels if label["kind"] not in POSITIVE and label["features"]]
     everyone = [r["features"] for r in conn.execute(
         "select features from candidates where owner_operator_id = %s and profile = %s and features is not null", (owner, profile)).fetchall()]
     if not liked and not disliked:

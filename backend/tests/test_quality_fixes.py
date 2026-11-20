@@ -13,8 +13,9 @@ def test_a_long_video_with_almost_no_words_is_flagged_and_a_normal_one_is_not():
 def _episode(texts):
     lines, t = [], 0.0
     for x in texts:
-        lines.append({"start": t, "end": t + 8.0, "text": x}); t += 8.0
-    return SimpleNamespace(lines=lines, line_ends=[l["end"] for l in lines])
+        lines.append({"start": t, "end": t + 8.0, "text": x})
+        t += 8.0
+    return SimpleNamespace(lines=lines, line_ends=[line["end"] for line in lines])
 
 
 def test_the_end_snaps_back_to_a_sentence_end_when_one_is_close():

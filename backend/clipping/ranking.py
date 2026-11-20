@@ -219,6 +219,7 @@ def rank(conn, listings: list[dict], operator_id) -> list[dict]:
             best["reasons"] = best.get("reasons", []) + ["no account of yours posts here yet: numbers are assumed"]
         best["fixed_first"] = bool(all_new and best.get("fixed_pay"))
         out.append(dict(listing, rank=best))
-    out.sort(key=lambda l: (not l["rank"]["fixed_first"], bool(l["rank"].get("language_mismatch")),
-                            -(l["rank"].get("score") if l["rank"].get("score") is not None else -1), -(float(l.get("alpha_score") or 0))))
+    out.sort(key=lambda listing: (not listing["rank"]["fixed_first"], bool(listing["rank"].get("language_mismatch")),
+                                  -(listing["rank"].get("score") if listing["rank"].get("score") is not None else -1),
+                                  -(float(listing.get("alpha_score") or 0))))
     return out
