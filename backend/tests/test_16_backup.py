@@ -70,5 +70,53 @@ def test_failed_backup_raises_alert_and_housekeeping_continues(db, monkeypatch):
     with db.session(Actor.worker()) as conn:
         rows = conn.execute("select type, severity, message from alerts where type = 'backup_failed'").fetchall()
     assert len(rows) == 1
-    assert rows[0]["severity"] == "info"
+    assert rows[0]["severity"] == "warn"
     assert "pg_dump exploded" in rows[0]["message"]
+
+
+def test_a_second_copy_is_made_only_when_the_setting_is_on_and_holds_only_the_dump(db, tmp_path, monkeypatch):
+    ops.ensure_owner(db)
+    main, second = tmp_path / "main", tmp_path / "second"
+    path = backup.create(db.dsn, main)
+    monkeypatch.delenv("CLIPPING_BACKUP_COPY_DIR", raising=False)
+    assert backup.copy_to_second(path) is None and not second.exists()          # default: off
+    monkeypatch.setenv("CLIPPING_BACKUP_COPY_DIR", str(second))
+    copy = backup.copy_to_second(path)
+    assert copy == second / path.name and copy.read_bytes() == path.read_bytes()
+    assert [p.name for p in second.iterdir()] == [path.name]                     # no .env, no key, no partial files
+
+
+def test_worker_errors_are_logged_and_the_third_in_a_row_raises_one_alert(db, caplog):
+    ops.ensure_owner(db)
+    streak: dict = {}
+    for _ in range(4):
+        ops._note_failure(db, "jobs", RuntimeError("disk gone"), streak)
+    assert sum("worker jobs failed" in r.getMessage() and "RuntimeError" in r.getMessage() for r in caplog.records) == 4
+    with db.session(Actor.worker()) as conn:
+        rows = conn.execute("select severity, message from alerts where type = 'worker_jobs'").fetchall()
+    assert len(rows) == 1 and rows[0]["severity"] == "warn" and "disk gone" in rows[0]["message"]
+
+
+def test_the_worker_loop_reports_a_failing_job_pass_instead_of_swallowing_it(db, monkeypatch, caplog):
+    import threading
+
+    from clipping import pipeline
+
+    ops.ensure_owner(db)
+    stop = threading.Event()
+    calls = []
+
+    def boom(_db):
+        calls.append(1)
+        if len(calls) >= 3:
+            stop.set()
+        raise RuntimeError("claim failed")
+
+    monkeypatch.setattr(pipeline, "process_one", boom)
+    monkeypatch.setattr(ops, "housekeeping", lambda _db: None)
+    monkeypatch.setattr(ops, "keepalive", lambda _db: True)
+    monkeypatch.setattr(ops, "keep_awake", lambda on: True)
+    ops.worker_loop(db, stop, poll_s=0.01)
+    assert len(calls) == 3 and any("claim failed" in r.getMessage() for r in caplog.records)
+    with db.session(Actor.worker()) as conn:
+        assert conn.execute("select count(*) as n from alerts where type = 'worker_jobs'").fetchone()["n"] == 1

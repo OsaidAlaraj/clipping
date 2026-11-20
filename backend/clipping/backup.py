@@ -8,6 +8,7 @@ from __future__ import annotations
 import datetime as dt
 import os
 import re
+import shutil
 import subprocess
 import time
 from contextlib import contextmanager
@@ -78,12 +79,29 @@ def due(directory: Path | None = None) -> bool:
     return not dumps or time.time() - dumps[-1].stat().st_mtime >= INTERVAL_S
 
 
+def copy_to_second(path: Path, directory: Path | None = None) -> Path | None:
+    """Copy one dump to the optional second directory (CLIPPING_BACKUP_COPY_DIR) and apply the same retention there.
+    Nothing but the dump file is copied. Returns the copy, or None when no second directory is set."""
+    directory = directory or config.backup_copy_dir()
+    if directory is None:
+        return None
+    directory.mkdir(parents=True, exist_ok=True)
+    target = directory / path.name
+    partial = target.with_suffix(".partial")
+    shutil.copy2(path, partial)
+    os.replace(partial, target)
+    prune(directory)
+    return target
+
+
 def run_if_due(dsn: str) -> Path | None:
-    """The automatic backup: one dump per 24 hours, then retention. Called from housekeeping."""
+    """The automatic backup: one dump per 24 hours, then retention, then the optional second copy. Called from housekeeping.
+    A failed second copy raises after the main dump is safely written, so housekeeping alerts it."""
     if not due():
         return None
     path = create(dsn)
     prune()
+    copy_to_second(path)
     return path
 
 
@@ -132,6 +150,9 @@ def cli(argv: list[str]) -> int:
             path = create(dsn)
             removed = prune()
         print(f"Backup written: {path}")
+        copy = copy_to_second(path)
+        if copy:
+            print(f"Second copy written: {copy}")
         if removed:
             print(f"Removed {len(removed)} old backup(s); keeping the newest {KEEP}.")
         return 0

@@ -62,6 +62,9 @@ def main(argv: list[str]) -> int:
         return 0
     stop = threading.Event()
     if command in ("dev", "worker"):
+        import logging
+
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
         if command == "dev" and "--no-seed" not in argv:
             from . import demo
 

@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import datetime as dt
+import logging
 import threading
 import time
 
 from . import alerts, backup, campaigns, config, ledger, pipeline
 from .core import audit, get_setting, kill_switch
 from .db import Actor, Database
+
+log = logging.getLogger("clipping.ops")
+ALERT_AFTER_FAILURES = 3   # the same part of the worker failing this many times in a row raises an alert
 
 
 def ensure_owner(db: Database, name: str = "Owner") -> Actor:
@@ -146,11 +150,12 @@ def housekeeping(db: Database) -> None:
             for row in conn.execute("select id from operators where status = 'active'").fetchall():
                 try:
                     moment_learning.learn(conn, row["id"])
-                except Exception:   # learning must never stop housekeeping
-                    pass
+                except Exception:   # learning must never stop housekeeping, but it is logged
+                    log.exception("learning failed for operator %s", row["id"])
     try:   # one automatic dump per 24 hours; a failure is alerted and never stops the rest of housekeeping
         backup.run_if_due(db.dsn)
     except Exception as exc:
+        log.exception("automatic backup failed")
         _alert_backup_failed(db, exc)
     with db.session(Actor.worker()) as conn:
         for row in conn.execute("select id from operators where status = 'active'").fetchall():
@@ -167,10 +172,26 @@ def _alert_backup_failed(db: Database, exc: Exception) -> None:
     try:
         with db.session(Actor.worker()) as conn:
             for row in conn.execute("select id from operators where role = 'admin'").fetchall():
-                alerts.raise_alert(conn, row["id"], "backup_failed", "info", None, None,
+                alerts.raise_alert(conn, row["id"], "backup_failed", "warn", None, None,
                                    f"Automatic database backup failed: {config.redact(str(exc))[:200]}")
     except Exception:
-        pass   # the alert itself must not stop housekeeping either
+        log.exception("could not raise the backup alert")   # the alert itself must not stop housekeeping either
+
+
+def _note_failure(db: Database, area: str, exc: Exception, streak: dict) -> None:
+    """Log a worker error with its type and, after ALERT_AFTER_FAILURES in a row for the same area, raise one alert for the owner."""
+    streak[area] = streak.get(area, 0) + 1
+    log.error("worker %s failed (%s in a row): %s: %s", area, streak[area], type(exc).__name__, config.redact(str(exc))[:300], exc_info=exc)
+    if streak[area] != ALERT_AFTER_FAILURES:
+        return
+    try:
+        with db.session(Actor.worker()) as conn:
+            for row in conn.execute("select id from operators where role = 'admin'").fetchall():
+                alerts.raise_alert(conn, row["id"], f"worker_{area}", "warn", None, None,
+                                   f"The worker's {area} failed {ALERT_AFTER_FAILURES} times in a row ({type(exc).__name__}): "
+                                   f"{config.redact(str(exc))[:160]}. Check the log.")
+    except Exception:
+        log.exception("could not raise the worker alert")   # the database itself may be down; the log line above is what remains
 
 
 _awake = {"on": False}
@@ -204,25 +225,29 @@ def has_work(db: Database) -> bool:
 def worker_loop(db: Database, stop: threading.Event, poll_s: float = 2.0) -> None:
     """Runs jobs, then housekeeping every minute and the keep-alive on its configured interval."""
     last_housekeeping = last_keepalive = 0.0
+    streak: dict = {}
     while not stop.is_set():
         try:
             worked = pipeline.process_one(db)
-        except Exception:
+            streak["jobs"] = 0
+        except Exception as exc:
             worked = False
+            _note_failure(db, "jobs", exc, streak)
         now = time.time()
         if now - last_housekeeping > 60:
             last_housekeeping = now
             try:
                 housekeeping(db)
-            except Exception:
-                pass
+                streak["housekeeping"] = 0
+            except Exception as exc:
+                _note_failure(db, "housekeeping", exc, streak)
         if now - last_keepalive > 24 * 3600:
             last_keepalive = now
             keepalive(db)
         try:
             keep_awake(worked or has_work(db))
         except Exception:
-            pass
+            log.exception("keep-awake check failed")
         if not worked:
             stop.wait(poll_s)
     keep_awake(False)
