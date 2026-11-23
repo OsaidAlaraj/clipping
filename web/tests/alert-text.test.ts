@@ -17,3 +17,14 @@ describe("plainAlert", () => {
     expect(plainAlert("Deadline soon").text).toBe("Deadline soon");
   });
 });
+
+describe("a failed job that is not an AI vendor", () => {
+  it("shows the job's own sentence instead of blaming the AI service", () => {
+    const r = plainAlert("A fetch_source job failed: The YouTube download failed. Check the link and try again.");
+    expect(r.text).toBe("The fetch source step failed. The YouTube download failed. Check the link and try again.");
+    expect(r.text).not.toContain("AI service");
+  });
+  it("still names the AI service when a vendor is the cause", () => {
+    expect(plainAlert("A transcribe job failed: deepgram failed (HTTP 500)").text).toContain("AI service");
+  });
+});

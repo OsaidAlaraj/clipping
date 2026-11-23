@@ -10,8 +10,10 @@ export function plainAlert(message: string): { text: string; raw: string } {
   if (m) return { text: `A clip for "${m[1]}" was blocked because ${CHECKS[m[2]] ?? "it failed a rule check"}. Open Review to fix or remake it.`, raw };
   m = message.match(/^(\w+) adapter \((\w+)\) failed (\d+) times/);
   if (m) return { text: `The ${m[2]} service did not answer after ${m[3]} tries. You can still add campaigns by hand.`, raw };
-  m = message.match(/^A (\w+) job failed: .*?(azure_openai|deepgram|\w+) failed/);
+  m = message.match(/^A (\w+) job failed: .*?(azure_openai|deepgram|whisper|openai) failed/i);
   if (m) return { text: `The AI service could not finish the ${m[1]} step. Do it by hand for now, or try again later.`, raw };
+  m = message.match(/^A (\w+) job failed: (.+)$/);   // not an AI vendor: the job's own plain sentence is the explanation
+  if (m) return { text: `The ${m[1].replace(/_/g, " ")} step failed. ${m[2]}`, raw };
   m = message.match(/^(.*?) was blocked: (.*?) \(hard rule \d+\)\.?$/);
   if (m) return { text: `"${m[1]}" is blocked: ${m[2].toLowerCase()}. It cannot be approved.`, raw };
   return { text: message, raw };

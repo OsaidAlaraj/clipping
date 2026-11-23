@@ -202,7 +202,8 @@ def download_youtube(url: str, folder: Path, info_out: dict | None = None) -> Pa
     folder.mkdir(parents=True, exist_ok=True)
     options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": YOUTUBE_FORMAT, "merge_output_format": "mp4", "quiet": True, "no_warnings": True,
                "writesubtitles": True, "subtitleslangs": ["live_chat"],
-               "js_runtimes": {"node": {}} if shutil.which("node") else {}}   # YouTube needs a JS runtime for every format
+               "js_runtimes": {"node": {}} if shutil.which("node") else {},
+               "ffmpeg_location": ffmpeg.exe()}   # merging video and sound needs ffmpeg; ours is bundled, not on PATH   # YouTube needs a JS runtime for every format
     try:
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(url, download=True)
