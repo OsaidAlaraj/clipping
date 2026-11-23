@@ -35,8 +35,22 @@ def run(args: list[str], cwd: Path | None = None, timeout: int = 900) -> subproc
     proc = subprocess.run([exe(), "-hide_banner", "-nostdin", "-y", *args], cwd=cwd, capture_output=True,
                           text=True, encoding="utf-8", errors="replace", timeout=timeout)
     if proc.returncode != 0:
-        raise FFmpegError(proc.stderr[-800:])
+        raise FFmpegError(readable_error(proc.stderr))
     return proc
+
+
+def readable_error(stderr: str) -> str:
+    """ffmpeg prints the whole input description before the reason; the owner gets the reason, in plain words when it is a known one."""
+    text = stderr.lower()
+    if "does not contain any stream" in text or "stream map" in text and "matches no streams" in text:
+        return "The video has no audio track to work with."
+    if "invalid data found" in text or "moov atom not found" in text:
+        return "The video file is damaged or incomplete."
+    lines = [ln.strip() for ln in stderr.splitlines() if ln.strip()]
+    for ln in reversed(lines):   # the last line that says what went wrong, not a metadata dump
+        if re.search(r"error|invalid|unable|cannot|could not|failed|no such|not found", ln, re.I):
+            return ln[:300]
+    return (lines[-1] if lines else "ffmpeg failed")[:300]
 
 
 def probe(path: Path) -> dict:

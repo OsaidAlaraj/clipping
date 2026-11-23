@@ -189,13 +189,18 @@ def download_to(url: str, dest: Path) -> Path:
         raise AppError("The link redirected too many times.", "fetch_failed")
 
 
+# Video AND audio merged into one mp4, at most 1080p (the clips are 1080x1920; a 4K AV1 stream is 4x the download and slow to decode).
+# Plain "best" can resolve to a video-only stream, which has no sound to transcribe.
+YOUTUBE_FORMAT = ("bv*[height<=1080][vcodec^=avc1]+ba[ext=m4a]/bv*[height<=1080]+ba/b[height<=1080]")
+
+
 def download_youtube(url: str, folder: Path, info_out: dict | None = None) -> Path:
     """Download one YouTube video. yt-dlp's metadata (the "most replayed" heatmap) is copied into `info_out` and the
     stream's live chat replay is saved beside the video when there is one; neither is needed for the download to work."""
     import yt_dlp
 
     folder.mkdir(parents=True, exist_ok=True)
-    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": "mp4/best", "quiet": True, "no_warnings": True,
+    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": YOUTUBE_FORMAT, "merge_output_format": "mp4", "quiet": True, "no_warnings": True,
                "writesubtitles": True, "subtitleslangs": ["live_chat"],
                "js_runtimes": {"node": {}} if shutil.which("node") else {}}   # YouTube needs a JS runtime for every format
     try:
@@ -239,6 +244,9 @@ def stage_fetch_source(conn, job: dict) -> Decimal:
             ffmpeg.probe(path)
         except Exception:
             raise AppError("The downloaded file is not a video the system can read.", "not_a_video") from None
+        if not ffmpeg.probe(path)["has_audio"]:
+            raise AppError("The downloaded video has no sound track, so it cannot be transcribed. Try the link again; if it keeps "
+                           "happening, download the video with sound and add it as a file.", "no_audio")
         source = campaigns.register_source(conn, Actor.worker(), payload["campaign_id"], str(path), payload["language"],
                                            permission_ref=payload["permission_ref"], origin_url=payload["url"])
         if payload["kind"] == "youtube":   # reached only after the owner confirmed the brief permits this video
