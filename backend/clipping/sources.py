@@ -4,6 +4,7 @@ YouTube's terms forbid downloads; it also needs the optional yt-dlp package."""
 from __future__ import annotations
 
 import ipaddress
+import logging
 import re
 import shutil
 import socket
@@ -16,6 +17,8 @@ from . import campaigns, config, ffmpeg, language_check, signals
 from .adapters import heatmap
 from .core import AppError, GateError, audit, enqueue
 from .db import Actor
+
+log = logging.getLogger(__name__)
 
 MAX_SOURCE_BYTES = 10 * 1024 ** 3   # 10 GB
 YOUTUBE_HOSTS = ("youtube.com", "youtu.be")
@@ -192,13 +195,31 @@ def download_youtube(url: str, folder: Path, info_out: dict | None = None) -> Pa
     import yt_dlp
 
     folder.mkdir(parents=True, exist_ok=True)
-    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": "mp4/best", "quiet": True,
-               "writesubtitles": True, "subtitleslangs": ["live_chat"]}
-    with yt_dlp.YoutubeDL(options) as ydl:
-        info = ydl.extract_info(url, download=True)
-        if info_out is not None and isinstance(info, dict):
-            info_out.update({"heatmap": info.get("heatmap")})
-        return Path(ydl.prepare_filename(info))
+    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": "mp4/best", "quiet": True, "no_warnings": True,
+               "writesubtitles": True, "subtitleslangs": ["live_chat"],
+               "js_runtimes": {"node": {}} if shutil.which("node") else {}}   # YouTube needs a JS runtime for every format
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(url, download=True)
+            if info_out is not None and isinstance(info, dict):
+                info_out.update({"heatmap": info.get("heatmap")})
+            return Path(ydl.prepare_filename(info))
+    except yt_dlp.utils.DownloadError as exc:   # yt-dlp's own text is technical; the owner gets a plain sentence and the cause stays in the log
+        log.warning("YouTube download failed: %s", exc)
+        raise AppError(_youtube_failure(str(exc)), "fetch_failed") from None
+
+
+def _youtube_failure(raw: str) -> str:
+    text = raw.lower()
+    if "private video" in text or "sign in" in text or "members-only" in text:
+        return "This YouTube video is private or needs a sign-in, so it cannot be downloaded."
+    if "unavailable" in text or "removed" in text or "does not exist" in text:
+        return "This YouTube video is unavailable or was removed."
+    if "429" in text or "too many requests" in text or "bot" in text:
+        return "YouTube is limiting downloads right now. Try again in a few minutes."
+    if "requested format is not available" in text:
+        return "YouTube did not offer a downloadable format for this video."
+    return "The YouTube download failed. Check the link and try again; the technical reason is in the server log."
 
 
 def youtube_signal_inputs(info: dict, folder: Path) -> tuple[list | None, list | None]:
