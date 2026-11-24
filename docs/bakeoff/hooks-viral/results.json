@@ -1,0 +1,673 @@
+[
+ {
+  "id": "a3zn9T1TINk",
+  "niche": "business",
+  "lang": "ar",
+  "old": "شو بتعمل لو مسك على لحيته",
+  "new": "ليش الرجال بيهبش على اللحية",
+  "new_all": [
+   "ليش الرجال بيهبش على اللحية",
+   "اسمعني شوي عن المسكة على اللحية",
+   "الموضوع عنده منتهي لو مسك لحيته"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "hear_me_out",
+   "outcome_first"
+  ],
+  "new_points": 2,
+  "excerpt": "هذي زي ما تقول عهده. حتى ما يرجع من عليه حتى ولو كلفه حياته في هذا الامر. اذا قد مسك الرجال على لحيته خلاص. هذي من تقدير اللحيه ومن يعني وقفه الرجال وقيمته عندن"
+ },
+ {
+  "id": "jM9Yfv-5Fxg",
+  "niche": "business",
+  "lang": "ar",
+  "old": "بتصدق إن السعودية أكبر سوق تقليد",
+  "new": "١٤٠٠ سنة تاريخنا بالعطور",
+  "new_all": [
+   "١٤٠٠ سنة تاريخنا بالعطور",
+   "ليش يرسلو العطر للمختبر وينسخوه",
+   "بطّل تبيع عطور مسروقة بالسعودية"
+  ],
+  "formats": [
+   "numbered",
+   "curiosity_gap",
+   "stop_doing"
+  ],
+  "new_points": 0,
+  "excerpt": "انا اعتقد ان السعوديه الان اكبر سوق يقلد عطور في العالم. واللي ابي يعني شوي الناس تبحث عنها انا اعتقد انه شرعيا ما يجوز. لان فيه سرقه حقوق. يعني انا بروح اليوم "
+ },
+ {
+  "id": "M_ociPHkC7U",
+  "niche": "business",
+  "lang": "ar",
+  "old": "المشروع مش حل لموظف متعب",
+  "new": "المشروع بياخد سنة ونص",
+  "new_all": [
+   "المشروع بياخد سنة ونص",
+   "البديل الصح مش مشروع يا زلمة",
+   "ليش المشروع ما بينفع بدل الوظيفة"
+  ],
+  "formats": [
+   "numbered",
+   "outcome_first",
+   "curiosity_gap"
+  ],
+  "new_points": 0,
+  "excerpt": "بديل الوظيفه السيئه مش ان انت تروح تعمل مشروع بديل الوظيفه السيئه ان انت تدور على وظيفه افضل منها من الاخطاء الشائعه في تفكير الشباب ان انا خلاص ما دام الوظيفه "
+ },
+ {
+  "id": "GGptNaKL-xg",
+  "niche": "business",
+  "lang": "ar",
+  "skipped": "ReadTimeout('The read operation timed out')"
+ },
+ {
+  "id": "-PH8CvgfJ6I",
+  "niche": "business",
+  "lang": "ar",
+  "old": "ليه كلامك مو عم يوصل له",
+  "new": "ليش كلامك ما يوصل له كامل",
+  "new_all": [
+   "ليش كلامك ما يوصل له كامل",
+   "اسمعني شوي انتباهه بدّو لحظة وحدة",
+   "مش الغياب هو الألم"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "hear_me_out",
+   "contradiction"
+  ],
+  "new_points": 1,
+  "excerpt": "تقعدي معه بنفس الغرفة. ويتحدث معك عن يومه. وبتردي عليه. بيضحك أحيانًا. ومع هيك في هناك شعور ما بيختفي. كأنك بتحكي مع شخص بعيد. مو بالمسافة. إنما في الانتباه. وا"
+ },
+ {
+  "id": "h-KHWUq3B7I",
+  "niche": "business",
+  "lang": "en",
+  "old": "Think successful founders just got lucky?",
+  "new": "The rumor that almost ended them",
+  "new_all": [
+   "The rumor that almost ended them",
+   "1 thing beat the lonely nights",
+   "Hear me out, daily rejection helped"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "numbered",
+   "hear_me_out"
+  ],
+  "new_points": 2,
+  "excerpt": "Most people only pay attention to the final product of a successful entrepreneur. They say things like, \"I can never be like them.” or \"They got lucky\". What mo"
+ },
+ {
+  "id": "eXbtll8q7nA",
+  "niche": "business",
+  "lang": "en",
+  "old": "Is 20 too young to be a parent?",
+  "new": "From partying at 20 to parent at 40",
+  "new_all": [
+   "From partying at 20 to parent at 40",
+   "Why people get mad about 40s moms",
+   "Having a baby at 20 was irresponsible"
+  ],
+  "formats": [
+   "outcome_first",
+   "curiosity_gap",
+   "contradiction"
+  ],
+  "new_points": 2,
+  "excerpt": "I would have been completely irresponsible to have a baby at 20. Oh my gosh. It's actually like kind of comical if you think about it. I know it gets people all"
+ },
+ {
+  "id": "ar_seif_el_isl_16",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "دخلت السجن سنة 83",
+  "new": "يا زلمة هالتهديد عنجد",
+  "new_all": [
+   "يا زلمة هالتهديد عنجد",
+   "كله طلع إلا شيخ مصطفى",
+   "ليش ضابط قال ورا الشمس"
+  ],
+  "formats": [
+   "reaction",
+   "contradiction",
+   "curiosity_gap"
+  ],
+  "new_points": 1,
+  "excerpt": "انا دخلت سجني من طرف قضيه في 83 فوجئت ب شاب من المنصوره الشيخ مصطفى من بقايا اعتقالات سبتمبر 81 فباله انت يا شيخ ما خرجتش ليه فقال ضابط المباحث القبض علي قال ان"
+ },
+ {
+  "id": "ar_seif_el_isl_278",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "بالثمانينات كان التعذيب مخفي عن الكل",
+  "new": "ليش القاضي ما شاف التعذيب",
+  "new_all": [
+   "ليش القاضي ما شاف التعذيب",
+   "استنى لتعرف ليش منعوا الزيارة",
+   "ما كان القاضي يشوفني بالثمانينات"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "wait_for_it",
+   "contradiction"
+  ],
+  "new_points": 2,
+  "excerpt": "لحد الثمانينات كان انا شفت كنت معتقد بالمنتصف الثمانينات لما كان يبقى في تظلم من قرار الاعتقال كنت بنزل قدام القاضي والقاضي بيشوفني بعينه والمحامين بيشوفوني اذا"
+ },
+ {
+  "id": "ar_seif_el_isl_171",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "هاد بيأثر على أي واحد منا",
+  "new": "ليش الحكومة بتوزع أدوات تعذيب",
+  "new_all": [
+   "ليش الحكومة بتوزع أدوات تعذيب",
+   "استنى لما أذكر مبادرة نبذة العنف",
+   "جرب تتجاهل ملف التعذيب هذا"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "wait_for_it",
+   "challenge"
+  ],
+  "new_points": 2,
+  "excerpt": "اللي بيستاور أدوات تعذيب الحكومة اللي بيوزعها عهد علي الضباط الحكومة يعني الحكومة هي الراعي الرسمي للتعذيب في مصر ممكن يتنسي ملف واحد محدش يبص في ملفه أو ممكن ي"
+ },
+ {
+  "id": "ar_seif_el_isl_w54",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "اتنسى في الملفات وتتحبس سنين",
+  "new": "ليش اسمه اتنسى بالملفات",
+  "new_all": [
+   "ليش اسمه اتنسى بالملفات",
+   "لو اتنسى ممكن يقعد سنتين",
+   "معتقا بس لأن اسمه اتنسى"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "contradiction",
+   "outcome_first"
+  ],
+  "new_points": 0,
+  "excerpt": "اتنسى في الملفات يعني ما حدش قاصد ان هو يقعده لكن اتنسى في الملفات لو كان قاصد انه يقعد يعني يبقي مواطن ممكن يقعد سنتين ثلاثه معتقا لمجرد ان اسمه اتنسى الاعتقال"
+ },
+ {
+  "id": "ar_seif_el_isl_w77",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "بعد أسبوع أو عشرة أيام التقرير بيعترف بالتعذيب",
+  "new": "يا زلمة الطب الشرعي أثبتها",
+  "new_all": [
+   "يا زلمة الطب الشرعي أثبتها",
+   "أسبوع أو عشرة أيام فقط",
+   "ما ضروري الشاهد ليثبت التعذيب"
+  ],
+  "formats": [
+   "reaction",
+   "numbered",
+   "contradiction"
+  ],
+  "new_points": 0,
+  "excerpt": "المده اللي احتاجت فيها اي مواطن حين عرض اعلاميه اكتشف هم في الثمانينات ان لما الواحد يتعذب ويعرض للطب الشرعي خلال اسبوع او عشره ايام من وقائع التعذيب تالثب الشر"
+ },
+ {
+  "id": "ar_seif_el_isl_w102",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "كيف القانون يخليهم يختفوا أسابيع",
+  "new": "ليش السلب الشرعي يصعّب اثبات الاصابه",
+  "new_all": [
+   "ليش السلب الشرعي يصعّب اثبات الاصابه",
+   "قانون الطوارئ بيحمي المتهم مش الضحية",
+   "السلب الشرعي بيخليهم يختفوا ثلاث اسابيع"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "contradiction",
+   "outcome_first"
+  ],
+  "new_points": 0,
+  "excerpt": "ثلاث اسابيع اربع اسابيع او بعد كده راح السلب الشرعي السلب الشرعي ح تعذر عليه اثبات اسباب الاصابه في بقى دي اللعبه اللي بتستخدم ان بيستخدم قانون الطوارئ ضد اي مت"
+ },
+ {
+  "id": "ar_seif_el_isl_w126",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "مين بيحكم على جثث الناس هون",
+  "new": "ليش الخبراء قالوا إنها سياسة",
+  "new_all": [
+   "ليش الخبراء قالوا إنها سياسة",
+   "القرار مش راجع لأفراد منحرفين",
+   "بدي أقول ليش الموضوع سياسة"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "contradiction",
+   "hear_me_out"
+  ],
+  "new_points": 1,
+  "excerpt": "ومن العرض على الطب الشرعي لحد ما كفوس المدة الفنيا يمكن تحديد فيها أسباب خبراء لجنس حقول الإسلام و متاحة ده بيقول انت عزيزه في مصر بيتم بشكل منهاجم اي انه سياسه"
+ },
+ {
+  "id": "ar_seif_el_isl_w220",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "ليش مطلوب منك تعمل سلوك غير قانوني",
+  "new": "ليش في قتل خارج القانوني",
+  "new_all": [
+   "ليش في قتل خارج القانوني",
+   "يا زلمة الداخلية بتتجاهل الـ95",
+   "القضية رقم 95 فيها أسرار"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "reaction",
+   "numbered"
+  ],
+  "new_points": 0,
+  "excerpt": "مطلوب مني اعمل سلوك اخر عشان ترضي عن الادارة ده ما هوش قانوني أنا أظنه ده السبب الحقيقي اللي مخلي كل المعتقلين دول موجودين إن في إصرار من الداخلية انها تبعث زي "
+ },
+ {
+  "id": "ar_seif_el_isl_w244",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "غياب المعتقل يعني ضياع حقه",
+  "new": "ليش الاستقصي اختفى فجأة",
+  "new_all": [
+   "ليش الاستقصي اختفى فجأة",
+   "المحاكم النهارده مصرّة على التمثيل",
+   "يا زلمة وين الاستقصي هسا"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "contradiction",
+   "reaction"
+  ],
+  "new_points": 2,
+  "excerpt": "عايز يعرف الحقيقة فين الاستقصي ده جدع بن ادمين من قصيره واتل تظلمات من خلال الاعتقال في معظم الاحوال بقت تظلمات شكليه سوريه مالهاش قيمه قانونيه حقيقيه لدرجه ان "
+ },
+ {
+  "id": "ar_seif_el_isl_w340",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "لو تسيب الدوا ممكن يموت",
+  "new": "استنى لما تسمع مين مات",
+  "new_all": [
+   "استنى لما تسمع مين مات",
+   "ليش عدم انتظام الدواء قتل واحد",
+   "الدواء اللي مفروض ينقذه قتله"
+  ],
+  "formats": [
+   "wait_for_it",
+   "curiosity_gap",
+   "contradiction"
+  ],
+  "new_points": 2,
+  "excerpt": "تظلم قراءه القروح لا نعم ما تعملش تظلم تخليه جنب مني على ارفي احتمال ان انا اقدر اشوفه في الزياره او ادخل له حاجه حصل حالات النوات فيها مات يعني احد المعتقلين ا"
+ },
+ {
+  "id": "ar_seif_el_isl_w388",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "ليش بنحكم عليه مش بنساعده",
+  "new": "شو بصير لما يقع تحت ايدك",
+  "new_all": [
+   "شو بصير لما يقع تحت ايدك",
+   "مش تؤهل اللي الظروف دفعته",
+   "اسمعني شوي عن ارتكاب خطا قانونيا"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "contradiction",
+   "hear_me_out"
+  ],
+  "new_points": 1,
+  "excerpt": "من اخطا حتى يكون واصلا صالحا بالعكس يعني فلسفه كلها قايمه على ازاي ان انت تطلع دين ام اللي يقع تحت ايدك مش ان انت تؤهل اللي الظروف دفعته الى ارتكاب خطا قانونيا "
+ },
+ {
+  "id": "ar_seif_el_isl_w413",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "هاد بيأثر على أي قضية عندك",
+  "new": "ليش الضابط بيقدم على التعذيب",
+  "new_all": [
+   "ليش الضابط بيقدم على التعذيب",
+   "يا زلمة شو هالقصة بالتعذيب",
+   "جرب ما تحكم قبل تسمع حالتين"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "reaction",
+   "challenge"
+  ],
+  "new_points": 2,
+  "excerpt": "التعذيب الا في حالتين واخرتين اثنين في القضايا الجنائيه العاديه هتلاقي ضباط من بحث امن ان واحد الجنائيين تقدموا للتعذيب لان ما عليهمش نفس درجه الحمايه اللي خاصه"
+ },
+ {
+  "id": "ar_seif_el_isl_w436",
+  "niche": "podcast",
+  "lang": "ar",
+  "old": "مين رح يحاسب عن التعذيب هون",
+  "new": "استنى لتعرف مين بيحقق",
+  "new_all": [
+   "استنى لتعرف مين بيحقق",
+   "ليش ما في جهة محايدة",
+   "يا زلمة وين جهة التحقيق"
+  ],
+  "formats": [
+   "wait_for_it",
+   "curiosity_gap",
+   "reaction"
+  ],
+  "new_points": 0,
+  "excerpt": "استقلال كامل قضاء بجد بحيث يبقى ينظر بطريقه عادله ومصفه في وقائع التعذيب فلو حتى الاثنين دول مستقتلين عندي لا عندي سلطه تحقيق مستقله ولا عندي قضاء كامل لاستقلال"
+ },
+ {
+  "id": "en_cordkillers_441",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Is two minutes really a view",
+  "new": "More people quit Extraction than Bird Box",
+  "new_all": [
+   "More people quit Extraction than Bird Box",
+   "Why Bird Box tops hours watched",
+   "Bro a view equals two minutes"
+  ],
+  "formats": [
+   "contradiction",
+   "curiosity_gap",
+   "reaction"
+  ],
+  "new_points": 2,
+  "excerpt": "A view, of course, in Netflix's opinion is at least two minutes during the first twenty eight days of availability. Bridgerton led the way for series with 82,00"
+ },
+ {
+  "id": "en_cordkillers_5",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Her lipstick was not smudged",
+  "new": "Two wives for Harold now dead",
+  "new_all": [
+   "Two wives for Harold now dead",
+   "Wait Harold had two wives",
+   "Wait for the lipstick clue"
+  ],
+  "formats": [
+   "numbered",
+   "reaction",
+   "wait_for_it"
+  ],
+  "new_points": 0,
+  "excerpt": "My brother said, Tony's been in an accident. She was gone. Now we have a investigation we have to conduct. There were small things that didn't totally add up. T"
+ },
+ {
+  "id": "en_cordkillers_316",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Did Netflix just buy Roald Dahl?",
+  "new": "Bro, Taika is attached to Charlie?",
+  "new_all": [
+   "Bro, Taika is attached to Charlie?",
+   "Which Dahl book is already licensed?",
+   "Wait for the part about Phil Johnston"
+  ],
+  "formats": [
+   "reaction",
+   "curiosity_gap",
+   "wait_for_it"
+  ],
+  "new_points": 2,
+  "excerpt": "So, Netflix acquired the Roald Dahl story company, which administers the rights to the works of the late author Roald Dahl. Netflix had already reached a deal. "
+ },
+ {
+  "id": "en_cordkillers_w62",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Was that a trailer or a call",
+  "new": "Try not to laugh at scancy pants",
+  "new_all": [
+   "Try not to laugh at scancy pants",
+   "4 episodes start Tuesday this week",
+   "Why she said it wasn't a phone call"
+  ],
+  "formats": [
+   "challenge",
+   "numbered",
+   "curiosity_gap"
+  ],
+  "new_points": 0,
+  "excerpt": "I swear. I don't think that was about us. That was... Oh, god. That wasn't a phone call. That was a video. Kind of scancy pants. I'm not gonna lie. That was a t"
+ },
+ {
+  "id": "en_cordkillers_w87",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why white millennials love true crime",
+  "new": "Hear me out ask Ayaz Akhtar",
+  "new_all": [
+   "Hear me out ask Ayaz Akhtar",
+   "The note he found from last episode",
+   "Bet you missed the Ayaz name drop"
+  ],
+  "formats": [
+   "hear_me_out",
+   "curiosity_gap",
+   "challenge"
+  ],
+  "new_points": 0,
+  "excerpt": "White millennials do love their true crime. You know, yeah, you know who doesn't have an alibi, who I think they should talk to about what happened at at this t"
+ },
+ {
+  "id": "en_cordkillers_w112",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why did Netflix steal the headlines",
+  "new": "Why the Tadam event mattered",
+  "new_all": [
+   "Why the Tadam event mattered",
+   "Cordkillers actually became a Netflix show",
+   "Bro really called Netflix Tadam"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "contradiction",
+   "reaction"
+  ],
+  "new_points": 2,
+  "excerpt": "So I'm really sad. How did you know? How did... That's just crazy. You know? Wow. Yeah. Well, folks, people used to joke in the early days of Cordkillers and it"
+ },
+ {
+  "id": "en_cordkillers_w148",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Did Netflix just list a VR game",
+  "new": "Bet you missed Netflix's April 20 listing",
+  "new_all": [
+   "Bet you missed Netflix's April 20 listing",
+   "Bro Netflix uploaded Eden Unearthed?",
+   "Why Eden Unearthed showed up on App Lab"
+  ],
+  "formats": [
+   "challenge",
+   "reaction",
+   "curiosity_gap"
+  ],
+  "new_points": 0,
+  "excerpt": "That took place on Saturday. We will start, however, with the the non Tadam news and then move quickly through some, but not all, of the content announcements, "
+ },
+ {
+  "id": "en_cordkillers_w175",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why bet only on mobile",
+  "new": "Hear me out, Oculus people are voracious",
+  "new_all": [
+   "Hear me out, Oculus people are voracious",
+   "Bro really said no interest in VR",
+   "Try not to notice Oculus"
+  ],
+  "formats": [
+   "hear_me_out",
+   "reaction",
+   "challenge"
+  ],
+  "new_points": 2,
+  "excerpt": "So I've been thinking, they'll just do mobile. And I guess VR kind of mobile with the Oculus because it's not wired, but, doing VR too, looks like. At least exp"
+ },
+ {
+  "id": "en_cordkillers_w199",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Did Netflix just go free in Kenya",
+  "new": "Why Netflix gave Kenya 25% access",
+  "new_all": [
+   "Why Netflix gave Kenya 25% access",
+   "Bro Netflix free in Kenya",
+   "Bet you install it on Android"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "reaction",
+   "challenge"
+  ],
+  "new_points": 0,
+  "excerpt": "I I feel like this isn't... This is a... Maybe someday this will become something, so let's keep trying it until it does. Netflix also launched a free mobile ve"
+ },
+ {
+  "id": "en_cordkillers_w236",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why is Netflix going free in India",
+  "new": "Bro, Netflix went free in India",
+  "new_all": [
+   "Bro, Netflix went free in India",
+   "The $3 mobile plan in India",
+   "Bet you missed the Tom line"
+  ],
+  "formats": [
+   "reaction",
+   "numbered",
+   "challenge"
+  ],
+  "new_points": 2,
+  "excerpt": "Netflix has previously done free trials, of course, and they offer a mobile service for about $3, US in India. But this is certainly the most expansive free ver"
+ },
+ {
+  "id": "en_cordkillers_w269",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "They only show 25 percent at a time",
+  "new": "Giving it away grows subscribers",
+  "new_all": [
+   "Giving it away grows subscribers",
+   "Hear me out, free Netflix wins",
+   "Bro, they give it away free"
+  ],
+  "formats": [
+   "contradiction",
+   "hear_me_out",
+   "reaction"
+  ],
+  "new_points": 0,
+  "excerpt": "It's really good. It's Netflix. It's brilliant. I... It it it has no friction to entry, and it's limited in all the right ways where if you care, if you like th"
+ },
+ {
+  "id": "en_cordkillers_w355",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "19 Roald Dahl projects are coming",
+  "new": "19 Roald Dahl projects incoming",
+  "new_all": [
+   "19 Roald Dahl projects incoming",
+   "Why there are 19 Dahl projects",
+   "Wait for Netflix Roald Dahl tie ins"
+  ],
+  "formats": [
+   "numbered",
+   "curiosity_gap",
+   "wait_for_it"
+  ],
+  "new_points": 2,
+  "excerpt": "The company will work as an autonomous unit under Netflix, it will continue to develop and expand on the 19 TV shows, films, stage shows, and live experiences c"
+ },
+ {
+  "id": "en_cordkillers_w379",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why is Netflix buying comic universes",
+  "new": "Why Netflix bought the Millerverse",
+  "new_all": [
+   "Why Netflix bought the Millerverse",
+   "Hear me out Netflix will remake Millerverse",
+   "Miller was the first buy"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "hear_me_out",
+   "numbered"
+  ],
+  "new_points": 2,
+  "excerpt": "I I don't have any interest in Roald Dahl's stuff. Oh, it's always big when Netflix is picking up companies and when they bought the Miller verse from Mike Mill"
+ },
+ {
+  "id": "en_cordkillers_w409",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Netflix just revealed top 10 viewer counts",
+  "new": "What Ted Serendaus just revealed",
+  "new_all": [
+   "What Ted Serendaus just revealed",
+   "Wait for the number Ted drops",
+   "Bro really remade James and the Giant Peach"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "wait_for_it",
+   "reaction"
+  ],
+  "new_points": 2,
+  "excerpt": "They'll level up. They'll they'll try this, then they'll get a little bigger. This time, they got a little bigger with Roald Dahl, Charlie and the Chocolate Fac"
+ },
+ {
+  "id": "en_cordkillers_w529",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Does 100,000,000 views mean anything",
+  "new": "Two minute views aren't BS",
+  "new_all": [
+   "Two minute views aren't BS",
+   "Bro Netflix flexed 100,000,000 views",
+   "100,000,000 views anchors everything"
+  ],
+  "formats": [
+   "contradiction",
+   "reaction",
+   "numbered"
+  ],
+  "new_points": 1,
+  "excerpt": "Hulu's gonna be shouting numbers, all that stuff. And so by anchoring these bigger numbers, like, doesn't matter. And and in fact, you would want to use a BS me"
+ },
+ {
+  "id": "en_cordkillers_w559",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Do hours watched matter more than views",
+  "new": "Why Birdbox flips with Extraction",
+  "new_all": [
+   "Why Birdbox flips with Extraction",
+   "15 minute number close to 2 minute",
+   "Bet you miss Birdbox Extraction flip"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "numbered",
+   "challenge"
+  ],
+  "new_points": 2,
+  "excerpt": "And if you look at the list of total hours viewed, it kinda tracks. Most of the stuff that shows up on the on the views side shows up in the total hours track, "
+ }
+]
