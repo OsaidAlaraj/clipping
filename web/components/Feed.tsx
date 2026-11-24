@@ -29,6 +29,7 @@ type Summary = { clips_reviewed: number; accepted: number; rejected: number; par
 type Sheet = null | "reject" | "hooks" | "edit" | "report" | "filtered";
 type Decision = "accept" | "reject" | "later";
 import { shuffleAhead } from "@/lib/shuffle";
+import { setSoundOn, useGesture, useSound } from "@/lib/sound";
 
 const SKIP_GAP = 5;        // a skipped clip returns after this many other clips
 const MAX_RETURNS = 2;     // it returns at most twice; the next skip moves it to Review Later
@@ -264,31 +265,43 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
 }) {
   const { t, lang } = useLang();
   const video = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true); // iOS blocks sound autoplay: clips start muted, a tap turns sound on
+  // Owner note 11: sound is on by default and remembered for every player. The browser may refuse it until the person touches
+  // the page; then the clip plays muted and shows the tap, and it retries with sound on the first touch.
+  const soundOn = useSound();
+  const gesture = useGesture();
+  const [blocked, setBlocked] = useState(false);
+  const audible = soundOn && !blocked;
   const [progress, setProgress] = useState(0);
   const [textHidden, setTextHidden] = useState(false); // the caption block can be hidden to see the whole picture
-  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setMuted((value) => !value) } : {}, { tilt: true });
+  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setSoundOn(!audible) } : {}, { tilt: true });
 
   // Only the clip on screen plays; the buffered ones wait and start from their first frame the moment they are shown.
   useEffect(() => {
     const el = video.current;
     if (!el) return;
-    if (active) el.play()?.catch?.(() => undefined);
-    else { el.pause(); setMuted(true); setProgress(0); }
-  }, [active]);
+    if (!active) { el.pause(); setProgress(0); return; }
+    el.muted = !soundOn;
+    setBlocked(false);
+    el.play()?.catch?.(() => {
+      // The browser refused sound: play muted, and show the tap.
+      el.muted = true;
+      setBlocked(true);
+      el.play()?.catch?.(() => undefined);
+    });
+  }, [active, soundOn, gesture]);
 
   /** Full screen with sound. iPhone Safari only supports its own player on a video element (webkitEnterFullscreen). */
   const fullScreen = () => {
     const el = video.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
     if (!el) return;
     el.muted = false;
-    setMuted(false);
+    setSoundOn(true);
     if (el.requestFullscreen) el.requestFullscreen().catch(() => el.webkitEnterFullscreen?.());
     else el.webkitEnterFullscreen?.();
   };
 
   const player = clip.video_url && (
-    <video ref={video} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={muted} autoPlay={active} loop playsInline preload={preload}
+    <video ref={video} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={!audible} autoPlay={active} loop playsInline preload={preload}
       onTimeUpdate={active ? (event) => { const el = event.currentTarget; if (el.duration) setProgress((el.currentTime / el.duration) * 100); } : undefined} />
   );
   // The buffered card keeps the video in the same position as the visible one, so React reuses the element (and its loaded data) when the card becomes active.
@@ -302,7 +315,7 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
       {player}
       {intent === "right" && <div className="swipe-flag yes">{t("acceptPost")}</div>}
       {intent === "left" && <div className="swipe-flag no">{t("reject")}</div>}
-      {muted && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
+      {!audible && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
       <div className={`bottom${textHidden ? " text-hidden" : ""}`} aria-hidden={textHidden || undefined}>
         <div className="line">
           <strong>{clip.account_handle ? `@${clip.account_handle}` : "No account"}</strong>
@@ -338,6 +351,7 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
 
 export default function Feed({ campaignId, onExit }: { campaignId?: string; onExit?: () => void }) {
   const { t } = useLang();
+  const soundOn = useSound();
   const key = feedKey(campaignId);
   const cached = peek<FeedData>(key);
   // A feed seen a moment ago is on screen straight away; the fresh one replaces it while nothing has been decided yet.
@@ -635,6 +649,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
               <button className={`chip rules ${clip.compliance_status}`} onClick={() => setSheet("report")} aria-label={`Rules check: ${clip.compliance_status}`}>
                 {clip.compliance_status === "pass" ? "Rules OK" : clip.compliance_status === "fail" ? "Rules failed" : "Check rules"}
               </button>
+              <button className="chip" aria-pressed={soundOn} onClick={() => setSoundOn(!soundOn)}>{soundOn ? t("mute") : t("soundOn")}</button>
               <span className="chip" aria-label="Position in feed">{index + 1} of {clips.length}</span>
               {filtered.length > 0 && <button className="chip" onClick={() => setSheet("filtered")}>{t("filtered")} {filtered.length}</button>}
               <button className="chip" onClick={() => setClips((list) => (list ? shuffleAhead(list, index) : list))}>{t("shuffle")}</button>

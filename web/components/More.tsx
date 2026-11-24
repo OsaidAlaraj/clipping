@@ -8,6 +8,7 @@ import { plainAlert } from "@/lib/alertText";
 import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
+import { setSoundOn, useSound } from "@/lib/sound";
 import { RejectSheet } from "./Feed";
 import { DetailSkeleton, RowsSkeleton } from "./Skeleton";
 
@@ -47,6 +48,7 @@ type Folder = { campaign_id: string; campaign_name: string; deadline: string | n
 
 export function ReviewLater() {
   const { data, error, setError, load } = useLoad<{ folders: Folder[] }>("/api/review-later");
+  const soundOn = useSound(); // owner note 11: the same sound choice as the feed
   const [rejecting, setRejecting] = useState<string | null>(null);
   const act = async (fn: () => Promise<unknown>) => { try { await fn(); load(); } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } };
   return (
@@ -64,9 +66,10 @@ export function ReviewLater() {
           <span className="small muted">{folder.deadline ? `Deadline ${new Date(folder.deadline).toLocaleDateString()}` : "No deadline"}{folder.closed ? ". This campaign is closed, so these clips can no longer be accepted." : ""}</span>
           {folder.clips.map((clip) => (
             <div key={clip.id} className="later-row">
-              {clip.video_url && <video src={clip.video_url} muted playsInline preload="metadata" />}
+              {clip.video_url && <video src={clip.video_url} muted={!soundOn} controls playsInline preload="metadata" />}
               <div className="stack" style={{ gap: 6 }}>
                 <span dir="auto" style={{ fontWeight: 600 }}>{clip.hook_text}</span>
+                {clip.video_url && <button className="chip" style={{ alignSelf: "start" }} aria-pressed={soundOn} onClick={() => setSoundOn(!soundOn)}>{soundOn ? "Mute" : "Sound on"}</button>}
                 <span className="small muted">Parked: {clip.park_reason ?? "no reason given"}</span>
                 {!folder.closed && (
                   <div className="row">
