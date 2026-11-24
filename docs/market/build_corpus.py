@@ -1,6 +1,6 @@
 """Market corpus builder (cheap, resumable, no API key, no video download). For each niche x language: YouTube search (this month, by view
 count), keep Shorts-length results (<= 90 s), look up each channel's recent median views for an outlier score, and try the first words
-from the auto-captions (VTT only). Writes L:\\Projects\\Clipping\\.data\\market\\youtube.jsonl (one row per video, dated, with `expires`).
+from the auto-captions (VTT only). Writes L:\\Projects\\Clipping\\.data\\market\\youtube_curated.jsonl (one row per video, dated, with `expires`).
 Run:  .venv\\Scripts\\python.exe docs\\market\\build_corpus.py [cells_limit]   (anonymous, slow on purpose; see docs/market-corpus.md)"""
 import datetime
 import json
@@ -24,6 +24,18 @@ CELLS = {
     ("comedy", "en"): ["stand up comedy shorts", "funny sketch shorts"], ("comedy", "ar"): ["كوميدي مقطع مضحك شورتس", "ستاند اب كوميدي شورتس"],
     ("movies", "en"): ["movie scene shorts", "tv series scene shorts"], ("movies", "ar"): ["مشهد فيلم شورتس", "مشهد مسلسل شورتس"],
     ("general", "en"): ["viral youtube shorts", "most viewed shorts"], ("general", "ar"): ["شورتس منتشر", "اكثر مشاهدة شورتس"],
+}
+
+
+# v2: search discovery was noisy (kids, DIY, music channels), so the real run uses known channels per cell (handles that do not resolve are skipped).
+CURATED = {
+    ("gaming", "en"): ["IShowSpeed", "Jynxzi", "KaiCenatLive", "xQcOW", "Ludwig", "Markiplier"], ("gaming", "ar"): ["aboflah", "SA7RAWI"],
+    ("podcast", "en"): ["lexfridman", "PowerfulJRE", "TheDiaryOfACEO", "hubermanlab", "flagrantpodcast"], ("podcast", "ar"): ["thmanyah"],
+    ("business", "en"): ["AlexHormozi", "CodieSanchez", "Valuetainment", "garyvee", "ycombinator"], ("business", "ar"): ["thmanyah", "Annajah"],
+    ("sports", "en"): ["ESPN", "brfootball", "DAZNFootball", "NBA", "FabrizioRomano"],
+    ("comedy", "en"): ["netflixisajoke", "jimmyfallon", "kevinhart4real", "ComedyCentral", "SNL"],
+    ("movies", "en"): ["Movieclips", "netflix", "HBO", "A24", "WarnerBrosPictures"],
+    ("general", "en"): ["MrBeast", "MarkRober", "DudePerfect"],
 }
 
 
@@ -65,16 +77,18 @@ def first_words(vid, lang):
 
 def main():
     limit = int(sys.argv[1]) if len(sys.argv) > 1 else 99
-    path = OUT / "youtube.jsonl"
+    path = OUT / "youtube_curated.jsonl"
     done = {(json.loads(l)["niche"], json.loads(l)["lang"]) for l in path.read_text(encoding="utf-8").splitlines()} if path.exists() else set()
     medians: dict[str, float | None] = {}
     for (niche, lang), queries in list(CELLS.items())[:limit]:
+        if (niche, lang) not in CURATED:
+            continue
         if (niche, lang) in done:
             continue
         # 1) discover active channels of the niche from search results (short-video filter); 2) read each channel's newest 30 Shorts
         # (newest first, so roughly the last weeks; the flat listing has no dates) and score every one against that channel's own median
-        channels: dict[str, str] = {}
-        for q in queries:
+        channels: dict[str, str] = {f"https://www.youtube.com/@{h}": h for h in CURATED.get((niche, lang), [])}
+        for q in ([] if channels else queries):
             for r in flat(f"https://www.youtube.com/results?search_query={q.replace(' ', '+')}&sp=EgIYAQ%253D%253D", 40):
                 if r.get("channel_url") and r["channel_url"] not in channels:
                     channels[r["channel_url"]] = r.get("channel")

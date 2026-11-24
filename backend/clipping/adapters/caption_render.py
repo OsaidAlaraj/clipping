@@ -50,7 +50,7 @@ STYLES: dict[str, dict] = {
 DEFAULT_STYLE = "karaoke_clean"
 # What "auto" resolves to: the niche decides (podcasts and interviews name the speaker, gaming is loud, business stresses key words).
 AUTO_BY_NICHE = {"gaming": "bold_pop", "podcast": "speaker_label", "business": "emphasis", "lifestyle": "stacked", "arabic": "karaoke_clean",
-                 "comedy": "bold_pop", "sports": "bold_pop", "movies": "minimal", "general": "karaoke_clean"}   # movies: small and steady so the picture and the scene lead
+                 "comedy": "hype", "sports": "bold_pop", "movies": "karaoke_clean", "general": "karaoke_clean"}   # docs/bakeoff/templates-2: hype 81%, bold_pop 88% in the blind stills round; minimal scored 3% so movies use the calm clean karaoke
 SPEAKER_SHOWN_S = 2.2
 _PLACEHOLDER = re.compile(r"^\s*(speaker|spk|host|guest|متحدث|المتحدث|ضيف|الضيف)?\s*[#_-]?\s*\d*\s*$", re.IGNORECASE)
 

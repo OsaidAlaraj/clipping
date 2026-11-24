@@ -137,7 +137,7 @@ LLM_SYSTEM = {
             "name or number from segment_text; a line that would fit any video is wrong. Never promise what the clip does not deliver; "
             "never invent a quote. Never use AI-sounding words (unlock, game-changer, dive into, delve, leverage, journey, elevate, "
             "here's why, you won't believe). A dry joke or a relatable exaggeration beats a statement, and cringe is worse than plain. "
-            "Then mark each candidate honestly from 0 to 10 (be tough: most lines deserve 4 to 6) on specific_to_clip, curiosity_gap, "
+            "Match the mood: tag formats (POV:, Nobody:, Me when:) and jokes are only for light, playful clips; for serious, sad or heavy topics (law, prison, death, money trouble) use plain curiosity, a real number or a contradiction and never joke. Then mark each candidate honestly from 0 to 10 (be tough: most lines deserve 4 to 6) on specific_to_clip, curiosity_gap, "
             "humour, trendiness, clarity and length (10 = lands in 3 seconds). Reply with JSON only: "
             "{\"hooks\":[{\"text\",\"format\",\"type\",\"rubric\":{\"specific_to_clip\",\"curiosity_gap\",\"humour\",\"trendiness\","
             "\"clarity\",\"length\"}}]}. type is one of question, contrarian, stakes, number, story-open."),
@@ -153,7 +153,7 @@ LLM_SYSTEM = {
             "قواعد صارمة: من 3 إلى 9 كلمات بدون الـ tag، فكرة واحدة، بتتسع بسطرين قصار؛ ممنوع الشرطات والفاصلة المنقوطة وعلامات "
             "الاقتباس والإيموجي والهاشتاغ. خليها محددة لهالمقطع بالذات: استعمل تفصيل أو اسم أو رقم حقيقي من segment_text، وأي جملة بتنفع "
             "لأي فيديو غلط. لا تعد بشي المقطع ما بقدمه ولا تخترع اقتباس. ممنوع كلام الذكاء الاصطناعي مثل اكتشف وأطلق العنان وفي هذا "
-            "الفيديو وسر النجاح وهل تعلم. نكتة ناشفة أو مبالغة بيعرفها الكل أحسن من جملة تقريرية، والتصنّع أسوأ من البساطة. بعدين قيّم كل "
+            "الفيديو وسر النجاح وهل تعلم. نكتة ناشفة أو مبالغة بيعرفها الكل أحسن من جملة تقريرية، والتصنّع أسوأ من البساطة. طابق المزاج: الصيغ ذات الوسم (POV: ما حدا: أنا لما:) والنكت فقط للمقاطع الخفيفة؛ للمواضيع الجدية أو الحزينة أو الثقيلة (قانون، سجن، موت، ضائقة مالية) استعمل فضول بسيط أو رقم حقيقي أو تناقض ولا تمزح أبداً. بعدين قيّم كل "
             "جملة بصدق من 0 إلى 10 (كن قاسي: أغلب الجمل بين 4 و6) على specific_to_clip وcuriosity_gap وhumour وtrendiness وclarity وlength. "
             "أجب بـ JSON فقط: {\"hooks\":[{\"text\",\"format\",\"type\",\"rubric\":{\"specific_to_clip\",\"curiosity_gap\",\"humour\","
             "\"trendiness\",\"clarity\",\"length\"}}]}. type واحد من question وcontrarian وstakes وnumber وstory-open."),

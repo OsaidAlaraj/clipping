@@ -358,5 +358,277 @@
   ],
   "new_points": 0,
   "excerpt": "A view, of course, in Netflix's opinion is at least two minutes during the first twenty eight days of availability. Bridgerton led the way for series with 82,00"
+ },
+ {
+  "id": "en_cordkillers_5",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Two of Harold's wives died",
+  "new": "2 wives died, lipstick not smudged",
+  "new_all": [
+   "2 wives died, lipstick not smudged",
+   "Nobody: Him explaining Harold's two dead wives",
+   "Me when: brother says Tony's been in an accident"
+  ],
+  "formats": [
+   "numbered",
+   "nobody",
+   "me_when"
+  ],
+  "new_points": 2,
+  "excerpt": "My brother said, Tony's been in an accident. She was gone. Now we have a investigation we have to conduct. There were small things that didn't totally add up. T"
+ },
+ {
+  "id": "en_cordkillers_316",
+  "niche": "podcast",
+  "lang": "en",
+  "skipped": "ReadTimeout('The read operation timed out')"
+ },
+ {
+  "id": "en_cordkillers_w62",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Four episodes drop this week",
+  "new": "Hulu turned Tony Henthorne into TV",
+  "new_all": [
+   "Hulu turned Tony Henthorne into TV",
+   "4 episodes in 4 days",
+   "Not me saying scancy pants"
+  ],
+  "formats": [
+   "outcome_first",
+   "numbered",
+   "not_me"
+  ],
+  "new_points": 2,
+  "excerpt": "I swear. I don't think that was about us. That was... Oh, god. That wasn't a phone call. That was a video. Kind of scancy pants. I'm not gonna lie. That was a t"
+ },
+ {
+  "id": "en_cordkillers_w87",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "I found my note from last episode",
+  "new": "Why Ayaz kept that note",
+  "new_all": [
+   "Why Ayaz kept that note",
+   "Tell me you're on CNN Zone without telling me",
+   "Wait for Ayaz's note reveal"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "tell_me_without",
+   "wait_for_it"
+  ],
+  "new_points": 2,
+  "excerpt": "White millennials do love their true crime. You know, yeah, you know who doesn't have an alibi, who I think they should talk to about what happened at at this t"
+ },
+ {
+  "id": "en_cordkillers_w112",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Did Netflix invent a fan ritual",
+  "new": "POV: you hear the Netflix sound",
+  "new_all": [
+   "POV: you hear the Netflix sound",
+   "Why Cordkillers joked about Netflix",
+   "Me when: they play Tadam"
+  ],
+  "formats": [
+   "pov",
+   "curiosity_gap",
+   "me_when"
+  ],
+  "new_points": 0,
+  "excerpt": "So I'm really sad. How did you know? How did... That's just crazy. You know? Wow. Yeah. Well, folks, people used to joke in the early days of Cordkillers and it"
+ },
+ {
+  "id": "en_cordkillers_w148",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Did Netflix just enter VR gaming?",
+  "new": "Bro really listed Eden Unearthed",
+  "new_all": [
+   "Bro really listed Eden Unearthed",
+   "Hear me out App Lab just got Netflix",
+   "Why Netflix listed Eden Unearthed April 20"
+  ],
+  "formats": [
+   "reaction",
+   "hear_me_out",
+   "curiosity_gap"
+  ],
+  "new_points": 0,
+  "excerpt": "That took place on Saturday. We will start, however, with the the non Tadam news and then move quickly through some, but not all, of the content announcements, "
+ },
+ {
+  "id": "en_cordkillers_w175",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "I'm not into VR",
+  "new": "Why he called Oculus a mobile play",
+  "new_all": [
+   "Why he called Oculus a mobile play",
+   "1 reason he has no interest in VR",
+   "Nobody: Him casually killing VR interest"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "numbered",
+   "nobody"
+  ],
+  "new_points": 2,
+  "excerpt": "So I've been thinking, they'll just do mobile. And I guess VR kind of mobile with the Oculus because it's not wired, but, doing VR too, looks like. At least exp"
+ },
+ {
+  "id": "en_cordkillers_w199",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Netflix free in Kenya now?",
+  "new": "25% of Netflix catalog free in Kenya",
+  "new_all": [
+   "25% of Netflix catalog free in Kenya",
+   "Netflix did NOT just go free in Kenya",
+   "Nobody: Netflix handing 25% of shows away"
+  ],
+  "formats": [
+   "numbered",
+   "he_did_not",
+   "nobody"
+  ],
+  "new_points": 2,
+  "excerpt": "I I feel like this isn't... This is a... Maybe someday this will become something, so let's keep trying it until it does. Netflix also launched a free mobile ve"
+ },
+ {
+  "id": "en_cordkillers_w236",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Is Netflix launching a huge free tier?",
+  "new": "Wait for Tom saying he never considered this",
+  "new_all": [
+   "Wait for Tom saying he never considered this",
+   "Not me excited about Netflix's free tier",
+   "Netflix launches its most expansive free version"
+  ],
+  "formats": [
+   "wait_for_it",
+   "not_me",
+   "outcome_first"
+  ],
+  "new_points": 1,
+  "excerpt": "Netflix has previously done free trials, of course, and they offer a mobile service for about $3, US in India. But this is certainly the most expansive free ver"
+ },
+ {
+  "id": "en_cordkillers_w269",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Netflix shows only 25% of its library",
+  "new": "Nobody: Netflix gives away 25% content",
+  "new_all": [
+   "Nobody: Netflix gives away 25% content",
+   "Why Netflix changes which 25% shows",
+   "25% Netflix you never see"
+  ],
+  "formats": [
+   "nobody",
+   "curiosity_gap",
+   "numbered"
+  ],
+  "new_points": 0,
+  "excerpt": "It's really good. It's Netflix. It's brilliant. I... It it it has no friction to entry, and it's limited in all the right ways where if you care, if you like th"
+ },
+ {
+  "id": "en_cordkillers_w355",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Did Netflix just buy Roald Dahl rights?",
+  "new": "Why 19 Dahl projects just got Netflix",
+  "new_all": [
+   "Why 19 Dahl projects just got Netflix",
+   "POV: You're the exec told about 19 shows",
+   "Tell me you made 19 shows without saying"
+  ],
+  "formats": [
+   "curiosity_gap",
+   "pov",
+   "tell_me_without"
+  ],
+  "new_points": 2,
+  "excerpt": "The company will work as an autonomous unit under Netflix, it will continue to develop and expand on the 19 TV shows, films, stage shows, and live experiences c"
+ },
+ {
+  "id": "en_cordkillers_w379",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why is Netflix buying entire universes",
+  "new": "Nobody: Me overreacting to Miller buy",
+  "new_all": [
+   "Nobody: Me overreacting to Miller buy",
+   "Tell me you don't like Roald Dahl",
+   "Miller gets remade then canceled"
+  ],
+  "formats": [
+   "nobody",
+   "tell_me_without",
+   "outcome_first"
+  ],
+  "new_points": 0,
+  "excerpt": "I I don't have any interest in Roald Dahl's stuff. Oh, it's always big when Netflix is picking up companies and when they bought the Miller verse from Mike Mill"
+ },
+ {
+  "id": "en_cordkillers_w409",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Why is Dahl getting remade again",
+  "new": "Nobody: Ted Serendaus drops Netflix receipts",
+  "new_all": [
+   "Nobody: Ted Serendaus drops Netflix receipts",
+   "Ted Serendaus showed real view counts",
+   "What Netflix's top 10 numbers actually showed"
+  ],
+  "formats": [
+   "nobody",
+   "outcome_first",
+   "curiosity_gap"
+  ],
+  "new_points": 0,
+  "excerpt": "They'll level up. They'll they'll try this, then they'll get a little bigger. This time, they got a little bigger with Roald Dahl, Charlie and the Chocolate Fac"
+ },
+ {
+  "id": "en_cordkillers_w529",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Are streaming numbers lying to you",
+  "new": "100,000,000 views makes two minutes boring",
+  "new_all": [
+   "100,000,000 views makes two minutes boring",
+   "Why two minutes tanks press coverage",
+   "Nobody: Hulu shouting numbers in every press release"
+  ],
+  "formats": [
+   "numbered",
+   "curiosity_gap",
+   "nobody"
+  ],
+  "new_points": 2,
+  "excerpt": "Hulu's gonna be shouting numbers, all that stuff. And so by anchoring these bigger numbers, like, doesn't matter. And and in fact, you would want to use a BS me"
+ },
+ {
+  "id": "en_cordkillers_w559",
+  "niche": "podcast",
+  "lang": "en",
+  "old": "Total hours matter more than clicks",
+  "new": "Nobody: Birdbox and Extraction swapping spots",
+  "new_all": [
+   "Nobody: Birdbox and Extraction swapping spots",
+   "Why Birdbox and Extraction keep flipping",
+   "He did NOT just compare 15 and 2 minutes"
+  ],
+  "formats": [
+   "nobody",
+   "curiosity_gap",
+   "he_did_not"
+  ],
+  "new_points": 2,
+  "excerpt": "And if you look at the list of total hours viewed, it kinda tracks. Most of the stuff that shows up on the on the views side shows up in the total hours track, "
  }
 ]

@@ -7,7 +7,14 @@
       "id": "pov",
       "language": "en",
       "tag": "POV:",
-      "niches": [],
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
       "weight": 0.8,
       "expires": "2027-03-01",
       "type": "story-open",
@@ -23,7 +30,6 @@
       "tag": "Nobody:",
       "niches": [
         "gaming",
-        "podcast",
         "lifestyle",
         "general",
         "comedy",
@@ -45,7 +51,6 @@
       "tag": "Me when:",
       "niches": [
         "gaming",
-        "podcast",
         "lifestyle",
         "general",
         "comedy",
@@ -65,7 +70,14 @@
       "id": "tell_me_without",
       "language": "en",
       "tag": null,
-      "niches": [],
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
       "weight": 0.9,
       "expires": "2027-03-01",
       "type": "contrarian",
@@ -102,7 +114,6 @@
       "language": "en",
       "tag": null,
       "niches": [
-        "podcast",
         "lifestyle",
         "gaming",
         "general",
@@ -125,7 +136,6 @@
       "tag": null,
       "niches": [
         "gaming",
-        "podcast",
         "general",
         "comedy",
         "movies",
@@ -305,7 +315,14 @@
       "id": "pov",
       "language": "ar",
       "tag": "POV:",
-      "niches": [],
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
       "weight": 0.8,
       "expires": "2027-03-01",
       "type": "story-open",
@@ -321,7 +338,6 @@
       "tag": "ما حدا:",
       "niches": [
         "gaming",
-        "podcast",
         "lifestyle",
         "general",
         "comedy",
@@ -343,7 +359,6 @@
       "tag": "أنا لما:",
       "niches": [
         "gaming",
-        "podcast",
         "lifestyle",
         "general",
         "comedy",
@@ -363,7 +378,14 @@
       "id": "tell_me_without",
       "language": "ar",
       "tag": null,
-      "niches": [],
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
       "weight": 0.8,
       "expires": "2027-03-01",
       "type": "contrarian",
@@ -400,7 +422,6 @@
       "language": "ar",
       "tag": null,
       "niches": [
-        "podcast",
         "lifestyle",
         "gaming",
         "general",
@@ -423,7 +444,6 @@
       "tag": null,
       "niches": [
         "gaming",
-        "podcast",
         "general",
         "comedy",
         "movies",

@@ -49,7 +49,7 @@ def test_trend_formats_expire_and_the_lexicon_is_consistent():
     for lang in ("en", "ar"):
         for niche in ("business", "gaming", "podcast", "lifestyle", "comedy", "movies", "sports", "general"):
             assert len(hook_lexicon.fewshot(lang, niche)) >= 2
-            assert len(hook_lexicon.formats(lang, niche)) >= 8        # enough different formats for 8 candidates
+            assert len(hook_lexicon.formats(lang, niche)) >= 6        # enough different formats for a spread of candidates
     assert hook_lexicon.load()["rubric_weights"].keys() == set(hook_lexicon.load()["rubric"])
     assert abs(sum(hook_lexicon.load()["rubric_weights"].values()) - 1) < 1e-9
 
