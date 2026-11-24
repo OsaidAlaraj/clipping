@@ -15,6 +15,7 @@ from .base import Adapter, AdapterError, http_client, register
 
 PLATFORM_LABEL = {"youtube_shorts": "YouTube", "instagram_reels": "Instagram", "tiktok": "TikTok"}
 PLATFORMS = tuple(PLATFORM_LABEL)
+IG_API_VERSION = "v27.0"     # Meta's current Instagram API version; the publishing adapter row (adapters.config_json) can override it
 PKCE_PLATFORMS = {"youtube_shorts"}   # the TikTok PKCE encoding differs from RFC 7636: check it live before switching it on
 
 
@@ -59,6 +60,15 @@ def _json(response, on_permanent: Exception | None = None) -> dict:
     return data
 
 
+def _ig_first(data: dict) -> dict:
+    """The short-lived token answer is {"data": [{access_token, user_id, permissions}]} in Meta's current docs; older answers were flat."""
+    rows = data.get("data")
+    first = rows[0] if isinstance(rows, list) and rows and isinstance(rows[0], dict) else data
+    if not isinstance(first.get("access_token"), str):
+        raise AdapterError("unexpected response")
+    return first
+
+
 def _seconds(value) -> int | None:
     return int(value) if isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0 else None
 
@@ -94,13 +104,14 @@ class PlatformOAuth(Adapter):
                 snippet = item.get("snippet") or {}
                 return self._result(data, item.get("id"), snippet.get("customUrl") or snippet.get("title"))
             if platform == "instagram_reels":
-                short = _json(client.post("https://api.instagram.com/oauth/access_token", data={
-                    "client_id": client_id, "client_secret": secret, "grant_type": "authorization_code", "redirect_uri": redirect, "code": code}))
+                short = _ig_first(_json(client.post("https://api.instagram.com/oauth/access_token", data={
+                    "client_id": client_id, "client_secret": secret, "grant_type": "authorization_code", "redirect_uri": redirect,
+                    "code": code.removesuffix("#_")})))     # Instagram appends "#_" to the code: it is not part of it
                 long = _json(client.get("https://graph.instagram.com/access_token", params={
                     "grant_type": "ig_exchange_token", "client_secret": secret, "access_token": short.get("access_token")}))
-                me = _json(client.get("https://graph.instagram.com/v21.0/me", params={"fields": "user_id,username"},
+                me = _json(client.get(f"https://graph.instagram.com/{IG_API_VERSION}/me", params={"fields": "user_id,username"},
                                       headers={"Authorization": f"Bearer {long.get('access_token')}"}))
-                out = self._result(long, me.get("user_id") or short.get("user_id"), me.get("username"))
+                out = self._result({**long, "permissions": short.get("permissions")}, me.get("user_id") or short.get("user_id"), me.get("username"))
                 out["refresh_token"] = None            # Instagram refreshes the long-lived token itself
                 out["refresh_expires_in"] = out["expires_in"]
                 return out

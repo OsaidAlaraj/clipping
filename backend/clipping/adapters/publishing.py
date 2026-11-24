@@ -26,7 +26,7 @@ import httpx
 from .. import config
 from ..core import AppError
 from .base import Adapter, AdapterError, http_client, register
-from .oauth import PLATFORM_LABEL, PLATFORMS
+from .oauth import IG_API_VERSION, PLATFORM_LABEL, PLATFORMS
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "publishing"
 YT_UPLOAD = "https://www.googleapis.com/upload/youtube/v3/videos"
@@ -38,6 +38,12 @@ PRIVACY = ("private", "unlisted", "public")
 ID_RE = re.compile(r"^[A-Za-z0-9_.~:-]{3,128}$")
 BLOCK = 1 << 20
 TIKTOK_HOST = re.compile(r"[a-z0-9-]+(\.[a-z0-9-]+)*\.tiktokapis\.com")
+
+
+def dry_run() -> bool:
+    """CLIPPING_PUBLISH_DRY_RUN=1: Instagram posts go through container, upload and processing, then stop before media_publish.
+    Nothing becomes public, so it is the safe way to test a real account and app."""
+    return config.env("CLIPPING_PUBLISH_DRY_RUN", "0") == "1"
 
 
 def provider_name() -> str:
@@ -105,6 +111,8 @@ class PlatformPublishing(Adapter):
             path, size = self._file(file_path)
             self._caption(platform, caption)
             row = self._connection(connection_id, platform)
+            if dry_run() and platform != "instagram_reels":
+                self._stop("dry-run mode only covers Instagram, so this post was not sent")
             self._quota(platform, connection_id)
             token = self._token(connection_id)
             with self._client() as client:
@@ -245,7 +253,10 @@ class PlatformPublishing(Adapter):
             self._stop(f"today's {label} posting allowance is used up")
 
     def _upload_started(self, platform: str, connection_id) -> None:
-        """Called right before the first byte leaves: from here on a failure is ambiguous. Counts against the quota."""
+        """Called right before the first byte leaves: from here on a failure is ambiguous. Counts against the quota.
+        A dry run publishes nothing, so it stays unambiguous and uses no allowance."""
+        if dry_run():
+            return
         self._started = True
         self.conn.execute("insert into publish_quota_log (owner_operator_id, connection_id, platform, units) values (%s, %s, %s, %s)",
                           (self._owner, connection_id, platform, self._limit(platform)["units_per_upload"]))
@@ -331,21 +342,26 @@ class PlatformPublishing(Adapter):
 
     # ------------------------------------------------------------------ Instagram
     def _ig_url(self, tail: str) -> str:
-        return f"{IG_GRAPH}/{self.cfg.get('instagram_api_version', 'v21.0')}/{tail}"
+        return f"{IG_GRAPH}/{self.cfg.get('instagram_api_version', IG_API_VERSION)}/{tail}"
 
     def _ig_publish(self, client, token, row, connection_id, path, size, caption, opts) -> dict:
         platform = "instagram_reels"
-        form = {"media_type": "REELS", "upload_type": "resumable", "caption": caption}
+        form = {"media_type": "REELS", "upload_type": "resumable", "caption": caption, "share_to_feed": "true"}
         if (self.cfg.get("paid_partnership_supported") or {}).get(platform):
             if opts["paid"]:
                 form["is_paid_partnership"] = "true"
         elif opts["paid"]:
             self._notes.append("Tick the paid partnership label in Instagram: the API setting is switched off.")
         created = self._call(client, "POST", self._ig_url(f"{row['external_account_id']}/media"), headers={"Authorization": f"Bearer {token}"}, data=form)
-        container = self._id(self._json(created, "container answer").get("id"), "container id")
+        answer = self._json(created, "container answer")
+        container = self._id(answer.get("id"), "container id")
         self._upload_started(platform, connection_id)
         self._post_id = container
-        sent = self._call(client, "POST", f"{IG_UPLOAD}/{self.cfg.get('instagram_api_version', 'v21.0')}/{container}",
+        # Meta returns the upload address with the container; it is used only when it is on Meta's upload host, else we build it.
+        uri = answer.get("uri")
+        upload_url = uri if isinstance(uri, str) and urlsplit(uri).scheme == "https" and urlsplit(uri).hostname == "rupload.facebook.com" \
+            else f"{IG_UPLOAD}/{self.cfg.get('instagram_api_version', IG_API_VERSION)}/{container}"
+        sent = self._call(client, "POST", upload_url,
                           headers={"Authorization": f"OAuth {token}", "offset": "0", "file_size": str(size), "Content-Length": str(size)}, content=_blocks(path))
         if self._json(sent, "upload answer").get("success") is not True:
             self._bad("upload answer")
@@ -370,6 +386,8 @@ class PlatformPublishing(Adapter):
                 time.sleep(float(self.cfg.get("poll_interval_s", 30)))
         else:
             return self._finish("processing", container, None, "Instagram is still processing the video.")
+        if dry_run():
+            return outcome("failed", container, None, "Dry run finished: Instagram accepted and processed the video. Nothing was published.")
         published = self._call(client, "POST", self._ig_url(f"{row['external_account_id']}/media_publish"), headers=auth, data={"creation_id": container})
         media_id = self._id(self._json(published, "publish answer").get("id"), "media id")
         self._post_id = media_id

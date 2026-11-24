@@ -121,8 +121,8 @@ Still open:
 Phase E is built and pushed on `feature/phase-e-posting`. Everything was tested on fakes. Nothing real has been posted yet.
 
 ### Live checks not run yet
-- **OAuth redirects on Meta and TikTok.** Both need an HTTPS redirect (Tailscale `ts.net`). Blocks connecting Instagram and TikTok on a real account.
-- **Instagram resumable upload and permalink.** Blocks a real Reels post and reading its link.
+- **OAuth redirect on Meta and TikTok.** Both need an HTTPS redirect (Tailscale `ts.net`). Instagram steps are now written in `docs/instagram-setup.md`; `python run.py phone` and the Meta redirect entry have not been run on a real account. TikTok still waits.
+- **Instagram live check (code ready, unverified live).** Aligned with Meta's docs on 2026-11-25: the short-token answer is read from its `data` array, API version v27.0, `share_to_feed`, upload address from the container answer. Meta's content-publishing page says resumable upload is for Facebook Login for Business; whether it works with Instagram Login is not confirmed. Test with `CLIPPING_PUBLISH_DRY_RUN=1` first (stops before `media_publish`). If resumable is refused, the fallback needs a public `video_url` (not built).
 - **YouTube private lock and paid-promotion flag.** Blocks confirming that uploads land private and that the flag is set.
 - **TikTok inbox upload and its caption limit.** Blocks a real TikTok draft and the caption check.
 - **PKCE for TikTok.** Only Google uses PKCE for now. Blocks TikTok sign-in until checked.

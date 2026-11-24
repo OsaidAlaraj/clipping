@@ -49,10 +49,13 @@ def test_youtube_exchange_sends_the_code_and_verifier_and_reads_the_channel(monk
                    "external_account_id": "UC1", "handle": "@chan"}
 
 
-def test_instagram_exchange_swaps_the_short_token_for_a_long_one_and_has_no_refresh_token(monkeypatch):
+@pytest.mark.parametrize("short_answer", [
+    {"data": [{"access_token": "short", "user_id": 77, "permissions": "instagram_business_basic,instagram_business_content_publish"}]},
+    {"access_token": "short", "user_id": 77, "permissions": "instagram_business_basic,instagram_business_content_publish"}])
+def test_instagram_exchange_swaps_the_short_token_for_a_long_one_and_has_no_refresh_token(monkeypatch, short_answer):
     def handler(request):
         if request.url.host == "api.instagram.com":
-            return httpx.Response(200, json={"access_token": "short", "user_id": 77})
+            return httpx.Response(200, json=short_answer)
         if request.url.path == "/access_token":
             assert request.url.params["access_token"] == "short" and request.url.params["grant_type"] == "ig_exchange_token"
             return httpx.Response(200, json={"access_token": "long", "expires_in": 5184000})
@@ -60,8 +63,9 @@ def test_instagram_exchange_swaps_the_short_token_for_a_long_one_and_has_no_refr
         return httpx.Response(200, json={"user_id": "77", "username": "own_ig"})
 
     seen = mock_platforms(monkeypatch, handler)
-    out = REAL.exchange_code("instagram_reels", "c", None, "https://x/cb")
+    out = REAL.exchange_code("instagram_reels", "c#_", None, "https://x/cb")
     assert form(seen[0])["code"] == "c" and len(seen) == 3
+    assert out["scopes"] == ["instagram_business_basic", "instagram_business_content_publish"]
     assert out["access_token"] == "long" and out["refresh_token"] is None and out["external_account_id"] == "77" and out["handle"] == "own_ig"
     assert out["expires_in"] == out["refresh_expires_in"] == 5184000
 

@@ -323,7 +323,9 @@ def test_DW_2_3_instagram_publishes_publicly_with_a_url_and_follows_the_containe
     real_ready(db)
     connection, result = publish(db, owner, "instagram_reels", video, REAL, options={"paid_partnership": True})
     create, upload, poll, publish_call, link = seen
-    assert create.url.path == "/v21.0/fake-instagram_reels-1/media" and form(create) == {"media_type": "REELS", "upload_type": "resumable", "caption": "A caption #clip"}
+    assert create.url.path == "/v27.0/fake-instagram_reels-1/media" and form(create) == {
+        "media_type": "REELS", "upload_type": "resumable", "caption": "A caption #clip", "share_to_feed": "true"}
+    assert upload.url.path == "/ig-api-upload/v27.0/17889455560051444"
     assert upload.url.host == "rupload.facebook.com" and upload.headers["authorization"].startswith("OAuth ")
     assert upload.headers["offset"] == "0" and upload.headers["file_size"] == "10" and upload.content == b"0123456789"
     assert poll.url.params["fields"] == "status_code"
@@ -565,3 +567,32 @@ def test_no_token_appears_in_results_audit_rows_or_alerts(db, owner, video, monk
 def test_the_base_adapter_alert_hook_is_a_no_op_until_the_registry_binds_it():
     adapter = publishing.PlatformPublishing({"config_json": {}})
     assert adapter.alert("x", "warn", "hello") is None and adapter.conn is None and adapter.no_retry == ("publish_video", "finish_publish")
+
+
+# ------------------------------------------------------------------ Instagram dry run
+
+def test_instagram_dry_run_creates_uploads_and_waits_but_never_calls_media_publish_and_uses_no_allowance(db, owner, video, monkeypatch):
+    monkeypatch.setenv("CLIPPING_PUBLISH_DRY_RUN", "1")
+    seen = real_http(monkeypatch)
+    real_ready(db)
+    connection, result = publish(db, owner, "instagram_reels", video, REAL)
+    assert [r.url.path.rsplit("/", 1)[-1] for r in seen][-1] != "media_publish" and not any(r.url.path.endswith("/media_publish") for r in seen)
+    assert any(r.url.host == "rupload.facebook.com" for r in seen)
+    assert result["state"] == "failed" and "Dry run" in result["reason"] and result["url"] is None
+    assert sql(db, "select count(*) as n from publish_quota_log where connection_id = %s", connection)[0]["n"] == 0
+
+
+def test_dry_run_refuses_the_other_platforms_before_any_call(db, owner, video, monkeypatch):
+    monkeypatch.setenv("CLIPPING_PUBLISH_DRY_RUN", "1")
+    seen = real_http(monkeypatch)
+    real_ready(db)
+    result = publish(db, owner, "tiktok", video, REAL)[1]
+    assert result["state"] == "failed" and seen == []
+
+
+def test_instagram_upload_goes_only_to_metas_upload_host_even_if_the_container_answer_names_another(db, owner, video, monkeypatch):
+    seen = real_http(monkeypatch, overrides=[(lambda r: r.url.path.endswith("/media"),
+                                              httpx.Response(200, json={"id": "17889455560051444", "uri": "https://evil.example/steal"}))])
+    real_ready(db)
+    publish(db, owner, "instagram_reels", video, REAL)
+    assert all(r.url.host != "evil.example" for r in seen) and seen[1].url.host == "rupload.facebook.com"

@@ -1,6 +1,6 @@
 {
   "_source": "developers.facebook.com/docs/instagram-platform/content-publishing (documented shapes)",
-  "container_created": {"id": "17889455560051444"},
+  "container_created": {"id": "17889455560051444", "uri": "https://rupload.facebook.com/ig-api-upload/v27.0/17889455560051444"},
   "upload_ok": {"success": true, "message": "Upload successful."},
   "status_in_progress": {"status_code": "IN_PROGRESS", "id": "17889455560051444"},
   "status_finished": {"status_code": "FINISHED", "id": "17889455560051444"},
