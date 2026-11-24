@@ -6,7 +6,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: 
 vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a href={href} {...rest}>{children}</a> }));
 
 import { BriefReview } from "@/components/BriefReview";
-import { AddCampaign } from "@/components/More";
+import { AddCampaign } from "@/components/Add";
 import { blockingKeys, counts, editItem, previewDecisions, resolveConflict, textToValue, valueToText, type Lang, type Spec, type SpecItem } from "@/lib/briefSpec";
 import { mockApi } from "./helpers";
 
@@ -119,7 +119,7 @@ describe("Add campaign: rich paste, then the review screen, then create", () => 
 
   it("keeps the links from a pasted web page and says how many", async () => {
     mockApi({ "GET /api/reference": { marketplaces: [{ slug: "clipster", name: "Clipster" }], categories: [{ name: "podcast" }] } });
-    render(<AddCampaign embedded />);
+    render(<AddCampaign />);
     const box = screen.getByLabelText("Brief text") as HTMLTextAreaElement;
     fireEvent.paste(box, { clipboardData: clipboard({ "text/html": html, "text/plain": "Max $2,500 LOGO" }) });
     await waitFor(() => expect(box.value).toContain("[LOGO](https://drive.google.com/drive/folders/abc)"));
@@ -128,7 +128,7 @@ describe("Add campaign: rich paste, then the review screen, then create", () => 
 
   it("a plain-text paste is left alone", () => {
     mockApi({ "GET /api/reference": { marketplaces: [], categories: [] } });
-    render(<AddCampaign embedded />);
+    render(<AddCampaign />);
     const box = screen.getByLabelText("Brief text") as HTMLTextAreaElement;
     expect(fireEvent.paste(box, { clipboardData: clipboard({ "text/plain": "just words" }) })).toBe(true);
     expect(screen.queryByText(/kept/)).toBeNull();
@@ -141,7 +141,7 @@ describe("Add campaign: rich paste, then the review screen, then create", () => 
       "POST /api/campaigns/spec": read,
       "POST /api/campaigns": { campaign: { id: "c9" } },
     });
-    render(<AddCampaign embedded />);
+    render(<AddCampaign />);
     fireEvent.change(screen.getByLabelText("Brief text"), { target: { value: "ADD PROVIDED LOGO" } });
     fireEvent.change(screen.getByLabelText("Campaign name"), { target: { value: "x" } });
     fireEvent.click(screen.getByRole("button", { name: "Read the brief" }));
