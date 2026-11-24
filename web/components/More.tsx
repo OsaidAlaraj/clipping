@@ -8,8 +8,11 @@ import { api, ApiError, Clip, ConnectionsData, money, PLATFORM_LABEL, reviewActi
 import { plainAlert } from "@/lib/alertText";
 import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
+import type { Spec } from "@/lib/briefSpec";
+import { pasteToMarkdown } from "@/lib/richPaste";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
 import { setSoundOn, useSound } from "@/lib/sound";
+import { BriefReview } from "./BriefReview";
 import { RejectSheet } from "./Feed";
 import { DetailSkeleton, RowsSkeleton } from "./Skeleton";
 
@@ -430,14 +433,55 @@ export function AddCampaign({ embedded = false, initial }: { embedded?: boolean;
       setForm((f) => ({ ...f, brief_text: [f.brief_text, body.text].filter(Boolean).join("\n\n") }));
     } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } finally { setReading(false); }
   };
-  const submit = async () => {
-    setError("");
+  const { lang } = useLang();
+  const [spec, setSpec] = useState<Spec | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [linksKept, setLinksKept] = useState(0);
+  // Rich paste: HTML on the clipboard (Notion, Google Docs, Discord, a marketplace page) becomes Markdown that keeps its links.
+  const onPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const html = event.clipboardData.getData("text/html");
+    if (!html) return;   // plain text pastes as usual
+    const converted = pasteToMarkdown(html, event.clipboardData.getData("text/plain"));
+    if (!converted.rich) return;
+    event.preventDefault();
+    const box = event.currentTarget;
+    const [from, to] = [box.selectionStart, box.selectionEnd];
+    setForm((f) => ({ ...f, brief_text: f.brief_text.slice(0, from) + converted.text + f.brief_text.slice(to) }));
+    setLinksKept((n) => n + converted.links);
+  };
+  const submit = async () => {   // read the brief into a spec for the owner to check; nothing is created yet
+    setError(""); setBusy(true);
     try {
-      const result = await api("/api/campaigns", { body: { ...form, url: form.url || null, licence_ref: form.licence_ref || null } });
+      const read = await api<Spec>("/api/campaigns/spec", { body: { brief_text: form.brief_text } });
+      setSpec(read);
+      const title = read.items.find((i) => i.key === "identity.name" && i.value);
+      if (!form.name.trim() && title) setForm((f) => ({ ...f, name: String(title.value) }));
+    }
+    catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } finally { setBusy(false); }
+  };
+  const pasteLink = async (url: string, text: string) => {
+    if (!spec) return;
+    setError("");
+    try { setSpec(await api<Spec>("/api/campaigns/spec/paste", { body: { spec, url, text } })); }
+    catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); }
+  };
+  const confirm = async () => {
+    setError(""); setBusy(true);
+    try {
+      const result = await api("/api/campaigns", { body: { ...form, url: form.url || null, licence_ref: form.licence_ref || null, spec } });
       window.location.href = `/campaign?id=${result.campaign.id}`;
-    } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); }
+    } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); setBusy(false); }
   };
   const set = (key: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setForm({ ...form, [key]: event.target.value });
+  if (spec) {
+    return (
+      <div className={embedded ? "stack" : "page"}>
+        {!embedded && <Head title="Add campaign" back="/" />}
+        <button className="btn ghost" onClick={() => setSpec(null)}>{lang === "ar" ? "رجوع إلى النص" : "Back to the text"}</button>
+        <BriefReview spec={spec} onChange={setSpec} onPasteLink={pasteLink} onConfirm={confirm} busy={busy} error={error} lang={lang} linksKept={linksKept} />
+      </div>
+    );
+  }
   return (
     <div className={embedded ? "stack" : "page"}>
       {!embedded && <Head title="Add campaign" back="/" />}
@@ -450,7 +494,8 @@ export function AddCampaign({ embedded = false, initial }: { embedded?: boolean;
           <select id="c-cat" className="input" value={form.category} onChange={set("category")}>{(reference.data?.categories ?? []).map((c: any) => <option key={c.name} value={c.name}>{c.name.replace("_", " ")}</option>)}</select></div>
       </div>
       <div className="field"><label htmlFor="c-url">Brief link (optional)</label><input id="c-url" className="input" inputMode="url" value={form.url} onChange={set("url")} /></div>
-      <div className="field"><label htmlFor="c-brief">Brief text</label><textarea id="c-brief" className="input" style={{ minHeight: 220 }} dir="auto" value={form.brief_text} onChange={set("brief_text")} /></div>
+      <div className="field"><label htmlFor="c-brief">Brief text</label><textarea id="c-brief" className="input" style={{ minHeight: 220 }} dir="auto" value={form.brief_text} onChange={set("brief_text")} onPaste={onPaste} />
+        {linksKept > 0 && <span className="small muted" role="status">{linksKept} {linksKept === 1 ? "link" : "links"} kept</span>}</div>
       <div className="row wrap">
         <label htmlFor="c-shot" className="btn">{reading ? "Reading…" : "Read from a screenshot"}</label>
         <input id="c-shot" type="file" accept="image/*" className="sr-only" onChange={(e) => readScreenshot(e.target.files?.[0])} />
@@ -458,7 +503,7 @@ export function AddCampaign({ embedded = false, initial }: { embedded?: boolean;
       </div>
       <div className="field"><label htmlFor="c-lic">Licensed-client reference (finance or crypto campaigns only)</label><input id="c-lic" className="input" value={form.licence_ref} onChange={set("licence_ref")} /></div>
       {error && <p className="error" role="alert">{error}</p>}
-      <button className="btn primary block" disabled={!form.name.trim() || !form.brief_text.trim()} onClick={submit}>Read the brief</button>
+      <button className="btn primary block" disabled={busy || !form.name.trim() || !form.brief_text.trim()} onClick={submit}>{busy ? "Reading…" : "Read the brief"}</button>
     </div>
   );
 }
