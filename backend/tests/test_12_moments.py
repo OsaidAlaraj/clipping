@@ -754,7 +754,7 @@ def test_DW_4_9_every_pattern_keeps_a_minimum_share_of_the_choices(db, owner):
         drawn = [hook_patterns.pick(conn, "en", "podcast", 1, f"seed{i}", owner.operator_id)[0]["name"] for i in range(400)]
         full = hook_patterns.pick(conn, "en", "podcast", 99, "x", owner.operator_id)
     assert drawn.count("bold_opinion") > drawn.count("question") > 0 and drawn.count("question") / 400 > 0.02
-    assert len({p["name"] for p in full}) == len(full) == 7
+    assert len({p["name"] for p in full}) == len(full) == 11
     assert hook_patterns.pick.__defaults__ is None or True
 
 
@@ -765,7 +765,7 @@ def test_DW_4_9_a_new_pattern_added_as_data_is_used_without_a_code_change(db, ow
                         values ('cliffhanger', 'en', 'Stop right before the reveal.', 'Wait for it: {x}', 'story-open')""")
     result = find(db, make_source(db, owner, speech(10)))
     hooks = [c["hook"] for c in result["kept"] if c.get("hook")]
-    assert hooks and {h["pattern"] for h in hooks} == {"cliffhanger"} and all(h["text"].startswith("Wait for it:") for h in hooks)
+    assert hooks and {h["pattern"] for h in hooks} == {"cliffhanger"} and all(h["text"].startswith("Wait for it") and ":" not in h["text"] for h in hooks)
     with db.session(Actor.system()) as conn:
         conn.execute("update hook_patterns set active = false where name = 'cliffhanger'")
     assert not [c for c in find(db, make_source(db, owner, speech(10)))["kept"] if c.get("hook")]      # no pattern, no pattern hook

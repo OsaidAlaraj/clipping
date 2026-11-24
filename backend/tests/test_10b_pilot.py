@@ -525,7 +525,7 @@ def test_the_arabic_prompt_is_used_for_an_arabic_transcript_and_the_transcript_n
         assert "temperature" not in body and sent[-1]["timeout"] == 180        # a reasoning model, given time to think
     assert "العربية" in vendors.LLM_SYSTEM["moments"]["ar"] and "English" in vendors.LLM_SYSTEM["moments"]["en"]
     adapter.complete_json("hooks", {"language": "ar", "segment_text": "x"})
-    assert sent[-1]["body"]["messages"][0]["content"] == vendors.LLM_SYSTEM["hooks"] and sent[-1]["timeout"] == 60
+    assert sent[-1]["body"]["messages"][0]["content"] == vendors.LLM_SYSTEM["hooks"]["ar"] and sent[-1]["timeout"] == 60
 
 
 def test_an_arabic_practice_transcript_is_proposed_with_the_arabic_language_and_flows_through(db, owner):
