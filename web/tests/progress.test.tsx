@@ -195,3 +195,25 @@ describe("Home", () => {
     expect(screen.queryByTestId("progress-section")).toBeNull();
   });
 });
+
+describe("Home primary action", () => {
+  it("offers one main action: review when clips are ready", async () => {
+    mockApi({ "GET /api/home": { ...home(), today: { ...home().today, to_review: 4 } }, "GET /api/progress": data() });
+    render(<Home />);
+    const card = await screen.findByTestId("primary-action");
+    expect(within(card).getByRole("link", { name: "Review 4 clips" }).getAttribute("href")).toBe("/review");
+  });
+
+  it("says post when only accepted clips are waiting", async () => {
+    mockApi({ "GET /api/home": { ...home(), today: { ...home().today, to_review: 0, posts_due: 2 } }, "GET /api/progress": data() });
+    const first = render(<Home />);
+    expect(within(await screen.findByTestId("primary-action")).getByRole("link", { name: "Post 2 clips" }).getAttribute("href")).toBe("/queue");
+    first.unmount();
+  });
+
+  it("says find a campaign when there is nothing yet", async () => {
+    mockApi({ "GET /api/home": { ...home(), today: { ...home().today, to_review: 0 } }, "GET /api/progress": data() });
+    render(<Home />);
+    expect(within(await screen.findByTestId("primary-action")).getByRole("link", { name: "Find a campaign" }).getAttribute("href")).toBe("/explore");
+  });
+});

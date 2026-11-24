@@ -205,6 +205,9 @@ describe("Review Later and Settings", () => {
     fireEvent.click(input.parentElement!.querySelector("button")!);
     await screen.findByText("setting session_length_min = 99 is outside 10 to 60");
     expect(screen.getByLabelText("Pay per clip display")).toBeTruthy();
+    expect(screen.queryByText(/never override the hard rules/i)).toBeNull();
+    expect(screen.getByText("Always blocked")).toBeTruthy();
+    expect(screen.getByText("Where the pay per clip is shown while you review.")).toBeTruthy();   // one line of help per control
     fireEvent.click(screen.getByRole("button", { name: "Switch on now" }));
     await waitFor(() => expect(mock.posts("/api/kill-switch")[0].body.active).toBe(true));
     fireEvent.click(screen.getByRole("button", { name: "العربية" }));

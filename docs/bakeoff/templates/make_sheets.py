@@ -51,8 +51,9 @@ def main() -> None:
         out = HERE / f"clip_{name}.mp4"
         clip = {"start_s": start, "end_s": start + length, "language": language, "platform": "tiktok", "crop": "follow_speaker", "audio": "speech",
                 "hook_text": hook, "emphasis": [], "speaker_names": {"0": "Sara", "1": "Omar"}}
-        adapter.render_clip(str(video), clip, words, {"caption_style": name, "karaoke": True}, "#ad", str(out))
-        times = [w["start"] - start + 0.25 for w in words[2::max(len(words) // 6, 1)]][:6]
+        adapter.render_clip(str(video), clip, words, {"caption_style": name, "karaoke": True, "tighten": False}, "#ad", str(out))
+        top = ffmpeg.probe(out)["duration_s"] - 0.3
+        times = [min(w["start"] - start + 0.25, top) for w in words[2::max(len(words) // 6, 1)]][:6]
         frames = []
         for t in times:
             png = HERE / f"_{name}_{t:.1f}.png"
