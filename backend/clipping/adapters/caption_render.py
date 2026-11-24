@@ -8,8 +8,8 @@ Every style draws into the same one-encode ASS script as before; nothing here ad
   the line holds still, so nothing jitters;
 - the text block stays inside the safe area of the platform's own interface (SAFE) at any size;
 - Arabic is never upper-cased and never gets letter spacing.
-Licence note: the animation ideas (pop-in with overshoot, active-word highlight) follow common ASS karaoke practice as in
-pulsence/caption-animator (MIT); no code is copied from it."""
+Licence note: the animation ideas (pop-in with overshoot, active-word highlight, box and faint-ahead looks) are common ASS karaoke
+practice; the box, hype and fill-in looks follow the pycaps presets (MIT) described as data; no code is copied from either."""
 from __future__ import annotations
 
 import re
@@ -35,10 +35,22 @@ STYLES: dict[str, dict] = {
     "speaker_label": {"label": "Speaker name", "about": "Clean karaoke plus the speaker's name above the line when someone new starts talking.",
                       "words": 3, "highlight": "word", "entrance": "fade", "bold": True, "size": 1.0, "outline": 1.0, "case": "asis", "lines": 1,
                       "speaker": True},
+    # Looks taken from the researched templates (docs/viral-templates-research.md; MIT pycaps presets described as data, no code copied).
+    # Optional keys: hot = a fixed highlight colour instead of the account accent, dim = words not spoken yet are drawn faint,
+    # box = the spoken word sits on a solid box (a thick outline in the box colour, so it stays one encode, no extra layer).
+    "hype": {"label": "Hype yellow", "about": "Two big words at a time in capitals, the spoken word turns bright yellow, thick black outline.",
+             "words": 2, "highlight": "word", "entrance": "pop", "bold": True, "size": 1.3, "outline": 1.5, "case": "upper", "lines": 1,
+             "hot": "#FFE600"},
+    "word_box": {"label": "Word box", "about": "Three words in capitals; the spoken word sits on an orange box like a highlighter.",
+                 "words": 3, "highlight": "word", "entrance": "pop", "bold": True, "size": 1.1, "outline": 1.1, "case": "upper", "lines": 1,
+                 "box": "#F76F00"},
+    "dim_ahead": {"label": "Fill in", "about": "Four words; the ones not said yet are faint and fill in white, the spoken one in the accent.",
+                  "words": 4, "highlight": "word", "entrance": "fade", "bold": True, "size": 1.05, "outline": 1.0, "case": "asis", "lines": 1, "dim": True},
 }
 DEFAULT_STYLE = "karaoke_clean"
 # What "auto" resolves to: the niche decides (podcasts and interviews name the speaker, gaming is loud, business stresses key words).
-AUTO_BY_NICHE = {"gaming": "bold_pop", "podcast": "speaker_label", "business": "emphasis", "lifestyle": "stacked", "arabic": "karaoke_clean"}
+AUTO_BY_NICHE = {"gaming": "bold_pop", "podcast": "speaker_label", "business": "emphasis", "lifestyle": "stacked", "arabic": "karaoke_clean",
+                 "comedy": "hype", "sports": "bold_pop", "movies": "karaoke_clean", "general": "karaoke_clean"}   # docs/bakeoff/templates-2: hype 81%, bold_pop 88% in the blind stills round; minimal scored 3% so movies use the calm clean karaoke
 SPEAKER_SHOWN_S = 2.2
 _PLACEHOLDER = re.compile(r"^\s*(speaker|spk|host|guest|متحدث|المتحدث|ضيف|الضيف)?\s*[#_-]?\s*\d*\s*$", re.IGNORECASE)
 
@@ -116,11 +128,20 @@ def style_events(name: str, words: list[dict], clip_start: float, clip_end: floa
             if loud is None:
                 loud = next((i for i, (_, t) in enumerate(shown) if any(c.isdigit() for c in t)), None)
 
+        mark = media._ass_colour(p["hot"]) if p.get("hot") else hot
+        box = media._ass_colour(p["box"]) if p.get("box") else None
+        edge = ass_style_fields(name, cap)["outline"]
+
         def line(active: int | None) -> str:
             parts = []
             for j, (_, t) in enumerate(shown):
                 if p["highlight"] == "word" and j == active:
-                    t = f"{{\\1c{hot}&}}{t}{{\\1c{white}&}}"
+                    if box:   # a thick outline in the box colour draws the box; the next word resets to the plain black edge
+                        t = f"{{\\1c{white}&\\3c{box}&\\bord{edge * 3}}}{t}{{\\3c&H000000&\\bord{edge}}}"
+                    else:
+                        t = f"{{\\1c{mark}&}}{t}{{\\1c{white}&}}"
+                elif p.get("dim") and active is not None and j > active:
+                    t = f"{{\\1a&H99&}}{t}{{\\1a&H00&}}"
                 elif p["highlight"] == "emphasis" and j == loud:
                     t = f"{{\\1c{hot}&}}{t}{{\\1c{white}&}}"
                 parts.append(t)

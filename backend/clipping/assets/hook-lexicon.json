@@ -1,0 +1,1001 @@
+{
+  "version": 1,
+  "reviewed": "2026-11-24",
+  "about": "The hook lexicon is DATA. A format is one way to open a clip (see docs/viral-templates-research.md for the sources). `tag` is a leading format tag with its colon: the tag IS the trend, hook_rules allows exactly one of them at the start and counts words without it. `weight` is the starting share; the owner's results (hook_pattern_stats) and thumbs re-weight it. `expires` (YYYY-MM-DD) drops a trend format that has gone stale; review it then. `niches` empty means all. `type` maps to the five stored hook types.",
+  "formats": [
+    {
+      "id": "pov",
+      "language": "en",
+      "tag": "POV:",
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.8,
+      "expires": "2027-03-01",
+      "type": "story-open",
+      "about": "Put the viewer inside a scene the clip really shows. Reported as overused in 2025, so a moderate weight.",
+      "examples": [
+        "POV: your boss reads the group chat",
+        "POV: you finally ask for the raise"
+      ]
+    },
+    {
+      "id": "nobody",
+      "language": "en",
+      "tag": "Nobody:",
+      "niches": [
+        "gaming",
+        "lifestyle",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.9,
+      "expires": "2027-03-01",
+      "type": "contrarian",
+      "about": "Nobody asked, then the clip does the absurd thing anyway. Works for reactions and chaos.",
+      "examples": [
+        "Nobody: Him at 3am explaining crypto",
+        "Nobody: This guy after one win"
+      ]
+    },
+    {
+      "id": "me_when",
+      "language": "en",
+      "tag": "Me when:",
+      "niches": [
+        "gaming",
+        "lifestyle",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.9,
+      "expires": "2027-03-01",
+      "type": "story-open",
+      "about": "Relatable reaction meme. Only when the clip shows that feeling.",
+      "examples": [
+        "Me when the shop says no refunds",
+        "Me when chat spots my mistake"
+      ]
+    },
+    {
+      "id": "tell_me_without",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.9,
+      "expires": "2027-03-01",
+      "type": "contrarian",
+      "about": "Tell me you ... without telling me you ... The clip is the proof.",
+      "examples": [
+        "Tell me you're broke without telling me",
+        "Tell me you skipped leg day without telling me"
+      ]
+    },
+    {
+      "id": "wait_for_it",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "podcast",
+        "lifestyle",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.8,
+      "expires": null,
+      "type": "stakes",
+      "about": "Promise a payoff and make it land inside the clip.",
+      "examples": [
+        "Wait for the last second",
+        "Wait till he sees the price"
+      ]
+    },
+    {
+      "id": "not_me",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "lifestyle",
+        "gaming",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.7,
+      "expires": "2027-03-01",
+      "type": "story-open",
+      "about": "Not me ... self-aware confession in the clip's own voice.",
+      "examples": [
+        "Not me crying at a spreadsheet",
+        "Not me trusting the tutorial"
+      ]
+    },
+    {
+      "id": "he_did_not",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.9,
+      "expires": null,
+      "type": "contrarian",
+      "about": "He did NOT just ... disbelief at a specific thing someone really did in the clip.",
+      "examples": [
+        "He did NOT just say that",
+        "She did NOT just turn it down"
+      ]
+    },
+    {
+      "id": "your_sign",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "business",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.7,
+      "expires": null,
+      "type": "stakes",
+      "about": "This is your sign to ... a nudge tied to what the speaker advises.",
+      "examples": [
+        "This is your sign to quit",
+        "This is your sign to raise your price"
+      ]
+    },
+    {
+      "id": "hear_me_out",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "podcast",
+        "business",
+        "lifestyle",
+        "general",
+        "comedy"
+      ],
+      "weight": 0.9,
+      "expires": null,
+      "type": "contrarian",
+      "about": "Hear me out ... a spicy opinion the clip then defends.",
+      "examples": [
+        "Hear me out, rent is cheaper than owning",
+        "Hear me out, skip college"
+      ]
+    },
+    {
+      "id": "numbered",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "business",
+        "lifestyle",
+        "podcast",
+        "general",
+        "comedy"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "number",
+      "about": "An exact number that is really in the clip.",
+      "examples": [
+        "3 words that doubled his rate",
+        "He lost 40k in one hour"
+      ]
+    },
+    {
+      "id": "curiosity_gap",
+      "language": "en",
+      "tag": null,
+      "niches": [],
+      "weight": 1.2,
+      "expires": null,
+      "type": "question",
+      "about": "Open a gap the clip closes: say that something happened, not what.",
+      "examples": [
+        "Why he left the room mid sentence",
+        "The one question she refused to answer"
+      ]
+    },
+    {
+      "id": "contradiction",
+      "language": "en",
+      "tag": null,
+      "niches": [],
+      "weight": 1.1,
+      "expires": null,
+      "type": "contrarian",
+      "about": "A claim that goes against what the viewer believes, which the clip backs up.",
+      "examples": [
+        "Working harder made him poorer",
+        "The best players never practise this"
+      ]
+    },
+    {
+      "id": "challenge",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "lifestyle",
+        "podcast",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.8,
+      "expires": null,
+      "type": "stakes",
+      "about": "Dare the viewer: try not to ..., bet you can't ...",
+      "examples": [
+        "Try not to laugh at his face",
+        "Bet you miss the trick"
+      ]
+    },
+    {
+      "id": "reaction",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "podcast",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "story-open",
+      "about": "A reaction line a friend would say watching it.",
+      "examples": [
+        "Bro really tried that",
+        "Chat, is this legal?"
+      ]
+    },
+    {
+      "id": "outcome_first",
+      "language": "en",
+      "tag": null,
+      "niches": [],
+      "weight": 1.2,
+      "expires": null,
+      "type": "number",
+      "about": "Show the result first (the strongest type in the 2026 clip studies), the clip shows how.",
+      "examples": [
+        "From broke to 10k in a month",
+        "He cleared it with one hit"
+      ]
+    },
+    {
+      "id": "stop_doing",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "business",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.9,
+      "expires": null,
+      "type": "stakes",
+      "about": "Stop doing X. Direct, short, specific to the advice in the clip.",
+      "examples": [
+        "Stop pricing by the hour",
+        "Stop saving in this account"
+      ]
+    },
+    {
+      "id": "pov",
+      "language": "ar",
+      "tag": "POV:",
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.8,
+      "expires": "2027-03-01",
+      "type": "story-open",
+      "about": "حط المشاهد جوا مشهد حقيقي من المقطع.",
+      "examples": [
+        "POV: مديرك قرأ رسالتك بالغلط",
+        "POV: أول يوم راتب"
+      ]
+    },
+    {
+      "id": "nobody",
+      "language": "ar",
+      "tag": "ما حدا:",
+      "niches": [
+        "gaming",
+        "lifestyle",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.9,
+      "expires": "2027-03-01",
+      "type": "contrarian",
+      "about": "ما حدا سأل، والمقطع بعمل الشي المجنون بكل الأحوال.",
+      "examples": [
+        "ما حدا: هو الساعة ثلاثة الفجر",
+        "ما حدا: صاحبي بعد أول فوز"
+      ]
+    },
+    {
+      "id": "me_when",
+      "language": "ar",
+      "tag": "أنا لما:",
+      "niches": [
+        "gaming",
+        "lifestyle",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.9,
+      "expires": "2027-03-01",
+      "type": "story-open",
+      "about": "إحساس يعرفه كل الناس، فقط إذا المقطع بوريه.",
+      "examples": [
+        "أنا لما يقولوا ما في استرجاع",
+        "أنا لما الشات يكشف غلطتي"
+      ]
+    },
+    {
+      "id": "tell_me_without",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "comedy",
+        "movies",
+        "sports",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.8,
+      "expires": "2027-03-01",
+      "type": "contrarian",
+      "about": "قلي إنك ... من غير ما تقول.",
+      "examples": [
+        "قلي إنك مفلس من غير ما تحكي",
+        "اعرف إنه جديد من أول حركة"
+      ]
+    },
+    {
+      "id": "wait_for_it",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "podcast",
+        "lifestyle",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.9,
+      "expires": null,
+      "type": "stakes",
+      "about": "استنى للآخر، والمقطع بدفع الوعد.",
+      "examples": [
+        "استنى لآخر ثانية",
+        "استنى لما يشوف السعر"
+      ]
+    },
+    {
+      "id": "not_me",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "lifestyle",
+        "gaming",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.6,
+      "expires": "2027-03-01",
+      "type": "story-open",
+      "about": "اعتراف على نفسك بنفس صوت المقطع.",
+      "examples": [
+        "أنا اللي صدقت الشرح",
+        "مين غيري ضغط على الرابط"
+      ]
+    },
+    {
+      "id": "he_did_not",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "contrarian",
+      "about": "عنجد قال هيك؟ عدم تصديق لشي محدد صار بالمقطع.",
+      "examples": [
+        "عنجد قال هاد الحكي",
+        "مش معقول عملها قدام الكل"
+      ]
+    },
+    {
+      "id": "your_sign",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "business",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.7,
+      "expires": null,
+      "type": "stakes",
+      "about": "هاي إشارة إلك، مرتبطة بنصيحة المتحدث.",
+      "examples": [
+        "هاي إشارة إلك ترفع سعرك",
+        "هاي إشارة إلك تترك الوظيفة"
+      ]
+    },
+    {
+      "id": "hear_me_out",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "podcast",
+        "business",
+        "lifestyle",
+        "general",
+        "comedy"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "contrarian",
+      "about": "اسمعني شوي، رأي جريء بدافع عنه المقطع.",
+      "examples": [
+        "اسمعني شوي، الإيجار أوفر",
+        "اسمعني شوي، الجامعة مش ضرورية"
+      ]
+    },
+    {
+      "id": "numbered",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "business",
+        "lifestyle",
+        "podcast",
+        "general",
+        "comedy"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "number",
+      "about": "رقم دقيق موجود فعلاً بالمقطع.",
+      "examples": [
+        "خسر أربعين ألف بساعة",
+        "٣ كلمات ضاعفوا أجره"
+      ]
+    },
+    {
+      "id": "curiosity_gap",
+      "language": "ar",
+      "tag": null,
+      "niches": [],
+      "weight": 1.2,
+      "expires": null,
+      "type": "question",
+      "about": "افتح فجوة بسكّرها المقطع: قل إنه صار شي، مش شو صار.",
+      "examples": [
+        "ليش طلع من الغرفة فجأة",
+        "السؤال اللي ما رضيت تجاوبه"
+      ]
+    },
+    {
+      "id": "contradiction",
+      "language": "ar",
+      "tag": null,
+      "niches": [],
+      "weight": 1.1,
+      "expires": null,
+      "type": "contrarian",
+      "about": "حكي عكس اللي بتصدقه، والمقطع بثبته.",
+      "examples": [
+        "كل ما اشتغل أكثر صار أفقر",
+        "أحسن لاعب ما بتمرن هيك"
+      ]
+    },
+    {
+      "id": "challenge",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "lifestyle",
+        "podcast",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 0.8,
+      "expires": null,
+      "type": "stakes",
+      "about": "تحدّى المشاهد: جرب ما تضحك.",
+      "examples": [
+        "جرب ما تضحك على وجهه",
+        "بتراهن إنك بتفوت الحركة"
+      ]
+    },
+    {
+      "id": "reaction",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "gaming",
+        "podcast",
+        "general",
+        "comedy",
+        "movies",
+        "sports"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "story-open",
+      "about": "جملة بقولها صاحبك وهو بتفرج.",
+      "examples": [
+        "يا زلمة شو هاد",
+        "مين سمحلو يلعب هيك"
+      ]
+    },
+    {
+      "id": "outcome_first",
+      "language": "ar",
+      "tag": null,
+      "niches": [],
+      "weight": 1.2,
+      "expires": null,
+      "type": "number",
+      "about": "النتيجة أولاً، والمقطع بوري كيف.",
+      "examples": [
+        "من الصفر لعشرة آلاف بشهر",
+        "خلصها بضربة وحدة"
+      ]
+    },
+    {
+      "id": "stop_doing",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "business",
+        "lifestyle",
+        "general"
+      ],
+      "weight": 0.9,
+      "expires": null,
+      "type": "stakes",
+      "about": "بطّل تعمل هيك. مباشر وقصير ومحدد.",
+      "examples": [
+        "بطّل تسعّر بالساعة",
+        "بطّل توفر بهاد الحساب"
+      ]
+    },
+    {
+      "id": "punchline_wait",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "comedy"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "stakes",
+      "about": "Name the setup, hold back the punchline. The clip must deliver it.",
+      "examples": [
+        "Wait for the punchline",
+        "He built this joke for ten minutes"
+      ]
+    },
+    {
+      "id": "scene_take",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "movies"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "question",
+      "about": "A scene in a few words: what the character does, not the plot summary. Never cover the picture.",
+      "examples": [
+        "The scene that ruined villains forever",
+        "He stayed calm for this whole scene"
+      ]
+    },
+    {
+      "id": "roast",
+      "language": "en",
+      "tag": null,
+      "niches": [
+        "comedy",
+        "gaming",
+        "sports"
+      ],
+      "weight": 0.8,
+      "expires": null,
+      "type": "contrarian",
+      "about": "A friendly roast of the person on screen, never of a protected group.",
+      "examples": [
+        "Bro had one job",
+        "He trained for this and still missed"
+      ]
+    },
+    {
+      "id": "punchline_wait",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "comedy"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "stakes",
+      "about": "سمّ الموقف وخبّي الإفيه، والمقطع لازم يوصله.",
+      "examples": [
+        "استنى الإفيه الأخير",
+        "ظل يحضّر لهالنكتة عشر دقايق"
+      ]
+    },
+    {
+      "id": "scene_take",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "movies"
+      ],
+      "weight": 1.0,
+      "expires": null,
+      "type": "question",
+      "about": "المشهد بكلمات قليلة: شو بعمل الشخص، مش ملخص القصة. لا تغطي الصورة.",
+      "examples": [
+        "المشهد اللي خلّى الكل يكره الشرير",
+        "ضل هادي طول المشهد"
+      ]
+    },
+    {
+      "id": "roast",
+      "language": "ar",
+      "tag": null,
+      "niches": [
+        "comedy",
+        "gaming",
+        "sports"
+      ],
+      "weight": 0.8,
+      "expires": null,
+      "type": "contrarian",
+      "about": "مزح خفيف على الشخص اللي بالشاشة، مش على فئة.",
+      "examples": [
+        "كان عنده مهمة وحدة بس",
+        "تدرب لهاد اليوم وضيّعها"
+      ]
+    }
+  ],
+  "banned": {
+    "en": [
+      "unlock",
+      "game-changer",
+      "game changer",
+      "dive into",
+      "dive in",
+      "delve",
+      "leverage",
+      "tapestry",
+      "realm",
+      "in today's",
+      "here's why",
+      "heres why",
+      "let's talk",
+      "lets talk",
+      "you won't believe",
+      "you wont believe",
+      "in this video",
+      "ultimate guide",
+      "elevate",
+      "supercharge",
+      "revolutionize",
+      "revolutionise",
+      "journey",
+      "navigate",
+      "secret sauce",
+      "it's not about",
+      "harness",
+      "embark",
+      "landscape",
+      "paradigm",
+      "unleash",
+      "mind-blowing",
+      "mind blowing",
+      "buckle up",
+      "crucial",
+      "testament",
+      "seamless",
+      "robust",
+      "in the world of"
+    ],
+    "ar": [
+      "اكتشف",
+      "أطلق العنان",
+      "اطلق العنان",
+      "في هذا الفيديو",
+      "دعنا",
+      "دعونا",
+      "إليك",
+      "اليك",
+      "رحلة",
+      "سر النجاح",
+      "تعرف على",
+      "هل تعلم",
+      "ثورة في",
+      "لن تصدق",
+      "في عالم",
+      "بكل سهولة",
+      "خطوة بخطوة",
+      "الدليل الشامل",
+      "لا تفوت"
+    ]
+  },
+  "fewshot": {
+    "en": {
+      "business": [
+        {
+          "good": "Stop pricing by the hour",
+          "bad": "Unlock the secrets of smart pricing",
+          "why": "plain, specific advice from the clip, no marketing words"
+        },
+        {
+          "good": "He lost 40k in one hour",
+          "bad": "A lesson about financial risk",
+          "why": "an exact number from the clip instead of a topic"
+        }
+      ],
+      "gaming": [
+        {
+          "good": "Nobody: This guy after one win",
+          "bad": "An amazing clutch moment in gaming",
+          "why": "the trend tag is the joke, the rest is short and about the person"
+        },
+        {
+          "good": "Bro really tried that",
+          "bad": "Watch this incredible play unfold",
+          "why": "what a friend says, not a narrator"
+        }
+      ],
+      "podcast": [
+        {
+          "good": "The one question she refused to answer",
+          "bad": "An interesting conversation about career choices",
+          "why": "a gap the clip closes"
+        },
+        {
+          "good": "Hear me out, skip college",
+          "bad": "Why higher education may not be for everyone",
+          "why": "a spoken opinion, not a thesis"
+        }
+      ],
+      "lifestyle": [
+        {
+          "good": "Me when the shop says no refunds",
+          "bad": "Navigating the challenges of shopping",
+          "why": "relatable feeling in four words"
+        },
+        {
+          "good": "Tell me you're broke without telling me",
+          "bad": "Signs of financial stress",
+          "why": "a format people already know"
+        }
+      ],
+      "comedy": [
+        {
+          "good": "Wait for the punchline",
+          "bad": "A hilarious moment from a stand up show",
+          "why": "names the wait, not the genre"
+        },
+        {
+          "good": "Nobody: Him at his own wedding",
+          "bad": "Funny man tells a funny story",
+          "why": "the tag is the joke"
+        }
+      ],
+      "movies": [
+        {
+          "good": "POV: you walk in during this scene",
+          "bad": "An iconic moment from a classic film",
+          "why": "puts the viewer in it"
+        },
+        {
+          "good": "He stayed calm for this whole scene",
+          "bad": "A masterclass in acting and tension",
+          "why": "a plain observation, not a review"
+        }
+      ],
+      "sports": [
+        {
+          "good": "He did NOT just do that",
+          "bad": "An incredible display of athletic skill",
+          "why": "what a fan shouts"
+        },
+        {
+          "good": "Bro had one job",
+          "bad": "A moment of missed opportunity",
+          "why": "friendly roast in four words"
+        }
+      ],
+      "general": [
+        {
+          "good": "Tell me you're new without telling me",
+          "bad": "Signs you are a beginner",
+          "why": "a known format"
+        },
+        {
+          "good": "The one question she refused to answer",
+          "bad": "An interesting discussion",
+          "why": "a gap the clip closes"
+        }
+      ]
+    },
+    "ar": {
+      "business": [
+        {
+          "good": "بطّل تسعّر بالساعة",
+          "bad": "اكتشف أسرار التسعير الذكي",
+          "why": "نصيحة مباشرة ومحددة من المقطع، بدون كلام تسويقي"
+        },
+        {
+          "good": "خسر أربعين ألف بساعة",
+          "bad": "درس مهم عن المخاطر المالية",
+          "why": "رقم دقيق من المقطع بدل عنوان عام"
+        }
+      ],
+      "gaming": [
+        {
+          "good": "ما حدا: صاحبي بعد أول فوز",
+          "bad": "لقطة رائعة من عالم الألعاب",
+          "why": "الوسم هو النكتة، والباقي قصير وعن شخص"
+        },
+        {
+          "good": "يا زلمة شو هاد",
+          "bad": "شاهد هذه اللعبة المذهلة",
+          "why": "جملة صاحبك، مش مذيع"
+        }
+      ],
+      "podcast": [
+        {
+          "good": "السؤال اللي ما رضيت تجاوبه",
+          "bad": "حوار شيق حول الخيارات المهنية",
+          "why": "فجوة بسكّرها المقطع"
+        },
+        {
+          "good": "اسمعني شوي، الجامعة مش ضرورية",
+          "bad": "لماذا قد لا يناسب التعليم العالي الجميع",
+          "why": "رأي محكي مش أطروحة"
+        }
+      ],
+      "lifestyle": [
+        {
+          "good": "أنا لما يقولوا ما في استرجاع",
+          "bad": "كيف تتعامل مع تحديات التسوق",
+          "why": "إحساس يعرفه الكل بأربع كلمات"
+        },
+        {
+          "good": "قلي إنك مفلس من غير ما تحكي",
+          "bad": "علامات الضغط المالي",
+          "why": "صيغة الناس بتعرفها"
+        }
+      ],
+      "comedy": [
+        {
+          "good": "استنى الإفيه الأخير",
+          "bad": "لحظة مضحكة من عرض كوميدي",
+          "why": "بسمّي الانتظار مش النوع"
+        },
+        {
+          "good": "ما حدا: هو بفرح أخوه",
+          "bad": "رجل مضحك يحكي قصة مضحكة",
+          "why": "الوسم هو النكتة"
+        }
+      ],
+      "movies": [
+        {
+          "good": "POV: دخلت وسط هاد المشهد",
+          "bad": "لحظة أيقونية من فيلم كلاسيكي",
+          "why": "بحط المشاهد جواته"
+        },
+        {
+          "good": "ضل هادي طول المشهد",
+          "bad": "درس في التمثيل والتوتر",
+          "why": "ملاحظة بسيطة مش نقد"
+        }
+      ],
+      "sports": [
+        {
+          "good": "مش معقول عملها",
+          "bad": "عرض رياضي مذهل",
+          "why": "اللي بصرخ فيه المشجع"
+        },
+        {
+          "good": "كان عنده مهمة وحدة بس",
+          "bad": "لحظة ضياع فرصة",
+          "why": "مزح خفيف بخمس كلمات"
+        }
+      ],
+      "general": [
+        {
+          "good": "قلي إنك جديد من غير ما تحكي",
+          "bad": "علامات المبتدئين",
+          "why": "صيغة معروفة"
+        },
+        {
+          "good": "السؤال اللي ما رضيت تجاوبه",
+          "bad": "نقاش مثير للاهتمام",
+          "why": "فجوة بسكّرها المقطع"
+        }
+      ]
+    }
+  },
+  "rubric": [
+    "specific_to_clip",
+    "curiosity_gap",
+    "humour",
+    "trendiness",
+    "clarity",
+    "length"
+  ],
+  "rubric_weights": {
+    "specific_to_clip": 0.3,
+    "curiosity_gap": 0.22,
+    "humour": 0.16,
+    "trendiness": 0.1,
+    "clarity": 0.14,
+    "length": 0.08
+  }
+}

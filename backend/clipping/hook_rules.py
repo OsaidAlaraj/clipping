@@ -1,12 +1,16 @@
 """The hook rules: what a short-form editor would accept as an on-screen hook, enforced in code (owner notes 1 and 10).
 
-A hook is 3 to 9 words, one idea, spoken style, no dashes, semicolons, colons or quotation marks, at most two lines at the
-title size inside the safe area, and on screen long enough to read (words / 2 seconds, 3 s at the least, 5 s at the most).
+A hook is 3 to 9 words, one idea, spoken style, no dashes, semicolons or quotation marks, at most two lines at the title size
+inside the safe area, and on screen long enough to read (words / 2 seconds, 3 s at the least, 5 s at the most). The one colon
+allowed is a leading format tag from the lexicon (POV:, Nobody:, Me when: ...): the tag is the trend itself, so it is kept and
+the words are counted without it. A phrase that sounds like an AI wrote it (unlock, game-changer, dive into ...) is rejected.
 `clean` rewrites what can be fixed safely (punctuation only, never the words); `problems` lists what is still wrong;
 `check` does both. A hook that still fails is rejected and the generator is asked again with the problems named."""
 from __future__ import annotations
 
 import re
+
+from . import hook_lexicon
 
 MIN_WORDS, MAX_WORDS = 3, 9
 MIN_SHOW_S, WORDS_PER_S, MAX_SHOW_S = 3.0, 2.0, 5.0   # a viewer reads about 2 words a second on a moving picture; a hook is up for 3 to 5 s
@@ -26,9 +30,33 @@ def words(text: str) -> list[str]:
     return [w for w in _SPACE.split(str(text).strip()) if w]
 
 
+def split_tag(text: str) -> tuple[str | None, str]:
+    """(the allowed leading format tag, the rest). The tag comes back in the lexicon's own spelling."""
+    tag = hook_lexicon.leading_tag(text)
+    if tag is None:
+        return None, str(text or "")
+    rest = _SPACE.sub(" ", str(text).lstrip()).split(":", 1)[1] if ":" in tag else _SPACE.sub(" ", str(text).lstrip())[len(tag):]
+    return tag, rest
+
+
+def spoken_words(text: str) -> list[str]:
+    """The words of a hook without its leading tag (what the 3 to 9 word rule counts)."""
+    return words(split_tag(text)[1])
+
+
+def _language(text: str, language: str | None) -> str:
+    return language or ("ar" if re.search("[؀-ۿ]", str(text)) else "en")
+
+
 def clean(text: str) -> str:
-    """Punctuation only: dashes and colons become a space, semicolons a comma, quotation marks go, a repeated !!! or ???
-    becomes one, spaces collapse. The words are never touched."""
+    """Punctuation only: dashes and colons become a space (a leading format tag keeps its colon), semicolons a comma, quotation
+    marks go, a repeated !!! or ???  becomes one, spaces collapse. The words are never touched."""
+    tag, rest = split_tag(text)
+    body = _clean_body(rest)
+    return f"{tag} {body}".strip() if tag else body
+
+
+def _clean_body(text: str) -> str:
     text = _QUOTE_RE.sub("", str(text or ""))
     text = _EDGE_APOS.sub("", text)
     text = _DASH_RE.sub(" ", text)
@@ -55,16 +83,20 @@ def lines_needed(text: str, frame_w: int, size: int) -> int:
     return count
 
 
-def problems(text: str, available_s: float | None = None, frame_w: int = 1080, title_size: int = 69) -> list[str]:
+def problems(text: str, available_s: float | None = None, frame_w: int = 1080, title_size: int = 69, language: str | None = None) -> list[str]:
     """Why a hook is not acceptable, in plain words; [] when it is fine."""
     out = []
-    n = len(words(text))
+    _tag, body = split_tag(text)
+    n = len(words(body))
     if n < MIN_WORDS:
         out.append(f"too short ({n} words, need at least {MIN_WORDS})")
     if n > MAX_WORDS:
         out.append(f"too long ({n} words, at most {MAX_WORDS})")
-    if _DASH_RE.search(text) or ";" in text or ":" in text or "؛" in text:
-        out.append("contains a dash, colon or semicolon")
+    if _DASH_RE.search(text) or ";" in text or ":" in body or "؛" in text:
+        out.append("contains a dash, colon or semicolon (only a leading format tag such as POV: may have a colon)")
+    phrase = hook_lexicon.banned_phrase(body, _language(text, language))
+    if phrase:
+        out.append(f"sounds like an AI wrote it ({phrase})")
     if _QUOTE_RE.search(text):
         out.append("contains quotation marks")
     if lines_needed(text, frame_w, int(title_size * TITLE_FLOOR)) > MAX_LINES:   # the renderer shrinks the title down to this
@@ -74,10 +106,10 @@ def problems(text: str, available_s: float | None = None, frame_w: int = 1080, t
     return out
 
 
-def check(text: str, available_s: float | None = None, frame_w: int = 1080, title_size: int = 69) -> tuple[str, list[str]]:
+def check(text: str, available_s: float | None = None, frame_w: int = 1080, title_size: int = 69, language: str | None = None) -> tuple[str, list[str]]:
     """(cleaned text, remaining problems)."""
     fixed = clean(text)
-    return fixed, problems(fixed, available_s, frame_w, title_size)
+    return fixed, problems(fixed, available_s, frame_w, title_size, language)
 
 
 def feedback(rejected: list[tuple[str, list[str]]]) -> str:

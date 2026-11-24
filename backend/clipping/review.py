@@ -184,7 +184,7 @@ def _decorate(conn, rows: list[dict], operator_id=None) -> list[dict]:
         row["hook_text"] = (row.get("render_meta") or {}).get("hook_text")
         row.pop("min_views_to_qualify", None)
         row["hooks"] = conn.execute(
-            "select id, text, hook_type, chosen, rank, score from hooks where candidate_id = %s order by rank", (row["candidate_id"],)
+            "select id, text, hook_type, chosen, rank, score, rating from hooks where candidate_id = %s order by rank", (row["candidate_id"],)
         ).fetchall()
     return rows
 
@@ -283,6 +283,25 @@ def accept(conn, actor, clip_id, session_id=None, client_action_id=None) -> dict
     audit(conn, "gate.clip_acceptance", "clips", clip_id, {"hook_id": hook_id, "review_id": str(review["id"])},
           rule_version_id=clip["campaign_version_id"])
     return review
+
+
+def rate_hook(conn, hook_id, value: str) -> dict:
+    """The owner's thumb on one hook ("up", "down" or "none"). The first thumb teaches the hook library: an up counts as an approval
+    and a down as a rejection of the hook's format for this language (a changed mind only changes the thumb, never counts twice)."""
+    from . import hook_patterns
+
+    marks = {"up": 1, "down": -1, "none": None}
+    if value not in marks:
+        raise AppError("The thumb must be up, down or none.", "bad_rating")
+    hook = conn.execute("select h.id, h.rating, h.pattern, h.hook_type, h.owner_operator_id, coalesce(c.language, 'en') as language "
+                        "from hooks h left join clips c on c.id = h.clip_id where h.id = %s", (hook_id,)).fetchone()
+    if hook is None:
+        raise AppError("Hook not found.", "not_found")
+    conn.execute("update hooks set rating = %s where id = %s", (marks[value], hook_id))
+    if hook["rating"] is None and marks[value] is not None:
+        hook_patterns.record(conn, hook["pattern"] or hook["hook_type"], hook["language"], "default", "approve" if value == "up" else "reject",
+                             hook["owner_operator_id"])
+    return {"id": str(hook["id"]), "rating": marks[value]}
 
 
 def reject(conn, actor, clip_id, reason_code: str, notes: str | None = None, session_id=None, client_action_id=None) -> dict:

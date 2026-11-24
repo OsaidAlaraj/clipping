@@ -91,6 +91,15 @@ function HooksSheet({ clip, onPick, onClose }: { clip: Clip; onPick: (hookId: st
   const [list, setList] = useState(clip.hooks);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const rate = async (hookId: string, value: "up" | "down" | "none") => {
+    const mark = value === "up" ? 1 : value === "down" ? -1 : null;
+    setList((rows) => rows.map((h) => (h.id === hookId ? { ...h, rating: mark } : h)));   // optimistic: the thumb answers at once
+    try {
+      await api(`/api/hooks/${hookId}/rating`, { body: { value } });
+    } catch {
+      setList((rows) => rows.map((h) => (h.id === hookId ? { ...h, rating: clip.hooks.find((x) => x.id === hookId)?.rating ?? null } : h)));
+    }
+  };
   const regenerate = async () => {
     setBusy(true);
     setError("");
@@ -108,10 +117,14 @@ function HooksSheet({ clip, onPick, onClose }: { clip: Clip; onPick: (hookId: st
       <p className="small muted">Tap a hook to use it. The clip is re-rendered as a new version and returns to the feed.</p>
       <div className="stack">
         {list.map((hook) => (
-          <button key={hook.id} className="choice" aria-pressed={hook.id === current} onClick={() => (hook.id === current ? onClose() : onPick(hook.id))}>
-            <span dir="auto">{hook.text}</span>
-            <span className="badge">{hook.hook_type}</span>
-          </button>
+          <div key={hook.id} className="hook-row">
+            <button className="choice" aria-pressed={hook.id === current} onClick={() => (hook.id === current ? onClose() : onPick(hook.id))}>
+              <span dir="auto">{hook.text}</span>
+              <span className="badge">{hook.hook_type}</span>
+            </button>
+            <button className="thumb" aria-label="Good hook" aria-pressed={hook.rating === 1} onClick={() => rate(hook.id, hook.rating === 1 ? "none" : "up")}>👍</button>
+            <button className="thumb" aria-label="Bad hook" aria-pressed={hook.rating === -1} onClick={() => rate(hook.id, hook.rating === -1 ? "none" : "down")}>👎</button>
+          </div>
         ))}
       </div>
       {error && <p className="small" role="alert" style={{ color: "var(--danger, #c0392b)" }}>{error}</p>}

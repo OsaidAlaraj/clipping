@@ -178,6 +178,10 @@ class EditIn(BaseModel):
     caption: str | None = None
 
 
+class HookRatingIn(BaseModel):
+    value: str
+
+
 class CaptionVariantIn(BaseModel):
     kind: str
 
@@ -986,6 +990,12 @@ def edit(clip_id: str, body: EditIn, actor: Actor = Depends(current_actor)):
 def regenerate_hooks(clip_id: str, actor: Actor = Depends(current_actor)):
     """New hook variants for the editor; the owner's own words for any failure."""
     return {"hooks": run(actor, pipeline.regenerate_hooks, clip_id)}
+
+
+@app.post("/api/hooks/{hook_id}/rating")
+def rate_hook(hook_id: str, body: HookRatingIn, actor: Actor = Depends(current_actor)):
+    """The owner's thumb up or down on a hook (value: up, down or none); it also re-weights the hook's format."""
+    return run(actor, review.rate_hook, hook_id, body.value)
 
 
 @app.post("/api/clips/{clip_id}/caption-variant")
