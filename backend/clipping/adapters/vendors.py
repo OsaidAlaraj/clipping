@@ -273,7 +273,7 @@ LLM_SYSTEM = {
             "بنتيجة واحدة لكل زوج."),
     },
 }
-REASONING_TASKS = ("moments", "moment_score", "moment_compare")   # a reasoning model "thinks" before it answers
+REASONING_TASKS = ("moments", "moment_score", "moment_compare", "brief_spec")   # a reasoning model "thinks" before it answers
 
 
 @register

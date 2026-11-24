@@ -7,7 +7,7 @@ vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a 
 
 import { BriefReview } from "@/components/BriefReview";
 import { AddCampaign } from "@/components/More";
-import { blockingKeys, counts, editItem, previewDecisions, resolveConflict, textToValue, valueToText, type Spec, type SpecItem } from "@/lib/briefSpec";
+import { blockingKeys, counts, editItem, previewDecisions, resolveConflict, textToValue, valueToText, type Lang, type Spec, type SpecItem } from "@/lib/briefSpec";
 import { mockApi } from "./helpers";
 
 const item = (id: string, key: string, value: any, extra: Partial<SpecItem> = {}): SpecItem => ({
@@ -26,7 +26,7 @@ const spec = (): Spec => ({
   ],
 });
 
-function Harness({ onConfirm = () => {}, onPasteLink = () => {}, lang = "en" as const, initial = spec() }) {
+function Harness({ onConfirm = () => {}, onPasteLink = () => {}, lang = "en" as Lang, initial = spec() }) {
   const [s, setS] = useState(initial);
   return <BriefReview spec={s} onChange={setS} onPasteLink={onPasteLink} onConfirm={onConfirm} lang={lang} linksKept={2} />;
 }
