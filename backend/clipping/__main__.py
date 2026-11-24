@@ -65,10 +65,10 @@ def main(argv: list[str]) -> int:
         import logging
 
         logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-        if command == "dev" and "--no-seed" not in argv:
+        if command == "dev" and "--no-seed" not in argv and _first_start(db):
             from . import demo
 
-            demo.run(db, log=lambda *_: None, finish_all=False)
+            demo.run(db, log=lambda *_: None, finish_all=False)   # the sample campaign is only for the very first look, never again
         thread = threading.Thread(target=ops.worker_loop, args=(db, stop), daemon=True)
         thread.start()
         if command == "worker":
@@ -85,6 +85,17 @@ def main(argv: list[str]) -> int:
     uvicorn.run("clipping.api:app", host=host, port=config.api_port(), log_level="warning")
     stop.set()
     return 0
+
+
+def _first_start(db) -> bool:
+    """True until the owner has enrolled a sign-in: after that, an emptied database stays empty instead of growing sample campaigns."""
+    import psycopg
+
+    try:
+        with psycopg.connect(db.dsn) as conn:
+            return conn.execute("select count(*) from auth_credentials").fetchone()[0] == 0
+    except Exception:   # no table yet (a brand-new database): this is the first start
+        return True
 
 
 if __name__ == "__main__":
