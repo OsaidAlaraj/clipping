@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -10,6 +11,9 @@ import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
 import { RejectSheet } from "./Feed";
 import { DetailSkeleton, RowsSkeleton } from "./Skeleton";
+
+// Places imports this file, so the upload form is loaded lazily to avoid a circular import.
+const UploadVideo = dynamic(() => import("./Places").then((m) => m.UploadVideo), { ssr: false });
 
 /** A screen's data: the last copy at once if there is one, refreshed in the background. */
 function useLoad<T>(path: string) {
@@ -411,7 +415,6 @@ export function AddCampaign({ embedded = false, initial }: { embedded?: boolean;
 export function CampaignDetail({ id }: { id: string }) {
   const { data, error, setError, load } = useLoad<any>(`/api/campaigns/${id}`);
   const [reason, setReason] = useState("");
-  const [source, setSource] = useState({ file_path: "", language: "en", permission_ref: "" });
   const [note, setNote] = useState("");
   const act = async (fn: () => Promise<unknown>, done?: string) => { setError(""); try { await fn(); setNote(done ?? ""); load(); } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } };
   if (!data) return error ? <div className="page"><Head title="Campaign" back="/" /><p className="muted">{error}</p></div> : <DetailSkeleton />;
@@ -478,13 +481,8 @@ export function CampaignDetail({ id }: { id: string }) {
       {campaign.status === "approved" && (
         <section className="card stack">
           <h2>Add permitted footage</h2>
-          <p className="small muted">Only footage you have a licence or written permission for. The file is read from this laptop.</p>
-          <div className="field"><label htmlFor="s-path">File path on this laptop</label><input id="s-path" className="input" value={source.file_path} onChange={(e) => setSource({ ...source, file_path: e.target.value })} /></div>
-          <div className="row">
-            <div className="field"><label htmlFor="s-lang">Language</label><select id="s-lang" className="input" value={source.language} onChange={(e) => setSource({ ...source, language: e.target.value })}><option value="en">English</option><option value="ar">Arabic</option></select></div>
-            <div className="field grow"><label htmlFor="s-perm">Permission or licence reference</label><input id="s-perm" className="input" value={source.permission_ref} onChange={(e) => setSource({ ...source, permission_ref: e.target.value })} /></div>
-          </div>
-          <button className="btn block" disabled={!source.file_path.trim() || !source.permission_ref.trim()} onClick={() => act(() => api(`/api/campaigns/${id}/sources`, { body: source }), "Footage added. Clips appear in the Feed when the pipeline finishes.")}>Add footage and start</button>
+          <p className="small muted">Only footage you have a licence or written permission for. Upload a file or paste a link.</p>
+          <UploadVideo campaigns={[{ id, name: campaign.name, practice: !!campaign.is_practice, language: campaign.language ?? null }]} initialId={id} />
           <span className="small muted">{data.sources.length} source file{data.sources.length === 1 ? "" : "s"} so far.</span>
           <Link className="btn primary block" href={`/review?campaign=${id}`}>Open this campaign's feed</Link>
         </section>
