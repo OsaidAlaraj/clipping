@@ -211,7 +211,7 @@ def moments(payload: dict) -> dict:
 
 # The moment engine's two LLM tasks. Tests set "rate" / "compare" to a raw reply (or a function of the payload), "bias" to
 # "first" to simulate a model that always prefers the first of a pair, and read "calls" for every payload received.
-FAKE_MOMENT_LLM: dict = {"rate": None, "compare": None, "bias": None, "calls": []}
+FAKE_MOMENT_LLM: dict = {"rate": None, "compare": None, "scout": None, "bias": None, "calls": []}
 FUNNY = re.compile(r"\b(haha|lol|joke|funny|laugh\w*)\b|ههه|ضحك", re.I)
 HYPE = re.compile(r"\b(wow|insane|unbelievable|no way|crazy)\b|!|والله|مستحيل", re.I)
 
@@ -249,6 +249,27 @@ def moment_score(payload: dict) -> dict:
                         "overall": round(q, 2), "reason": f"A clear, self-contained stretch ({emotion}).",
                         "hook_text": _hook_from(item.get("pattern"), text)})
     return {"ratings": ratings}
+
+
+def moment_scout(payload: dict) -> dict:
+    """The scout's stand-in: groups of whole units that reach min_s, the best-looking ones first, never overlapping."""
+    FAKE_MOMENT_LLM["calls"].append(("scout", payload))
+    answer = FAKE_MOMENT_LLM["scout"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    units, groups, i = payload["units"], [], 0
+    while i < len(units):
+        j, seconds = i, 0.0
+        while j < len(units) and seconds < payload["min_s"]:
+            seconds += units[j][2] + units[j][5] / 10
+            j += 1
+        if seconds >= payload["min_s"] and seconds <= payload["max_s"]:
+            text = " ".join(u[4] for u in units[i:j])
+            groups.append((quality(text), units[i][0], units[j - 1][0], text))
+        i = max(j, i + 1)
+    best = sorted(groups, reverse=True)[:payload["max_moments"]]
+    return {"moments": [{"first": a, "last": b, "score": round(q, 2), "reason": "A self-contained stretch that builds to its point."}
+                        for q, a, b, _ in best]}
 
 
 def moment_compare(payload: dict) -> dict:
@@ -345,5 +366,5 @@ def commentary(payload: dict) -> dict:
 
 def complete(task: str, payload: dict) -> dict:
     return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments,
-            "moment_score": moment_score, "moment_compare": moment_compare, "caption_lab": caption_lab,
+            "moment_score": moment_score, "moment_compare": moment_compare, "moment_scout": moment_scout, "caption_lab": caption_lab,
             "caption_check": caption_check, "commentary": commentary}[task](payload)

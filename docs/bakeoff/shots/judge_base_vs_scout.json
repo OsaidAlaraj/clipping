@@ -1,0 +1,89 @@
+{
+ "A": "base",
+ "B": "scout",
+ "win_rate_B": 0.7,
+ "asked": 5,
+ "identical": 1.0,
+ "pairs": [
+  {
+   "label": "local_ar",
+   "rank": 1,
+   "A": [
+    233.925,
+    277.6
+   ],
+   "B": [
+    71.945,
+    118.72
+   ],
+   "B_score": 1.0,
+   "A_text": "في القتل خارج القانوني تم 95 وتم قضية طبعا ، نكون متهمين الأساسيين يتقدلوا ، ما يوصلوش ، لا محكمة ولا نيابة ولا البويسة عايز يعرف الحقيقة فين الاستقصي ده جدع بن ادمين من قصيره واتل تظلمات من خلال الاعتقال في معظم الاحوال بقت تظلمات شكليه سوريه مالهاش قيمه قانونيه حقيقيه لدرجه ان المحاكم النهارده ما بقتش تصر على ان يمثل المعتقل بنفسه امام المحكمه عند نظر تظلمه وده بيساعد على تخطيط المده اللازمه للت",
+   "B_text": "يد لجهاز مباحث امن الدوله الفرصه لاطاله المده اللي احتاجت فيها اي مواطن حين عرض اعلاميه اكتشف هم في الثمانينات ان لما الواحد يتعذب ويعرض للطب الشرعي خلال اسبوع او عشره ايام من وقائع التعذيب تالثب الشرعي له بيقول ان سبب الاصابه ديت ناتج عن التعذيب بالطريقه الفلانيه لو احتفظت بالشخص المصاب بجروح لمده ثلاث اسابيع اربع اسابيع او بعد كده راح السلب الشرعي السلب الشرعي ح تعذر عليه اثبات اسباب الاصابه في "
+  },
+  {
+   "label": "local_ar",
+   "rank": 2,
+   "A": [
+    431.095,
+    472.67
+   ],
+   "B": [
+    16.455,
+    52.955
+   ],
+   "B_score": 1.0,
+   "A_text": "لو افترضنا ان عندي اصلا استقلال في السلطه اللي بتحقق لو افترضنا عندي استقلال كامل قضاء بجد بحيث يبقى ينظر بطريقه عادله ومصفه في وقائع التعذيب فلو حتى الاثنين دول مستقتلين عندي لا عندي سلطه تحقيق مستقله ولا عندي قضاء كامل لاستقلال فتبقى الكارثه اكبر من اللي بيحصل هل عندي جهه تحقيق محايده لحق في هذه المجالات انا اقول لك بقاء التعذيب اللي انا تعرضت لها شخصيا في 83 لحد يومنا هذا النيابه ما استكمل التح",
+   "B_text": "انا دخلت سجني من طرف قضيه في 83 فوجئت ب شاب من المنصوره الشيخ مصطفى من بقايا اعتقالات سبتمبر 81 فباله انت يا شيخ ما خرجتش ليه فقال ضابط المباحث القبض علي قال ان هحطلك ورا الشمس ومش هتشوف الشارع مره تانيه هل عندك مانع نعملك تظلم لا ما عنديش مانع عملنا تظلم اعتبر ضد الداخليه عملنا تظلم الثاني اخري سيبيه مشكلته سيخ مصال كانت ايه انه جسمي اتنسي"
+  },
+  {
+   "label": "local_ar",
+   "rank": 3,
+   "A": [
+    145.84,
+    191.98
+   ],
+   "B": [
+    160.445,
+    205.965
+   ],
+   "B_score": 0.0,
+   "A_text": "ماهياش راجعه لافراد منحرفين في جهاز الشرطه ده سياسه التعليميه سدوله بلاش تقرير ام من تحت الحياه الواقعه اللي احنا بنعيشها ما فيش ضابط مباحث حيروح يشتري ادوات التعذيب من جيبه الخاص ويصمم ويجهز ويبني تلاجة تعذيب في كل اسم دبيس ، ده ده بتيجي من اعتمادات من الخزانة العامة اللي بيستاور أدوات تعذيب الحكومة اللي بيوزعها عهد علي الضباط الحكومة يعني الحكومة هي الراعي الرسمي للتعذيب في مصر ممكن يتنسي ملف وا",
+   "B_text": "ادوات التعذيب من جيبه الخاص ويصمم ويجهز ويبني تلاجة تعذيب في كل اسم دبيس ، ده ده بتيجي من اعتمادات من الخزانة العامة اللي بيستاور أدوات تعذيب الحكومة اللي بيوزعها عهد علي الضباط الحكومة يعني الحكومة هي الراعي الرسمي للتعذيب في مصر ممكن يتنسي ملف واحد محدش يبص في ملفه أو ممكن يتجاهل النظر في الملف لاسباب متعلقه بالضغط علي مجموعات من الجماعات الإسلامية الموجودة في داخل السجون بسبب مأسلام زي مبادرة ن"
+  },
+  {
+   "label": "local_en",
+   "rank": 1,
+   "result": "same clip"
+  },
+  {
+   "label": "local_en",
+   "rank": 2,
+   "A": [
+    489.665,
+    544.845
+   ],
+   "B": [
+    555.44,
+    600.03
+   ],
+   "B_score": 0.5,
+   "A_text": "Does that mean you watch the movie? Well, I mean, you're aware of it at least. You know, at least you made it through the title screen. Like, okay. That's a thing. I know it's a thing, and you can kinda talk about it in an educated way. I am surprised they're giving out numbers at all. It just seems like a strange thing. The Netflix for years didn't bother with this. Why start now? Bragging. Bragg",
+   "B_text": "If you sit for two minutes, you're likely to keep sitting. And if you look at the list of total hours viewed, it kinda tracks. Most of the stuff that shows up on the on the views side shows up in the total hours track, you know, are pretty close. Birdbox and extraction, great examples. They just flip flop places. So I don't think it's totally a BS number. I think it might be smarter for them to lo"
+  },
+  {
+   "label": "local_en",
+   "rank": 3,
+   "A": [
+    555.44,
+    600.03
+   ],
+   "B": [
+    211.635,
+    245.005
+   ],
+   "B_score": 1.0,
+   "A_text": "If you sit for two minutes, you're likely to keep sitting. And if you look at the list of total hours viewed, it kinda tracks. Most of the stuff that shows up on the on the views side shows up in the total hours track, you know, are pretty close. Birdbox and extraction, great examples. They just flip flop places. So I don't think it's totally a BS number. I think it might be smarter for them to lo",
+   "B_text": "You do have to sign up for a Netflix account, but you don't have to pay anything, and there are no ads. Anyone older than 18 with an Android phone can get the free plan, which gives access to about 25% of the Netflix catalog in Kenya. Although that does include some full series, the idea seems to be to entice people to want to watch the rest of the catalog, or to get tired of watching on their pho"
+  }
+ ]
+}
