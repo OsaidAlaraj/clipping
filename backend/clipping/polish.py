@@ -206,9 +206,9 @@ def plan_tighten(words: list[dict], clip_start: float, clip_end: float, language
 
 # ------------------------------------------------------------------ stress moments for the punch-in zooms
 
-ZOOM_DEPTH_MIN, ZOOM_DEPTH_MAX = 1.05, 1.10
-STRESS_GAP_S = 5.0
-STRESS_MAX = 5
+ZOOM_DEPTH_MIN, ZOOM_DEPTH_MAX = 1.03, 1.06   # subtle: a push you feel, not one you notice
+STRESS_GAP_S = 12.0   # at least 12 s between pushes: a zoom every few seconds reads as the picture breathing
+STRESS_MAX = 2
 
 
 def stress_moments(words: list[dict], clip_start: float, clip_end: float, env, plan: Plan | None = None) -> list[tuple[float, float]]:

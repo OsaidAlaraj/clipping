@@ -12,6 +12,8 @@ Licence note: the animation ideas (pop-in with overshoot, active-word highlight)
 pulsence/caption-animator (MIT); no code is copied from it."""
 from __future__ import annotations
 
+import re
+
 from . import media
 
 # Share of the frame the platform's own buttons and text cover: (top, bottom, left, right). Approximations of the published
@@ -38,6 +40,14 @@ DEFAULT_STYLE = "karaoke_clean"
 # What "auto" resolves to: the niche decides (podcasts and interviews name the speaker, gaming is loud, business stresses key words).
 AUTO_BY_NICHE = {"gaming": "bold_pop", "podcast": "speaker_label", "business": "emphasis", "lifestyle": "stacked", "arabic": "karaoke_clean"}
 SPEAKER_SHOWN_S = 2.2
+_PLACEHOLDER = re.compile(r"^\s*(speaker|spk|host|guest|متحدث|المتحدث|ضيف|الضيف)?\s*[#_-]?\s*\d*\s*$", re.IGNORECASE)
+
+
+def real_name(value) -> str | None:
+    """The name to show, or None when it is empty or only a placeholder ("Speaker 1", "المتحدث 2", "0"). A made-up label on a public
+    clip is worse than no label, so a name nobody gave is never drawn."""
+    text = str(value or "").strip()
+    return None if _PLACEHOLDER.match(text) else text
 
 
 def resolve(style: str | None, niche: str | None = None, language: str | None = None) -> str:
@@ -145,7 +155,10 @@ def speaker_events(chunks: list[dict], clip_start: float, width: int, height: in
         if speaker is None or speaker == last:
             continue
         last = speaker
-        label = media._esc(str(names.get(speaker) or f"Speaker {speaker}"))
+        name = real_name(names.get(speaker))
+        if name is None:
+            continue   # unknown speaker: show nothing rather than "Speaker 1"
+        label = media._esc(name)
         start = chunk["start"]
         events.append({"start": start, "end": start + SPEAKER_SHOWN_S, "layer": 2, "style": "Speaker",
                        "text": f"{{\\an5\\pos({width // 2},{y})\\fad(120,200)}}{label}"})

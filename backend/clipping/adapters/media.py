@@ -185,7 +185,7 @@ def zoom_graph(times: list[float], out_w: int, out_h: int, source: str = "lay", 
     return (f"[{source}]scale=w='trunc({out_w}*{z}/2)*2':h='trunc({out_h}*{z}/2)*2':eval=frame,crop={out_w}:{out_h}[{label}]")
 
 
-ZOOM_IN_S, ZOOM_HOLD_S, ZOOM_OUT_S = 0.40, 0.80, 0.70     # punch-in: ease in, hold, ease back out
+ZOOM_IN_S, ZOOM_HOLD_S, ZOOM_OUT_S = 0.60, 0.90, 1.00     # punch-in: ease in, hold, ease back out
 ZOOM_FLAT_STYLES = ("facecam_over_game", "stacked_facecam_over_gameplay", "stacked")   # the gameplay half never zooms
 
 
