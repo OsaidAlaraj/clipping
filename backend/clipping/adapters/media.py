@@ -224,7 +224,7 @@ def tighten_graphs(plan, source: str, has_audio: bool, fps: float) -> str:
     half = polish.XFADE_S / 2
     half_frame = 0.5 / fps
     parts = [f"[{source}]split={n}" + "".join(f"[tv{i}]" for i in range(n))]
-    parts += [f"[tv{i}]trim=start={max(a - half_frame, 0) if i else 0:.4f}:end={b - half_frame:.4f},"
+    parts += [f"[tv{i}]trim=start={max(a - half_frame, 0) if i or plan.prefix else 0:.4f}:end={b - half_frame:.4f},"
               f"setpts=PTS-STARTPTS[cv{i}]" for i, (a, b) in enumerate(keeps)]
     parts.append("".join(f"[cv{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=0[cutv]")
     if has_audio:
@@ -546,6 +546,10 @@ class FFmpegRender(Adapter):
         if tpl["tighten"] and self.force_crop is None and words:
             plan = polish.plan_tighten(words, start, end, language, env, info.get("fps") or 30.0, min_s=float(clip.get("min_s") or 0.0))
             plan = plan if plan.cuts else None
+        story = clip.get("story") or {}
+        if story and self.force_crop is None:   # the Story Director's cold open and ending trim ride on the same trim and concat
+            cold = story.get("cold_open")
+            plan = polish.with_story(plan, duration, tuple(cold["clip"]) if cold else None, float(story.get("ending_trim_s") or 0.0))
         shown_words, c0, c1 = (plan.words(words, start, end), 0.0, plan.new_duration) if plan else (words, start, end)
         shown_emphasis = [plan.map(float(e) - start) for e in clip.get("emphasis") or []] if plan else clip.get("emphasis") or []
         social, rtl = clip.get("platform") in SOCIAL_PLATFORMS, language == "ar"
@@ -570,6 +574,9 @@ class FFmpegRender(Adapter):
             moments = polish.stress_moments(words, start, end, env, plan) if env is not None and words else []
             if not moments:    # no words or no audio: the loud moments the pipeline found, at a middle depth
                 moments = [(max(t - 0.25, 0.0), 1.08) for t in zoom_times(clip.get("emphasis") or [], start, duration)]
+            hook_zoom = (story.get("rehook") or {}) if story else {}
+            if hook_zoom and all(abs(hook_zoom["at_s"] - 0.3 - t) >= 4.0 for t, _ in moments):
+                moments = sorted(moments + [(round(hook_zoom["at_s"] - 0.3, 2), float(hook_zoom["depth"]))])
         graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path, stack=stack)
         graph += (";" + punch_graph(moments, width, height)) if moments else ""
         last = "zm" if moments else "lay"
@@ -588,7 +595,7 @@ class FFmpegRender(Adapter):
             args = ["-ss", f"{start:.3f}", "-i", str(src_path)]
             if bed:   # looped from the chosen bar line, so a track shorter than the clip still fills it
                 args += ["-stream_loop", "-1", "-ss", f"{float(bed['offset_s']):.3f}", "-i", str(Path(bed["path"]).resolve())]
-            args += ["-t", f"{duration:.3f}", "-filter_complex", graph, "-map", "[v]"]
+            args += ["-t", f"{c1 - c0 + 0.05:.3f}", "-filter_complex", graph, "-map", "[v]"]
             if has_audio:
                 args += ["-map", "[a]", "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
             return [*args, *ffmpeg.encoder_args(encoder, str(self.cfg.get("preset", "medium")), int(self.cfg.get("crf", 23))),

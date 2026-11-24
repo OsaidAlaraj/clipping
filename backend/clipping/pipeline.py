@@ -294,6 +294,18 @@ def _portfolio_room(conn, owner, campaign_id, made: int, room: int, wanted: int)
     return room, None
 
 
+PORTFOLIO_MIN_WEEK = 8   # a share of fewer clips than this means nothing: 40 % of 1 clip is 0
+
+
+def portfolio_allowance(share: float, week: int, made: int, wanted: int, room: int, min_week: int = PORTFOLIO_MIN_WEEK) -> int:
+    """PROPOSED replacement for the share arithmetic in `_portfolio_room` (not wired in: the owner decides). Same maths, but the share
+    only limits a campaign once the week has `min_week` clips; before that the weekly cap alone applies, so a second campaign can
+    no longer squeeze a quiet week down to one clip. Never starves: with no history the answer is `room`."""
+    if share >= 1 or week + made < min_week:
+        return room
+    return min(room, max(int((share * week - made) // (1 - share)), 1 if made == 0 else 0))
+
+
 def add_manual_candidates(conn, actor, source_id, moments: list[dict]) -> int:
     """Manual selection (the A4 fallback): the owner gives start and end times."""
     source, campaign, version = _source_ctx(conn, source_id)
@@ -477,6 +489,22 @@ def _pick_music(conn, clip: dict, campaign: dict, render_clip: dict, words: list
     return {"path": track["path"], "offset_s": decision["offset_s"], "gain_db": decision["gain_db"], "record": record, "profile": profile}
 
 
+def _story(conn, clip: dict, campaign: dict, version: dict, words: list[dict]) -> dict:
+    """The Story Director's edit plan for this clip, within the campaign's longest allowed length. A failure here never stops the
+    render: the clip is then cut as chosen."""
+    try:
+        from . import moment_rank as rank, story_director   # lazy: moment_rank reaches back into this module through moments_pilot
+        category = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone()
+        high = float(get_setting(conn, "clip_max_duration_s"))
+        brief = rank.brief_terms(version.get("rules_json"), None)
+        if brief["length"] and brief["length"][1]:
+            high = min(high, float(brief["length"][1]))
+        planned = story_director.plan(words, float(clip["start_s"]), float(clip["end_s"]), clip["language"], (category or {}).get("name") or "general", high)
+        return planned if planned["techniques"] else {}
+    except Exception:
+        return {}
+
+
 def stage_render(conn, job: dict) -> Decimal:
     """The clip in one encode: reframe, captions, the disclosure label and the account's template (title card, progress bar,
     emphasis zooms), then its cover. The disclosure text is checked first: without it the clip is blocked."""
@@ -497,6 +525,10 @@ def stage_render(conn, job: dict) -> Decimal:
     out = storage.path(key)
     words = _words(conn, source)
     render_clip = _render_request(conn, clip, source, platform, meta.get("hook_text"))
+    story = _story(conn, clip, campaign, version, words)
+    if story:
+        render_clip["story"] = story
+    meta["story"] = story or None          # plain words for the review screen: "why this opening"
     bed = _pick_music(conn, clip, campaign, render_clip, words, platform)
     if bed and bed.get("path"):
         render_clip["music"] = bed

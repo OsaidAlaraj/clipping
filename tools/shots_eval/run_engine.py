@@ -28,8 +28,8 @@ def _spy(src, kept, aside, *a, **k):          # every candidate that reached the
     return _orig_finish(src, kept, aside, *a, **k)
 moments._finish = _spy
 VARIANT = os.environ.get("SHOTS_VARIANT", "base")
-LOCAL = {"local_ar": "L:/Projects/Clipping/.data/samples/ar_seif_el_islam_interview.mp4", "local_en": "L:/Projects/Clipping/.data/tmp/en_cordkillers_first10min.mp4"}
-META = {"local_ar": ("ar", "podcast"), "local_en": ("en", "podcast"), "en_podcast": ("en", "podcast"), "en_business": ("en", "podcast"), "ar_podcast": ("ar", "podcast"),
+LOCAL = {"local_ep377": "L:/Projects/Clipping/.data/samples/en_cordkillers_ep377.mp4", "local_kau": "L:/Projects/Clipping/.data/samples/ar_kau_physiology_l38.mp4", "local_ar": "L:/Projects/Clipping/.data/samples/ar_seif_el_islam_interview.mp4", "local_en": "L:/Projects/Clipping/.data/tmp/en_cordkillers_first10min.mp4"}
+META = {"local_ep377": ("en", "podcast"), "local_kau": ("ar", "podcast"), "local_ar": ("ar", "podcast"), "local_en": ("en", "podcast"), "en_podcast": ("en", "podcast"), "en_business": ("en", "podcast"), "ar_podcast": ("ar", "podcast"),
         "en_gaming": ("en", "gaming"), "en_stream": ("en", "gaming")}
 db = get_db(); db.migrate()
 owner = ops.ensure_owner(db)
