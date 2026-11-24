@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, language_check, music, packaging, quality_gate, signals, templates, transcripts
+from . import brand_checks, config, hook_patterns, hook_rules, job_progress, ffmpeg, language_check, music, packaging, quality_gate, signals, templates, transcripts
 from .adapters import media
 from .adapters import music as _music_adapters  # noqa: F401  (registers the music stage providers)
 from .adapters.base import AdapterPaused
@@ -307,6 +307,10 @@ def _with_pattern_hook(conn, candidate: dict, source: dict, hooks: list[dict]) -
     from . import moment_rank
 
     text = candidate.get("hook_text")
+    if text:
+        text, bad = hook_rules.check(text)   # the engine's line follows the same rules as the agent's
+        if bad:
+            text = None
     if not text:
         return hooks
     row = conn.execute("select hook_type from hook_patterns where name = %s and language = %s",
@@ -317,6 +321,42 @@ def _with_pattern_hook(conn, candidate: dict, source: dict, hooks: list[dict]) -
     for rank_, hook in enumerate(merged, start=1):
         hook["rank"] = rank_
     return merged
+
+
+def regenerate_hooks(conn, clip_id) -> list[dict]:
+    """New hook variants for a clip's moment (the hook editor's Regenerate button): never a text the moment already has, each
+    one passing hook_rules. They are added after the existing hooks; nothing is re-rendered until the owner picks one."""
+    import time
+
+    clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
+    if clip is None:
+        raise AppError("Clip not found.", "not_found")
+    candidate = conn.execute("select * from candidates where id = %s", (clip["candidate_id"],)).fetchone()
+    source, _campaign, _version = _source_ctx(conn, candidate["source_id"])
+    owner = source["owner_operator_id"]
+    words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
+    existing = conn.execute("select text, rank from hooks where candidate_id = %s", (candidate["id"],)).fetchall()
+    picked = hook_patterns.pick(conn, source["language"], "default", 3, f"{clip_id}:{time.time()}", owner)
+    try:
+        fresh, _cost = agent_b.run(conn, registry, " ".join(w["text"] for w in words), source["language"], candidate["score"], owner,
+                                   avoid=[h["text"] for h in existing], patterns=[p["name"] for p in picked])
+    except (ContentFiltered, AdapterPaused, KillSwitchOn):
+        raise
+    except AppError:
+        raise
+    except Exception as exc:   # a vendor or network failure: plain words for the owner, the cause goes to the server log
+        import logging
+
+        logging.getLogger("clipping").warning("hook regenerate failed: %r", exc)
+        raise AppError("Could not write new hooks right now. Try again in a moment.", "hooks_failed") from exc
+    top = max([h["rank"] for h in existing], default=0)
+    for offset, hook in enumerate(fresh, start=1):
+        conn.execute(
+            """insert into hooks (candidate_id, clip_id, owner_operator_id, text, hook_type, chosen, rank, score)
+               values (%s, %s, %s, %s, %s, false, %s, %s)""",
+            (candidate["id"], clip["id"], owner, hook["text"], hook["hook_type"], top + offset, hook["score"]))
+    return [dict(r) | {"id": str(r["id"])} for r in conn.execute(
+        "select id, text, hook_type, chosen, rank, score from hooks where candidate_id = %s order by rank", (candidate["id"],)).fetchall()]
 
 
 def stage_hooks(conn, job: dict) -> Decimal:
@@ -388,6 +428,10 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
     request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
                "audio": style.get("audio"), "hook_text": hook_text, "emphasis": [],
                "min_s": float(get_setting(conn, "clip_min_duration_s"))}      # tightening never takes the clip below the campaign minimum
+    try:
+        request["speaker_names"] = {str(k): str(v) for k, v in (transcripts.load(conn, source["id"]).get("speakers") or {}).items()}
+    except Exception:   # no transcript names: the label falls back to "Speaker N"
+        request["speaker_names"] = {}
     measured = signals.load(conn, source["id"])
     if measured:
         first, last = int(start), math.ceil(end)
@@ -626,7 +670,8 @@ def process_one(db: Database) -> bool:
         with db.session(worker) as conn:
             if kill_switch_on(conn):
                 raise KillSwitchOn()
-            cost = HANDLERS[job["type"]](conn, job)
+            with job_progress.bind(db, job["id"]):
+                cost = HANDLERS[job["type"]](conn, job)
             finish_job(conn, job["id"], cost)
     except KillSwitchOn:
         with db.session(worker) as conn:

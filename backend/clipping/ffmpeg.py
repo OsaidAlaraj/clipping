@@ -31,12 +31,46 @@ def exe() -> str:
     return imageio_ffmpeg.get_ffmpeg_exe()
 
 
-def run(args: list[str], cwd: Path | None = None, timeout: int = 900) -> subprocess.CompletedProcess:
+def run(args: list[str], cwd: Path | None = None, timeout: int = 900, progress_total_s: float | None = None) -> subprocess.CompletedProcess:
+    """Run ffmpeg. With `progress_total_s` (the length of the output in seconds) the real position of the encode is reported
+    to the running job while it works."""
+    if progress_total_s:
+        return _run_reporting(args, cwd, timeout, progress_total_s)
     proc = subprocess.run([exe(), "-hide_banner", "-nostdin", "-y", *args], cwd=cwd, capture_output=True,
                           text=True, encoding="utf-8", errors="replace", timeout=timeout)
     if proc.returncode != 0:
         raise FFmpegError(readable_error(proc.stderr))
     return proc
+
+
+def _run_reporting(args: list[str], cwd: Path | None, timeout: int, total_s: float) -> subprocess.CompletedProcess:
+    """Same as run(), reading ffmpeg's own -progress lines (out_time) so the share done is real."""
+    import tempfile
+    import threading
+
+    from . import job_progress
+
+    with tempfile.TemporaryFile("w+", encoding="utf-8", errors="replace") as err:
+        proc = subprocess.Popen([exe(), "-hide_banner", "-nostdin", "-y", "-progress", "pipe:1", "-nostats", *args], cwd=cwd,
+                                stdout=subprocess.PIPE, stderr=err, text=True, encoding="utf-8", errors="replace")
+        timer = threading.Timer(timeout, proc.kill)
+        timer.start()
+        try:
+            for line in proc.stdout:   # type: ignore[union-attr]
+                if line.startswith("out_time_us=") or line.startswith("out_time_ms="):
+                    try:
+                        job_progress.report(int(line.split("=", 1)[1]) / 1_000_000, total_s, "seconds of video")
+                    except ValueError:
+                        pass   # "N/A" before the first frame
+            proc.wait()
+        finally:
+            timer.cancel()
+        err.seek(0)
+        stderr = err.read()
+    if proc.returncode != 0:
+        raise FFmpegError(readable_error(stderr))
+    job_progress.report(total_s, total_s, "seconds of video")   # finished: the last line may have been skipped by the throttle
+    return subprocess.CompletedProcess(proc.args, proc.returncode, "", stderr)
 
 
 def readable_error(stderr: str) -> str:

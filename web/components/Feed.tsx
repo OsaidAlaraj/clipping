@@ -85,29 +85,75 @@ export function RejectSheet({ onSubmit, onClose }: { onSubmit: (reason: string, 
 
 function HooksSheet({ clip, onPick, onClose }: { clip: Clip; onPick: (hookId: string) => void; onClose: () => void }) {
   const current = String(clip.render_meta?.hook_id ?? "");
+  const [list, setList] = useState(clip.hooks);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const regenerate = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const data = await api<{ hooks: Clip["hooks"] }>(`/api/clips/${clip.id}/hooks/regenerate`, { body: {} });
+      setList(data.hooks);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not write new hooks right now.");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <SheetFrame title="Hooks" onClose={onClose}>
       <p className="small muted">Tap a hook to use it. The clip is re-rendered as a new version and returns to the feed.</p>
-      <div className="choices">
-        {clip.hooks.map((hook) => (
+      <div className="stack">
+        {list.map((hook) => (
           <button key={hook.id} className="choice" aria-pressed={hook.id === current} onClick={() => (hook.id === current ? onClose() : onPick(hook.id))}>
             <span dir="auto">{hook.text}</span>
             <span className="badge">{hook.hook_type}</span>
           </button>
         ))}
       </div>
+      {error && <p className="small" role="alert" style={{ color: "var(--danger, #c0392b)" }}>{error}</p>}
+      <button className="btn block" onClick={regenerate} disabled={busy} aria-busy={busy}>{busy ? "Writing new hooks…" : "Regenerate hooks"}</button>
     </SheetFrame>
+  );
+}
+
+const STEP = 0.1;
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
+/** A value changed only by the - and + buttons, 0.1 s a step (no free typing). Holding the button repeats. */
+export function Stepper({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const latest = useRef(value);
+  latest.current = value;
+  const nudge = (dir: number) => {
+    latest.current = Math.min(max, Math.max(min, round1(latest.current + dir * STEP)));
+    onChange(latest.current);
+  };
+  const stop = () => { if (timer.current) { clearInterval(timer.current); timer.current = null; } };
+  const hold = (dir: number) => { nudge(dir); stop(); timer.current = setInterval(() => nudge(dir), 160); };
+  useEffect(() => stop, []);
+  return (
+    <div className="field grow">
+      <span className="small muted" id={`step-${label}`}>{label}</span>
+      <div className="row between" role="group" aria-labelledby={`step-${label}`}>
+        <button className="btn" aria-label={`${label} minus 0.1`} disabled={value <= min} onPointerDown={() => hold(-1)} onPointerUp={stop} onPointerLeave={stop} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nudge(-1); } }}>−</button>
+        <output aria-live="polite" style={{ minWidth: "4ch", textAlign: "center", fontVariantNumeric: "tabular-nums" }}>{value.toFixed(1)} s</output>
+        <button className="btn" aria-label={`${label} plus 0.1`} disabled={value >= max} onPointerDown={() => hold(1)} onPointerUp={stop} onPointerLeave={stop} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nudge(1); } }}>+</button>
+      </div>
+    </div>
   );
 }
 
 function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Record<string, unknown>) => void; onClose: () => void }) {
   const [caption, setCaption] = useState(clip.caption_text ?? "");
-  const [start, setStart] = useState(String(clip.start_s));
-  const [end, setEnd] = useState(String(clip.end_s));
+  const startNow = Number(clip.start_s);
+  const [start, setStart] = useState(round1(startNow));
+  const [duration, setDuration] = useState(round1(Number(clip.end_s) - startNow));
+  const original = { start: round1(startNow), duration: round1(Number(clip.end_s) - startNow) };
   const save = () => {
     const body: Record<string, unknown> = {};
     if (caption !== (clip.caption_text ?? "")) body.caption = caption;
-    if (Number(start) !== Number(clip.start_s) || Number(end) !== Number(clip.end_s)) body.trim = { start_s: Number(start), end_s: Number(end) };
+    if (start !== original.start || duration !== original.duration) body.trim = { start_s: start, end_s: round1(start + duration) };
     if (Object.keys(body).length) onSave(body);
     else onClose();
   };
@@ -119,14 +165,8 @@ function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Recor
         <textarea id="edit-caption" className="input" dir="auto" value={caption} onChange={(event) => setCaption(event.target.value)} />
       </div>
       <div className="row">
-        <div className="field grow">
-          <label htmlFor="edit-start">Start (s)</label>
-          <input id="edit-start" className="input" inputMode="decimal" value={start} onChange={(event) => setStart(event.target.value)} />
-        </div>
-        <div className="field grow">
-          <label htmlFor="edit-end">End (s)</label>
-          <input id="edit-end" className="input" inputMode="decimal" value={end} onChange={(event) => setEnd(event.target.value)} />
-        </div>
+        <Stepper label="Start" value={start} min={0} max={Math.max(start, 36000)} onChange={setStart} />
+        <Stepper label="Length" value={duration} min={1} max={180} onChange={setDuration} />
       </div>
       <button className="btn primary block" onClick={save}>Save as new version</button>
       {clip.source_id && <Link className="btn block" href={`/transcript?id=${clip.source_id}`}>Fix transcript</Link>}

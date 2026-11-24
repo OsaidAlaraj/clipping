@@ -10,7 +10,7 @@ import math
 import re
 from pathlib import Path
 
-from .. import faces, ffmpeg, gaming_layout, music, polish
+from .. import faces, ffmpeg, gaming_layout, hook_rules, music, polish
 from ..core import AppError
 from .base import Adapter, register
 
@@ -18,7 +18,7 @@ from .base import Adapter, register
 
 TEMPLATE_DEFAULTS: dict = {"layout": "auto", "font": "Arial", "primary": "#FFFFFF", "accent": "#FFC400", "caption_position": "lower",
                            "title_card": True, "progress_bar": True, "zooms": True, "font_size": 3.7, "cover": "band",
-                           "tighten": True, "karaoke": True}
+                           "tighten": True, "karaoke": True, "caption_style": "auto"}
 CAPTION_POSITIONS = ("lower", "middle")
 COVER_STYLES = ("band", "outline")
 NICHE_OF_CROP = {"facecam_over_game": "gaming", "follow_speaker": "podcast"}   # the profile's crop style tells the niche
@@ -54,6 +54,10 @@ def _checked(key: str, value):
         raise _bad(f"The {key} colour must look like #FFC400.")
     if key == "caption_position" and value not in CAPTION_POSITIONS:
         raise _bad("The caption position must be lower or middle.")
+    if key == "caption_style":
+        from . import caption_render
+        if value != "auto" and value not in caption_render.STYLES:
+            raise _bad("The caption style must be auto or one of: " + ", ".join(caption_render.STYLES) + ".")
     if key == "layout" and value not in LAYOUTS:
         raise _bad("The layout must be auto, blur_pad or gaming_stack.")
     if key == "cover" and value not in COVER_STYLES:
@@ -361,39 +365,44 @@ def _box(size: int) -> int:
 
 
 def build_ass(width: int, height: int, duration: float, events: list[dict], label: str | None, rtl: bool, template: dict,
-              hook: str | None = None) -> str:
+              hook: str | None = None, caption_style: str | None = None) -> str:
     """One subtitle script for the whole clip: captions, the disclosure label (top right for Arabic, top left otherwise, the
     whole clip), the title card with the hook and the progress bar."""
     t = normalize_template(template)
     cap = int(height * t["font_size"] / 100)
     label_size, bar = int(height * 0.026), max(int(height * 0.006), 3)
-    title_size = fit_size(_esc(hook or ""), width * 0.8, int(height * 0.036))
+    title_size = fit_size(_esc(hook or ""), width * 0.8, int(height * 0.036), max_lines=2)
     primary, accent = _ass_colour(t["primary"]), _ass_colour(t["accent"])
     lower = t["caption_position"] == "lower"
     font = t["font"]
+    from . import caption_render
+    look = caption_render.ass_style_fields(caption_style, cap) if caption_style else {"bold": 1, "outline": max(cap // 12, 2), "shadow": 0}
     lines = [
         "[Script Info]", "ScriptType: v4.00+", f"PlayResX: {width}", f"PlayResY: {height}", "WrapStyle: 0", "ScaledBorderAndShadow: yes", "",
         "[V4+ Styles]",
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, "
         "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
-        f"Style: Caption,{font},{cap},{primary},{primary},&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,{max(cap // 12, 2)},0,"
+        f"Style: Caption,{font},{cap},{primary},{primary},&H00000000,&H80000000,{look['bold']},0,0,0,100,100,0,0,1,{look['outline']},{look['shadow']},"
         f"{2 if lower else 5},{width // 12},{width // 12},{int(height * 0.16) if lower else 0},1",
         f"Style: Label,{font},{label_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,{_box(label_size)},0,"
         f"{9 if rtl else 7},{width // 24},{width // 24},{int(height * 0.035)},1",
         f"Style: Title,{font},{title_size},{_ass_colour(_contrast(t['accent']))},&H00FFFFFF,{accent},{accent},1,0,0,0,100,100,0,0,3,"
         f"{_box(title_size)},0,8,{width // 10},{width // 10},{int(height * 0.1)},1",
+        f"Style: Speaker,{font},{max(int(cap * 0.62), 14)},{_ass_colour(_contrast(t['accent']))},&H00FFFFFF,{accent},{accent},1,0,0,0,100,100,0,0,3,"
+        f"{_box(cap // 3)},0,5,0,0,0,1",
         f"Style: Bar,{font},20,{accent},{accent},{accent},{accent},0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1",
         "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
     ]
     if label:
         lines.append(f"Dialogue: 5,{_ts(0)},{_ts(duration + 1.0)},Label,,0,0,0,,{_esc(label)}")   # runs past the last frame: the full clip
     if hook and t["title_card"]:
-        lines.append(f"Dialogue: 3,{_ts(0)},{_ts(min(3.0, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
+        shown = max(hook_rules.show_seconds(hook) + 0.5, 2.0)   # long enough to read: words / 3 s plus the fades
+        lines.append(f"Dialogue: 3,{_ts(0)},{_ts(min(shown, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
     if t["progress_bar"]:
         lines.append(f"Dialogue: 4,{_ts(0)},{_ts(duration + 1.0)},Bar,,0,0,0,,{{\\an7\\pos(0,{height - bar})\\fscx0.1"
                      f"\\t(0,{int(duration * 1000)},\\fscx100)\\p1}}m 0 0 l {width} 0 {width} {bar} 0 {bar}")
     for event in events:
-        lines.append(f"Dialogue: 0,{_ts(event['start'])},{_ts(event['end'])},Caption,,0,0,0,,{event['text']}")
+        lines.append(f"Dialogue: {event.get('layer', 0)},{_ts(event['start'])},{_ts(event['end'])},{event.get('style', 'Caption')},,0,0,0,,{event['text']}")
     return "\n".join(lines) + "\n"
 
 
@@ -490,16 +499,16 @@ class FFmpegRender(Adapter):
         except Exception as exc:
             return {"ok": False, "provider": self.provider, "error": str(exc)}
 
-    def _encode(self, args_for, folder: Path) -> str:
+    def _encode(self, args_for, folder: Path, total_s: float | None = None) -> str:
         """Run the one encode with the configured encoder; when NVENC cannot take it (busy, missing) the same encode runs with x264."""
         encoder = ffmpeg.video_encoder(str(self.cfg.get("encoder", "auto")))
         try:
-            ffmpeg.run(args_for(encoder), cwd=folder)
+            ffmpeg.run(args_for(encoder), cwd=folder, progress_total_s=total_s)
         except ffmpeg.FFmpegError:
             if encoder == "libx264":
                 raise
             encoder = "libx264"
-            ffmpeg.run(args_for(encoder), cwd=folder)
+            ffmpeg.run(args_for(encoder), cwd=folder, progress_total_s=total_s)
         return "nvenc" if encoder == "h264_nvenc" else "x264"
 
     def render_clip(self, src: str, clip: dict, words: list[dict], template: dict, label: str, out: str) -> dict:
@@ -540,12 +549,19 @@ class FFmpegRender(Adapter):
         shown_words, c0, c1 = (plan.words(words, start, end), 0.0, plan.new_duration) if plan else (words, start, end)
         shown_emphasis = [plan.map(float(e) - start) for e in clip.get("emphasis") or []] if plan else clip.get("emphasis") or []
         social, rtl = clip.get("platform") in SOCIAL_PLATFORMS, language == "ar"
-        if tpl["karaoke"]:
+        from . import caption_render
+        chosen = caption_render.resolve(tpl.get("caption_style"), niche, language) if tpl["karaoke"] else None
+        if chosen and chosen != caption_render.DEFAULT_STYLE:
+            events = caption_render.style_events(
+                chosen, shown_words, c0, c1, social, tpl["accent"], width, height, int(height * tpl["font_size"] / 100), rtl, clip.get("platform"),
+                tpl["caption_position"], cell.get("caption_y") if isinstance(cell.get("caption_y"), (int, float)) else None, shown_emphasis,
+                clip.get("speaker_names"))
+        elif tpl["karaoke"]:
             events = karaoke_events(shown_words, c0, c1, social, tpl["accent"], width, height, int(height * tpl["font_size"] / 100), rtl, tpl["caption_position"],
                                     cell.get("caption_y") if isinstance(cell.get("caption_y"), (int, float)) else None, max(1, math.ceil(float(cell.get("caption_words") or KARAOKE_WORDS))))
         else:
             events = caption_events(shown_words, c0, c1, social, shown_emphasis, tpl["accent"])
-        ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"))
+        ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"), chosen if chosen != caption_render.DEFAULT_STYLE else None)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         ass_path = out_path.with_suffix(".ass")
         ass_path.write_text(ass, encoding="utf-8-sig")
@@ -578,7 +594,7 @@ class FFmpegRender(Adapter):
             return [*args, *ffmpeg.encoder_args(encoder, str(self.cfg.get("preset", "medium")), int(self.cfg.get("crf", 23))),
                     "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_path)]
 
-        encoder = self._encode(args_for, out_path.parent)
+        encoder = self._encode(args_for, out_path.parent, c1 - c0)
         finished = ffmpeg.probe(out_path)
         cover = self._cover(src_path, clip, tpl, style, info, (width, height), focus, out_path.with_name("cover.png"), stack)
         return {"path": str(out_path), "ass_path": str(ass_path), "encodes": 1, "encoder": encoder, "cover_path": cover,

@@ -290,7 +290,7 @@ def test_template_text_cannot_break_out_of_the_subtitle_script():
     hostile = "Hook {\\an9\\pos(0,0)}\\N{\\p1}m 0 0\nsecond: 'quoted', [bracket];x"
     ass = media.build_ass(270, 480, 8, [], "#ad {\\b1}", False, {"font": "Arial\nStyle: Evil,Arial"}, hostile)
     lines = ass.splitlines()
-    assert sum(line.startswith("Style:") for line in lines) == 4 and "Evil" not in ass         # the font name cannot add a style
+    assert sum(line.startswith("Style:") for line in lines) == 5 and "Evil" not in ass         # the font name cannot add a style
     title = next(line for line in lines if ",Title," in line and line.startswith("Dialogue"))
     assert title.endswith("{\\fad(150,200)}Hook (an9pos(0,0))N(p1)m 0 0 second: 'quoted', [bracket];x")   # braces and backslashes neutralised, one line
     label = next(line for line in lines if ",Label," in line and line.startswith("Dialogue"))

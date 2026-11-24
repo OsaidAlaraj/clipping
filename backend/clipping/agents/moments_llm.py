@@ -14,6 +14,7 @@ import math
 import re
 from decimal import Decimal
 
+from .. import hook_rules
 from .. import moment_rank as rank
 
 MAX_TEXT_CHARS = 700            # a candidate's text sent to the model: head and tail of long windows
@@ -73,6 +74,10 @@ def parse_ratings(raw, texts: dict[str, str]) -> dict[str, dict]:
         said = " ".join(texts[item["id"]].lower().split())
         if any(" ".join(q.lower().split()) not in said for q in _QUOTED.findall(hook)):
             hook = ""                                   # a hook may quote the clip, never invent a quote
+        if hook:
+            hook, bad = hook_rules.check(hook)          # the same rules as every hook; a line that breaks them is dropped
+            if bad:
+                hook = ""
         rating = {"overall": overall, "reason": reason, "hook_text": hook,
                   "emotion": item.get("emotion") if item.get("emotion") in rank.EMOTIONS else "calm"}
         for name in ("hook", "standalone", "payoff", "value", "emotion_strength"):
