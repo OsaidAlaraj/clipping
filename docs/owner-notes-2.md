@@ -10,3 +10,5 @@
 | 6 | Posting queue page is unreachable | | | open |
 | 7 | Settings: "never override the hard rules. Caps warn; compliance rules always block." page design is awful and too complicated | | | open |
 | 8 | Home page crowded and unorganised | | | open |
+| 9 | Progress bar and timing are not real, not moving, not accurate; cannot tell what is happening | | | open |
+| 10 | Use premade open templates for captions and hooks (not from scratch), then enhance with our layers; every part expert, smart, creative, adaptive | candidates: pycaps (Python, CSS templates), pulsence/caption-animator (ASS, MIT), Remotion captions elements; hooks: HF benxh/tiktok-hooks-finetune (MIT), quso.ai 11-archetype study, vyralcontent/content-skills (MIT). Licences to verify before use | | researching |
