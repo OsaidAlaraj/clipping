@@ -52,6 +52,12 @@ def test_title_card_stays_long_enough_to_read():
     assert line.split(",")[2] == "0:00:05.10"       # 9 words: 4.5 s plus the fades
 
 
+def test_owner_sets_the_hook_time():
+    ass = media.build_ass(1080, 1920, 30, [], None, False, {}, "one two three", None, 8.0)
+    line = next(x for x in ass.splitlines() if ",Title," in x)
+    assert line.split(",")[2] == "0:00:08.60"       # the owner's 8 s plus the fades, not the automatic 3 s
+
+
 def test_regenerate_gives_new_hooks_each_time(produced):
     with produced.db.session(produced.owner) as conn:
         clip = review.feed(conn, produced.owner.operator_id)[0]

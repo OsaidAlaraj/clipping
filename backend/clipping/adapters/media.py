@@ -365,7 +365,7 @@ def _box(size: int) -> int:
 
 
 def build_ass(width: int, height: int, duration: float, events: list[dict], label: str | None, rtl: bool, template: dict,
-              hook: str | None = None, caption_style: str | None = None) -> str:
+              hook: str | None = None, caption_style: str | None = None, hook_show_s: float | None = None) -> str:
     """One subtitle script for the whole clip: captions, the disclosure label (top right for Arabic, top left otherwise, the
     whole clip), the title card with the hook and the progress bar."""
     t = normalize_template(template)
@@ -396,7 +396,7 @@ def build_ass(width: int, height: int, duration: float, events: list[dict], labe
     if label:
         lines.append(f"Dialogue: 5,{_ts(0)},{_ts(duration + 1.0)},Label,,0,0,0,,{_esc(label)}")   # runs past the last frame: the full clip
     if hook and t["title_card"]:
-        shown = hook_rules.show_seconds(hook) + 0.6   # long enough to read (3 to 5 s) plus the fades
+        shown = (hook_show_s if hook_show_s and hook_show_s > 0 else hook_rules.show_seconds(hook)) + 0.6   # the owner's own time, or 3 to 5 s from the word count, plus the fades
         lines.append(f"Dialogue: 3,{_ts(0)},{_ts(min(shown, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
     if t["progress_bar"]:
         lines.append(f"Dialogue: 4,{_ts(0)},{_ts(duration + 1.0)},Bar,,0,0,0,,{{\\an7\\pos(0,{height - bar})\\fscx0.1"
@@ -565,7 +565,8 @@ class FFmpegRender(Adapter):
                                     cell.get("caption_y") if isinstance(cell.get("caption_y"), (int, float)) else None, max(1, math.ceil(float(cell.get("caption_words") or KARAOKE_WORDS))))
         else:
             events = caption_events(shown_words, c0, c1, social, shown_emphasis, tpl["accent"])
-        ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"), chosen if chosen != caption_render.DEFAULT_STYLE else None)
+        ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"), chosen if chosen != caption_render.DEFAULT_STYLE else None,
+                        clip.get("hook_show_s"))
         out_path.parent.mkdir(parents=True, exist_ok=True)
         ass_path = out_path.with_suffix(".ass")
         ass_path.write_text(ass, encoding="utf-8-sig")

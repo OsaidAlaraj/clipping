@@ -470,6 +470,7 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
     start, end = float(clip["start_s"]), float(clip["end_s"])
     request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
                "audio": style.get("audio"), "hook_text": hook_text, "emphasis": [],
+               "hook_show_s": float(get_setting(conn, "hook_show_s") or 0) or None,      # the owner's own hook time; none = automatic
                "min_s": float(get_setting(conn, "clip_min_duration_s"))}      # tightening never takes the clip below the campaign minimum
     try:
         request["speaker_names"] = {str(k): str(v) for k, v in (transcripts.load(conn, source["id"]).get("speakers") or {}).items()}

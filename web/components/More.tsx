@@ -275,7 +275,7 @@ const SETTING_LABEL: Record<string, string> = {
   priority_weight_account_cap: "Priority weight: account cap", priority_weight_compliance: "Priority weight: compliance",
   adapter_cap_usd_llm: "Monthly cap: LLM ($)", adapter_cap_usd_transcription: "Monthly cap: transcription ($)", adapter_cap_usd_moments: "Monthly cap: moment finding ($)",
   adapter_cap_usd_database: "Monthly cap: database ($)", adapter_alert_pct: "Adapter alert at (% of cap)", max_accounts_per_campaign_platform: "Accounts per campaign per platform",
-  clip_min_duration_s: "Clip minimum length (seconds)", clip_max_duration_s: "Clip maximum length (seconds)",
+  clip_min_duration_s: "Clip minimum length (seconds)", clip_max_duration_s: "Clip maximum length (seconds)", hook_show_s: "Hook on screen (seconds, 0 = automatic)",
 };
 
 const SETTING_HELP: Record<string, string> = {
@@ -283,7 +283,7 @@ const SETTING_HELP: Record<string, string> = {
   undo_window_s: "How long you can undo a reject.", pay_per_clip_display: "Where the pay per clip is shown while you review.",
   posts_per_operator_per_day: "The most posts you make in a day, across all accounts.", posts_per_account_per_day: "The most posts one account makes in a day.",
   clips_per_campaign_per_week: "The most clips made for one campaign each week.", max_accounts_per_campaign_platform: "How many of your accounts may post the same campaign on one platform.",
-  clip_min_duration_s: "Shorter moments are not made into clips.", clip_max_duration_s: "Longer moments are trimmed or skipped.",
+  clip_min_duration_s: "Shorter moments are not made into clips.", clip_max_duration_s: "Longer moments are trimmed or skipped.", hook_show_s: "How long the hook title stays on screen. 0 lets the system choose 3 to 5 seconds from the length of the hook.",
   adapter_cap_usd_llm: "Monthly limit for the AI that writes hooks and rates moments.", adapter_cap_usd_transcription: "Monthly limit for turning speech into text.",
   adapter_cap_usd_moments: "Monthly limit for finding moments.", adapter_cap_usd_database: "Monthly limit for the online database.",
   adapter_alert_pct: "You get a warning when a service has used this share of its limit.", budget_alert_threshold_pct: "You get a warning when a campaign has this share of its budget left.",
@@ -295,7 +295,7 @@ const SETTING_HELP: Record<string, string> = {
 };
 const SETTING_GROUPS: { title: string; hint: string; keys: string[]; advanced?: boolean }[] = [
   { title: "Your day", hint: "How long you work and how review feels.", keys: ["hours_cap_per_day", "session_length_min", "undo_window_s", "pay_per_clip_display"] },
-  { title: "Posting and clips", hint: "How much is made and posted.", keys: ["posts_per_operator_per_day", "posts_per_account_per_day", "clips_per_campaign_per_week", "max_accounts_per_campaign_platform", "clip_min_duration_s", "clip_max_duration_s"] },
+  { title: "Posting and clips", hint: "How much is made and posted.", keys: ["posts_per_operator_per_day", "posts_per_account_per_day", "clips_per_campaign_per_week", "max_accounts_per_campaign_platform", "clip_min_duration_s", "clip_max_duration_s", "hook_show_s"] },
   { title: "Money limits and warnings", hint: "Monthly limits for paid services and when to be warned.", keys: ["adapter_cap_usd_llm", "adapter_cap_usd_transcription", "adapter_cap_usd_moments", "adapter_cap_usd_database", "adapter_alert_pct", "budget_alert_threshold_pct", "health_alert_drop_pct"] },
   { title: "Keep and delete", hint: "How long files are kept.", keys: ["source_retention_days", "clip_retention_days_after_close"] },
   { title: "Review order", hint: "What puts a clip first. Most people never change these.", advanced: true,
