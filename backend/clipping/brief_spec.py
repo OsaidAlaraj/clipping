@@ -593,7 +593,7 @@ def extract(conn, registry, markdown: str, owner_id=None, now: dt.datetime | Non
     return spec
 
 
-def merge_pasted(spec: dict, link_url: str, markdown: str, llm_raw: Any = None) -> dict:
+def merge_pasted(spec: dict, link_url: str, markdown: str, llm_raw: Any = None, status: str = "pasted") -> dict:
     """The owner pasted the text of a link that needed it. Its items join the spec (an item the owner already stated wins; a
     different value for a single key becomes a conflict); the link is marked pasted."""
     extra = merge_items(rule_items(markdown), validate_llm(llm_raw, markdown))
@@ -603,7 +603,8 @@ def merge_pasted(spec: dict, link_url: str, markdown: str, llm_raw: Any = None) 
     gaps = [i for i in spec["items"] if i["status"] == "unclear" and i["key"] not in {e["key"] for e in extra}]
     merged = merge_items(existing, extra)
     out = {**spec, "items": add_unclear(merged + gaps)}
-    out["links"] = [({**l, "fetch": {"status": "pasted", "note": "The owner pasted this page's text."}} if l["url"] == link_url else l)
+    note = "The owner pasted this page's text." if status == "pasted" else "Read from the public page."
+    out["links"] = [({**l, "fetch": {"status": status, "note": note}} if l["url"] == link_url else l)
                     for l in spec.get("links", [])]
     out["blocking"] = blocking_keys(out)
     return out

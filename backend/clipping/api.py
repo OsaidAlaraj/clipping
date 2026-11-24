@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, library, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
+from . import alerts, auth, brand_checks, brief_reader, campaigns, config, connections, discovery, ledger, library, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -124,6 +124,7 @@ class IntakeIn(BaseModel):
     category: str = "podcast"
     deadline: str | None = None
     licence_ref: str | None = None
+    spec: dict | None = None   # the owner-confirmed campaign spec from the review screen
 
 
 class PracticeIn(BaseModel):
@@ -269,6 +270,7 @@ class LinkIn(BaseModel):
     language: str = "en"
     permission_ref: str | None = None
     youtube_permitted: bool = False
+    override_whitelist: bool = False   # the owner knowingly adds footage that is not on the brief's list
 
 
 class AddListingIn(BaseModel):
@@ -353,7 +355,30 @@ def reference(actor: Actor = Depends(current_actor)):
 @app.post("/api/campaigns")
 def post_campaign(body: IntakeIn, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.intake, actor, body.marketplace, body.name, body.brief_text, body.url, body.category,
-               body.deadline, body.licence_ref)
+               body.deadline, body.licence_ref, spec=body.spec)
+
+
+class SpecIn(BaseModel):
+    brief_text: str
+    read_links: bool = True
+
+
+class SpecPasteIn(BaseModel):
+    spec: dict
+    url: str
+    text: str
+
+
+@app.post("/api/campaigns/spec")
+def read_brief_spec(body: SpecIn, actor: Actor = Depends(current_actor)):
+    """Brief text (Markdown with its links) to a typed spec for the review screen. Nothing is stored."""
+    return run(actor, brief_reader.read_brief, alerts.registry, body.brief_text, actor.operator_id, body.read_links)
+
+
+@app.post("/api/campaigns/spec/paste")
+def paste_link_text(body: SpecPasteIn, actor: Actor = Depends(current_actor)):
+    """The owner pasted the text of a link that needed it: its rules are merged into the spec."""
+    return run(actor, brief_reader.add_pasted_text, alerts.registry, body.spec, body.url, body.text, actor.operator_id)
 
 
 @app.post("/api/campaigns/practice")
@@ -772,9 +797,10 @@ def get_persona(account_id: str, actor: Actor = Depends(current_actor)):
 
 @app.post("/api/campaigns/{campaign_id}/sources/upload")
 def upload_source(campaign_id: str, file: UploadFile = File(...), language: str = Form("en"), permission_ref: str = Form(""),
-                  actor: Actor = Depends(current_actor)):
+                  override_whitelist: bool = Form(False), actor: Actor = Depends(current_actor)):
     path = sources.save_upload(file.file, file.filename)
-    return run(actor, sources.register_upload, actor, campaign_id, path, language, permission_ref or None, file.filename)
+    return run(actor, sources.register_upload, actor, campaign_id, path, language, permission_ref or None, file.filename,
+               override_whitelist=override_whitelist)
 
 
 @app.post("/api/capture/screenshot")
@@ -798,7 +824,8 @@ def capture_screenshot(image: UploadFile = File(...), actor: Actor = Depends(cur
 
 @app.post("/api/campaigns/{campaign_id}/sources/link")
 def link_source(campaign_id: str, body: LinkIn, actor: Actor = Depends(current_actor)):
-    return run(actor, sources.queue_link, actor, campaign_id, body.url, body.language, body.permission_ref, body.youtube_permitted)
+    return run(actor, sources.queue_link, actor, campaign_id, body.url, body.language, body.permission_ref, body.youtube_permitted,
+               override_whitelist=body.override_whitelist)
 
 
 # ------------------------------------------------------------------ passkey sign-in

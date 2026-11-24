@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import ad_label, brand_checks, config, ffmpeg, hook_patterns, hook_rules, job_progress, language_check, music, packaging, quality_gate, signals, templates, transcripts
+from . import ad_label, brand_checks, brief_wiring, config, ffmpeg, hook_patterns, hook_rules, job_progress, language_check, music, packaging, quality_gate, signals, templates, transcripts
 from .adapters import music as _music_adapters  # noqa: F401  (registers the music stage providers)
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
@@ -497,6 +497,9 @@ def stage_render(conn, job: dict) -> Decimal:
     out = storage.path(key)
     words = _words(conn, source)
     render_clip = _render_request(conn, clip, source, platform, meta.get("hook_text"))
+    render_clip["min_s"] = brief_wiring.min_clip_s(version["rules_json"], render_clip["min_s"])   # the brief's own minimum length (brief_spec)
+    account_row = conn.execute("select niche from accounts where id = %s", (account_id,)).fetchone() if account_id else None
+    meta["account_warnings"] = brief_wiring.account_warnings(version["rules_json"], account_row)   # shown to the owner before posting
     bed = _pick_music(conn, clip, campaign, render_clip, words, platform)
     if bed and bed.get("path"):
         render_clip["music"] = bed
@@ -550,7 +553,8 @@ def stage_captions(conn, job: dict) -> Decimal:
 def run_compliance(conn, clip: dict, campaign: dict, version: dict) -> tuple[dict, Decimal]:
     template = disclosure_for(conn, campaign, version, clip["language"]) or {}
     category = conn.execute("select banned_words from categories where id = %s", (campaign["category_id"],)).fetchone()
-    limits = {"min_s": get_setting(conn, "clip_min_duration_s"), "max_s": get_setting(conn, "clip_max_duration_s")}
+    limits = {"min_s": brief_wiring.min_clip_s(version["rules_json"], get_setting(conn, "clip_min_duration_s")),
+              "max_s": get_setting(conn, "clip_max_duration_s")}
     report, cost = agent_c.run(conn, registry, clip, template, limits, (category or {}).get("banned_words") or [],
                                version["rules_json"].get("content_rules") or [],
                                (clip["render_meta"] or {}).get("hook_text") or "", clip["owner_operator_id"],

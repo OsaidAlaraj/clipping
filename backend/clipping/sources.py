@@ -13,7 +13,7 @@ from decimal import Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urljoin, urlparse
 
-from . import campaigns, config, ffmpeg, language_check, signals
+from . import brief_wiring, campaigns, config, ffmpeg, language_check, signals
 from .adapters import heatmap
 from .core import AppError, GateError, audit, enqueue
 from .db import Actor
@@ -116,8 +116,10 @@ def save_upload(stream, filename: str | None) -> Path:
     return dest
 
 
-def register_upload(conn, actor, campaign_id, path: Path, language: str, permission_ref: str | None, filename: str | None) -> dict:
+def register_upload(conn, actor, campaign_id, path: Path, language: str, permission_ref: str | None, filename: str | None,
+                    override_whitelist: bool = False) -> dict:
     try:
+        whitelist_gate(conn, campaigns.get_campaign(conn, campaign_id), None, Path(filename or path.name).stem, override_whitelist)
         try:
             ffmpeg.probe(path)
         except Exception:
@@ -132,7 +134,20 @@ def register_upload(conn, actor, campaign_id, path: Path, language: str, permiss
         path.unlink(missing_ok=True)
 
 
-def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref: str | None, youtube_permitted: bool = False) -> dict:
+def whitelist_gate(conn, campaign: dict, url: str | None, title: str | None, override: bool) -> None:
+    """The brief's list of allowed footage (brief_wiring.source_refusal). The owner can override it knowingly; that is audited."""
+    version = conn.execute("select rules_json from campaign_versions where id = %s",
+                           (campaign.get("approved_version_id") or campaign.get("current_version_id"),)).fetchone()
+    refusal = brief_wiring.source_refusal((version or {}).get("rules_json"), url, title)
+    if refusal is None:
+        return
+    if not override:
+        raise AppError(refusal, "not_on_brief_list")
+    audit(conn, "source.whitelist_override", "campaigns", campaign["id"], {"url": url, "title": title, "reason": refusal})
+
+
+def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref: str | None, youtube_permitted: bool = False,
+               override_whitelist: bool = False, title: str | None = None) -> dict:
     campaign = campaigns.get_campaign(conn, campaign_id)
     if campaign["status"] != "approved":
         raise GateError("Only an approved campaign can take source footage.")
@@ -141,6 +156,7 @@ def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref
     if not (permission_ref and permission_ref.strip()):
         raise AppError("Permitted footage only: give a licence or written-permission reference.", "no_permission")
     check_public_https(url)
+    whitelist_gate(conn, campaign, url, title, override_whitelist)
     kind = link_kind(url)
     if kind == "youtube":
         if not youtube_permitted:

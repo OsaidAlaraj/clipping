@@ -15,7 +15,7 @@ MUSIC = {"campaign_audio_only", "licensed_only", "none", "unclear"}
 PAYOUT_FIELDS = ["model", "rate_per_1k", "fee_pct", "min_views_to_qualify", "max_payout_per_clip", "budget_total", "budget_remaining"]
 
 GAMBLING = r"casino|sportsbook|sports ?betting|\bbetting\b|gambl|\bpoker\b|roulette|wager|قمار|كازينو|مراهن"
-FINANCE = r"crypto|bitcoin|ethereum|\bnft\b|\btoken sale\b|forex|\btrading\b|\binvest(?:ment|ing)?\b|\bbroker|\bloans?\b|تداول|عملات رقمية|استثمار"
+FINANCE = r"crypto|bitcoin|ethereum|\bnft\b|\btoken sale\b|forex|\btrading\b(?!\s+cards?\b)|\binvest(?:ment|ing)?\b|\bbroker|\bloans?\b|تداول|عملات رقمية|استثمار"
 NO_DISCLOSURE = (r"(?:do not|don't|never|no need to)[^.\n]{0,80}(?:#ad\b|disclos|sponsor|paid partnership|branded content)"
                  r"|without (?:any )?disclos|hide (?:that )?(?:it is|it's) (?:an ad|sponsored)")
 PLATFORM_CONFLICT = (r"buy(?:ing)? views|view bots?|\bbots?\b to|engagement (?:pod|farm)|anti-?detect|fake engagement"
