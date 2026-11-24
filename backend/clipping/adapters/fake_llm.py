@@ -130,12 +130,12 @@ def extract_rules(payload: dict) -> dict:
 
 
 HOOK_TEMPLATES = {
-    "en": [("question", "What if {x}?"), ("contrarian", "Everyone gets this wrong: {x}"),
-           ("stakes", "Ignore this and it costs you: {x}"), ("number", "{n} things nobody says about this"),
-           ("story-open", "It started like this: {x}")],
-    "ar": [("question", "ماذا لو {x}؟"), ("contrarian", "الجميع يخطئ في هذا: {x}"),
-           ("stakes", "تجاهل هذا وسوف يكلفك: {x}"), ("number", "{n} أشياء لا يقولها أحد عن هذا"),
-           ("story-open", "بدأ الأمر هكذا: {x}")],
+    "en": [("question", "What if {x}?"), ("contrarian", "You are doing {x} wrong"),
+           ("stakes", "Skip this and {x} costs you"), ("number", "{n} things nobody says about this"),
+           ("story-open", "It all started with {x}")],
+    "ar": [("question", "شو لو {x}؟"), ("contrarian", "كلنا غلطانين في {x}"),
+           ("stakes", "تجاهل هاد وبتدفع ثمنه"), ("number", "{n} أشياء ما حدا بقولها"),
+           ("story-open", "كل شي بلش مع {x}")],
 }
 
 
@@ -143,8 +143,12 @@ def hooks(payload: dict) -> dict:
     language = payload.get("language", "en")
     text = payload.get("segment_text", "").strip()
     first = sentences(text)[0] if sentences(text) else text
-    gist = " ".join(first.rstrip(".?!؟").split()[:7]).lower() if language == "en" else " ".join(first.rstrip(".?!؟").split()[:7])
-    seed = sum(ord(c) for c in text) if text else 0
+    spoken = first.rstrip(".?!؟").split()
+    shift = len(payload.get("avoid") or [])
+    start = shift % max(len(spoken) - 2, 1)             # a regenerate looks at other words of the clip, so it is never the same text
+    gist = " ".join(spoken[start:start + 3])
+    gist = gist.lower() if language == "en" else gist
+    seed = (sum(ord(c) for c in text) if text else 0) + shift
     templates = HOOK_TEMPLATES.get(language, HOOK_TEMPLATES["en"])
     picks = [templates[(seed + i * 2) % len(templates)] for i in range(3)]
     out, seen = [], set()
@@ -226,7 +230,7 @@ def _hook_from(pattern: dict | None, text: str) -> str:
     if not pattern:
         return ""
     last = (sentences(text) or [text])[-1].rstrip(".?!؟")
-    gist = " ".join(last.split()[:7])
+    gist = " ".join(last.split()[:3])
     return pattern["template"].replace("{x}", gist).replace("{n}", "3")[:140]
 
 

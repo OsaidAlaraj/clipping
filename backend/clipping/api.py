@@ -712,7 +712,7 @@ def _template_view(conn, template: dict) -> dict:
 
 
 def _account_templates(conn, account_id: str) -> dict:
-    return {"templates": [_template_view(conn, t) for t in templates.ensure_set(conn, account_id)], "presets": templates.presets()}
+    return {"templates": [_template_view(conn, t) for t in templates.ensure_set(conn, account_id)], "presets": templates.presets(), "styles": templates.caption_styles()}
 
 
 @app.get("/api/accounts/{account_id}/template")
@@ -953,6 +953,12 @@ def undo(body: UndoIn, actor: Actor = Depends(current_actor)):
 @app.post("/api/clips/{clip_id}/edit")
 def edit(clip_id: str, body: EditIn, actor: Actor = Depends(current_actor)):
     return run(actor, review.edit, actor, clip_id, body.trim, body.hook_id, body.caption)
+
+
+@app.post("/api/clips/{clip_id}/hooks/regenerate")
+def regenerate_hooks(clip_id: str, actor: Actor = Depends(current_actor)):
+    """New hook variants for the editor; the owner's own words for any failure."""
+    return {"hooks": run(actor, pipeline.regenerate_hooks, clip_id)}
 
 
 @app.post("/api/clips/{clip_id}/caption-variant")

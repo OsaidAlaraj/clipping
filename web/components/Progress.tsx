@@ -9,12 +9,12 @@ export type ProgressStage = "uploaded" | "transcribing" | "moments" | "clips" | 
 export type ProgressItem = {
   id: string; source_id: string | null; campaign_id: string | null; name: string; video: string | null; is_practice: boolean;
   state: "active" | "ready" | "failed"; stage: ProgressStage; clips_done: number; clips_planned: number;
-  eta_s: number | null; error: string | null; note: string | null;
+  eta_s: number | null; step_pct: number | null; detail: string | null; error: string | null; note: string | null;
 };
 export type ProgressData = { items: ProgressItem[]; active: boolean };
 
 export const STEPS: { stage: ProgressStage; label: string }[] = [
-  { stage: "uploaded", label: "Uploaded" }, { stage: "transcribing", label: "Transcribing" }, { stage: "moments", label: "Choosing moments" },
+  { stage: "uploaded", label: "Video received" }, { stage: "transcribing", label: "Listening to the video" }, { stage: "moments", label: "Finding the best moments" },
   { stage: "clips", label: "Making clips" }, { stage: "ready", label: "Ready" },
 ];
 export const POLL_MS = 5000;
@@ -74,10 +74,10 @@ export function useProgress(): { data: ProgressData | null; settled: boolean } {
   return { data, settled };
 }
 
-export function percent(item: ProgressItem): number {
+/** The real share of the current step (from the server's measurement), or null when nothing is measured: then no bar is drawn. */
+export function percent(item: ProgressItem): number | null {
   if (item.stage === "ready") return 100;
-  if (item.stage === "clips") return item.clips_planned ? Math.round(50 + 45 * Math.min(item.clips_done / item.clips_planned, 1)) : 50;
-  return { uploaded: 5, transcribing: 20, moments: 40 }[item.stage];
+  return item.step_pct;
 }
 
 export function etaText(seconds: number | null): string {
@@ -112,12 +112,15 @@ export function ProgressCard({ item }: { item: ProgressItem }) {
         <span className={`badge ${failed ? "fail" : ready ? "pass" : "info"}`}>{label}</span>
       </div>
       <Steps item={item} />
-      <div className={`bar pg-bar${failed ? " failed" : ""}`} role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
-        <i style={{ width: `${pct}%` }} />
-      </div>
+      {(pct !== null || failed) && (
+        <div className={`bar pg-bar${failed ? " failed" : ""}`} role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct ?? 0}>
+          <i style={{ width: `${pct ?? 0}%` }} />
+        </div>
+      )}
       <div className="meta pg-meta">
         {ready ? <span>Ready — {item.clips_done} {item.clips_done === 1 ? "clip" : "clips"}</span>
           : item.stage === "clips" || item.clips_planned > 0 ? <span>{item.clips_done} of {item.clips_planned} clips</span>
+          : item.detail ? <span>{item.detail}</span>
           : <span>Clips come after the moments</span>}
         {!ready && !failed && <span>{etaText(item.eta_s)}</span>}
       </div>

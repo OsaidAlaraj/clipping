@@ -75,20 +75,24 @@ def _with_hooks(db, owner, source_id, campaign, statuses, age_s=0) -> None:
         _clip(db, owner, candidate, campaign, status)
 
 
-def test_a_video_being_transcribed_shows_the_transcribing_stage_with_a_time_estimate(db, owner):
+def test_a_video_being_transcribed_shows_the_transcribing_stage_without_an_invented_time(db, owner):
     campaign = _campaign(db, owner, "Pilot")
     source_id = _source(db, owner, campaign, duration=600)
     _job(db, owner, source_id, "transcribe", "running")
     item = _only(db, owner)
     assert (item["stage"], item["state"], item["name"], item["video"]) == ("transcribing", "active", "Practice · Pilot", "talk.mp4")
     assert item["clips_planned"] == 0 and item["error"] is None
-    assert item["eta_s"] == 60 + 60 + 3 * 30   # 10% of 10 minutes, one minute for moments, three clips assumed
+    assert item["eta_s"] is None and item["step_pct"] is None   # nothing measured yet: the stage name only, no made-up percent or time
 
 
-def test_transcription_time_is_capped_for_a_very_long_video(db, owner):
-    source_id = _source(db, owner, _campaign(db, owner), duration=36000)
-    _job(db, owner, source_id, "transcribe", "queued")
-    assert _only(db, owner)["eta_s"] == 600 + 60 + 90
+def test_a_running_job_shows_its_measured_share_and_time_left(db, owner):
+    source_id = _source(db, owner, _campaign(db, owner), duration=600)
+    _job(db, owner, source_id, "transcribe", "running")
+    with db.session(Actor.worker()) as conn:
+        conn.execute("update jobs set progress = %s", (Jsonb({"share": 0.5, "eta_s": 120, "done": 300.0, "total": 600.0, "unit": "seconds of audio"}),))
+    item = _only(db, owner)
+    assert (item["step_pct"], item["eta_s"]) == (50, 120)
+    assert item["detail"] == "5 of 10 min of the video heard"
 
 
 def test_a_source_with_no_jobs_yet_shows_the_uploaded_stage(db, owner):
@@ -102,7 +106,7 @@ def test_a_video_whose_moments_are_being_chosen_shows_the_moments_stage(db, owne
     _job(db, owner, source_id, "moments", "running")
     item = _only(db, owner)
     assert item["stage"] == "moments" and item["state"] == "active"
-    assert item["eta_s"] == 60 + 3 * 30
+    assert item["eta_s"] is None
 
 
 def test_making_clips_counts_finished_clips_of_the_planned_ones(db, owner):
@@ -112,7 +116,7 @@ def test_making_clips_counts_finished_clips_of_the_planned_ones(db, owner):
     _job(db, owner, source_id, "render", "running")
     item = _only(db, owner)
     assert (item["stage"], item["state"], item["clips_done"], item["clips_planned"]) == ("clips", "active", 1, 3)
-    assert item["eta_s"] == 2 * 30
+    assert item["step_pct"] == 33 and item["detail"] == "1 of 3 clips made"
 
 
 def test_a_set_aside_moment_is_not_a_planned_clip(db, owner):

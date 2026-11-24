@@ -3,11 +3,13 @@ from __future__ import annotations
 
 import re
 
+from .. import hook_rules
+
 HOOK_TYPES = ("question", "contrarian", "stakes", "number", "story-open")
 QUOTED = re.compile(r"[\"“«]([^\"”»]{3,})[\"”»]")
 
 
-def validate(raw: dict, segment_text: str) -> list[dict]:
+def validate(raw: dict, segment_text: str, avoid=(), rejected: list | None = None) -> list[dict]:
     """Keep 2 to 3 well-formed hooks. Drop any hook that quotes words the transcript does not contain."""
     segment_norm = " ".join(segment_text.lower().split())
     hooks: list[dict] = []
@@ -15,10 +17,17 @@ def validate(raw: dict, segment_text: str) -> list[dict]:
         if not isinstance(item, dict):
             continue
         text = " ".join(str(item.get("text") or "").split())
-        if not text or len(text) > 140 or item.get("type") not in HOOK_TYPES:
+        if not text or item.get("type") not in HOOK_TYPES:
             continue
         if any(" ".join(q.lower().split()) not in segment_norm for q in QUOTED.findall(text)):
-            continue   # invented quote
+            continue   # invented quote (checked before quote marks are cleaned away)
+        text, bad = hook_rules.check(text)
+        if bad:
+            if rejected is not None:
+                rejected.append((text, bad))
+            continue
+        if text.lower() in {a.lower() for a in avoid}:
+            continue   # never the same text twice
         try:
             score = min(max(float(item.get("score", 0.5)), 0.0), 1.0)
         except (TypeError, ValueError):
@@ -32,19 +41,23 @@ def validate(raw: dict, segment_text: str) -> list[dict]:
     return hooks
 
 
-def run(conn, registry, segment_text: str, language: str, candidate_score, owner_id=None) -> tuple[list[dict], object]:
-    """An empty or too-small set is re-prompted once (spec 12.1, S6)."""
+def run(conn, registry, segment_text: str, language: str, candidate_score, owner_id=None, avoid=(), patterns=()) -> tuple[list[dict], object]:
+    """Hooks that pass the rules (hook_rules). A set that is too small is re-asked up to three times, each time naming what was
+    wrong with the rejected lines and the lines to avoid, so a regenerate never repeats itself."""
     from ..core import AppError
 
-    total_cost = 0
-    for _ in range(2):
+    total_cost, rejected, seen = 0, [], list(avoid)
+    for _ in range(3):
         raw, cost = registry.call(conn, "llm", "complete_json", {"task": "hooks", "payload": {
-            "segment_text": segment_text, "language": language, "candidate_score": float(candidate_score or 0.6)}}, owner_id)
+            "segment_text": segment_text, "language": language, "candidate_score": float(candidate_score or 0.6),
+            "avoid": seen, "patterns": list(patterns), "fix": hook_rules.feedback(rejected)}}, owner_id)
         total_cost += cost
-        hooks = validate(raw, segment_text)
+        rejected = []
+        hooks = validate(raw, segment_text, seen, rejected)
+        seen += [str(i.get("text")) for i in (raw or {}).get("hooks") or [] if isinstance(i, dict) and i.get("text")]   # a retry must not repeat
         if len(hooks) >= 2:
             return hooks, total_cost
-    raise AppError("Agent B did not return 2 to 3 valid hooks.", "hooks_failed")
+    raise AppError("The AI could not write good hooks for this clip. Try again in a moment.", "hooks_failed")
 
 
 def rank_candidates(candidates: list[dict]) -> list[dict]:

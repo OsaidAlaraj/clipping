@@ -13,11 +13,12 @@ process.env.TZ = "Asia/Riyadh";   // UTC+3 all year: the hours shown to the owne
 const SPEC = { font: "Arial", primary: "#FFFFFF", accent: "#FFC400", caption_position: "lower", title_card: true, progress_bar: true, zooms: true, font_size: 4.2, cover: "band" };
 const look = (id: string, name: string, extra: object = {}) => ({ ...SPEC, template_id: id, name, active: true, version: 1, versions: [{ version: 1, note: "Created" }], ...extra });
 const PRESETS = [{ name: "Ocean", spec: { ...SPEC, font: "Tahoma", accent: "#35C4FF" } }, { name: "Mint", spec: { ...SPEC, accent: "#2EE59D" } }];
+const STYLES = [{ key: "auto", label: "Automatic", about: "Chosen for the niche." }, { key: "bold_pop", label: "Bold pop", about: "Big words that pop in." }, { key: "minimal", label: "Minimal", about: "Small and steady." }];
 const PERSONA = { posts_per_week: 5, best_hours: { hours: [12, 18, 21], basis: "typical", tz: "local", posts_counted: 2 } };
 
 function routes(extra: Record<string, any> = {}) {
   return {
-    "GET /api/accounts/a1/templates": { templates: [look("t1", "Sunrise main"), look("t2", "Sunrise bright", { accent: "#FF8A3D", progress_bar: false })], presets: PRESETS },
+    "GET /api/accounts/a1/templates": { templates: [look("t1", "Sunrise main"), look("t2", "Sunrise bright", { accent: "#FF8A3D", progress_bar: false })], presets: PRESETS, styles: STYLES },
     "GET /api/accounts/a1/persona": PERSONA,
     "PUT /api/accounts/a1/template": (body: any) => ({ ...look("t1", "Sunrise main"), ...body, version: 2, versions: [{ version: 2, note: "Edited" }, { version: 1, note: "Created" }] }),
     ...extra,
@@ -84,6 +85,26 @@ describe("an account's look and posting plan", () => {
     const puts = mock.calls.filter((c) => c.method === "PUT");
     expect(puts).toHaveLength(1);
     expect(puts[0].body).toEqual({ accent: "#334455" });
+  });
+
+  it("picks a named caption style, shows it in the preview at once and saves it", async () => {
+    const mock = mockApi(routes());
+    await opened();
+    expect(screen.getByTestId("sample-caption").getAttribute("data-style")).toBe("auto");
+    fireEvent.click(screen.getByRole("radio", { name: "Bold pop" }));
+    expect(screen.getByTestId("sample-caption").getAttribute("data-style")).toBe("bold_pop");
+    expect(screen.getByText("Big words that pop in.")).toBeTruthy();
+    await waitFor(() => expect(mock.calls.some((c) => c.method === "PUT" && c.path === "/api/accounts/a1/template")).toBe(true));
+    expect(mock.calls.find((c) => c.method === "PUT")!.body).toEqual({ caption_style: "bold_pop" });
+  });
+
+  it("can give every look of the account the same caption style", async () => {
+    const mock = mockApi(routes({ "PUT /api/templates/t2": (body: any) => ({ ...look("t2", "Sunrise bright"), ...body, version: 2, versions: [] }) }));
+    await opened();
+    fireEvent.click(screen.getByRole("radio", { name: "Minimal" }));
+    fireEvent.click(screen.getByRole("button", { name: /Use this style for all/ }));
+    await waitFor(() => expect(mock.calls.filter((c) => c.method === "PUT" && c.path === "/api/templates/t2")).toHaveLength(1));
+    expect(mock.calls.find((c) => c.path === "/api/templates/t2")!.body).toEqual({ caption_style: "minimal" });
   });
 
   it("edits the look that is selected: the main one through the account route, the others by template", async () => {

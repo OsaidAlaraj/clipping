@@ -280,6 +280,33 @@ const SETTING_LABEL: Record<string, string> = {
   clip_min_duration_s: "Clip minimum length (seconds)", clip_max_duration_s: "Clip maximum length (seconds)",
 };
 
+const SETTING_HELP: Record<string, string> = {
+  hours_cap_per_day: "The most you plan to work on clips in one day.", session_length_min: "How long one review session lasts before a break.",
+  undo_window_s: "How long you can undo a reject.", pay_per_clip_display: "Where the pay per clip is shown while you review.",
+  posts_per_operator_per_day: "The most posts you make in a day, across all accounts.", posts_per_account_per_day: "The most posts one account makes in a day.",
+  clips_per_campaign_per_week: "The most clips made for one campaign each week.", max_accounts_per_campaign_platform: "How many of your accounts may post the same campaign on one platform.",
+  clip_min_duration_s: "Shorter moments are not made into clips.", clip_max_duration_s: "Longer moments are trimmed or skipped.",
+  adapter_cap_usd_llm: "Monthly limit for the AI that writes hooks and rates moments.", adapter_cap_usd_transcription: "Monthly limit for turning speech into text.",
+  adapter_cap_usd_moments: "Monthly limit for finding moments.", adapter_cap_usd_database: "Monthly limit for the online database.",
+  adapter_alert_pct: "You get a warning when a service has used this share of its limit.", budget_alert_threshold_pct: "You get a warning when a campaign has this share of its budget left.",
+  health_alert_drop_pct: "You get a warning when an account's views fall this far below its usual.",
+  source_retention_days: "How long original videos are kept before they are deleted.", clip_retention_days_after_close: "How long clips and transcripts are kept after a campaign closes.",
+  priority_weight_net_pay: "How much pay per hour pushes a clip up the review order.", priority_weight_deadline: "How much a near deadline pushes a clip up.",
+  priority_weight_hook_score: "How much a strong hook pushes a clip up.", priority_weight_budget: "How much remaining budget pushes a clip up.",
+  priority_weight_account_cap: "How much free room on the account pushes a clip up.", priority_weight_compliance: "How much a clean rules check pushes a clip up.",
+};
+const SETTING_GROUPS: { title: string; hint: string; keys: string[]; advanced?: boolean }[] = [
+  { title: "Your day", hint: "How long you work and how review feels.", keys: ["hours_cap_per_day", "session_length_min", "undo_window_s", "pay_per_clip_display"] },
+  { title: "Posting and clips", hint: "How much is made and posted.", keys: ["posts_per_operator_per_day", "posts_per_account_per_day", "clips_per_campaign_per_week", "max_accounts_per_campaign_platform", "clip_min_duration_s", "clip_max_duration_s"] },
+  { title: "Money limits and warnings", hint: "Monthly limits for paid services and when to be warned.", keys: ["adapter_cap_usd_llm", "adapter_cap_usd_transcription", "adapter_cap_usd_moments", "adapter_cap_usd_database", "adapter_alert_pct", "budget_alert_threshold_pct", "health_alert_drop_pct"] },
+  { title: "Keep and delete", hint: "How long files are kept.", keys: ["source_retention_days", "clip_retention_days_after_close"] },
+  { title: "Review order", hint: "What puts a clip first. Most people never change these.", advanced: true,
+    keys: ["priority_weight_net_pay", "priority_weight_deadline", "priority_weight_hook_score", "priority_weight_budget", "priority_weight_account_cap", "priority_weight_compliance"] },
+];
+/** What always stops a clip, however the settings are set (read-only). */
+const ALWAYS_BLOCKED = ["A caption that does not start with the #ad disclosure", "No #ad label on screen for the whole clip", "Words the campaign bans",
+  "A clip outside the allowed length or not vertical (9:16)", "A campaign you have not approved"];
+
 export function Settings() {
   const { data, error, setError, load } = useLoad<{ settings: any[]; kill_switch: { active: boolean; reason: string | null } }>("/api/settings");
   const reference = useLoad<any>("/api/reference");
@@ -295,51 +322,72 @@ export function Settings() {
     try { await api("/api/kill-switch", { body: { active, reason: active ? "Switched on in Settings" : null } }); load(); }
     catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); }
   };
+  const control = (setting: any) => {
+    const value = draft[setting.key] ?? String(setting.value);
+    return (
+      <div key={setting.key} className="field">
+        <label htmlFor={setting.key}>{SETTING_LABEL[setting.key]}{setting.min !== null ? ` (${Number(setting.min)} to ${Number(setting.max)})` : ""}</label>
+        {SETTING_HELP[setting.key] && <span className="small muted" id={`${setting.key}-help`}>{SETTING_HELP[setting.key]}</span>}
+        {setting.allowed ? (
+          <select id={setting.key} className="input" aria-describedby={`${setting.key}-help`} value={String(setting.value)} onChange={(event) => save(setting.key, event.target.value)}>
+            {setting.allowed.map((option: string) => <option key={option} value={option}>{option === "card" ? "On each card" : option === "summary" ? "Summary only" : "Off"}</option>)}
+          </select>
+        ) : (
+          <div className="row">
+            <input id={setting.key} className="input" aria-describedby={`${setting.key}-help`} inputMode="decimal" value={value} onChange={(event) => setDraft({ ...draft, [setting.key]: event.target.value })} />
+            <button className="btn" disabled={draft[setting.key] === undefined || draft[setting.key] === "" || Number.isNaN(Number(draft[setting.key]))} onClick={() => save(setting.key, Number(draft[setting.key]))}>Save</button>
+          </div>
+        )}
+      </div>
+    );
+  };
+  const byKey = new Map((data?.settings ?? []).map((s) => [s.key, s]));
   return (
     <div className="page">
       <Head title="Settings" />
-      {data && (
-        <section className={`card stack`} style={{ borderColor: data.kill_switch.active ? "var(--danger)" : undefined }}>
-          <div className="row between"><strong>Kill switch</strong><span className={`badge ${data.kill_switch.active ? "block" : "pass"}`}>{data.kill_switch.active ? "on" : "off"}</span></div>
-          <p className="small muted">Stops new jobs and hides every ready-to-post package.</p>
-          <button className={`btn ${data.kill_switch.active ? "primary" : "danger"} block`} onClick={() => kill(!data.kill_switch.active)}>{data.kill_switch.active ? "Switch off" : "Switch on now"}</button>
-        </section>
-      )}
-      <DeviceSection />
-      <SaveButtonSection />
-      <AccuracySection />
-      <section className="card stack">
+      {error && <p className="error" role="alert">{error}</p>}
+      {saved && <p className="small" role="status">{saved}</p>}
+      {SETTING_GROUPS.map((group) => {
+        const items = group.keys.map((k) => byKey.get(k)).filter((x) => x && SETTING_LABEL[x.key]);
+        if (!items.length) return null;
+        const body = <div className="stack" style={{ gap: 14 }}>{items.map(control)}</div>;
+        return (
+          <section key={group.title} className="card stack" aria-label={group.title}>
+            {group.advanced ? (
+              <details>
+                <summary><strong>{group.title}</strong> <span className="small muted">{group.hint}</span></summary>
+                <div style={{ marginTop: 12 }}>{body}</div>
+              </details>
+            ) : (<><div className="stack" style={{ gap: 2 }}><h2>{group.title}</h2><p className="small muted">{group.hint}</p></div>{body}</>)}
+          </section>
+        );
+      })}
+      <section className="card stack" aria-label="This device">
+        <div className="stack" style={{ gap: 2 }}><h2>This device</h2><p className="small muted">Language, theme and how you save clips.</p></div>
         <span className="label">Interface language</span>
         <div className="row">
           <button className="btn grow" aria-pressed={lang === "en"} onClick={() => setLang("en")}>English</button>
           <button className="btn grow" aria-pressed={lang === "ar"} onClick={() => setLang("ar")}>العربية</button>
         </div>
-        <p className="small muted">Arabic mirrors the layout right-to-left. Swipes keep their meaning: right accepts, left rejects.</p>
+        <p className="small muted">Arabic mirrors the layout right to left. Swipe right accepts, swipe left rejects.</p>
       </section>
-      {error && <p className="error" role="alert">{error}</p>}
-      {saved && <p className="small" role="status">{saved}</p>}
-      <p className="small muted">Settings never override the hard rules. Caps warn; compliance rules always block.</p>
-      {data?.settings.filter((s) => SETTING_LABEL[s.key]).map((setting) => {
-        const value = draft[setting.key] ?? String(setting.value);
-        return (
-          <div key={setting.key} className="field">
-            <label htmlFor={setting.key}>{SETTING_LABEL[setting.key]}{setting.min !== null ? ` (${Number(setting.min)} to ${Number(setting.max)})` : ""}</label>
-            {setting.allowed ? (
-              <select id={setting.key} className="input" value={String(setting.value)} onChange={(event) => save(setting.key, event.target.value)}>
-                {setting.allowed.map((option: string) => <option key={option} value={option}>{option === "card" ? "On each card" : option === "summary" ? "Summary only" : "Off"}</option>)}
-              </select>
-            ) : (
-              <div className="row">
-                <input id={setting.key} className="input" inputMode="decimal" value={value} onChange={(event) => setDraft({ ...draft, [setting.key]: event.target.value })} />
-                <button className="btn" disabled={draft[setting.key] === undefined || draft[setting.key] === "" || Number.isNaN(Number(draft[setting.key]))} onClick={() => save(setting.key, Number(draft[setting.key]))}>Save</button>
-              </div>
-            )}
-          </div>
-        );
-      })}
+      <DeviceSection />
+      <SaveButtonSection />
+      <AccuracySection />
+      <section className="card stack" aria-label="Always blocked">
+        <div className="stack" style={{ gap: 2 }}><h2>Always blocked</h2><p className="small muted">These stop a clip whatever you set above.</p></div>
+        <ul className="stack small" style={{ gap: 4, paddingInlineStart: 18, margin: 0 }}>{ALWAYS_BLOCKED.map((rule) => <li key={rule}>{rule}</li>)}</ul>
+      </section>
+      {data && (
+        <section className="card stack" aria-label="Emergency stop" style={{ borderColor: data.kill_switch.active ? "var(--danger)" : undefined }}>
+          <div className="row between"><h2>Emergency stop</h2><span className={`badge ${data.kill_switch.active ? "block" : "pass"}`}>{data.kill_switch.active ? "on" : "off"}</span></div>
+          <p className="small muted">Stops new jobs and hides every ready-to-post package.</p>
+          <button className={`btn ${data.kill_switch.active ? "primary" : "danger"} block`} onClick={() => kill(!data.kill_switch.active)}>{data.kill_switch.active ? "Switch off" : "Switch on now"}</button>
+        </section>
+      )}
       {reference.data && (
-        <section className="card stack">
-          <h2>Adapters</h2>
+        <section className="card stack" aria-label="Services and accounts">
+          <h2>Services</h2>
           {reference.data.adapters.filter((a: any) => a.active).map((a: any) => (
             <div key={a.stage} className="row between"><span>{a.stage}</span><span className="small muted">{a.provider}{a.is_fake ? " (fake)" : ""}{a.paused_reason ? ` · paused: ${a.paused_reason}` : ""}</span></div>
           ))}

@@ -180,6 +180,37 @@ describe("hooks sheet and keyboard", () => {
     await screen.findByText(/Re-rendering as a new version/);
   });
 
+  it("Regenerate adds new hooks, and a failure is a plain sentence", async () => {
+    let fail = false;
+    const { mock } = await open(feedRoutes(three(), {
+      "POST /api/clips/c1/hooks/regenerate": () => fail
+        ? { __status: 502, body: { error: "Could not write new hooks right now. Try again in a moment." } }
+        : { hooks: [{ id: "n1", text: "Stop doing this", hook_type: "stakes", chosen: false, rank: 3, score: 0.7 }] },
+    }));
+    fireEvent.click(screen.getByRole("button", { name: "Hooks" }));
+    const dialog = await screen.findByRole("dialog", { name: "Hooks" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Regenerate hooks" }));
+    await within(dialog).findByText("Stop doing this");
+    fail = true;
+    fireEvent.click(within(dialog).getByRole("button", { name: "Regenerate hooks" }));
+    await within(dialog).findByText(/Could not write new hooks/);
+    expect(mock.posts("/hooks/regenerate")).toHaveLength(2);
+  });
+
+  it("the edit sheet changes start and length in 0.1 s steps with - and + buttons", async () => {
+    const { mock } = await open(feedRoutes(three(), { "POST /api/clips/c1/edit": { id: "c1v2", status: "rendering" } }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const dialog = await screen.findByRole("dialog", { name: "Edit clip" });
+    expect(within(dialog).queryByRole("textbox", { name: /Start/ })).toBeNull();
+    fireEvent.pointerDown(within(dialog).getByRole("button", { name: "Start plus 0.1" }));
+    fireEvent.pointerUp(within(dialog).getByRole("button", { name: "Start plus 0.1" }));
+    fireEvent.pointerDown(within(dialog).getByRole("button", { name: "Length minus 0.1" }));
+    fireEvent.pointerUp(within(dialog).getByRole("button", { name: "Length minus 0.1" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save as new version" }));
+    await waitFor(() => expect(mock.posts("/edit")).toHaveLength(1));
+    expect(mock.posts("/edit")[0].body).toEqual({ trim: { start_s: 5.1, end_s: 18.4 } });
+  });
+
   it("desktop shortcuts: A accepts, R opens reasons, Esc closes, arrows move, U undoes", async () => {
     const { mock } = await open(feedRoutes(three()));
     fireEvent.keyDown(window, { key: "ArrowDown" });

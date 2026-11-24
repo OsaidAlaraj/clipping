@@ -118,71 +118,95 @@ export default function Home() {
   const week = net.this_week, month = net.month_to_date;
   const perHour = (b: any) => (b.with_pending_per_hour === null ? "—" : `$${Number(b.with_pending_per_hour).toFixed(2)}`);
 
+  const toReview = today.to_review ?? data.stories.reduce((n, st) => n + st.clips_ready, 0);
+  const approved = data.campaigns.filter((c) => c.status === "approved").length;
+  const waiting = data.campaigns.filter((c) => c.status !== "approved" && c.status !== "paused" && !c.is_practice).length;
+  const processing = (progress.data?.items ?? []).filter((i) => i.state === "active").length;
+  // One main thing to do: review what is ready, else post what is accepted, else bring in a video, else find work.
+  const primary = toReview > 0 ? { href: "/review", label: `Review ${toReview} ${toReview === 1 ? "clip" : "clips"}`, why: "Clips are ready for your decision." }
+    : today.posts_due > 0 ? { href: "/queue", label: `Post ${today.posts_due} ${today.posts_due === 1 ? "clip" : "clips"}`, why: "Accepted clips are waiting to go out." }
+    : approved > 0 ? { href: "/new", label: "Add a video", why: processing ? "Clips are being made from your last video." : "Nothing to review. Give it a video to cut." }
+    : { href: "/explore", label: "Find a campaign", why: "No approved campaign yet." };
+  const decisions: { key: string; text: string; href: string }[] = [
+    ...(waiting > 0 ? [{ key: "rules", text: `${waiting} ${waiting === 1 ? "campaign is" : "campaigns are"} waiting for your approval`, href: "#campaigns" }] : []),
+    ...(toReview > 0 && primary.href !== "/review" ? [{ key: "review", text: `${toReview} clips to review`, href: "/review" }] : []),
+    ...(today.posts_due > 0 && primary.href !== "/queue" ? [{ key: "post", text: `${today.posts_due} clips ready to post`, href: "/queue" }] : []),
+  ];
+
   return (
     <div className="page home-grid">
       <h1 className="sr-only">Home</h1>
-      <div className="stack home-main" style={{ gap: 14 }}>
+      <div className="stack home-main" style={{ gap: 16 }}>
         {data.kill_switch.active && <div className="banner block" role="alert">The kill switch is on. No new jobs run and ready-to-post clips are hidden.</div>}
 
-        <section aria-label="Active campaigns" className="stories">
-          <Link href="/explore" className="story">
-            <span className="ring add"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></span>
-            <span className="name">Find more</span>
-          </Link>
-          {orderStories(data.stories).map((story) => {
-            const byBudget = story.budget_left_pct !== null;
-            const p = byBudget ? story.budget_left_pct! : story.hours_to_deadline !== null ? Math.max(0, Math.min(100, (story.hours_to_deadline / (14 * 24)) * 100)) : 100;
-            return (
-              <Link key={story.id} className="story" href={`/review?campaign=${story.id}`}
-                aria-label={`${story.name}: ${byBudget ? `${story.budget_left_pct}% budget left` : deadlineText(story.hours_to_deadline)}, ${story.clips_ready} clips to review`}>
-                <span className={`ring ${story.clips_ready === 0 ? "done" : p < 25 ? "low" : ""}`} style={{ ["--p" as any]: p }}>
-                  <span className="avatar" style={{ background: tintFor(story.id) }}>{initials(story.name)}</span>
-                </span>
-                <span className="name">{story.name}</span>
-              </Link>
-            );
-          })}
+        <section className="card ink stack" aria-label="What to do now" data-testid="primary-action" style={{ gap: 10 }}>
+          <span className="small" style={{ color: "var(--accent)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Next</span>
+          <p style={{ fontWeight: 600, margin: 0 }}>{primary.why}</p>
+          <Link className="btn primary block" href={primary.href}>{primary.label}</Link>
         </section>
+
+        {(decisions.length > 0 || data.attention.length > 0) && (
+          <section className="stack" aria-label="Needs you" style={{ gap: 8 }}>
+            <h2>Needs you</h2>
+            {decisions.map((d) => <Link key={d.key} className="card row between" href={d.href}><span>{d.text}</span><span aria-hidden="true">→</span></Link>)}
+            {data.attention.length > 0 && (
+              <details className="attention stack" aria-label="Attention" open={data.attention.length <= 2}>
+                <summary className="row between"><strong>Alerts ({data.attention.length})</strong><Link href="/alerts" className="small">All alerts</Link></summary>
+                {data.attention.map((alert) => {
+                  const plain = plainAlert(alert.message);
+                  return (
+                    <div key={alert.id} className={`banner ${alert.severity}`}>
+                      <p>{plain.text}</p>
+                      {plain.text !== plain.raw && <details className="small"><summary>Technical details</summary><p>{plain.raw}</p></details>}
+                    </div>
+                  );
+                })}
+              </details>
+            )}
+          </section>
+        )}
 
         <ProgressCards data={progress.data} />
 
-        <section aria-label="Today" className="card tiles">
-          <div className="tile">
-            <div className="num">{today.hours_logged.toFixed(1)}<small> / {today.hours_cap}h</small></div>
-            <div className="small muted">Hours today</div>
-          </div>
-          <div className="tile"><div className="num">{today.clips_accepted}</div><div className="small muted">Clips accepted</div></div>
-          <div className="tile"><div className="num">{today.posts_done}</div><div className="small muted">Posts done</div></div>
-          <div className="tile"><div className="num">{today.posts_due}</div><div className="small muted">Posts due</div></div>
+        <section className="card stack" aria-label="Net pay per hour" style={{ gap: 8 }}>
+          <div className="row between"><h2>Net pay per hour</h2><span className="badge">Confidence: {net.confidence}</span></div>
+          <div className="row between"><span className="muted">This week</span><strong>{perHour(week)}</strong></div>
+          <div className="row between"><span className="muted">Month to date</span><strong>{perHour(month)}</strong></div>
+          <p className="small muted">Includes pending payouts. Paid so far this month: {money(month.paid_usd)} over {month.hours} h.{month.fee_unknown ? " Some fees are unknown, so this is before those fees." : ""}</p>
         </section>
 
-        {today.posts_due > 0 && (
-          <article className="card ink row wrap" aria-label="Ready to post">
-            <div className="grow stack" style={{ gap: 4 }}>
-              <span className="small" style={{ color: "var(--accent)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Ready to post · {today.posts_due} waiting</span>
-              <span style={{ fontWeight: 600 }}>Accepted clips are waiting for their publish checklist.</span>
+        <details className="card stack" aria-label="Today">
+          <summary className="row between"><strong>Today</strong><span className="small muted">{today.hours_logged.toFixed(1)} / {today.hours_cap} h · {today.clips_accepted} accepted · {today.posts_done} posted</span></summary>
+          <div className="tiles" style={{ marginTop: 10 }}>
+            <div className="tile">
+              <div className="num">{today.hours_logged.toFixed(1)}<small> / {today.hours_cap}h</small></div>
+              <div className="small muted">Hours today</div>
             </div>
-            <Link className="btn primary" href="/queue">Open queue</Link>
-          </article>
-        )}
+            <div className="tile"><div className="num">{today.clips_accepted}</div><div className="small muted">Clips accepted</div></div>
+            <div className="tile"><div className="num">{today.posts_done}</div><div className="small muted">Posts done</div></div>
+            <div className="tile"><div className="num">{today.posts_due}</div><div className="small muted">Posts due</div></div>
+          </div>
+        </details>
 
-        {data.attention.length > 0 && (
-          <details className="attention stack" aria-label="Attention" open={data.attention.length <= 2}>
-            <summary className="row between"><h2>Needs attention ({data.attention.length})</h2><Link href="/alerts" className="small">All alerts</Link></summary>
-            {data.attention.map((alert) => {
-              const plain = plainAlert(alert.message);
-              return (
-                <div key={alert.id} className={`banner ${alert.severity}`}>
-                  <p>{plain.text}</p>
-                  {plain.text !== plain.raw && <details className="small"><summary>Technical details</summary><p>{plain.raw}</p></details>}
-                </div>
-              );
-            })}
-          </details>
-        )}
-
-        <section className="stack" aria-label="Campaigns">
-          <h2>Campaigns by estimated net pay</h2>
+        <section id="campaigns" className="stack" aria-label="Campaigns" style={{ gap: 10 }}>
+          <div className="row between"><h2>Campaigns</h2><Link href="/explore" className="small">Find more</Link></div>
+          {data.stories.length > 0 && (
+            <div aria-label="Active campaigns" className="stories">
+              {orderStories(data.stories).map((story) => {
+                const byBudget = story.budget_left_pct !== null;
+                const p = byBudget ? story.budget_left_pct! : story.hours_to_deadline !== null ? Math.max(0, Math.min(100, (story.hours_to_deadline / (14 * 24)) * 100)) : 100;
+                return (
+                  <Link key={story.id} className="story" href={`/review?campaign=${story.id}`}
+                    aria-label={`${story.name}: ${byBudget ? `${story.budget_left_pct}% budget left` : deadlineText(story.hours_to_deadline)}, ${story.clips_ready} clips to review`}>
+                    <span className={`ring ${story.clips_ready === 0 ? "done" : p < 25 ? "low" : ""}`} style={{ ["--p" as any]: p }}>
+                      <span className="avatar" style={{ background: tintFor(story.id) }}>{initials(story.name)}</span>
+                    </span>
+                    <span className="name">{story.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
           {data.campaigns.length === 0 && <p className="muted">No campaigns yet. Tap ➕ to add one by pasting its brief.</p>}
           {data.campaigns.map((card) => (
             <CampaignCard key={card.id} card={card}
@@ -192,15 +216,6 @@ export default function Home() {
           ))}
         </section>
       </div>
-
-      <aside className="stack home-side" aria-label="Your numbers" style={{ gap: 14 }}>
-        <section className="card stack" aria-label="Net pay per hour">
-          <div className="row between"><h2>Net pay per hour</h2><span className="badge">Confidence: {net.confidence}</span></div>
-          <div className="row between"><span className="muted">This week</span><strong>{perHour(week)}</strong></div>
-          <div className="row between"><span className="muted">Month to date</span><strong>{perHour(month)}</strong></div>
-          <p className="small muted">Includes pending payouts. Paid so far this month: {money(month.paid_usd)} over {month.hours} h.{month.fee_unknown ? " Some fees are unknown, so this is before those fees." : ""}</p>
-        </section>
-      </aside>
     </div>
   );
 }
