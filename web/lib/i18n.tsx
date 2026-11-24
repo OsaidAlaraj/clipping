@@ -8,7 +8,7 @@ const LABELS = {
   en: {
     home: "Home", feed: "Feed", queue: "Queue", more: "More",
     accept: "Accept", reject: "Reject", hooks: "Hooks", edit: "Edit", later: "Review later",
-    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", accepted: "Accepted", fullScreen: "Full screen", hideText: "Hide text", showText: "Show text", parked: "Saved for later", stopHere: "Stop here", soundOn: "Tap for sound", muted: "Muted",
+    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", accepted: "Accepted", fullScreen: "Full screen", hideText: "Hide text", showText: "Show text", parked: "Saved for later", stopHere: "Stop here", shuffle: "Shuffle", libraryTitle: "Accepted clips", searchClips: "Search clips", sortBy: "Sort", sortNewest: "Newest", sortViews: "Most views", sortEarned: "Most earned", sortCampaign: "Campaign A to Z", campaigns: "Campaigns", allCampaigns: "All", libraryEmpty: "No accepted clips yet", libraryNoMatch: "No clips match", openPost: "Open the post", soundOn: "Tap for sound", mute: "Mute", muted: "Muted",
     reviewLater: "Review Later", ledger: "Ledger", alerts: "Alerts", settings: "Settings",
     explore: "Explore", review: "Review", profile: "Profile", create: "New", addCampaign: "Add campaign", addVideo: "Add video",
     marketRejected: "The marketplace rejected this clip", marketReasonLabel: "What did the marketplace say?",
@@ -28,7 +28,7 @@ const LABELS = {
   ar: {
     home: "الرئيسية", feed: "المراجعة", queue: "قائمة النشر", more: "المزيد",
     accept: "قبول", reject: "رفض", hooks: "العناوين", edit: "تعديل", later: "مراجعة لاحقاً",
-    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", accepted: "تم القبول", fullScreen: "ملء الشاشة", hideText: "إخفاء النص", showText: "إظهار النص", parked: "حُفظ للمراجعة لاحقاً", stopHere: "توقف هنا", soundOn: "اضغط لتشغيل الصوت", muted: "صامت",
+    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", accepted: "تم القبول", fullScreen: "ملء الشاشة", hideText: "إخفاء النص", showText: "إظهار النص", parked: "حُفظ للمراجعة لاحقاً", stopHere: "توقف هنا", shuffle: "اخلط", libraryTitle: "الكليبات المقبولة", searchClips: "ابحث في الكليبات", sortBy: "ترتيب", sortNewest: "الأحدث", sortViews: "الأكثر مشاهدات", sortEarned: "الأعلى ربحاً", sortCampaign: "الحملة أ إلى ي", campaigns: "الحملات", allCampaigns: "الكل", libraryEmpty: "ما في كليبات مقبولة بعد", libraryNoMatch: "ما في كليبات تطابق", openPost: "افتح البوست", soundOn: "اضغط لتشغيل الصوت", mute: "كتم", muted: "صامت",
     reviewLater: "للمراجعة لاحقاً", ledger: "السجل المالي", alerts: "التنبيهات", settings: "الإعدادات",
     explore: "استكشاف", review: "المراجعة", profile: "ملفي", create: "جديد", addCampaign: "إضافة حملة", addVideo: "إضافة فيديو",
     marketRejected: "المنصّة رفضت هذا المقطع", marketReasonLabel: "ماذا قالت المنصّة؟",

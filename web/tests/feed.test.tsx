@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import Feed from "@/components/Feed";
 import { flushOutbox, readOutbox } from "@/lib/api";
@@ -41,14 +41,24 @@ describe("feed card", () => {
     expect(screen.getByRole("progressbar")).toBeTruthy();
   });
 
-  it("has labelled rail buttons and starts muted until tapped", async () => {
+  it("has labelled rail buttons, starts with sound on (owner note 11), and a tap turns sound off and back on", async () => {
     const { card } = await open(feedRoutes(three()));
     for (const label of ["Accept", "Reject", "Hooks", "Edit", "Review later"]) expect(screen.getByRole("button", { name: label })).toBeTruthy();
     const video = card.querySelector("video")!;
-    expect(video.muted).toBe(true);
+    expect(video.muted).toBe(false);
     expect(video.hasAttribute("playsinline")).toBe(true);
     swipe(card, [150, 300], [151, 301]); // a tap
+    await waitFor(() => expect(card.querySelector("video")!.muted).toBe(true));
+    swipe(card, [150, 300], [151, 301]); // and back
     await waitFor(() => expect(card.querySelector("video")!.muted).toBe(false));
+  });
+
+  it("when the browser refuses sound, the clip plays muted and shows the tap instead of failing", async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementationOnce(() => Promise.reject(new DOMException("blocked", "NotAllowedError")));
+    const { card } = await open(feedRoutes(three()));
+    await waitFor(() => expect(card.querySelector("video")!.muted).toBe(true));
+    expect(screen.getByText("Tap for sound")).toBeTruthy();
+    play.mockRestore();
   });
 
   it("shows no likes, comments, follower counts or streaks, and hides pay on the card by default", async () => {

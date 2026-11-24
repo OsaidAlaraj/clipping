@@ -8,7 +8,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import ffmpeg
+from . import ad_label, ffmpeg
 from .agents import rules as agent_a
 from .alerts import raise_alert, registry
 from .core import AppError, GateError, audit, enqueue, get_setting, sha256_text
@@ -146,6 +146,17 @@ def approve(conn, actor, campaign_id) -> dict:
                             (campaign_id,)).fetchone()
     audit(conn, "gate.campaign_approval", "campaigns", campaign_id,
           {"version_no": version["version_no"], "compliance_status": version["compliance_status"]}, rule_version_id=version["id"])
+    return campaign
+
+
+def set_ad_label(conn, actor, campaign_id, on: bool) -> dict:
+    """The ad-label switch (owner notes 2). Off is refused when the brief requires the label; compliance is the second check."""
+    campaign = get_campaign(conn, campaign_id)
+    version = conn.execute("select rules_json from campaign_versions where id = %s", (campaign["current_version_id"],)).fetchone()
+    if not on and ad_label.required_by_brief((version or {}).get("rules_json")):
+        raise AppError("The brief requires the ad label, so it stays on. Only the brief can change that.", "ad_label_required")
+    campaign = conn.execute("update campaigns set ad_label = %s where id = %s returning *", (bool(on), campaign_id)).fetchone()
+    audit(conn, "campaign.ad_label", "campaigns", campaign_id, {"on": bool(on)})
     return campaign
 
 

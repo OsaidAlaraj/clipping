@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
+from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, library, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -134,6 +134,10 @@ class PracticeIn(BaseModel):
 
 class ReasonIn(BaseModel):
     reason: str | None = None
+
+
+class AdLabelIn(BaseModel):
+    on: bool
 
 
 class SourceIn(BaseModel):
@@ -378,6 +382,11 @@ def confirm_rules(campaign_id: str, actor: Actor = Depends(current_actor)):
 @app.post("/api/campaigns/{campaign_id}/approve")
 def approve_campaign(campaign_id: str, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.approve, actor, campaign_id)
+
+
+@app.post("/api/campaigns/{campaign_id}/ad-label")
+def set_ad_label(campaign_id: str, body: AdLabelIn, actor: Actor = Depends(current_actor)):
+    return run(actor, campaigns.set_ad_label, actor, campaign_id, body.on)
 
 
 @app.post("/api/campaigns/{campaign_id}/park")
@@ -1066,6 +1075,14 @@ def back_to_later(clip_id: str, body: ReasonIn, actor: Actor = Depends(current_a
 @app.post("/api/posts/{post_id}/views")
 def views(post_id: str, body: ViewsIn, actor: Actor = Depends(current_actor)):
     return run(actor, ledger.record_views, actor, post_id, body.window, body.views, body.watch_time_s, body.source)
+
+
+@app.get("/api/library")
+def get_library(campaign_ids: str | None = None, q: str = "", sort: str = "newest", actor: Actor = Depends(current_actor)):
+    """Accepted clips as a scroll of reels, with their collected numbers. `campaign_ids` is comma-separated."""
+    ids = [c for c in (campaign_ids or "").split(",") if c.strip()]
+    with get_db().session(actor) as conn:
+        return library.listing(conn, ids, q, sort)
 
 
 @app.get("/api/ledger")

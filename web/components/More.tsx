@@ -9,6 +9,7 @@ import { plainAlert } from "@/lib/alertText";
 import { clearCache, useData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { clock, dialectLabel, percent, providerLabel } from "@/lib/transcript";
+import { setSoundOn, useSound } from "@/lib/sound";
 import { RejectSheet } from "./Feed";
 import { DetailSkeleton, RowsSkeleton } from "./Skeleton";
 
@@ -25,7 +26,7 @@ function useLoad<T>(path: string) {
   return { data: (result.data ?? null) as T | null, error, setError, load };
 }
 
-function Head({ title, back = "/profile" }: { title: string; back?: string }) {
+export function Head({ title, back = "/profile" }: { title: string; back?: string }) {
   return <div className="page-head"><h1>{title}</h1><Link className="btn ghost" href={back}>Back</Link></div>;
 }
 
@@ -51,6 +52,7 @@ type Folder = { campaign_id: string; campaign_name: string; deadline: string | n
 
 export function ReviewLater() {
   const { data, error, setError, load } = useLoad<{ folders: Folder[] }>("/api/review-later");
+  const soundOn = useSound(); // owner note 11: the same sound choice as the feed
   const [rejecting, setRejecting] = useState<string | null>(null);
   const act = async (fn: () => Promise<unknown>) => { try { await fn(); load(); } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } };
   return (
@@ -68,9 +70,10 @@ export function ReviewLater() {
           <span className="small muted">{folder.deadline ? `Deadline ${new Date(folder.deadline).toLocaleDateString()}` : "No deadline"}{folder.closed ? ". This campaign is closed, so these clips can no longer be accepted." : ""}</span>
           {folder.clips.map((clip) => (
             <div key={clip.id} className="later-row">
-              {clip.video_url && <video src={clip.video_url} muted playsInline preload="metadata" />}
+              {clip.video_url && <video src={clip.video_url} muted={!soundOn} controls playsInline preload="metadata" />}
               <div className="stack" style={{ gap: 6 }}>
                 <span dir="auto" style={{ fontWeight: 600 }}>{clip.hook_text}</span>
+                {clip.video_url && <button className="chip" style={{ alignSelf: "start" }} aria-pressed={soundOn} onClick={() => setSoundOn(!soundOn)}>{soundOn ? "Mute" : "Sound on"}</button>}
                 <span className="small muted">Parked: {clip.park_reason ?? "no reason given"}</span>
                 {!folder.closed && (
                   <div className="row">
@@ -421,6 +424,8 @@ export function CampaignDetail({ id }: { id: string }) {
   const { campaign, version } = data;
   const rules = version.rules_json;
   const payoutQuotes = rules.payout?.quotes ?? {};
+  const adOn = campaign.ad_label !== false;
+  const adRequired = Boolean(rules.disclosure?.required_by_brief);
   return (
     <div className="page">
       <Head title={campaign.name} back="/" />
@@ -467,6 +472,19 @@ export function CampaignDetail({ id }: { id: string }) {
           ))}
         </section>
       )}
+      <section className="card stack" aria-label="Ad label">
+        <h2>Ad label</h2>
+        <div className="row between wrap">
+          <span className="stack" style={{ gap: 0, minWidth: 0 }}>
+            <strong>{adOn ? "On" : "Off"}</strong>
+            <span className="small muted">{adRequired ? "The brief requires the label, so it stays on." : "Turn it off only if this campaign does not need the label."}</span>
+          </span>
+          <button className="btn" disabled={adOn && adRequired}
+            onClick={() => act(() => api(`/api/campaigns/${id}/ad-label`, { body: { on: !adOn } }), adOn ? "Ad label off for this campaign." : "Ad label on.")}>
+            {adOn ? "Turn off" : "Turn on"}
+          </button>
+        </div>
+      </section>
       <p className="small muted">This is a draft extracted by Agent A. The system flags and records; it does not certify legal compliance. You decide.</p>
       {error && <p className="error" role="alert">{error}</p>}
       {note && <p className="small" role="status">{note}</p>}

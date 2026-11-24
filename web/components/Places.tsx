@@ -389,6 +389,7 @@ export function Profile() {
         </section>
       )}
       <nav className="card" style={{ padding: 0 }} aria-label="Your places">
+        <Link className="list-link" href="/library">Accepted clips<span aria-hidden="true">›</span></Link>
         <Link className="list-link" href="/queue">Posting queue<span aria-hidden="true">›</span></Link>
         <Link className="list-link" href="/more/review-later">{t("reviewLater")}<span aria-hidden="true">›</span></Link>
         <Link className="list-link" href="/more/ledger">{t("ledger")}<span aria-hidden="true">›</span></Link>

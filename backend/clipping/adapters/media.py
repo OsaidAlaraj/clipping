@@ -506,7 +506,7 @@ class FFmpegRender(Adapter):
         """Cut [start_s, end_s] of `src` and make the finished clip in one encode, then its cover.
         `clip`: start_s, end_s, language, platform, crop, audio, hook_text, emphasis (loud moments, source seconds) and
         signals (per-second series from `first_s`). Returns {"encodes", "encoder", "cover_path", ...}."""
-        if not label or not label.strip():
+        if label is not None and not label.strip():   # None: the owner switched the ad label off for this campaign
             raise ValueError("disclosure label is missing")
         tpl = normalize_template(template)
         src_path, out_path = Path(src).resolve(), Path(out).resolve()
