@@ -63,7 +63,7 @@ def validate(raw: dict, segment_text: str, avoid=(), rejected: list | None = Non
             except (TypeError, ValueError):
                 score = 0.5
         if text.lower() not in {h["text"].lower() for h in pool}:
-            pool.append({"text": text, "hook_type": hook_type, "score": score, "chosen": False, "pattern": fmt})
+            pool.append({"text": text, "hook_type": hook_type, "score": score, "chosen": False, "pattern": fmt, "format": fmt})   # `format` for the story director: it can open as the title or as the cold-open text
     pool.sort(key=lambda h: -h["score"])
     return _spread(pool, set(avoid_formats), keep)
 

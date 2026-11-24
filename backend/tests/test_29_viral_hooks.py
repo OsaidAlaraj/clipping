@@ -47,7 +47,7 @@ def test_trend_formats_expire_and_the_lexicon_is_consistent():
             assert not hook_rules.problems(example, language=f["language"]), (f["id"], example)
             assert not f.get("tag") or example.startswith(f["tag"].rstrip(":")), (f["id"], example)
     for lang in ("en", "ar"):
-        for niche in ("business", "gaming", "podcast", "lifestyle"):
+        for niche in ("business", "gaming", "podcast", "lifestyle", "comedy", "movies", "sports", "general"):
             assert len(hook_lexicon.fewshot(lang, niche)) >= 2
             assert len(hook_lexicon.formats(lang, niche)) >= 8        # enough different formats for 8 candidates
     assert hook_lexicon.load()["rubric_weights"].keys() == set(hook_lexicon.load()["rubric"])

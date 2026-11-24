@@ -103,7 +103,7 @@ def main() -> None:
     results_path = OUT / "results.json"
     done = {r["id"]: r for r in json.loads(results_path.read_text(encoding="utf-8"))} if results_path.exists() else {}
     for m in moments:
-        if m["id"] in done:
+        if m["id"] in done and "skipped" not in done[m["id"]]:   # a skipped moment (vendor hiccup) is retried on the next run
             continue
         text = " ".join(m["text"].split()[:200])
         try:

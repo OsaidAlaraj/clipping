@@ -180,6 +180,20 @@ describe("hooks sheet and keyboard", () => {
     await screen.findByText(/Re-rendering as a new version/);
   });
 
+  it("a thumb on a hook is sent and shows at once, a second tap on the same thumb clears it", async () => {
+    const { mock } = await open(feedRoutes(three(), { "POST /api/hooks/c1-h1/rating": { id: "c1-h1", rating: 1 } }));
+    fireEvent.click(screen.getByRole("button", { name: "Hooks" }));
+    const dialog = await screen.findByRole("dialog", { name: "Hooks" });
+    const up = within(dialog).getAllByRole("button", { name: "Good hook" })[0];
+    fireEvent.click(up);
+    await waitFor(() => expect(mock.posts("/hooks/c1-h1/rating")).toHaveLength(1));
+    expect(mock.posts("/hooks/c1-h1/rating")[0].body).toEqual({ value: "up" });
+    expect(up.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(up);
+    await waitFor(() => expect(mock.posts("/hooks/c1-h1/rating")).toHaveLength(2));
+    expect(mock.posts("/hooks/c1-h1/rating")[1].body).toEqual({ value: "none" });
+  });
+
   it("Regenerate adds new hooks, and a failure is a plain sentence", async () => {
     let fail = false;
     const { mock } = await open(feedRoutes(three(), {
