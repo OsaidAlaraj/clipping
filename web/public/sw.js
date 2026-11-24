@@ -1,6 +1,6 @@
 // Offline support (spec section 7): cached app shell, cached Home and Queue data.
 // Review actions are queued in the page (lib/outbox.ts) and sent when the connection returns.
-const CACHE = "clipping-v1";
+const CACHE = "clipping-v2";
 const DATA = ["/api/home", "/api/counts", "/api/queue", "/api/reference", "/api/review-later"];
 
 self.addEventListener("install", (event) => {
@@ -38,6 +38,9 @@ self.addEventListener("fetch", (event) => {
         if (response.status === 401 && isData) dropData(); // signed out: never serve the old person's copy offline
         return response;
       })
-      .catch(() => caches.match(request).then((hit) => hit || caches.match("/")))
+      .catch(() => caches.match(request).then((hit) => hit || (isData || url.pathname.startsWith("/api/")
+        // A data request never gets the app shell (HTML would read as "loaded" and leave the screen blank forever).
+        ? new Response(JSON.stringify({ error: "No connection. Try again when you are online.", code: "offline" }), { status: 503, headers: { "content-type": "application/json" } })
+        : caches.match("/"))))
   );
 });
