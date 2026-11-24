@@ -9,23 +9,29 @@ from __future__ import annotations
 
 import random
 
+from . import hook_lexicon
 from .router import floored, owner_of
 
 PATTERN_FLOOR = 0.08
 OUTCOMES = {"use": "uses", "approve": "approvals", "reject": "rejections", "views_high": "views_high", "views_low": "views_low"}
 
 
-def library(conn, language: str, profile: str) -> list[dict]:
-    """The active patterns of a language that apply to this profile (a pattern with no profiles applies to all)."""
+def library(conn, language: str, profile: str, niche: str | None = None) -> list[dict]:
+    """The active patterns of a language that apply to this profile (a pattern with no profiles applies to all), plus the live
+    formats of the hook lexicon for this niche (POV:, Nobody:, curiosity gap ...; a trend format drops out after its `expires`)."""
     rows = conn.execute("select name, description, template, hook_type, profiles from hook_patterns where active and language = %s order by name",
                         (language,)).fetchall()
-    return [r for r in rows if not r["profiles"] or profile in r["profiles"]]
+    rows = [r for r in rows if not r["profiles"] or profile in r["profiles"]]
+    known = {r["name"] for r in rows}
+    fmts = [{"name": f["id"], "description": f["about"], "template": f["examples"][0], "hook_type": f["type"], "profiles": [], "base": f["weight"]}
+            for f in hook_lexicon.formats(language, niche) if f["id"] not in known]
+    return rows + fmts
 
 
-def weights(conn, language: str, profile: str, owner_id=None, patterns: list[dict] | None = None) -> dict[str, float]:
+def weights(conn, language: str, profile: str, owner_id=None, patterns: list[dict] | None = None, niche: str | None = None) -> dict[str, float]:
     """Each pattern's share of the choices: its Laplace-smoothed success rate (approvals and high views against
     rejections and low views), never below PATTERN_FLOOR."""
-    patterns = library(conn, language, profile) if patterns is None else patterns
+    patterns = library(conn, language, profile, niche) if patterns is None else patterns
     if not patterns:
         return {}
     stats = {r["pattern"]: r for r in conn.execute(
@@ -36,13 +42,13 @@ def weights(conn, language: str, profile: str, owner_id=None, patterns: list[dic
         s = stats.get(p["name"])
         good = (s["approvals"] + s["views_high"]) if s else 0
         bad = (s["rejections"] + s["views_low"]) if s else 0
-        raw[p["name"]] = (good + 1) / (good + bad + 2)
+        raw[p["name"]] = (good + 1) / (good + bad + 2) * float(p.get("base", 1.0))   # a lexicon format starts at its own weight
     return floored(raw, PATTERN_FLOOR)
 
 
-def pick(conn, language: str, profile: str, count: int, seed, owner_id=None) -> list[dict]:
+def pick(conn, language: str, profile: str, count: int, seed, owner_id=None, niche: str | None = None) -> list[dict]:
     """`count` different patterns drawn by weight. The same seed gives the same draw, so a re-run of a video is stable."""
-    patterns = library(conn, language, profile)
+    patterns = library(conn, language, profile, niche)
     share = weights(conn, language, profile, owner_id, patterns)
     rng, chosen = random.Random(str(seed)), []
     pool = list(patterns)

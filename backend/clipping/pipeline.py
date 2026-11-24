@@ -330,6 +330,25 @@ def _with_pattern_hook(conn, candidate: dict, source: dict, hooks: list[dict]) -
     return merged
 
 
+def _hook_context(conn, source: dict) -> tuple[str | None, list[str]]:
+    """(niche, hook_constraints) of this source's campaign: the category name ("business", "gaming", "podcast" ...) and the campaign's
+    own hook rules when its approved version lists them (`rules_json["hook_constraints"]`, written by the brief extractor)."""
+    campaign = conn.execute("select category_id, approved_version_id from campaigns where id = %s", (source["campaign_id"],)).fetchone()
+    cat = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone() if campaign and campaign["category_id"] else None
+    version = conn.execute("select rules_json from campaign_versions where id = %s", (campaign["approved_version_id"],)).fetchone() if campaign else None
+    constraints = ((version or {}).get("rules_json") or {}).get("hook_constraints") or []
+    return (str(cat["name"]).lower() if cat else None), [str(c) for c in constraints if str(c).strip()]
+
+
+def _neighbour_formats(conn, source: dict, candidate: dict) -> list[str]:
+    """Formats the top hook of the nearest other moments of this source opened with, so two clips in a row never start alike."""
+    rows = conn.execute(
+        """select h.pattern from candidates c join hooks h on h.candidate_id = c.id and h.rank = 1
+           where c.source_id = %s and c.id <> %s and h.pattern is not null order by abs(c.start_s - %s) limit 2""",
+        (source["id"], candidate["id"], candidate["start_s"])).fetchall()
+    return [r["pattern"] for r in rows]
+
+
 def regenerate_hooks(conn, clip_id) -> list[dict]:
     """New hook variants for a clip's moment (the hook editor's Regenerate button): never a text the moment already has, each
     one passing hook_rules. They are added after the existing hooks; nothing is re-rendered until the owner picks one."""
@@ -343,10 +362,12 @@ def regenerate_hooks(conn, clip_id) -> list[dict]:
     owner = source["owner_operator_id"]
     words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
     existing = conn.execute("select text, rank from hooks where candidate_id = %s", (candidate["id"],)).fetchall()
-    picked = hook_patterns.pick(conn, source["language"], "default", 3, f"{clip_id}:{time.time()}", owner)
+    niche, constraints = _hook_context(conn, source)
+    picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, f"{clip_id}:{time.time()}", owner, niche)
     try:
         fresh, _cost = agent_b.run(conn, registry, " ".join(w["text"] for w in words), source["language"], candidate["score"], owner,
-                                   avoid=[h["text"] for h in existing], patterns=[p["name"] for p in picked])
+                                   avoid=[h["text"] for h in existing], patterns=[p["name"] for p in picked], niche=niche,
+                                   avoid_formats=_neighbour_formats(conn, source, candidate), hook_constraints=constraints)
     except (ContentFiltered, AdapterPaused, KillSwitchOn):
         raise
     except AppError:
@@ -359,11 +380,11 @@ def regenerate_hooks(conn, clip_id) -> list[dict]:
     top = max([h["rank"] for h in existing], default=0)
     for offset, hook in enumerate(fresh, start=1):
         conn.execute(
-            """insert into hooks (candidate_id, clip_id, owner_operator_id, text, hook_type, chosen, rank, score)
-               values (%s, %s, %s, %s, %s, false, %s, %s)""",
-            (candidate["id"], clip["id"], owner, hook["text"], hook["hook_type"], top + offset, hook["score"]))
+            """insert into hooks (candidate_id, clip_id, owner_operator_id, text, hook_type, chosen, rank, score, pattern)
+               values (%s, %s, %s, %s, %s, false, %s, %s, %s)""",
+            (candidate["id"], clip["id"], owner, hook["text"], hook["hook_type"], top + offset, hook["score"], hook.get("pattern")))
     return [dict(r) | {"id": str(r["id"])} for r in conn.execute(
-        "select id, text, hook_type, chosen, rank, score from hooks where candidate_id = %s order by rank", (candidate["id"],)).fetchall()]
+        "select id, text, hook_type, chosen, rank, score, rating from hooks where candidate_id = %s order by rank", (candidate["id"],)).fetchall()]
 
 
 def stage_hooks(conn, job: dict) -> Decimal:
@@ -373,7 +394,10 @@ def stage_hooks(conn, job: dict) -> Decimal:
     words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
     segment = " ".join(w["text"] for w in words)
     try:
-        hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner)
+        niche, constraints = _hook_context(conn, source)
+        picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, str(candidate["id"]), owner, niche)
+        hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner, patterns=[p["name"] for p in picked],
+                                  niche=niche, avoid_formats=_neighbour_formats(conn, source, candidate), hook_constraints=constraints)
     except ContentFiltered as exc:
         # The AI safety filter refused this moment (e.g. graphic violence): not brand-safe either, so the moment is
         # set aside with its reason and the other moments carry on. Never retried, never a failed job.

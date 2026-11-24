@@ -1,6 +1,6 @@
 // Typed client for the Python API, plus the offline outbox for review actions.
 
-export type Hook = { id: string; text: string; hook_type: string; chosen: boolean; rank: number; score: number | null };
+export type Hook = { id: string; text: string; hook_type: string; chosen: boolean; rank: number; score: number | null; rating?: number | null };
 
 /** How likely a clip is to reach the campaign's view minimum. `label` is the server's English sentence; the web builds the Arabic
  *  one from the numbers (see `qualityText` in i18n). `weak` clips are shown last. */
