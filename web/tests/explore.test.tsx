@@ -7,7 +7,7 @@ vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a 
 
 import ExploreScreen, { ListingPage } from "@/components/Explore";
 import { bookmarkletCode } from "@/components/More";
-import { NewPlace } from "@/components/Places";
+import { NewPlace } from "@/components/Add";
 import { LangProvider } from "@/lib/i18n";
 import { mockApi } from "./helpers";
 

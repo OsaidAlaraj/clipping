@@ -9,7 +9,8 @@ const startRegistration = vi.fn(async () => ({ id: "cred", response: {} }));
 const startAuthentication = vi.fn(async () => ({ id: "cred", response: {} }));
 vi.mock("@simplewebauthn/browser", () => ({ startRegistration: (...a: any[]) => (startRegistration as any)(...a), startAuthentication: (...a: any[]) => (startAuthentication as any)(...a) }));
 
-import { NewPlace, Profile, UploadVideo } from "@/components/Places";
+import { NewPlace } from "@/components/Add";
+import { Profile, UploadVideo } from "@/components/Places";
 import Shell, { PLACES } from "@/components/Shell";
 import SignIn from "@/components/SignIn";
 import { LangProvider } from "@/lib/i18n";
@@ -66,6 +67,7 @@ describe("adding footage", () => {
     }
     vi.stubGlobal("XMLHttpRequest", FakeXHR as any);
     render(<LangProvider initial="en"><UploadVideo campaigns={[{ id: "c1", name: "Founders Table" }]} /></LangProvider>);
+    fireEvent.click(screen.getByRole("tab", { name: "From this device" }));
     const go = screen.getByRole("button", { name: "Upload and start" }) as HTMLButtonElement;
     expect(go.disabled).toBe(true);
     const file = new File([new Uint8Array(10)], "IMG_0042.mov", { type: "video/quicktime" });
@@ -99,8 +101,7 @@ describe("adding footage", () => {
     mockApi({ "GET /api/home": homeData, "GET /api/reference": { marketplaces: [], categories: [] } });
     render(<LangProvider initial="en"><NewPlace /></LangProvider>);
     fireEvent.click(screen.getByRole("tab", { name: "Add video" }));
-    await waitFor(() => expect((screen.getByLabelText("Campaign") as HTMLSelectElement).options).toHaveLength(1));
-    expect((screen.getByLabelText("Campaign") as HTMLSelectElement).value).toBe("c1");
+    expect((await screen.findByRole("button", { name: "Founders Table" })).getAttribute("aria-pressed")).toBe("true");
   });
 });
 

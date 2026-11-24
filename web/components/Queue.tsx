@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { api, ApiError, Clip, PLATFORM_LABEL } from "@/lib/api";
@@ -7,6 +8,7 @@ import { useData } from "@/lib/data";
 import PostPanel from "./PostPanel";
 import { ListSkeleton } from "./Skeleton";
 import { useLang } from "@/lib/i18n";
+import { Empty, PageHead, UiIcon } from "./ui";
 
 type ChecklistState = {
   clip: Clip;
@@ -197,6 +199,7 @@ export function Checklist({ clipId, onClose, onChanged }: { clipId: string; onCl
 }
 
 export default function Queue() {
+  const { tr } = useLang();
   const queue = useData<{ kill_switch: boolean; items: Clip[] }>("/api/queue");
   const data = queue.data ?? null;
   const [open, setOpen] = useState<string | null>(null);
@@ -207,10 +210,10 @@ export default function Queue() {
 
   return (
     <div className="page">
-      <div className="page-head"><h1>Queue</h1><span className="muted small">{data ? `${data.items.length} to post` : ""}</span></div>
+      <PageHead title={tr("Posting queue", "قائمة النشر")} back="/profile" sub={data ? tr(`${data.items.length} to post`, `${data.items.length} للنشر`) : undefined} />
       {data?.kill_switch && <div className="banner block" role="alert">The kill switch is on. Ready-to-post clips are hidden.</div>}
       {error && <p className="error">{error}</p>}
-      {data && data.items.length === 0 && <div className="empty"><h1>Nothing to post</h1><p className="muted">Clips you accept in the Feed appear here, ordered by due time.</p></div>}
+      {data && data.items.length === 0 && <Empty icon={UiIcon.video} title={tr("Nothing to post", "لا شيء للنشر")} body={tr("Clips you accept while reviewing appear here, ordered by due time.", "المقاطع التي تقبلها أثناء المراجعة تظهر هنا حسب موعد النشر.")} action={<Link className="btn primary" href="/review">{tr("Open Review", "افتح المراجعة")}</Link>} />}
       {data?.items.map((clip) => (
         <button key={clip.id} className="card stack" style={{ textAlign: "start" }} onClick={() => setOpen(clip.id)}>
           <div className="row between">

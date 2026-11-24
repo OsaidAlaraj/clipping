@@ -7,7 +7,8 @@ vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: any) => <a 
 
 import Feed from "@/components/Feed";
 import Home from "@/components/Home";
-import { NewPlace, UploadVideo, uploadProblem } from "@/components/Places";
+import { NewPlace } from "@/components/Add";
+import { UploadVideo, uploadProblem } from "@/components/Places";
 import Queue, { Checklist } from "@/components/Queue";
 import { LangProvider } from "@/lib/i18n";
 import { clip, feedRoutes, mockApi } from "./helpers";
@@ -36,15 +37,16 @@ describe("practice campaigns", () => {
       "POST /api/campaigns/practice": (body: any) => ({ id: "p9", name: `Practice · ${body.name}`, is_practice: true, status: "approved" }),
     });
     render(<LangProvider initial="en"><NewPlace /></LangProvider>);
-    fireEvent.click(screen.getByRole("tab", { name: "Practice" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Try a practice campaign/ }));
     fireEvent.change(screen.getByLabelText("Language of the video"), { target: { value: "ar" } });
     fireEvent.change(screen.getByLabelText("Niche"), { target: { value: "gaming" } });
     fireEvent.click(screen.getByRole("button", { name: "Create practice campaign" }));
     await screen.findByText(/Practice: for trying the system/);
     expect(mock.posts("/api/campaigns/practice")[0].body).toEqual({ name: "My first video", niche: "gaming", language: "ar" });
-    expect((screen.getByLabelText("Campaign") as HTMLSelectElement).value).toBe("p9");
+    expect(screen.getByRole("button", { name: /Practice · / }).getAttribute("aria-pressed")).toBe("true");
     await waitFor(() => expect((screen.getByLabelText("Language") as HTMLSelectElement).value).toBe("ar"));
     expect(screen.queryByLabelText("Permission or licence reference")).toBeNull();
+    fireEvent.click(screen.getByRole("tab", { name: "From this device" }));
     fireEvent.change(document.getElementById("v-file")!, { target: { files: [new File([new Uint8Array(10)], "talk.mp4", { type: "video/mp4" })] } });
     fireEvent.click(screen.getByRole("button", { name: "Upload and start" }));
     await screen.findByText(/Uploaded. Clips appear in Review/);
@@ -56,7 +58,7 @@ describe("practice campaigns", () => {
   it("shows the refusal in plain words and lets the owner try again", async () => {
     mockApi({ "GET /api/home": { campaigns: [] }, "POST /api/campaigns/practice": { __status: 400, body: { error: "Give the practice campaign a name.", code: "name_required" } } });
     render(<LangProvider initial="en"><NewPlace /></LangProvider>);
-    fireEvent.click(screen.getByRole("tab", { name: "Practice" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Try a practice campaign/ }));
     fireEvent.click(screen.getByRole("button", { name: "Create practice campaign" }));
     await screen.findByText("Give the practice campaign a name.");
     expect((screen.getByRole("button", { name: "Create practice campaign" }) as HTMLButtonElement).disabled).toBe(false);
@@ -67,7 +69,7 @@ describe("practice campaigns", () => {
     const view = render(<Home />);
     await screen.findByText("Practice · My first video");
     expect(screen.getByText("Practice")).toBeTruthy();
-    expect(screen.getByText(/No money, and nothing is posted/)).toBeTruthy();
+    expect(screen.getByTestId("campaign-row").textContent).toContain("Practice");
     expect(view.container.textContent).not.toMatch(/per 1,000 views|Rate unclear|fee unknown|budget/i);
   });
 
@@ -109,6 +111,7 @@ describe("big uploads", () => {
   it("blocks a video over 10 GB with a clear message and offers the link instead", () => {
     mockApi({});
     render(<LangProvider initial="en"><UploadVideo campaigns={[{ id: "c1", name: "Practice", practice: true }]} /></LangProvider>);
+    fireEvent.click(screen.getByRole("tab", { name: "From this device" }));
     fireEvent.change(document.getElementById("v-file")!, { target: { files: [sized(12 * 1024 ** 3)] } });
     expect(screen.getByRole("alert").textContent).toBe("This video is 12.0 GB. The most the system takes is 10 GB. Trim it, or send it as a link instead.");
     expect((screen.getByRole("button", { name: "Upload and start" }) as HTMLButtonElement).disabled).toBe(true);
@@ -119,6 +122,7 @@ describe("big uploads", () => {
     vi.stubGlobal("XMLHttpRequest", DroppedXHR as any);
     mockApi({});
     render(<LangProvider initial="en"><UploadVideo campaigns={[{ id: "c1", name: "Practice", practice: true }]} /></LangProvider>);
+    fireEvent.click(screen.getByRole("tab", { name: "From this device" }));
     fireEvent.change(document.getElementById("v-file")!, { target: { files: [sized(2 * 1024 ** 3)] } });
     expect(screen.getByRole("status").textContent).toMatch(/large video \(2.0 GB\)/);
     const go = screen.getByRole("button", { name: "Upload and start" }) as HTMLButtonElement;

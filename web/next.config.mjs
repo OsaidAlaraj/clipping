@@ -9,6 +9,18 @@ export default {
   allowedDevOrigins: ["*.ts.net", "*.trycloudflare.com"],
   // Phone uploads are proxied through /api when the app is opened through Tailscale or a tunnel.
   experimental: { proxyClientMaxBodySize: "2gb" },
+  // Old addresses keep working: one address per screen.
+  async redirects() {
+    return [
+      { source: "/more", destination: "/profile", permanent: true },
+      { source: "/more/add", destination: "/new", permanent: true },
+      { source: "/more/alerts", destination: "/alerts", permanent: true },
+      { source: "/more/ledger", destination: "/ledger", permanent: true },
+      { source: "/more/settings", destination: "/settings", permanent: true },
+      { source: "/more/review-later", destination: "/review-later", permanent: true },
+      { source: "/feed", destination: "/review", permanent: true },
+    ];
+  },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${api}/api/:path*` }];
   },

@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -15,9 +14,8 @@ import { setSoundOn, useSound } from "@/lib/sound";
 import { BriefReview } from "./BriefReview";
 import { RejectSheet } from "./Feed";
 import { DetailSkeleton, RowsSkeleton } from "./Skeleton";
-
-// Places imports this file, so the upload form is loaded lazily to avoid a circular import.
-const UploadVideo = dynamic(() => import("./Places").then((m) => m.UploadVideo), { ssr: false });
+import { useAdd } from "./Add";
+import { Empty, PageHead, UiIcon } from "./ui";
 
 /** A screen's data: the last copy at once if there is one, refreshed in the background. */
 function useLoad<T>(path: string) {
@@ -30,40 +28,23 @@ function useLoad<T>(path: string) {
 }
 
 export function Head({ title, back = "/profile" }: { title: string; back?: string }) {
-  return <div className="page-head"><h1>{title}</h1><Link className="btn ghost" href={back}>Back</Link></div>;
+  return <PageHead title={title} back={back} />;
 }
-
-export function MoreMenu() {
-  const { t } = useLang();
-  return (
-    <div className="page">
-      <div className="page-head"><h1>{t("more")}</h1></div>
-      <nav className="card" style={{ padding: 0 }} aria-label="More">
-        <Link className="list-link" href="/more/review-later">{t("reviewLater")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/ledger">{t("ledger")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/alerts">{t("alerts")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/settings">{t("settings")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/add">Add campaign<span aria-hidden="true">›</span></Link>
-      </nav>
-    </div>
-  );
-}
-
-// ------------------------------------------------------------------ Review Later
 
 type Folder = { campaign_id: string; campaign_name: string; deadline: string | null; closed: boolean; count: number; clips: Clip[] };
 
 export function ReviewLater() {
+  const { tr } = useLang();
   const { data, error, setError, load } = useLoad<{ folders: Folder[] }>("/api/review-later");
   const soundOn = useSound(); // owner note 11: the same sound choice as the feed
   const [rejecting, setRejecting] = useState<string | null>(null);
   const act = async (fn: () => Promise<unknown>) => { try { await fn(); load(); } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } };
   return (
     <div className="page">
-      <Head title="Review Later" />
+      <Head title={tr("Review later", "للمراجعة لاحقاً")} />
       {error && <p className="error">{error}</p>}
       {data === null && !error && <RowsSkeleton />}
-      {data?.folders.length === 0 && <p className="muted">Nothing here yet. Clips you save for later while reviewing collect here, grouped by campaign.</p>}
+      {data?.folders.length === 0 && <Empty icon={UiIcon.video} title={tr("Nothing saved for later", "لا شيء محفوظ لاحقاً")} body={tr("Clips you set aside while reviewing collect here, grouped by campaign.", "المقاطع التي تؤجّلها أثناء المراجعة تُجمع هنا حسب الحملة.")} />}
       {data?.folders.map((folder) => (
         <section key={folder.campaign_id} className="card stack" aria-label={folder.campaign_name} style={{ opacity: folder.closed ? 0.75 : 1 }}>
           <div className="row between">
@@ -103,6 +84,7 @@ const NEXT_STATUS: Record<string, string[]> = {
 };
 
 export function Ledger() {
+  const { tr } = useLang();
   const { data, error, setError, load } = useLoad<any>("/api/ledger");
   const [views, setViews] = useState<Record<string, string>>({});
   const month = new Date().toISOString().slice(0, 7);
@@ -110,21 +92,25 @@ export function Ledger() {
   const overall = data?.net_per_hour.overall;
   return (
     <div className="page">
-      <Head title="Ledger" />
+      <Head title={tr("Ledger", "السجل المالي")} />
       {error && <p className="error" role="alert">{error}</p>}
       {data === null && !error && <RowsSkeleton />}
       {data && (
         <>
-          <section className="card stack">
-            <div className="row between"><h2>Net pay per hour</h2><span className="badge info">Confidence: {data.net_per_hour.confidence}</span></div>
-            <div className="row between"><span className="muted">Paid</span><strong>{overall.paid_per_hour === null ? "—" : money(overall.paid_per_hour)} / h</strong></div>
-            <div className="row between"><span className="muted">Paid plus pending</span><strong>{overall.with_pending_per_hour === null ? "—" : money(overall.with_pending_per_hour)} / h</strong></div>
-            <div className="row between"><span className="muted">Weekly median</span><strong>{data.weekly.median_net_per_hour === null ? "—" : money(data.weekly.median_net_per_hour)} / h</strong></div>
-            <div className="row between"><span className="muted">Go / iterate / stop</span><span className="badge">{data.weekly.decision}</span></div>
-            <p className="small muted">{overall.hours} h logged · paid {money(overall.paid_usd)} · pending {money(overall.pending_usd)} · {data.net_per_hour.clips_clearing_threshold} of {data.net_per_hour.clips_posted} posted clips clear their view minimum. The go/stop thresholds are a framework from your own target, not market data.</p>
+          <section className="group" aria-label={tr("Net pay per hour", "صافي الأجر في الساعة")}>
+            <div className="item" style={{ display: "grid", gap: 4 }}>
+              <span className="eyebrow">{tr("Net pay per hour, paid and pending", "صافي الأجر في الساعة، المدفوع والمعلّق")}</span>
+              <span className="money xl">{overall.with_pending_per_hour === null ? "—" : money(overall.with_pending_per_hour)}</span>
+              <span className="small muted">{tr("Confidence", "درجة الثقة")}: {data.net_per_hour.confidence} · {overall.hours} h · {tr("paid", "مدفوع")} {money(overall.paid_usd)} · {tr("pending", "معلّق")} {money(overall.pending_usd)}</span>
+            </div>
+            <div className="stats">
+              <div><span className="num">{overall.paid_per_hour === null ? "—" : money(overall.paid_per_hour)}</span><span className="lab">{tr("Paid / h", "المدفوع / س")}</span></div>
+              <div><span className="num">{data.weekly.median_net_per_hour === null ? "—" : money(data.weekly.median_net_per_hour)}</span><span className="lab">{tr("Weekly median", "وسيط الأسبوع")}</span></div>
+              <div><span className="num">{data.net_per_hour.clips_clearing_threshold}/{data.net_per_hour.clips_posted}</span><span className="lab">{tr("Clips over minimum", "مقاطع تجاوزت الحدّ")}</span></div>
+            </div>
           </section>
           <a className="btn" href={`/api/export.csv?month=${month}`}>Export {month} as CSV</a>
-          {data.rows.length === 0 && <p className="muted">No posts recorded yet.</p>}
+          {data.rows.length === 0 && <Empty icon={UiIcon.flag} title={tr("No posts recorded yet", "لا منشورات مسجّلة بعد")} body={tr("When you post an accepted clip, its views and payout appear here.", "عندما تنشر مقطعاً مقبولاً تظهر مشاهداته ودفعته هنا.")} />}
           {data.rows.map((row: any) => (
             <section key={row.payout_id} className="card stack">
               <div className="row between"><strong>{row.campaign_name}</strong><span className="badge">{row.status}{row.disputed ? " · disputed" : ""}</span></div>
@@ -160,25 +146,34 @@ export function Ledger() {
 // ------------------------------------------------------------------ Alerts
 
 export function Alerts() {
+  const { tr } = useLang();
   const { data, error, load } = useLoad<{ alerts: any[] }>("/api/alerts");
   const act = async (path: string, body: object = {}) => { await api(path, { body }).catch(() => undefined); load(); };
+  const level = (severity: string) => (severity === "block" ? tr("Needs you", "يحتاجك") : severity === "warn" ? tr("Heads up", "تنبيه") : tr("Info", "معلومة"));
   return (
     <div className="page">
-      <Head title="Alerts" />
+      <PageHead title={tr("Alerts", "التنبيهات")} back="/" />
       {error && <p className="error">{error}</p>}
       {data === null && !error && <RowsSkeleton rows={2} />}
-      {data?.alerts.length === 0 && <p className="muted">No open alerts.</p>}
-      {data?.alerts.map((alert) => (
-        <section key={alert.id} className="card stack">
-          <div className="row between"><span className={`badge ${alert.severity}`}>{alert.severity}</span><span className="small muted">{new Date(alert.created_at).toLocaleString()}</span></div>
-          <p>{plainAlert(alert.message).text}</p>
-          {plainAlert(alert.message).text !== alert.message && <details className="small muted"><summary>Technical details</summary>{alert.message}</details>}
-          <div className="row">
-            <button className="btn grow" onClick={() => act(`/api/alerts/${alert.id}/ack`)}>Acknowledge</button>
-            {alert.severity !== "block" && <button className="btn ghost grow" onClick={() => act(`/api/alerts/${alert.id}/snooze`, { hours: 4 })}>Snooze 4 h</button>}
-          </div>
-        </section>
-      ))}
+      {data?.alerts.length === 0 && <Empty icon={UiIcon.flag} title={tr("All clear", "كل شيء تمام")} body={tr("Nothing needs you right now. New problems show up here and as a dot on the bell.", "لا شيء يحتاجك الآن. المشاكل الجديدة تظهر هنا وكنقطة على الجرس.")} />}
+      {data && data.alerts.length > 0 && (
+        <div className="group">
+          {data.alerts.map((alert) => {
+            const plain = plainAlert(alert.message);
+            return (
+              <div key={alert.id} className="item" style={{ display: "grid", gap: 8 }}>
+                <div className="row between"><span className={`badge ${alert.severity}`}>{level(alert.severity)}</span><span className="small muted">{new Date(alert.created_at).toLocaleString()}</span></div>
+                <p dir="auto">{plain.text}</p>
+                {plain.text !== alert.message && <details className="small muted"><summary>{tr("Technical details", "تفاصيل تقنية")}</summary>{alert.message}</details>}
+                <div className="row">
+                  <button className="btn grow" onClick={() => act(`/api/alerts/${alert.id}/ack`)}>{tr("Got it", "تمام")}</button>
+                  {alert.severity !== "block" && <button className="btn ghost grow" onClick={() => act(`/api/alerts/${alert.id}/snooze`, { hours: 4 })}>{tr("Snooze 4 h", "أجّل 4 ساعات")}</button>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -313,7 +308,7 @@ const ALWAYS_BLOCKED = ["A caption that does not start with the #ad disclosure",
 export function Settings() {
   const { data, error, setError, load } = useLoad<{ settings: any[]; kill_switch: { active: boolean; reason: string | null } }>("/api/settings");
   const reference = useLoad<any>("/api/reference");
-  const { lang, setLang } = useLang();
+  const { lang, setLang, t } = useLang();
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState("");
   const save = async (key: string, value: unknown) => {
@@ -347,7 +342,7 @@ export function Settings() {
   const byKey = new Map((data?.settings ?? []).map((s) => [s.key, s]));
   return (
     <div className="page">
-      <Head title="Settings" />
+      <Head title={t("settings")} />
       {error && <p className="error" role="alert">{error}</p>}
       {saved && <p className="small" role="status">{saved}</p>}
       {SETTING_GROUPS.map((group) => {
@@ -407,197 +402,115 @@ export function Settings() {
 
 // ------------------------------------------------------------------ Add campaign (manual paste) and campaign detail
 
-function guessMarketplace(url: string): string | null {
-  const host = (() => { try { return new URL(url).hostname; } catch { return ""; } })();
-  const known: [string, string][] = [["contentrewards.com", "content_rewards"], ["whop.com", "content_rewards"], ["vyro.com", "vyro"], ["clipping.net", "clipping_net"],
-    ["elev8or.io", "elev8or"], ["clipflip.io", "clipflip"], ["tryshoot.com", "shoot"], ["clipaffiliates.com", "clipaffiliates"], ["clipping.io", "clipping_io"],
-    ["promote.fun", "promote_fun"], ["clipster.com", "clipster"], ["clipstake.com", "clipstake"], ["evangelist.so", "evangelist"]];
-  return known.find(([h]) => host === h || host.endsWith(`.${h}`))?.[1] ?? null;
-}
-
-export function AddCampaign({ embedded = false, initial }: { embedded?: boolean; initial?: { name?: string; text?: string; url?: string } }) {
-  const reference = useLoad<any>("/api/reference");
-  const [form, setForm] = useState({ marketplace: (initial?.url && guessMarketplace(initial.url)) || "content_rewards", name: initial?.name ?? "",
-    brief_text: initial?.text ?? "", url: initial?.url ?? "", category: "podcast", licence_ref: "" });
-  const [error, setError] = useState("");
-  const [reading, setReading] = useState(false);
-  const readScreenshot = async (file: File | undefined) => {
-    if (!file) return;
-    setReading(true); setError("");
-    try {
-      const data = new FormData();
-      data.append("image", file);
-      const response = await fetch(`${uploadBase()}/api/capture/screenshot`, { method: "POST", body: data, credentials: "include" });
-      const body = await response.json();
-      if (!response.ok) throw new ApiError(body.error ?? "Could not read the screenshot.", response.status);
-      setForm((f) => ({ ...f, brief_text: [f.brief_text, body.text].filter(Boolean).join("\n\n") }));
-    } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } finally { setReading(false); }
-  };
-  const { lang } = useLang();
-  const [spec, setSpec] = useState<Spec | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [linksKept, setLinksKept] = useState(0);
-  // Rich paste: HTML on the clipboard (Notion, Google Docs, Discord, a marketplace page) becomes Markdown that keeps its links.
-  const onPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    const html = event.clipboardData.getData("text/html");
-    if (!html) return;   // plain text pastes as usual
-    const converted = pasteToMarkdown(html, event.clipboardData.getData("text/plain"));
-    if (!converted.rich) return;
-    event.preventDefault();
-    const box = event.currentTarget;
-    const [from, to] = [box.selectionStart, box.selectionEnd];
-    setForm((f) => ({ ...f, brief_text: f.brief_text.slice(0, from) + converted.text + f.brief_text.slice(to) }));
-    setLinksKept((n) => n + converted.links);
-  };
-  const submit = async () => {   // read the brief into a spec for the owner to check; nothing is created yet
-    setError(""); setBusy(true);
-    try {
-      const read = await api<Spec>("/api/campaigns/spec", { body: { brief_text: form.brief_text } });
-      setSpec(read);
-      const title = read.items.find((i) => i.key === "identity.name" && i.value);
-      if (!form.name.trim() && title) setForm((f) => ({ ...f, name: String(title.value) }));
-    }
-    catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } finally { setBusy(false); }
-  };
-  const pasteLink = async (url: string, text: string) => {
-    if (!spec) return;
-    setError("");
-    try { setSpec(await api<Spec>("/api/campaigns/spec/paste", { body: { spec, url, text } })); }
-    catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); }
-  };
-  const confirm = async () => {
-    setError(""); setBusy(true);
-    try {
-      const result = await api("/api/campaigns", { body: { ...form, url: form.url || null, licence_ref: form.licence_ref || null, spec } });
-      window.location.href = `/campaign?id=${result.campaign.id}`;
-    } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); setBusy(false); }
-  };
-  const set = (key: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setForm({ ...form, [key]: event.target.value });
-  if (spec) {
-    return (
-      <div className={embedded ? "stack" : "page"}>
-        {!embedded && <Head title="Add campaign" back="/" />}
-        <button className="btn ghost" onClick={() => setSpec(null)}>{lang === "ar" ? "رجوع إلى النص" : "Back to the text"}</button>
-        <BriefReview spec={spec} onChange={setSpec} onPasteLink={pasteLink} onConfirm={confirm} busy={busy} error={error} lang={lang} linksKept={linksKept} />
-      </div>
-    );
-  }
-  return (
-    <div className={embedded ? "stack" : "page"}>
-      {!embedded && <Head title="Add campaign" back="/" />}
-      <p className="small muted">Paste the brief. Rules are extracted as a draft with the exact sentence each one came from. You confirm before anything is produced.</p>
-      <div className="field"><label htmlFor="c-name">Campaign name</label><input id="c-name" className="input" value={form.name} onChange={set("name")} /></div>
-      <div className="row">
-        <div className="field grow"><label htmlFor="c-market">Marketplace</label>
-          <select id="c-market" className="input" value={form.marketplace} onChange={set("marketplace")}>{(reference.data?.marketplaces ?? []).map((m: any) => <option key={m.slug} value={m.slug}>{m.name}</option>)}</select></div>
-        <div className="field grow"><label htmlFor="c-cat">Category</label>
-          <select id="c-cat" className="input" value={form.category} onChange={set("category")}>{(reference.data?.categories ?? []).map((c: any) => <option key={c.name} value={c.name}>{c.name.replace("_", " ")}</option>)}</select></div>
-      </div>
-      <div className="field"><label htmlFor="c-url">Brief link (optional)</label><input id="c-url" className="input" inputMode="url" value={form.url} onChange={set("url")} /></div>
-      <div className="field"><label htmlFor="c-brief">Brief text</label><textarea id="c-brief" className="input" style={{ minHeight: 220 }} dir="auto" value={form.brief_text} onChange={set("brief_text")} onPaste={onPaste} />
-        {linksKept > 0 && <span className="small muted" role="status">{linksKept} {linksKept === 1 ? "link" : "links"} kept</span>}</div>
-      <div className="row wrap">
-        <label htmlFor="c-shot" className="btn">{reading ? "Reading…" : "Read from a screenshot"}</label>
-        <input id="c-shot" type="file" accept="image/*" className="sr-only" onChange={(e) => readScreenshot(e.target.files?.[0])} />
-        <span className="small muted">The text is read into the box above for you to check.</span>
-      </div>
-      <div className="field"><label htmlFor="c-lic">Licensed-client reference (finance or crypto campaigns only)</label><input id="c-lic" className="input" value={form.licence_ref} onChange={set("licence_ref")} /></div>
-      {error && <p className="error" role="alert">{error}</p>}
-      <button className="btn primary block" disabled={busy || !form.name.trim() || !form.brief_text.trim()} onClick={submit}>{busy ? "Reading…" : "Read the brief"}</button>
-    </div>
-  );
-}
-
 export function CampaignDetail({ id }: { id: string }) {
+  const { tr } = useLang();
+  const add = useAdd();
   const { data, error, setError, load } = useLoad<any>(`/api/campaigns/${id}`);
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
-  const act = async (fn: () => Promise<unknown>, done?: string) => { setError(""); try { await fn(); setNote(done ?? ""); load(); } catch (e) { setError(e instanceof ApiError ? e.message : "No connection."); } };
-  if (!data) return error ? <div className="page"><Head title="Campaign" back="/" /><p className="muted">{error}</p></div> : <DetailSkeleton />;
+  const act = async (fn: () => Promise<unknown>, done?: string) => { setError(""); try { await fn(); setNote(done ?? ""); load(); } catch (e) { setError(e instanceof ApiError ? e.message : tr("No connection.", "لا يوجد اتصال.")); } };
+  if (!data) return error ? <div className="page"><PageHead title={tr("Campaign", "الحملة")} back="/" /><p className="muted">{error}</p></div> : <DetailSkeleton />;
   const { campaign, version } = data;
   const rules = version.rules_json;
   const payoutQuotes = rules.payout?.quotes ?? {};
   const adOn = campaign.ad_label !== false;
   const adRequired = Boolean(rules.disclosure?.required_by_brief);
+  const approved = campaign.status === "approved";
+  const open = campaign.status === "pending_approval" || campaign.status === "paused";
+  const payout: [string, React.ReactNode, string][] = [
+    [tr("Model", "نموذج الدفع"), rules.payout.model, "model"],
+    [tr("Rate per 1,000 views", "السعر لكل 1000 مشاهدة"), rules.payout.rate_per_1k !== null ? money(rules.payout.rate_per_1k) : null, "rate_per_1k"],
+    [tr("Minimum views", "الحدّ الأدنى للمشاهدات"), rules.payout.min_views_to_qualify, "min_views_to_qualify"],
+    [tr("Maximum per clip", "الحد الأقصى للمقطع"), rules.payout.max_payout_per_clip !== null ? money(rules.payout.max_payout_per_clip) : null, "max_payout_per_clip"],
+    [tr("Budget", "الميزانية"), rules.payout.budget_total !== null ? money(rules.payout.budget_total) : null, "budget_total"],
+  ];
   return (
-    <div className="page">
-      <Head title={campaign.name} back="/" />
+    <div className="page stack-lg enter">
+      <PageHead title={campaign.name} back="/" />
       <div className="row wrap">
         <span className="badge">{campaign.status.replace("_", " ")}</span>
-        <span className={`badge ${version.compliance_status}`}>rules: {version.compliance_status}</span>
-        <span className="badge">version {version.version_no}</span>
+        <span className={`badge ${version.compliance_status}`}>{tr("rules", "القواعد")}: {version.compliance_status}</span>
+        <span className="badge">{tr("version", "نسخة")} {version.version_no}</span>
       </div>
       {campaign.status_reason && <div className={`banner ${campaign.status === "rejected" ? "block" : "warn"}`}>{campaign.status_reason}</div>}
       {version.hard_blocks.map((block: any) => (
         <div key={block.code} className="banner block">{block.reason}<blockquote dir="auto">{block.quote}</blockquote></div>
       ))}
-      {version.unclear_fields.length > 0 && <div className="banner warn">Unclear in the brief: {version.unclear_fields.join(", ")}. An unclear campaign is never marked as passing.</div>}
-      <section className="card stack">
-        <h2>Payout</h2>
-        {[["Model", rules.payout.model, "model"], ["Rate per 1,000 views", rules.payout.rate_per_1k !== null ? money(rules.payout.rate_per_1k) : null, "rate_per_1k"],
-          ["Minimum views", rules.payout.min_views_to_qualify, "min_views_to_qualify"], ["Maximum per clip", rules.payout.max_payout_per_clip !== null ? money(rules.payout.max_payout_per_clip) : null, "max_payout_per_clip"],
-          ["Budget", rules.payout.budget_total !== null ? money(rules.payout.budget_total) : null, "budget_total"]].map(([label, value, key]) => (
-          <div key={key as string}><div className="row between"><span className="muted">{label}</span><strong>{value ?? "unclear"}</strong></div>{payoutQuotes[key as string] && <blockquote dir="auto">{payoutQuotes[key as string]}</blockquote>}</div>
-        ))}
-        <div className="row between"><span className="muted">Creator fee</span><strong>{version.fee_pct === null ? "fee unknown" : `${Number(version.fee_pct)}%`}</strong></div>
-        <div className="row between"><span className="muted">Platforms</span><strong>{rules.platforms_allowed.map((p: string) => PLATFORM_LABEL[p] ?? p).join(", ") || "unclear"}</strong></div>
-        <div className="row between"><span className="muted">Music</span><strong>{rules.music_policy.replaceAll("_", " ")}</strong></div>
-      </section>
-      <section className="card stack">
-        <h2>Rules, each with its source sentence</h2>
-        {rules.content_rules.length === 0 && <p className="small muted">No content rules were found in the brief.</p>}
-        {rules.content_rules.map((rule: any, index: number) => (
-          <div key={index}><div className="row between"><span dir="auto">{rule.text}</span><span className={`badge ${rule.requirement === "unclear" ? "review" : ""}`}>{rule.requirement}</span></div>
-            {rule.quote ? <blockquote dir="auto">{rule.quote}</blockquote> : <p className="small muted">No source sentence: stored as unclear.</p>}</div>
-        ))}
-      </section>
-      {data.sources.length > 0 && (
-        <section className="card stack" aria-label="Footage">
-          <h2>Footage</h2>
-          {data.sources.map((source: any, n: number) => (
-            <div key={source.id} className="row between wrap">
-              <span className="stack" style={{ gap: 0, minWidth: 0 }}>
-                <strong>Footage {n + 1}</strong>
-                <span className="small muted">{source.language === "ar" ? "Arabic" : "English"}{source.duration_s ? ` · ${clock(Number(source.duration_s))}` : ""}</span>
-              </span>
-              <Link className="btn" href={`/transcript?id=${source.id}`}>Fix transcript</Link>
-            </div>
-          ))}
-        </section>
-      )}
-      <section className="card stack" aria-label="Ad label">
-        <h2>Ad label</h2>
-        <div className="row between wrap">
-          <span className="stack" style={{ gap: 0, minWidth: 0 }}>
-            <strong>{adOn ? "On" : "Off"}</strong>
-            <span className="small muted">{adRequired ? "The brief requires the label, so it stays on." : "Turn it off only if this campaign does not need the label."}</span>
-          </span>
-          <button className="btn" disabled={adOn && adRequired}
-            onClick={() => act(() => api(`/api/campaigns/${id}/ad-label`, { body: { on: !adOn } }), adOn ? "Ad label off for this campaign." : "Ad label on.")}>
-            {adOn ? "Turn off" : "Turn on"}
-          </button>
+      {version.unclear_fields.length > 0 && <div className="banner warn">{tr("Unclear in the brief", "غير واضح في البريف")}: {version.unclear_fields.join(", ")}. {tr("An unclear campaign is never marked as passing.", "الحملة غير الواضحة لا تُعتبر ناجحة أبداً.")}</div>}
+
+      {approved && (
+        <div className="stack" style={{ gap: 8 }}>
+          <Link className="btn primary block" href={`/review?campaign=${id}`}>{tr("Review this campaign's clips", "راجع مقاطع هذه الحملة")}</Link>
+          <button className="btn block" onClick={() => add.open({ kind: "video", campaignId: id })}>{tr("Add footage", "أضف فيديو")}</button>
         </div>
-      </section>
-      <p className="small muted">This is a draft extracted by Agent A. The system flags and records; it does not certify legal compliance. You decide.</p>
+      )}
+      {open && (
+        <div className="stack">
+          <button className="btn primary block" onClick={() => act(() => api(`/api/campaigns/${id}/approve`, { method: "POST" }), tr("Approved.", "تمت الموافقة."))}>{tr("Confirm rules and approve", "أكّد القواعد ووافق")}</button>
+          {campaign.status === "pending_approval" && <button className="btn block" onClick={() => act(() => api(`/api/campaigns/${id}/park`, { method: "POST" }), tr("Parked.", "تم التأجيل."))}>{tr("Park", "أجّل")}</button>}
+          <div className="row"><input className="input" aria-label={tr("Reason for rejecting", "سبب الرفض")} placeholder={tr("Reason for rejecting", "سبب الرفض")} value={reason} onChange={(event) => setReason(event.target.value)} />
+            <button className="btn danger" disabled={!reason.trim()} onClick={() => act(() => api(`/api/campaigns/${id}/reject`, { body: { reason } }), tr("Rejected.", "تم الرفض."))}>{tr("Reject", "ارفض")}</button></div>
+        </div>
+      )}
       {error && <p className="error" role="alert">{error}</p>}
       {note && <p className="small" role="status">{note}</p>}
-      {(campaign.status === "pending_approval" || campaign.status === "paused") && (
-        <div className="stack">
-          <button className="btn primary block" onClick={() => act(() => api(`/api/campaigns/${id}/approve`, { method: "POST" }), "Approved.")}>Confirm rules and approve</button>
-          {campaign.status === "pending_approval" && <button className="btn block" onClick={() => act(() => api(`/api/campaigns/${id}/park`, { method: "POST" }), "Parked.")}>Park</button>}
-          <div className="row"><input className="input" aria-label="Reason for rejecting" placeholder="Reason for rejecting" value={reason} onChange={(event) => setReason(event.target.value)} />
-            <button className="btn danger" disabled={!reason.trim()} onClick={() => act(() => api(`/api/campaigns/${id}/reject`, { body: { reason } }), "Rejected.")}>Reject</button></div>
+
+      <section className="section">
+        <h2>{tr("Payout", "الدفع")}</h2>
+        <div className="group">
+          {payout.map(([label, value, key]) => (
+            <div key={key} className="item" style={{ display: "grid", gap: 4 }}>
+              <div className="row between"><span className="muted">{label}</span><strong>{value ?? tr("unclear", "غير واضح")}</strong></div>
+              {payoutQuotes[key] && <blockquote dir="auto">{payoutQuotes[key]}</blockquote>}
+            </div>
+          ))}
+          <div className="item"><span className="muted grow">{tr("Creator fee", "عمولة المنصّة")}</span><strong>{version.fee_pct === null ? tr("fee unknown", "العمولة غير معروفة") : `${Number(version.fee_pct)}%`}</strong></div>
+          <div className="item"><span className="muted grow">{tr("Platforms", "المنصّات")}</span><strong>{rules.platforms_allowed.map((p: string) => PLATFORM_LABEL[p] ?? p).join(", ") || tr("unclear", "غير واضح")}</strong></div>
+          <div className="item"><span className="muted grow">{tr("Music", "الموسيقى")}</span><strong>{rules.music_policy.replaceAll("_", " ")}</strong></div>
         </div>
-      )}
-      {campaign.status === "approved" && (
-        <section className="card stack">
-          <h2>Add permitted footage</h2>
-          <p className="small muted">Only footage you have a licence or written permission for. Upload a file or paste a link.</p>
-          <UploadVideo campaigns={[{ id, name: campaign.name, practice: !!campaign.is_practice, language: campaign.language ?? null }]} initialId={id} />
-          <span className="small muted">{data.sources.length} source file{data.sources.length === 1 ? "" : "s"} so far.</span>
-          <Link className="btn primary block" href={`/review?campaign=${id}`}>Open this campaign's feed</Link>
+      </section>
+
+      <section className="section">
+        <h2>{tr("Rules, each with its source sentence", "القواعد، كل واحدة مع جملتها الأصلية")}</h2>
+        {rules.content_rules.length === 0 ? <p className="small muted">{tr("No content rules were found in the brief.", "لم تُوجد قواعد للمحتوى في البريف.")}</p> : (
+          <div className="group">
+            {rules.content_rules.map((rule: any, index: number) => (
+              <div key={index} className="item" style={{ display: "grid", gap: 6 }}>
+                <div className="row between"><span dir="auto">{rule.text}</span><span className={`badge ${rule.requirement === "unclear" ? "review" : ""}`}>{rule.requirement}</span></div>
+                {rule.quote ? <blockquote dir="auto">{rule.quote}</blockquote> : <p className="small muted">{tr("No source sentence: stored as unclear.", "لا توجد جملة أصلية: تُحفظ كغير واضحة.")}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {data.sources.length > 0 && (
+        <section className="section" aria-label="Footage">
+          <h2>{tr("Footage", "الفيديوهات")}</h2>
+          <div className="group">
+            {data.sources.map((source: any, n: number) => (
+              <Link key={source.id} className="item" href={`/transcript?id=${source.id}`}>
+                <span className="grow"><span className="title">{tr("Footage", "فيديو")} {n + 1}</span>
+                  <span className="note">{source.language === "ar" ? tr("Arabic", "عربي") : tr("English", "إنجليزي")}{source.duration_s ? ` · ${clock(Number(source.duration_s))}` : ""}</span></span>
+                <span className="small">{tr("Fix transcript", "صحّح النص")}</span><span className="flip go">{UiIcon.chev}</span>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
+
+      <section className="section" aria-label="Ad label">
+        <h2>{tr("Ad label", "وسم الإعلان")}</h2>
+        <div className="group"><div className="item">
+          <span className="grow"><span className="title">{adOn ? tr("On", "مفعّل") : tr("Off", "معطّل")}</span>
+            <span className="note" style={{ whiteSpace: "normal" }}>{adRequired ? tr("The brief requires the label, so it stays on.", "البريف يطلب الوسم، لذلك يبقى مفعّلاً.") : tr("Turn it off only if this campaign does not need the label.", "عطّله فقط إذا كانت الحملة لا تحتاج الوسم.")}</span></span>
+          <button className="btn" disabled={adOn && adRequired}
+            onClick={() => act(() => api(`/api/campaigns/${id}/ad-label`, { body: { on: !adOn } }), adOn ? tr("Ad label off for this campaign.", "تم إيقاف الوسم لهذه الحملة.") : tr("Ad label on.", "تم تفعيل الوسم."))}>
+            {adOn ? tr("Turn off", "عطّل") : tr("Turn on", "فعّل")}
+          </button>
+        </div></div>
+      </section>
+      <p className="small muted">{tr("This is a draft extracted by Agent A. The system flags and records; it does not certify legal compliance. You decide.", "هذه مسودّة استخرجها الوكيل A. النظام ينبّه ويسجّل ولا يشهد بالامتثال القانوني. القرار لك.")}</p>
     </div>
   );
 }
@@ -654,6 +567,7 @@ export function Connections() {
       <p className="small muted">{tx.intro}</p>
       {error && <p className="error" role="alert">{error}</p>}
       {note && <p className="small" role="status">{note}</p>}
+      {data === null && !error && <i className="sk" style={{ height: 260, borderRadius: 18 }} aria-hidden="true" />}
       {data && !data.vault_ready && <p className="small muted" role="status">{tx.noVault}</p>}
       {data?.platforms.map(({ platform }) => {
         const mine = data.connections.filter((c) => c.platform === platform);
