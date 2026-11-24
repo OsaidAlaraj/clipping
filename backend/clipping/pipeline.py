@@ -363,7 +363,7 @@ def regenerate_hooks(conn, clip_id) -> list[dict]:
     words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
     existing = conn.execute("select text, rank from hooks where candidate_id = %s", (candidate["id"],)).fetchall()
     niche, constraints = _hook_context(conn, source)
-    picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, f"{clip_id}:{time.time()}", owner, niche)
+    picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, f"{clip_id}:{time.time()}", owner, niche or "general")
     try:
         fresh, _cost = agent_b.run(conn, registry, " ".join(w["text"] for w in words), source["language"], candidate["score"], owner,
                                    avoid=[h["text"] for h in existing], patterns=[p["name"] for p in picked], niche=niche,
@@ -395,7 +395,7 @@ def stage_hooks(conn, job: dict) -> Decimal:
     segment = " ".join(w["text"] for w in words)
     try:
         niche, constraints = _hook_context(conn, source)
-        picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, str(candidate["id"]), owner, niche)
+        picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, str(candidate["id"]), owner, niche or "general")
         hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner, patterns=[p["name"] for p in picked],
                                   niche=niche, avoid_formats=_neighbour_formats(conn, source, candidate), hook_constraints=constraints)
     except ContentFiltered as exc:

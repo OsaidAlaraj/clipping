@@ -24,7 +24,7 @@ def library(conn, language: str, profile: str, niche: str | None = None) -> list
     rows = [r for r in rows if not r["profiles"] or profile in r["profiles"]]
     known = {r["name"] for r in rows}
     fmts = [{"name": f["id"], "description": f["about"], "template": f["examples"][0], "hook_type": f["type"], "profiles": [], "base": f["weight"]}
-            for f in hook_lexicon.formats(language, niche) if f["id"] not in known]
+            for f in (hook_lexicon.formats(language, niche) if niche is not None else []) if f["id"] not in known]   # no niche given: the stored patterns only
     return rows + fmts
 
 
