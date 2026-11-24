@@ -86,8 +86,12 @@ _INJECTION = re.compile(r"ignore (?:all |any )?(?:the )?(?:previous|prior|above)
 
 # ------------------------------------------------------------------ text helpers
 
+_SMART = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"', "–": "-", "—": "-", " ": " "})
+
+
 def norm(text: str) -> str:
-    return re.sub(r"\s+", " ", text or "").strip().lower()
+    """Case, spacing and typographic quotes and dashes do not matter when a quote is compared with the brief."""
+    return re.sub(r"\s+", " ", (text or "").translate(_SMART)).strip().lower()
 
 
 def plain_text(markdown: str) -> str:
@@ -101,7 +105,20 @@ def plain_text(markdown: str) -> str:
 
 
 def is_verbatim(quote: Any, brief_norm: str) -> bool:
-    return isinstance(quote, str) and len(norm(quote)) >= 3 and norm(quote) in brief_norm
+    """The quote is in the brief word for word. A quote shortened with "..." is accepted when every piece is."""
+    if not isinstance(quote, str) or len(norm(quote)) < 3:
+        return False
+    pieces = [norm(p) for p in re.split(r"\[\.\.\.\]|\.\.\.|…", quote)]
+    pieces = [p for p in pieces if len(p) >= 3]
+    return bool(pieces) and all(p in brief_norm for p in pieces)
+
+
+def llm_catalog() -> dict[str, str]:
+    """What the LLM is told each key means, with the exact allowed values of an enum."""
+    out = {}
+    for key, (kind, text) in CATALOG.items():
+        out[key] = f"{text} [one of: {kind[5:].replace('|', ', ')}]" if kind.startswith("enum:") else f"{text} [{kind}]"
+    return out
 
 
 class _Text:
@@ -390,6 +407,15 @@ def rule_items(markdown: str, now: dt.datetime | None = None) -> list[dict]:
         add("sources.forbidden_class", "broadcast", m, 0.9)
         break
 
+    # a linked source video in the brief (YouTube, Instagram reel, TikTok video) is a named source: the content bank
+    from . import brief_links
+
+    for url, text in brief_links.links_in(t.raw):
+        if brief_links.classify(url, text) == "content_bank_video":
+            line = next((ln for ln, links in t.line_links if any(u == url for _, u in links)), "")
+            plain_line = next((pl for pl in P.split("\n") if norm(pl) == line), text)
+            out.append(_it("sources.whitelist", {"title": text or url, "url": url}, plain_line, 0.85))
+
     # account requirements
     for m in find(r"\b([\w+]+)\s+branded\s+pages?"):
         add("account.requirements", {"type": "branded_page", "detail": m.group(1).upper() if len(m.group(1)) <= 4 else m.group(1)}, m)
@@ -461,6 +487,7 @@ def _coerce(key: str, value: Any, quote: str) -> Any:
     if kind == "str":
         return str(value).strip() or None
     if kind.startswith("enum:"):
+        value = str(value).strip().lower().replace(" ", "_")
         return value if value in kind[5:].split("|") else None
     if kind == "list":
         return [str(v).strip() for v in value if str(v).strip()] if isinstance(value, list) and value else None
@@ -585,7 +612,7 @@ def extract(conn, registry, markdown: str, owner_id=None, now: dt.datetime | Non
     cost = 0
     try:
         raw, cost = registry.call(conn, "llm", "complete_json", {"task": "brief_spec", "payload": {
-            "brief_text": markdown[:30000], "catalog": {k: v[1] for k, v in CATALOG.items()}}}, owner_id)
+            "brief_text": markdown[:30000], "catalog": llm_catalog()}}, owner_id)
     except AppError:
         raw = {}
     spec = build_spec(markdown, raw, now)

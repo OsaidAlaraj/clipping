@@ -1,0 +1,537 @@
+{
+ "spec": {
+  "version": 1,
+  "items": [
+   {
+    "id": "f9dae05e19",
+    "layer": "identity",
+    "key": "identity.marketplace",
+    "value": "content_rewards",
+    "source_quote": "Submit each clip through Content Rewards within 30 minutes of posting.",
+    "confidence": 0.91,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "0be5981786",
+    "layer": "payout",
+    "key": "payout.rate_per_1k",
+    "value": 2,
+    "source_quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "d0decbb8bd",
+    "layer": "payout",
+    "key": "payout.model",
+    "value": "cpm",
+    "source_quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "428a7e9838",
+    "layer": "payout",
+    "key": "payout.max_per_platform",
+    "value": 750,
+    "source_quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "87d9415ee2",
+    "layer": "payout",
+    "key": "payout.min_payout",
+    "value": 10,
+    "source_quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "8c00498363",
+    "layer": "payout",
+    "key": "payout.min_qualifying_views",
+    "value": 5000,
+    "source_quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "abb0e4a9f5",
+    "layer": "platforms",
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "source_quote": "Videos can only be posted on TikTok, Instagram Reels, and YouTube Shorts. At least 50% of the audience from native English-speaking countries (USA, CA, AU, UK, NZ).",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "45344cd256",
+    "layer": "audience",
+    "key": "audience.min_share",
+    "value": {
+     "pct": 50,
+     "countries": [
+      "US",
+      "CA",
+      "AU",
+      "UK",
+      "NZ"
+     ],
+     "label": "native English-speaking"
+    },
+    "source_quote": "At least 50% of the audience from native English-speaking countries (USA, CA, AU, UK, NZ).",
+    "confidence": 0.63,
+    "status": "conflict",
+    "origin": "rule",
+    "alternatives": [
+     {
+      "value": {
+       "pct": 50,
+       "countries": [
+        "USA",
+        "CA",
+        "AU",
+        "UK",
+        "NZ"
+       ],
+       "label": "native English-speaking countries"
+      },
+      "source_quote": "At least 50% of the audience from native English-speaking countries (USA, CA, AU, UK, NZ).",
+      "origin": "llm"
+     }
+    ]
+   },
+   {
+    "id": "9a59186875",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "shaming",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "8fc90b010d",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "mocking people who struggle with addiction",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "f78c47a42d",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "self-harm",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "4458b62014",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "hate farming",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "0fe4bfabf5",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "rage-bait framing",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "626afbfbd4",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "AI-generated content",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "db3bcf7855",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "manipulating views or engagement",
+    "source_quote": "Views and engagement cannot be manipulated in any way.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "54b199b706",
+    "layer": "content",
+    "key": "content.safety_flag",
+    "value": "young_audience",
+    "source_quote": "Content must be suitable for a young audience.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "c183ec4388",
+    "layer": "content",
+    "key": "content.safety_flag",
+    "value": "ai_generated_forbidden",
+    "source_quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "99ed26c58a",
+    "layer": "captions",
+    "key": "captions.required_hashtags",
+    "value": "#SocialMediaJustice",
+    "source_quote": "Captions must include #SocialMediaJustice.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "ab823e9591",
+    "layer": "assets",
+    "key": "assets.logo",
+    "value": {
+     "requirement": "forbidden",
+     "link": null
+    },
+    "source_quote": "Logos of any kind are not allowed.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "650bafa7c1",
+    "layer": "account",
+    "key": "account.requirements",
+    "value": {
+     "type": "bio_link",
+     "detail": "website link in the account bio"
+    },
+    "source_quote": "The account bio must carry the website link.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "0edc4d50d8",
+    "layer": "submission",
+    "key": "submission.within_minutes",
+    "value": 30,
+    "source_quote": "Submit each clip through Content Rewards within 30 minutes of posting.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "be98989bd9",
+    "layer": "submission",
+    "key": "submission.duplicates_rejected",
+    "value": true,
+    "source_quote": "Duplicate URLs are rejected.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "55fb70e621",
+    "layer": "enforcement",
+    "key": "enforcement.strikes",
+    "value": {
+     "strikes": 1,
+     "consequence": "removal from every Reach campaign permanently"
+    },
+    "source_quote": "One strike and you are out: removal from every Reach campaign permanently.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "6e28bc18ef",
+    "layer": "content",
+    "key": "content.allowed_categories",
+    "value": [
+     "social_media_addiction",
+     "movies",
+     "youtube"
+    ],
+    "source_quote": "Content must clearly convey the message of social media addiction; supporting footage (movies, YouTube) allowed.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "b087cce746",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "Logos of any kind",
+    "source_quote": "Logos of any kind are not allowed.",
+    "confidence": 0.99,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "a3d2017d6d",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "duplicate URLs",
+    "source_quote": "Duplicate URLs are rejected.",
+    "confidence": 0.99,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "d76902ca9e",
+    "layer": "payout",
+    "key": "payout.budget_total",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "5e7ca61f81",
+    "layer": "audience",
+    "key": "audience.language",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "ccf0b340ad",
+    "layer": "length",
+    "key": "length.min_s",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "ccce59e559",
+    "layer": "captions",
+    "key": "captions.disclosure_policy",
+    "value": "unspecified",
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   }
+  ],
+  "links": [],
+  "warnings": [],
+  "blocking": []
+ },
+ "raw_items": 25,
+ "raw": {
+  "items": [
+   {
+    "key": "identity.marketplace",
+    "value": "content_rewards",
+    "quote": "Submit each clip through Content Rewards within 30 minutes of posting.",
+    "confidence": 0.86
+   },
+   {
+    "key": "payout.model",
+    "value": "cpm",
+    "quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 0.98
+   },
+   {
+    "key": "payout.rate_per_1k",
+    "value": 2,
+    "quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 0.99
+   },
+   {
+    "key": "payout.min_payout",
+    "value": 10,
+    "quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 0.99
+   },
+   {
+    "key": "payout.max_per_platform",
+    "value": 750,
+    "quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 0.99
+   },
+   {
+    "key": "payout.min_qualifying_views",
+    "value": 5000,
+    "quote": "Payout: $2 per 1K views per platform, $10 minimum and $750 maximum per platform, payouts begin at 5,000 views and approval.",
+    "confidence": 0.99
+   },
+   {
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "quote": "Videos can only be posted on TikTok, Instagram Reels, and YouTube Shorts.",
+    "confidence": 0.99
+   },
+   {
+    "key": "audience.min_share",
+    "value": {
+     "pct": 50,
+     "countries": [
+      "USA",
+      "CA",
+      "AU",
+      "UK",
+      "NZ"
+     ],
+     "label": "native English-speaking countries"
+    },
+    "quote": "At least 50% of the audience from native English-speaking countries (USA, CA, AU, UK, NZ).",
+    "confidence": 0.97
+   },
+   {
+    "key": "content.allowed_categories",
+    "value": [
+     "social_media_addiction",
+     "movies",
+     "youtube"
+    ],
+    "quote": "Content must clearly convey the message of social media addiction; supporting footage (movies, YouTube) allowed.",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.safety_flag",
+    "value": "young_audience",
+    "quote": "Content must be suitable for a young audience.",
+    "confidence": 0.98
+   },
+   {
+    "key": "content.safety_flag",
+    "value": "ai_generated_forbidden",
+    "quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.96
+   },
+   {
+    "key": "content.forbidden",
+    "value": "Logos of any kind",
+    "quote": "Logos of any kind are not allowed.",
+    "confidence": 0.99
+   },
+   {
+    "key": "assets.logo",
+    "value": {
+     "requirement": "forbidden"
+    },
+    "quote": "Logos of any kind are not allowed.",
+    "confidence": 0.99
+   },
+   {
+    "key": "captions.required_hashtags",
+    "value": [
+     "#SocialMediaJustice"
+    ],
+    "quote": "Captions must include #SocialMediaJustice.",
+    "confidence": 0.99
+   },
+   {
+    "key": "content.forbidden",
+    "value": "shaming or mocking people who struggle with addiction",
+    "quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.98
+   },
+   {
+    "key": "content.forbidden",
+    "value": "self-harm",
+    "quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.97
+   },
+   {
+    "key": "content.forbidden",
+    "value": "hate farming",
+    "quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.97
+   },
+   {
+    "key": "content.forbidden",
+    "value": "rage-bait framing",
+    "quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.97
+   },
+   {
+    "key": "content.forbidden",
+    "value": "AI-generated content",
+    "quote": "Prohibited: shaming or mocking people who struggle with addiction, self-harm, hate farming or rage-bait framing, AI-generated content.",
+    "confidence": 0.98
+   },
+   {
+    "key": "content.forbidden",
+    "value": "views and engagement manipulation",
+    "quote": "Views and engagement cannot be manipulated in any way.",
+    "confidence": 0.99
+   },
+   {
+    "key": "submission.within_minutes",
+    "value": 30,
+    "quote": "Submit each clip through Content Rewards within 30 minutes of posting.",
+    "confidence": 0.99
+   },
+   {
+    "key": "submission.duplicates_rejected",
+    "value": true,
+    "quote": "Duplicate URLs are rejected.",
+    "confidence": 0.99
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "duplicate URLs",
+    "quote": "Duplicate URLs are rejected.",
+    "confidence": 0.99
+   },
+   {
+    "key": "account.requirements",
+    "value": {
+     "type": "bio_link",
+     "detail": "must carry the website link"
+    },
+    "quote": "The account bio must carry the website link.",
+    "confidence": 0.98
+   },
+   {
+    "key": "enforcement.strikes",
+    "value": {
+     "strikes": 1,
+     "consequence": "removal from every Reach campaign permanently"
+    },
+    "quote": "One strike and you are out: removal from every Reach campaign permanently.",
+    "confidence": 0.98
+   }
+  ]
+ }
+}

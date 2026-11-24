@@ -1,0 +1,380 @@
+{
+ "spec": {
+  "version": 1,
+  "items": [
+   {
+    "id": "8b61b8fdeb",
+    "layer": "identity",
+    "key": "identity.name",
+    "value": "Castle [RUNESCAPE + GAMBA] 3",
+    "source_quote": "Castle [RUNESCAPE + GAMBA] 3",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "4b35f323c7",
+    "layer": "identity",
+    "key": "identity.campaign_url",
+    "value": "https://www.clipster.com/discover?openedCampaignId=78456560-59fa-4743-ad8b-6300bb4ee9ae",
+    "source_quote": "Castle [RUNESCAPE + GAMBA] 3",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "4b2e444e55",
+    "layer": "identity",
+    "key": "identity.marketplace",
+    "value": "clipster",
+    "source_quote": "Castle [RUNESCAPE + GAMBA] 3",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "cf6c74bd8d",
+    "layer": "payout",
+    "key": "payout.rate_per_1k",
+    "value": 0.5,
+    "source_quote": "💵 CPM (Pay Per 1,000 views)\n$0.5",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "14d089d051",
+    "layer": "payout",
+    "key": "payout.model",
+    "value": "cpm",
+    "source_quote": "💵 CPM (Pay Per 1,000 views)\n$0.5",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "007ff9afdf",
+    "layer": "payout",
+    "key": "payout.max_per_creator",
+    "value": 2000,
+    "source_quote": "💸 Max Payout Per Creator: $2,000",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "45d2b13e95",
+    "layer": "payout",
+    "key": "payout.budget_total",
+    "value": 3280,
+    "source_quote": ":budget: Total Budget: $3,280",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "1e34598622",
+    "layer": "payout",
+    "key": "payout.budget_used_pct",
+    "value": 1,
+    "source_quote": "Completion: 1%",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "cfa3e4983a",
+    "layer": "platforms",
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "source_quote": "📱 Platforms: TikTok / Instagram / YouTube",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "2e99fea277",
+    "layer": "audience",
+    "key": "audience.language",
+    "value": "en",
+    "source_quote": "ENGLISH LANGUAGE + REACH A T1 AUDIENCE",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "fcd3a8c8ec",
+    "layer": "audience",
+    "key": "audience.tier",
+    "value": "T1",
+    "source_quote": "ENGLISH LANGUAGE + REACH A T1 AUDIENCE",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "a48ca73e44",
+    "layer": "content",
+    "key": "content.allowed_categories",
+    "value": [
+     "runescape",
+     "gamba"
+    ],
+    "source_quote": "POST ANY RUNESCAPE OR GAMBA CONTENT",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "5584ee135f",
+    "layer": "content",
+    "key": "content.allowed_categories",
+    "value": [
+     "crypto streamer"
+    ],
+    "source_quote": "POST ANY CRYPTO STREAMER CONTENT (TJR, BREZ ETC)",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "081db591bd",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "LOW QUALITY / SPAM",
+    "source_quote": "POST LOW QUALITY / SPAM",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "106d41a175",
+    "layer": "content",
+    "key": "content.safety_flag",
+    "value": "gambling",
+    "source_quote": "Castle [RUNESCAPE + GAMBA] 3",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "b3b7fef6a3",
+    "layer": "content",
+    "key": "content.safety_flag",
+    "value": "crypto",
+    "source_quote": "POST ANY CRYPTO STREAMER CONTENT (TJR, BREZ ETC)",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "6bacd938ca",
+    "layer": "assets",
+    "key": "assets.logo",
+    "value": {
+     "requirement": "required",
+     "link": "https://drive.google.com/drive/folders/1WvhdcNyFKJ3Q5-0Qj7XpUtxFQe9gy2s9?usp=sharing"
+    },
+    "source_quote": "ADD PROVIDED LOGO -> LOGO",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "ff70aa73bd",
+    "layer": "assets",
+    "key": "assets.logo_guidelines",
+    "value": {
+     "link": "https://app.notion.com/p/Clipster-Logo-Guidelines-bec4a057b8c98243853a81f28fadbafc?source=copy_link"
+    },
+    "source_quote": "MUST FOLLOW CLIPSTER LOGO GUIDELINES",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "7926a9c2f2",
+    "layer": "length",
+    "key": "length.min_s",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "52ff5a83d7",
+    "layer": "captions",
+    "key": "captions.disclosure_policy",
+    "value": "unspecified",
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   }
+  ],
+  "links": [
+   {
+    "url": "https://www.clipster.com/discover?openedCampaignId=78456560-59fa-4743-ad8b-6300bb4ee9ae",
+    "text": "Castle [RUNESCAPE + GAMBA] 3",
+    "kind": "campaign_page",
+    "fetch": {
+     "status": "pending",
+     "note": ""
+    }
+   },
+   {
+    "url": "https://drive.google.com/drive/folders/1WvhdcNyFKJ3Q5-0Qj7XpUtxFQe9gy2s9?usp=sharing",
+    "text": "LOGO",
+    "kind": "logo_asset_folder",
+    "fetch": {
+     "status": "classified_only",
+     "note": "A shared folder: not downloaded. Add the logo file yourself."
+    }
+   },
+   {
+    "url": "https://app.notion.com/p/Clipster-Logo-Guidelines-bec4a057b8c98243853a81f28fadbafc?source=copy_link",
+    "text": "LOGO GUIDELINES",
+    "kind": "guidelines_doc",
+    "fetch": {
+     "status": "pending",
+     "note": ""
+    }
+   },
+   {
+    "url": "https://www.notion.so/Clipster-Logo-Guidelines-2e64a057b8c981a595a1c656a8194dc5?source=copy_link",
+    "text": "",
+    "kind": "guidelines_doc",
+    "fetch": {
+     "status": "pending",
+     "note": ""
+    }
+   }
+  ],
+  "warnings": [],
+  "blocking": []
+ },
+ "raw_items": 17,
+ "raw": {
+  "items": [
+   {
+    "key": "identity.marketplace",
+    "value": "clipster",
+    "quote": "[Castle [RUNESCAPE + GAMBA] 3](https://www.clipster.com/discover?openedCampaignId=78456560-59fa-4743-ad8b-6300bb4ee9ae)",
+    "confidence": 0.9
+   },
+   {
+    "key": "identity.name",
+    "value": "Castle [RUNESCAPE + GAMBA] 3",
+    "quote": "[Castle [RUNESCAPE + GAMBA] 3](https://www.clipster.com/discover?openedCampaignId=78456560-59fa-4743-ad8b-6300bb4ee9ae)",
+    "confidence": 0.9
+   },
+   {
+    "key": "identity.campaign_url",
+    "value": "https://www.clipster.com/discover?openedCampaignId=78456560-59fa-4743-ad8b-6300bb4ee9ae",
+    "quote": "[Castle [RUNESCAPE + GAMBA] 3](https://www.clipster.com/discover?openedCampaignId=78456560-59fa-4743-ad8b-6300bb4ee9ae)",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.model",
+    "value": "cpm",
+    "quote": "💵 CPM (Pay Per 1,000 views)",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.rate_per_1k",
+    "value": 0.5,
+    "quote": "$0.5",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.max_per_creator",
+    "value": 2000,
+    "quote": "💸 Max Payout Per Creator: $2,000",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.budget_total",
+    "value": 3280,
+    "quote": ":budget: Total Budget: $3,280",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.budget_used_pct",
+    "value": 1,
+    "quote": "Completion: 1%",
+    "confidence": 0.9
+   },
+   {
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "quote": "📱 Platforms: TikTok / Instagram / YouTube",
+    "confidence": 0.95
+   },
+   {
+    "key": "audience.language",
+    "value": "en",
+    "quote": "ENGLISH LANGUAGE + REACH A T1 AUDIENCE",
+    "confidence": 0.9
+   },
+   {
+    "key": "audience.tier",
+    "value": "T1",
+    "quote": "ENGLISH LANGUAGE + REACH A T1 AUDIENCE",
+    "confidence": 0.9
+   },
+   {
+    "key": "content.allowed_categories",
+    "value": [
+     "POST ANY RUNESCAPE OR GAMBA CONTENT",
+     "POST ANY CRYPTO STREAMER CONTENT (TJR, BREZ ETC)"
+    ],
+    "quote": "* POST ANY RUNESCAPE OR GAMBA CONTENT",
+    "confidence": 0.9
+   },
+   {
+    "key": "content.safety_flag",
+    "value": "crypto",
+    "quote": "* POST ANY CRYPTO STREAMER CONTENT (TJR, BREZ ETC)",
+    "confidence": 0.85
+   },
+   {
+    "key": "content.forbidden",
+    "value": "POST LOW QUALITY / SPAM",
+    "quote": "* POST LOW QUALITY / SPAM",
+    "confidence": 0.95
+   },
+   {
+    "key": "assets.logo",
+    "value": {
+     "requirement": "required",
+     "link": "https://drive.google.com/drive/folders/1WvhdcNyFKJ3Q5-0Qj7XpUtxFQe9gy2s9?usp=sharing"
+    },
+    "quote": "* ADD PROVIDED LOGO -> [LOGO](https://drive.google.com/drive/folders/1WvhdcNyFKJ3Q5-0Qj7XpUtxFQe9gy2s9?usp=sharing)",
+    "confidence": 0.95
+   },
+   {
+    "key": "assets.logo_guidelines",
+    "value": {
+     "link": "https://app.notion.com/p/Clipster-Logo-Guidelines-bec4a057b8c98243853a81f28fadbafc?source=copy_link"
+    },
+    "quote": "* MUST FOLLOW CLIPSTER [LOGO GUIDELINES](https://app.notion.com/p/Clipster-Logo-Guidelines-bec4a057b8c98243853a81f28fadbafc?source=copy_link)",
+    "confidence": 0.95
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "POST LOW QUALITY / SPAM",
+    "quote": "* POST LOW QUALITY / SPAM",
+    "confidence": 0.9
+   }
+  ]
+ }
+}

@@ -11,7 +11,7 @@ from .core import AppError
 def _llm(conn, registry, text: str, owner_id) -> Any:
     try:
         raw, _cost = registry.call(conn, "llm", "complete_json", {"task": "brief_spec", "payload": {
-            "brief_text": text[:30000], "catalog": {k: v[1] for k, v in brief_spec.CATALOG.items()}}}, owner_id)
+            "brief_text": text[:30000], "catalog": brief_spec.llm_catalog()}}, owner_id)
         return raw
     except AppError:
         return {}

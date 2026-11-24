@@ -264,3 +264,26 @@ def test_folders_and_videos_are_never_fetched():
 def test_a_private_address_is_refused_and_asks_for_a_paste():
     out = brief_links.read_link(_link("https://127.0.0.1/secret"))
     assert out["fetch"]["status"] == "needs_paste"
+
+
+def test_a_quote_shortened_with_dots_or_typographic_quotes_still_counts_when_every_piece_is_in_the_brief():
+    brief = brief_spec._Text("Why Clips Get Rejected: #ad; no captions; slop reposting. Don\u2019t copy-paste \u2014 ever.").norm
+    assert brief_spec.is_verbatim("Why Clips Get Rejected: ...; no captions; slop reposting", brief)
+    assert brief_spec.is_verbatim("Don't copy-paste - ever", brief)
+    assert not brief_spec.is_verbatim("Why Clips Get Rejected: ...; invented words", brief)
+
+
+def test_enum_values_are_accepted_in_any_case_and_the_llm_is_told_the_allowed_values():
+    raw = {"items": [{"key": "payout.model", "value": "CPM", "quote": "CPM (Pay Per 1,000 views)", "confidence": 0.9}]}
+    assert vals(brief_spec.build_spec(BRIEFS["VAVADA"], raw), "payout.model") == ["cpm"]
+    assert "one of: required, forbidden, unspecified" in brief_spec.llm_catalog()["captions.disclosure_policy"]
+
+
+def test_linked_source_videos_in_a_brief_become_the_whitelist_without_the_llm():
+    text = ("2 The Content Bank: clip from the links below.\n"
+            "* [He Has Aaron Judge Cards](https://www.youtube.com/watch?v=abc123def45)\n"
+            "* [Ratatouille Auto 1/1](https://www.instagram.com/reel/XyZ12/)\n* [LOGO](https://f.io/abc)\n")
+    s = brief_spec.build_spec(text, None)
+    listed = vals(s, "sources.whitelist")
+    assert [w["title"] for w in listed] == ["He Has Aaron Judge Cards", "Ratatouille Auto 1/1"]
+    assert listed[0]["url"].endswith("abc123def45")
