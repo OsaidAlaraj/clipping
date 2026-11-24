@@ -18,7 +18,7 @@
 .item .grow { min-width: 0; }
 .item .title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
 .item .note { color: var(--muted); font-size: 0.875rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.item .chev { color: var(--muted); width: 18px; height: 18px; flex: none; }
+.item .go { color: var(--muted); width: 18px; height: 18px; flex: none; }
 .item .lead { width: 40px; height: 40px; border-radius: 12px; display: inline-grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--fg); flex: none; }
 .item .tail { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums; }
 .item.urgent .note { color: var(--danger); }
@@ -89,5 +89,20 @@ button, a.btn, .item { transition: transform var(--t-fast) var(--ease-out), back
   .btn:active:not(:disabled) { transform: none; }
 }
 .swipe-hint { direction: ltr; } /* swipe meanings are physical: Park stays on the left in Arabic too */
-.chev { display: inline-grid; width: 18px; height: 18px; flex: none; color: var(--muted); }
-.chev svg { width: 100%; height: 100%; }
+.go { display: inline-grid; width: 18px; height: 18px; flex: none; color: var(--muted); }
+.go svg { width: 100%; height: 100%; }
+[hidden] { display: none !important; }
+
+/* ---- touch targets: 44 px everywhere */
+.wordmark { min-height: 44px; display: inline-flex; align-items: center; }
+.section-head a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 4px; }
+.chip-pill { min-height: 44px; }
+.segmented button, .segmented a { min-height: 44px; }
+
+/* ---- desktop Home: the hero and the campaign rail span the width, the rest sits in two calm columns */
+@media (min-width: 1100px) {
+  .home-grid { grid-template-columns: minmax(0, 1fr); }
+  .home-main.stack-lg { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: var(--s4); }
+  .home-main > .hero, .home-main > .banner, .home-main > [aria-label="Active campaigns"] { grid-column: 1 / -1; }
+}
+.pg-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--muted); font-size: 0.875rem; }

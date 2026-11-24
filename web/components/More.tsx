@@ -489,7 +489,7 @@ export function CampaignDetail({ id }: { id: string }) {
               <Link key={source.id} className="item" href={`/transcript?id=${source.id}`}>
                 <span className="grow"><span className="title">{tr("Footage", "فيديو")} {n + 1}</span>
                   <span className="note">{source.language === "ar" ? tr("Arabic", "عربي") : tr("English", "إنجليزي")}{source.duration_s ? ` · ${clock(Number(source.duration_s))}` : ""}</span></span>
-                <span className="small">{tr("Fix transcript", "صحّح النص")}</span><span className="flip chev">{UiIcon.chev}</span>
+                <span className="small">{tr("Fix transcript", "صحّح النص")}</span><span className="flip go">{UiIcon.chev}</span>
               </Link>
             ))}
           </div>
@@ -564,6 +564,7 @@ export function Connections() {
       <p className="small muted">{tx.intro}</p>
       {error && <p className="error" role="alert">{error}</p>}
       {note && <p className="small" role="status">{note}</p>}
+      {data === null && !error && <i className="sk" style={{ height: 260, borderRadius: 18 }} aria-hidden="true" />}
       {data && !data.vault_ready && <p className="small muted" role="status">{tx.noVault}</p>}
       {data?.platforms.map(({ platform }) => {
         const mine = data.connections.filter((c) => c.platform === platform);

@@ -177,12 +177,12 @@ export default function Home() {
           <section className="section" aria-label={tr("Needs you", "يحتاجك")}>
             <h2>{tr("Needs you", "يحتاجك")}</h2>
             <div className="group">
-              {toReview > 0 && primary.href !== "/review" && <Link className="item" href="/review"><span className="grow"><span className="title">{n(toReview, "clip to review", "clips to review", "مقطع للمراجعة", "مقاطع للمراجعة")}</span></span><span className="flip chev">{UiIcon.chev}</span></Link>}
-              {today.posts_due > 0 && primary.href !== "/queue" && <Link className="item" href="/queue"><span className="grow"><span className="title">{n(today.posts_due, "clip ready to post", "clips ready to post", "مقطع جاهز للنشر", "مقاطع جاهزة للنشر")}</span></span><span className="flip chev">{UiIcon.chev}</span></Link>}
+              {toReview > 0 && primary.href !== "/review" && <Link className="item" href="/review"><span className="grow"><span className="title">{n(toReview, "clip to review", "clips to review", "مقطع للمراجعة", "مقاطع للمراجعة")}</span></span><span className="flip go">{UiIcon.chev}</span></Link>}
+              {today.posts_due > 0 && primary.href !== "/queue" && <Link className="item" href="/queue"><span className="grow"><span className="title">{n(today.posts_due, "clip ready to post", "clips ready to post", "مقطع جاهز للنشر", "مقاطع جاهزة للنشر")}</span></span><span className="flip go">{UiIcon.chev}</span></Link>}
               {data.attention.length > 0 && (
                 <Link className={`item${worst?.severity === "block" ? " urgent" : ""}`} href="/alerts">
                   <span className="grow"><span className="title">{n(data.attention.length, "alert", "alerts", "تنبيه", "تنبيهات")}</span><span className="note">{worst ? plainAlert(worst.message).text : ""}</span></span>
-                  <span className="flip chev">{UiIcon.chev}</span>
+                  <span className="flip go">{UiIcon.chev}</span>
                 </Link>
               )}
             </div>
@@ -223,7 +223,7 @@ export default function Home() {
                   <span className="grow"><span className="title">{card.name}</span>
                     <span className="note">{card.is_practice ? tr("Practice", "تجريبية") : card.status === "paused" ? tr("Parked", "مؤجّلة") : [card.rate_per_1k !== null ? `${money(card.rate_per_1k)} / 1k` : null, deadlineText(card.hours_to_deadline), card.budget_left_pct !== null ? tr(`${card.budget_left_pct}% budget left`, `${card.budget_left_pct}% من الميزانية`) : null].filter(Boolean).join(" · ")}</span></span>
                   {card.clips_ready > 0 && <span className="tail">{card.clips_ready}</span>}
-                  <span className="flip chev">{UiIcon.chev}</span>
+                  <span className="flip go">{UiIcon.chev}</span>
                 </Link>
               ))}
             </div>

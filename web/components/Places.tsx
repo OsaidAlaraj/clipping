@@ -325,10 +325,11 @@ export function Profile() {
   const [form, setForm] = useState({ platform: "tiktok", handle: "", niche: "podcast", language: "" });
   const [error, setError] = useState("");
   const [net, setNet] = useState<any>(null);
+  const [loaded, setLoaded] = useState(false);
 
   // The first look reuses what the tab already fetched; after a change it asks the server again.
   const load = useCallback((force = true) => {
-    fetchData<any>("/api/reference", { force }).then((ref) => { setAccounts(ref.accounts); setCategories(ref.categories.map((c: any) => c.name)); }).catch(() => setError("Could not load."));
+    fetchData<any>("/api/reference", { force }).then((ref) => { setAccounts(ref.accounts); setCategories(ref.categories.map((c: any) => c.name)); setLoaded(true); }).catch(() => setError("Could not load."));
     fetchData<any>("/api/home", { force }).then((home) => setNet(home.net_per_hour)).catch(() => undefined);
   }, []);
   useEffect(() => { load(false); }, [load]);
@@ -349,6 +350,7 @@ export function Profile() {
   return (
     <div className="page" style={{ maxWidth: 820 }}>
       <PageHead title={t("profile")} />
+      {!net && <i className="sk" style={{ height: 112, borderRadius: 18 }} aria-hidden="true" />}
       {net && (
         <Link className="group" href="/ledger" aria-label={tr("Your numbers", "أرقامك")} style={{ textDecoration: "none", color: "inherit" }}>
           <div className="item" style={{ display: "grid", gap: 2 }}>
@@ -361,11 +363,12 @@ export function Profile() {
       <nav className="group" aria-label={tr("Your places", "أماكنك")}>
         {([["/library", tr("Accepted clips", "المقاطع المقبولة")], ["/queue", tr("Posting queue", "قائمة النشر")], ["/review-later", t("reviewLater")],
           ["/ledger", t("ledger")], ["/alerts", t("alerts")], ["/settings", t("settings")]] as const).map(([href, label]) => (
-          <Link key={href} className="item" href={href}><span className="grow title">{label}</span><span className="chev flip">{UiIcon.chev}</span></Link>
+          <Link key={href} className="item" href={href}><span className="grow title">{label}</span><span className="go flip">{UiIcon.chev}</span></Link>
         ))}
       </nav>
       <Connections />
-      <section className="stack" aria-label="Your accounts">
+      {!loaded && <i className="sk" style={{ height: 260, borderRadius: 18 }} aria-hidden="true" />}
+      <section className="stack" aria-label="Your accounts" hidden={!loaded}>
         <h2>{tr("Your accounts", "حساباتك")}</h2>
         <p className="small muted">One account per platform for each niche. The system never stores passwords, only the handle. Set the language each account posts in, and its US/UK/Canada/Australia audience share: many campaigns only pay for those views, and the ranking uses both. A screenshot of the platform's audience page is enough.</p>
         {Object.entries(byNiche).map(([niche, list]) => (

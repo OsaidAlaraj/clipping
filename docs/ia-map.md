@@ -78,4 +78,49 @@ Section A is the audit of the app **before** the redesign (branch tip 06cd35d). 
 
 ## C. State after the redesign
 
-(filled in at the end of the work)
+### C1. Screens and addresses
+
+| Route | Screen | Head / Back |
+|---|---|---|
+| `/` | Home: one hero action, campaign rail, "Needs you" group, live progress, earnings, campaigns as rows | no Back (a root) |
+| `/explore` | Explore: Marketplaces tab, **Inbox tab (reserved slot for the Discord inbox)** | root |
+| `/new` | The Add flow as a page (phone share target) | Back to Home |
+| middle button | **Add sheet** over any screen | Esc, scrim, drag down |
+| `/review` | Videos (review feed), unchanged in feel; finishing goes to Home with the router, no reload | own chrome |
+| `/profile` | Profile: earnings summary, list (Accepted clips, Posting queue, Review later, Ledger, Alerts, Settings), connections, accounts | root |
+| `/library`, `/queue`, `/review-later`, `/ledger`, `/settings`, `/alerts` | one address each | Back goes where you came from (fallback Profile, Alerts falls back to Home) |
+| `/campaign?id` | Campaign: primary action by status, payout / rules / footage / ad label as groups | Back, fallback Home |
+| `/listing?id` | Listing | Back, fallback Explore |
+| `/transcript?id` | Fix transcript | Back, fallback its campaign |
+
+Old addresses `/more`, `/more/add`, `/more/alerts`, `/more/ledger`, `/more/settings`, `/more/review-later`, `/feed` redirect (permanent) to the new ones (`next.config.mjs`).
+
+### C2. One component per capability
+
+| Capability | Component | Entry points |
+|---|---|---|
+| Add a video (file, link, YouTube with its permission step) | `UploadVideo` inside `AddFlow` | middle button anywhere, Home hero when nothing to review, campaign page "Add footage" (campaign preselected), `/new` |
+| Add a campaign (brief text, link, screenshot) | `AddCampaign` inside `AddFlow` | middle button, Home empty state, Explore listing "Add to my campaigns" (kept: it adds *that* listing), share target |
+| Practice campaign | `PracticeForm` inside `AddFlow` | "No brief? Try a practice campaign" link in the campaign kind |
+| Alerts | `Alerts` | bell, Home "Needs you", Profile |
+| Earnings | Home earnings group (summary), `Ledger` (detail) | Home, Profile |
+| Page head and Back | `PageHead` / `useBack` | every screen except roots |
+| Sheet | `Sheet` (Add); Feed keeps its own `SheetFrame` for review sheets (same look) | |
+
+### C3. Daily jobs, taps from Home (phone)
+
+| Job | Before | After |
+|---|---|---|
+| Add a video (link) | 6 | **3** (middle button, paste, Fetch) |
+| Add a campaign from a brief | 4 | 4 (middle button, Campaign, paste, Read); from a share: 1 |
+| Review clips | 1 | 1 |
+| Post | swipe | swipe (unchanged, bar and 10 s undo kept) |
+| See earnings | 0-2 | 0 (Home), Ledger 1 |
+| Open alerts | bell 1 | 1, and the alert row on Home shows the worst one |
+| Add footage to a given campaign | open campaign (1-2), form | open campaign, "Add footage" (sheet, campaign preselected) |
+
+### C4. Not done in this round (honest list)
+
+- Settings, Explore filters, Transcript editor and the Feed sheets still carry some English-only strings; the rebuilt screens (Home, Add, campaign page, Profile top, Alerts, Ledger top, Queue head, Explore head) have Arabic. A full string pass for Settings/Explore filters/Transcript is the next step.
+- Explore's Inbox tab is a placeholder with an explanation; the Discord bot is a backend task.
+- No real-device frame pacing; measured in a headless browser on a production build (see `docs/final-review/ui-2/`).
