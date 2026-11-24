@@ -24,17 +24,24 @@ def deterministic_checks(clip: dict, template: dict, limits: dict, banned_words:
                 "evidence": f"{w}x{h}"})
     caption = (clip.get("caption_text") or "").lstrip()
     disclosure = (template.get("caption_text") or "").strip()
-    starts = bool(disclosure) and caption.startswith(disclosure) and (
-        len(caption) == len(disclosure) or not re.match(r"[\w]", caption[len(disclosure)]))
-    out.append({"check": "caption_starts_with_disclosure", "status": "pass" if starts else "fail",
-                "evidence": caption[:40] or "(empty caption)"})
     overlay = clip.get("overlay_json") or {}
-    expected = (template.get("overlay_text") or "").strip()
-    present = (bool(expected) and overlay.get("text") == expected and float(overlay.get("start_s", 1)) <= 0.05
-               and float(overlay.get("end_s", 0)) >= duration - 0.1 and duration > 0)
-    out.append({"check": "overlay_present_full_duration", "status": "pass" if present else "fail",
-                "evidence": f"{overlay.get('text')!r} from {overlay.get('start_s')} to {overlay.get('end_s')} s"
-                if overlay else "no overlay recorded"})
+    if template.get("label_off"):   # the owner switched the ad label off for this campaign (ad_label.py)
+        required = bool(template.get("required"))
+        status = "fail" if required else "pass"
+        note = "The brief requires the ad label, but it is off." if required else "Ad label off for this campaign."
+        out.append({"check": "caption_starts_with_disclosure", "status": status, "evidence": note})
+        out.append({"check": "overlay_present_full_duration", "status": status, "evidence": note})
+    else:
+        starts = bool(disclosure) and caption.startswith(disclosure) and (
+            len(caption) == len(disclosure) or not re.match(r"[\w]", caption[len(disclosure)]))
+        out.append({"check": "caption_starts_with_disclosure", "status": "pass" if starts else "fail",
+                    "evidence": caption[:40] or "(empty caption)"})
+        expected = (template.get("overlay_text") or "").strip()
+        present = (bool(expected) and overlay.get("text") == expected and float(overlay.get("start_s", 1)) <= 0.05
+                   and float(overlay.get("end_s", 0)) >= duration - 0.1 and duration > 0)
+        out.append({"check": "overlay_present_full_duration", "status": "pass" if present else "fail",
+                    "evidence": f"{overlay.get('text')!r} from {overlay.get('start_s')} to {overlay.get('end_s')} s"
+                    if overlay else "no overlay recorded"})
     joined = " ".join(t for t in texts if t).lower()
     hits = sorted({word for word in banned_words if word and word.lower() in joined})
     out.append({"check": "banned_words", "status": "fail" if hits else "pass",

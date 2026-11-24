@@ -136,6 +136,10 @@ class ReasonIn(BaseModel):
     reason: str | None = None
 
 
+class AdLabelIn(BaseModel):
+    on: bool
+
+
 class SourceIn(BaseModel):
     file_path: str
     language: str
@@ -378,6 +382,11 @@ def confirm_rules(campaign_id: str, actor: Actor = Depends(current_actor)):
 @app.post("/api/campaigns/{campaign_id}/approve")
 def approve_campaign(campaign_id: str, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.approve, actor, campaign_id)
+
+
+@app.post("/api/campaigns/{campaign_id}/ad-label")
+def set_ad_label(campaign_id: str, body: AdLabelIn, actor: Actor = Depends(current_actor)):
+    return run(actor, campaigns.set_ad_label, actor, campaign_id, body.on)
 
 
 @app.post("/api/campaigns/{campaign_id}/park")

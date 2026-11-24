@@ -418,6 +418,8 @@ export function CampaignDetail({ id }: { id: string }) {
   const { campaign, version } = data;
   const rules = version.rules_json;
   const payoutQuotes = rules.payout?.quotes ?? {};
+  const adOn = campaign.ad_label !== false;
+  const adRequired = Boolean(rules.disclosure?.required_by_brief);
   return (
     <div className="page">
       <Head title={campaign.name} back="/" />
@@ -464,6 +466,19 @@ export function CampaignDetail({ id }: { id: string }) {
           ))}
         </section>
       )}
+      <section className="card stack" aria-label="Ad label">
+        <h2>Ad label</h2>
+        <div className="row between wrap">
+          <span className="stack" style={{ gap: 0, minWidth: 0 }}>
+            <strong>{adOn ? "On" : "Off"}</strong>
+            <span className="small muted">{adRequired ? "The brief requires the label, so it stays on." : "Turn it off only if this campaign does not need the label."}</span>
+          </span>
+          <button className="btn" disabled={adOn && adRequired}
+            onClick={() => act(() => api(`/api/campaigns/${id}/ad-label`, { body: { on: !adOn } }), adOn ? "Ad label off for this campaign." : "Ad label on.")}>
+            {adOn ? "Turn off" : "Turn on"}
+          </button>
+        </div>
+      </section>
       <p className="small muted">This is a draft extracted by Agent A. The system flags and records; it does not certify legal compliance. You decide.</p>
       {error && <p className="error" role="alert">{error}</p>}
       {note && <p className="small" role="status">{note}</p>}

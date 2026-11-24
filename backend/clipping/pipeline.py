@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, language_check, music, packaging, quality_gate, signals, templates, transcripts
+from . import ad_label, brand_checks, config, ffmpeg, language_check, music, packaging, quality_gate, signals, templates, transcripts
 from .adapters import media
 from .adapters import music as _music_adapters  # noqa: F401  (registers the music stage providers)
 from .adapters.base import AdapterPaused
@@ -71,6 +71,14 @@ def disclosure_template(conn, category_id, language: str) -> dict | None:
            order by (category_id is null) limit 1""",
         (language, category_id),
     ).fetchone()
+
+
+def disclosure_for(conn, campaign: dict, version: dict, language: str) -> dict | None:
+    """The label a clip carries: the campaign's template, or the off label when the owner switched it off (ad_label.py).
+    None: the label is on but there is no template for this language."""
+    if ad_label.is_off(campaign):
+        return ad_label.off_label((version or {}).get("rules_json"))
+    return disclosure_template(conn, campaign["category_id"], language)
 
 
 def _source_ctx(conn, source_id) -> tuple[dict, dict, dict]:
@@ -431,11 +439,13 @@ def stage_render(conn, job: dict) -> Decimal:
     emphasis zooms), then its cover. The disclosure text is checked first: without it the clip is blocked."""
     clip, source, campaign, version = _clip_ctx(conn, job["payload"]["clip_id"])
     owner = clip["owner_operator_id"]
-    disclosure = disclosure_template(conn, campaign["category_id"], clip["language"])
+    disclosure = disclosure_for(conn, campaign, version, clip["language"])
     if disclosure is None:
         raise_alert(conn, owner, "disclosure_missing", "block", "clips", clip["id"],
                     f"{campaign['name']}: no disclosure template for language {clip['language']}. The clip is blocked.")
         raise AppError("Disclosure text is missing. The clip is blocked.", "disclosure_missing")   # S8
+    if disclosure.get("required"):
+        raise AppError("The brief requires the ad label, so it stays on for this campaign. The clip is not rendered.", "ad_label_required")
     account_id, platform = _assign_account(conn, clip, campaign, version)
     meta = dict(clip["render_meta"] or {})
     template = templates.pick(conn, account_id, meta.get("template_id"))
@@ -449,7 +459,7 @@ def stage_render(conn, job: dict) -> Decimal:
         render_clip["music"] = bed
     result, cost = registry.call(conn, "render", "render_clip", {
         "src": str(storage.path(source["stored_path"])), "clip": render_clip,
-        "words": words, "template": template["spec"], "label": disclosure["overlay_text"], "out": str(out)}, owner)
+        "words": words, "template": template["spec"], "label": None if disclosure.get("label_off") else disclosure["overlay_text"], "out": str(out)}, owner)
     storage.put(key, str(out))
     cover_key = None
     if result.get("cover_path"):
@@ -461,7 +471,7 @@ def stage_render(conn, job: dict) -> Decimal:
         caption, hashtags, mentions = build_caption(disclosure["caption_text"], meta.get("hook_text") or "", version["rules_json"])
     try:   # the gate only reports: a failure here must never stop the render
         gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=caption,
-                                disclosure=disclosure.get("caption_text"), niche=media.NICHE_OF_CROP.get(render_clip.get("crop")))
+                                disclosure=None if disclosure.get("label_off") else disclosure.get("caption_text"), niche=media.NICHE_OF_CROP.get(render_clip.get("crop")))
     except Exception:
         gate = None
     meta["gate"] = gate
@@ -473,7 +483,7 @@ def stage_render(conn, job: dict) -> Decimal:
     meta.update(template_id=template["id"], template_version=template["version"], encoder=result["encoder"], encodes=result["encodes"],
                 reframe=result["reframe"], loudness_normalised=result["loudness_normalised"], overlay_burned=True,
                 captions=result["captions"], zooms=result.get("zooms", 0), caption_language=clip["language"],
-                disclosure_template_id=str(disclosure["id"]), cover_key=cover_key)
+                disclosure_template_id=str(disclosure["id"]) if disclosure.get("id") else None, cover_key=cover_key)
     conn.execute(
         """update clips set file_path = %s, file_hash = %s, duration_s = %s, width = %s, height = %s, overlay_json = %s,
                caption_text = %s, hashtags = %s, mentions = %s, render_meta = %s, cover_path = %s where id = %s""",
@@ -495,7 +505,7 @@ def stage_captions(conn, job: dict) -> Decimal:
 
 
 def run_compliance(conn, clip: dict, campaign: dict, version: dict) -> tuple[dict, Decimal]:
-    template = disclosure_template(conn, campaign["category_id"], clip["language"]) or {}
+    template = disclosure_for(conn, campaign, version, clip["language"]) or {}
     category = conn.execute("select banned_words from categories where id = %s", (campaign["category_id"],)).fetchone()
     limits = {"min_s": get_setting(conn, "clip_min_duration_s"), "max_s": get_setting(conn, "clip_max_duration_s")}
     report, cost = agent_c.run(conn, registry, clip, template, limits, (category or {}).get("banned_words") or [],
@@ -559,7 +569,7 @@ def _package_text(conn, clip_id, source: dict, campaign: dict, version: dict) ->
     """Caption lab, per-platform packaging and the originality record (packaging.py). The text is checked against the campaign's rules
     again: if the new caption fails compliance, the earlier one is put back. A failure here never stops the clip."""
     clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
-    disclosure = disclosure_template(conn, campaign["category_id"], clip["language"])
+    disclosure = disclosure_for(conn, campaign, version, clip["language"])
     if disclosure is None:
         return Decimal("0")
     before = {k: clip[k] for k in ("caption_text", "hashtags", "mentions", "render_meta")}
