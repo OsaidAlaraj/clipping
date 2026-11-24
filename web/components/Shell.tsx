@@ -48,7 +48,7 @@ export const PLACES = [
   { href: "/explore", key: "explore", icon: Icon.explore, match: (p: string) => p.startsWith("/explore") },
   { href: "/new", key: "create", icon: Icon.plus, match: (p: string) => p.startsWith("/new") || p.startsWith("/more/add") },
   { href: "/review", key: "review", icon: Icon.feed, match: (p: string) => p.startsWith("/review") || p.startsWith("/feed") },
-  { href: "/profile", key: "profile", icon: Icon.profile, match: (p: string) => p.startsWith("/profile") || p.startsWith("/queue") || p.startsWith("/more") },
+  { href: "/profile", key: "profile", icon: Icon.profile, match: (p: string) => p.startsWith("/profile") || p.startsWith("/queue") || p.startsWith("/library") || p.startsWith("/more") },
 ] as const;
 
 /** The data each place opens with. Warmed when a finger or pointer reaches the tab, so the screen is ready by the time it opens. */

@@ -22,7 +22,7 @@ function useLoad<T>(path: string) {
   return { data: (result.data ?? null) as T | null, error, setError, load };
 }
 
-function Head({ title, back = "/profile" }: { title: string; back?: string }) {
+export function Head({ title, back = "/profile" }: { title: string; back?: string }) {
   return <div className="page-head"><h1>{title}</h1><Link className="btn ghost" href={back}>Back</Link></div>;
 }
 
