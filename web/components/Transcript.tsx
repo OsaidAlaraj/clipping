@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PageHead } from "./ui";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api, ApiError, NetworkError } from "@/lib/api";
@@ -500,7 +501,7 @@ export default function Transcript({ sourceId }: { sourceId: string }) {
   if (tx.status !== "ready" || !data) {
     return (
       <div className="page">
-        <div className="page-head"><h1>Fix transcript</h1><Link className="btn ghost" href="/">Back</Link></div>
+        <PageHead title="Fix transcript" back="/" />
         <section className="card stack" role={tx.status === "error" ? "alert" : "status"}>
           <strong>{tx.status === "missing" ? "The transcript is not ready yet" : "The transcript could not be opened"}</strong>
           <p className="small muted">{tx.status === "missing" ? "It appears here once the footage has been transcribed. Check back in a few minutes." : tx.loadError}</p>
@@ -529,13 +530,7 @@ export default function Transcript({ sourceId }: { sourceId: string }) {
 
   return (
     <div className="page tx">
-      <div className="page-head">
-        <div className="stack" style={{ gap: 2, minWidth: 0 }}>
-          <h1>Fix transcript</h1>
-          <span className="small muted tx-sub">{data.campaign_name} · {providerLabel(data.provider)} · {dialectLabel(data.dialect)}</span>
-        </div>
-        <Link className="btn ghost" href={`/campaign?id=${data.campaign_id}`}>Back</Link>
-      </div>
+      <PageHead title="Fix transcript" back={`/campaign?id=${data.campaign_id}`} sub={`${data.campaign_name} · ${providerLabel(data.provider)} · ${dialectLabel(data.dialect)}`} />
 
       <Player audioRef={audioRef} src={data.media_url} fallbackDuration={lastWord} onTime={showNow} />
 

@@ -7,7 +7,9 @@ import { useEffect, useState } from "react";
 import { flushOutbox, OUTBOX_EVENT, readOutbox } from "@/lib/api";
 import { hydrateCache, prefetch, useData } from "@/lib/data";
 import { LangProvider, useLang } from "@/lib/i18n";
+import { AddProvider, useAdd } from "./Add";
 import ToastHost from "./ToastHost";
+import { noteNavigation } from "./ui";
 
 /** The ClipMind mark and name. On the dark side menu the square is lime; on light pages it is near-black. */
 export function Logo({ size = 28, onDark = false }: { size?: number; onDark?: boolean }) {
@@ -46,9 +48,9 @@ export const Icon = {
 export const PLACES = [
   { href: "/", key: "home", icon: Icon.home, match: (p: string) => p === "/" || p.startsWith("/campaign") },
   { href: "/explore", key: "explore", icon: Icon.explore, match: (p: string) => p.startsWith("/explore") },
-  { href: "/new", key: "create", icon: Icon.plus, match: (p: string) => p.startsWith("/new") || p.startsWith("/more/add") },
+  { href: "/new", key: "create", icon: Icon.plus, match: (p: string) => p.startsWith("/new") },
   { href: "/review", key: "review", icon: Icon.feed, match: (p: string) => p.startsWith("/review") || p.startsWith("/feed") },
-  { href: "/profile", key: "profile", icon: Icon.profile, match: (p: string) => p.startsWith("/profile") || p.startsWith("/queue") || p.startsWith("/library") || p.startsWith("/more") },
+  { href: "/profile", key: "profile", icon: Icon.profile, match: (p: string) => ["/profile", "/queue", "/library", "/ledger", "/settings", "/review-later", "/transcript"].some((r) => p.startsWith(r)) },
 ] as const;
 
 /** The data each place opens with. Warmed when a finger or pointer reaches the tab, so the screen is ready by the time it opens. */
@@ -65,11 +67,20 @@ function Navigation({ toReview }: { toReview: number }) {
   const path = usePathname() ?? "/";
   const { t } = useLang();
   const items = PLACES.map((place) => ({ ...place, label: t(place.key as any), active: place.match(path) }));
+  const add = useAdd();
+  // The middle button opens the Add sheet over whatever screen you are on (a campaign page preselects that campaign). The link still works as /new without scripts.
+  const openAdd = (event: React.MouseEvent) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    const id = path.startsWith("/campaign") ? new URLSearchParams(window.location.search).get("id") : null;
+    add.open(id ? { kind: "video", campaignId: id } : {});
+  };
+  const onClick = (key: string) => (key === "create" ? openAdd : undefined);
   return (
     <>
       <nav className="nav" aria-label="Main">
         {items.map((item) => (
-          <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined} {...warmProps(item.href)}
+          <Link key={item.href} href={item.href} className={item.key === "create" ? "create" : undefined} onClick={onClick(item.key)} {...warmProps(item.href)}
             aria-current={item.active ? "page" : undefined} aria-label={item.label}>
             {item.icon}
             {item.key === "review" && toReview > 0 && !item.active && <span className="count" aria-label={`${toReview} waiting`}>{toReview}</span>}
@@ -84,7 +95,7 @@ function Navigation({ toReview }: { toReview: number }) {
             {item.key === "review" && toReview > 0 && <span className="count" aria-label={`${toReview} waiting`}>{toReview}</span>}
           </Link>
         ))}
-        <Link href="/new" className="create" aria-current={path.startsWith("/new") ? "page" : undefined}>{Icon.plus}<span>{t("create")}</span></Link>
+        <Link href="/new" className="create" onClick={openAdd} aria-current={path.startsWith("/new") ? "page" : undefined}>{Icon.plus}<span>{t("create")}</span></Link>
       </nav>
     </>
   );
@@ -153,10 +164,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  useEffect(() => { prefetch("/api/counts"); setPending(readOutbox().length); }, [path]);
+  useEffect(() => { prefetch("/api/counts"); setPending(readOutbox().length); noteNavigation(path); }, [path]);
 
   return (
     <LangProvider>
+     <AddProvider>
       <div className="shell">
         <Navigation toReview={counts.to_review} />
         <div className="app">
@@ -172,6 +184,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       )}
       {!offline && pending === 0 && justSaved && <div className="sync-pill ok" role="status">All saved</div>}
       <ToastHost />
+     </AddProvider>
     </LangProvider>
   );
 }

@@ -23,11 +23,14 @@
   --ok-fill: #EEF8D2;
   --info: #1F4E99;
   --info-fill: #E3EEFF;
-  --radius: 22px;
+  --radius: 18px;
+  --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px; --s5: 32px; --s6: 48px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --t-fast: 150ms; --t-sheet: 280ms;
   --nav-h: 64px;
   --side-w: 236px;
-  --font: Inter, "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
-  --font-display: "Space Grotesk", "IBM Plex Sans Arabic", Inter, system-ui, sans-serif;
+  --font: var(--f-text), var(--f-arabic), Inter, "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+  --font-display: var(--f-display), var(--f-arabic), "Space Grotesk", Inter, system-ui, sans-serif;
   color-scheme: light;
 }
 html[data-theme="dark"] {
@@ -55,7 +58,8 @@ html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); fon
 body { min-height: 100dvh; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
 h1, h2, h3, p { margin: 0; }
 h1 { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
-h2 { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+h2 { font-size: 1.0625rem; font-weight: 650; color: var(--fg); letter-spacing: -0.005em; }
+.eyebrow { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
 a { color: var(--fg); text-underline-offset: 3px; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }

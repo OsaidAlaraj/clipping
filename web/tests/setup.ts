@@ -16,6 +16,9 @@ afterEach(() => {
   document.documentElement.lang = "en";
 });
 
+// Screens use the app router for Back and moves. Tests that care mock it themselves; the rest get a quiet default.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: () => undefined, replace: () => undefined, back: () => undefined }), usePathname: () => "/", useSearchParams: () => new URLSearchParams() }));
+
 // jsdom has no media playback or matchMedia.
 Object.defineProperty(HTMLMediaElement.prototype, "play", { configurable: true, value: () => Promise.resolve() });
 Object.defineProperty(HTMLMediaElement.prototype, "pause", { configurable: true, value: () => undefined });

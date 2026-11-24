@@ -10,13 +10,11 @@ import { mockApi } from "./helpers";
 const version = { version_no: 1, compliance_status: "pass", hard_blocks: [], unclear_fields: [], rules_json: { payout: { model: "cpm", rate_per_1k: 1, min_views_to_qualify: 0 }, platforms_allowed: ["tiktok"], music_policy: "any", content_rules: [] } };
 
 describe("an approved campaign page accepts footage as a file OR a link", () => {
-  it("offers the same upload-or-link form as the New screen, not a typed file path", async () => {
+  it("opens the one Add sheet for this campaign instead of carrying its own form", async () => {
     mockApi({ "GET /api/campaigns/c1": { campaign: { name: "Founders Table", status: "approved", status_reason: null }, version, sources: [] },
       "GET /api/home": { campaigns: [] } });
     render(<CampaignDetail id="c1" />);
-    expect(await screen.findByRole("tab", { name: "From a link" })).toBeTruthy();
+    fireEvent.click(await screen.findByRole("button", { name: "Add footage" }));
     expect(screen.queryByLabelText("File path on this laptop")).toBeNull();
-    fireEvent.click(screen.getByRole("tab", { name: "From a link" }));
-    expect(screen.getByLabelText("Video link")).toBeTruthy();
   });
 });

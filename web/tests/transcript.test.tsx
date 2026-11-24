@@ -571,7 +571,7 @@ describe("DW-2.3 accuracy in Settings, and the ways to reach the screen", () => 
     const version = { version_no: 1, compliance_status: "pass", hard_blocks: [], unclear_fields: [], rules_json: { payout: { model: "cpm", rate_per_1k: 1, min_views_to_qualify: null, max_payout_per_clip: null, budget_total: null, quotes: {} }, platforms_allowed: [], music_policy: "allowed", content_rules: [] }, fee_pct: null };
     mockApi({ "GET /api/campaigns/c1": { campaign: { name: "Founders Table", status: "approved", status_reason: null }, version, sources: [{ id: "s1", language: "ar", duration_s: 125 }, { id: "s2", language: "en", duration_s: null }] } });
     render(<CampaignDetail id="c1" />);
-    const links = await screen.findAllByRole("link", { name: "Fix transcript" });
+    const links = await screen.findAllByRole("link", { name: /Fix transcript/ });
     expect(links.map((a) => a.getAttribute("href"))).toEqual(["/transcript?id=s1", "/transcript?id=s2"]);
     expect(screen.getByText("Arabic · 2:05")).toBeTruthy();
   });
@@ -581,6 +581,6 @@ describe("DW-2.3 accuracy in Settings, and the ways to reach the screen", () => 
     render(<Feed onExit={() => undefined} />);
     await screen.findByTestId("clip-card");
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-    expect((await screen.findByRole("link", { name: "Fix transcript" })).getAttribute("href")).toBe("/transcript?id=s9");
+    expect((await screen.findByRole("link", { name: /Fix transcript/ })).getAttribute("href")).toBe("/transcript?id=s9");
   });
 });

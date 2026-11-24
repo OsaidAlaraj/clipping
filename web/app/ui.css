@@ -1,0 +1,93 @@
+/* ClipMind UI language, round 2 (see docs/ux-research.md section 3).
+   Quiet paper and ink surfaces, one lime signal, content first, groups instead of piles of cards. */
+
+/* ---- page head: one pattern on every screen. Back goes where the person came from. */
+.head { display: flex; align-items: center; gap: var(--s2); min-height: 48px; }
+.head h1 { flex: 1; min-width: 0; font-size: 1.75rem; line-height: 1.1; text-wrap: balance; }
+.head .back { width: 44px; height: 44px; margin-inline-start: -10px; border-radius: 22px; border: 0; background: transparent; display: inline-grid; place-items: center; color: var(--fg); text-decoration: none; }
+.head .back:active { background: var(--surface-2); }
+.head .back svg { width: 22px; height: 22px; }
+[dir="rtl"] .flip { transform: scaleX(-1); }
+.sub { color: var(--muted); font-size: 0.9375rem; margin-top: var(--s1); text-wrap: pretty; }
+
+/* ---- a group: one surface, rows divided by hairlines (replaces a card per row) */
+.group { background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+.group > .item { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 16px; color: var(--fg); text-decoration: none; border: 0; border-top: 1px solid var(--line); background: transparent; width: 100%; text-align: start; font: inherit; position: relative; }
+.group > .item:first-child { border-top: 0; }
+.group > a.item:active, .group > button.item:active { background: var(--surface-2); }
+.item .grow { min-width: 0; }
+.item .title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.item .note { color: var(--muted); font-size: 0.875rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .chev { color: var(--muted); width: 18px; height: 18px; flex: none; }
+.item .lead { width: 40px; height: 40px; border-radius: 12px; display: inline-grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; color: var(--fg); flex: none; }
+.item .tail { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums; }
+.item.urgent .note { color: var(--danger); }
+
+.section { display: grid; gap: var(--s2); }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
+.section-head a { font-size: 0.9rem; font-weight: 600; }
+.stack-lg { display: grid; gap: var(--s4); }
+
+/* ---- hero: the single thing to do now */
+.hero { background: var(--ink); color: var(--on-ink); border-radius: calc(var(--radius) + 6px); padding: 20px; display: grid; gap: var(--s3); position: relative; overflow: hidden; }
+.hero .eyebrow { color: var(--accent); }
+html[data-theme="dark"] .hero { background: var(--surface); color: var(--fg); border: 1px solid var(--line); }
+.hero .big { font-family: var(--font-display); font-size: 2.25rem; line-height: 1.05; font-weight: 700; letter-spacing: -0.03em; text-wrap: balance; }
+.hero .why { opacity: 0.75; margin-top: -8px; }
+.hero .btn.primary { min-height: 52px; font-size: 1.0625rem; }
+.hero.calm .big { font-size: 1.6rem; }
+
+/* ---- numbers */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stats > div { padding: 14px 16px; border-inline-start: 1px solid var(--line); display: grid; gap: 2px; }
+.stats > div:first-child { border-inline-start: 0; }
+.stats .num { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stats .lab { color: var(--muted); font-size: 0.8125rem; }
+.money { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.money.xl { font-size: 2.5rem; line-height: 1; }
+
+/* ---- empty state: says what to do next */
+.empty-state { display: grid; justify-items: center; text-align: center; gap: var(--s2); padding: var(--s5) var(--s3); }
+.empty-state .mark { width: 56px; height: 56px; border-radius: 18px; background: var(--surface-2); display: grid; place-items: center; color: var(--fg); margin-bottom: var(--s1); }
+.empty-state .mark svg { width: 26px; height: 26px; }
+.empty-state p { color: var(--muted); max-width: 32ch; text-wrap: balance; }
+.empty-state .btn { margin-top: var(--s2); }
+
+/* ---- sheet: the same on every screen. Rises from the bottom; a dialog on desktop. Drag the handle down to close. */
+.scrim { animation: fade var(--t-sheet) var(--ease-out); }
+.sheet { animation: rise var(--t-sheet) var(--ease-out); will-change: transform; padding-top: 8px; }
+.sheet.closing { animation: sink 200ms var(--ease-in) forwards; }
+.scrim.closing { animation: fadeout 200ms var(--ease-in) forwards; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 4px auto 6px; touch-action: none; cursor: grab; }
+.sheet .grab-zone { margin: 0 -18px; padding: 6px 18px 2px; touch-action: none; }
+@keyframes rise { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes sink { to { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes fadeout { to { opacity: 0; } }
+@media (min-width: 900px) { .sheet { animation-name: pop; } @keyframes pop { from { opacity: 0; transform: scale(0.97) translateY(8px); } } }
+
+/* ---- kind switch inside the Add sheet and similar two-way choices */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--surface-2); border-radius: 14px; padding: 3px; gap: 3px; }
+.seg button { min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); font-weight: 600; transition: background var(--t-fast) var(--ease-out), color var(--t-fast); }
+.seg button[aria-selected="true"], .seg button[aria-checked="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(14, 14, 16, 0.12); }
+html[data-theme="dark"] .seg button[aria-selected="true"] { background: var(--line); }
+
+/* ---- chips to pick one thing (campaign picker) */
+.pick { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick button { min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pick button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: transparent; }
+
+/* ---- enter motion: first load only, short, transform and opacity only */
+.enter > * { animation: enter 320ms var(--ease-out) both; }
+.enter > *:nth-child(2) { animation-delay: 40ms; } .enter > *:nth-child(3) { animation-delay: 80ms; }
+.enter > *:nth-child(4) { animation-delay: 120ms; } .enter > *:nth-child(n+5) { animation-delay: 160ms; }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+button, a.btn, .item { transition: transform var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out); }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+@media (prefers-reduced-motion: reduce) {
+  .enter > *, .sheet, .scrim, .sheet.closing, .scrim.closing { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+  .btn:active:not(:disabled) { transform: none; }
+}
+.swipe-hint { direction: ltr; } /* swipe meanings are physical: Park stays on the left in Arabic too */
+.chev { display: inline-grid; width: 18px; height: 18px; flex: none; color: var(--muted); }
+.chev svg { width: 100%; height: 100%; }

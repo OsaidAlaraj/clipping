@@ -15,7 +15,7 @@ describe("bottom navigation", () => {
     const links = Array.from(nav.children) as HTMLElement[];
     expect(links.length).toBe(5);                                    // five equal columns
     expect(links[2].className).toContain("create");                  // New is the middle one
-    expect(links.map((l) => l.getAttribute("aria-label"))).toEqual(["Home", "Explore", "New", "Review", "Profile"]);
+    expect(links.map((l) => l.getAttribute("aria-label"))).toEqual(["Home", "Explore", "Add", "Review", "Profile"]);
     expect(links.filter((l) => l.getAttribute("aria-current") === "page").length).toBe(1);
   });
 });
