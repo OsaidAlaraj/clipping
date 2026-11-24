@@ -20,3 +20,12 @@ blind pairwise judge (both orders), scout wins 0.70 of 5 judged pairs (1 identic
 ## Blocked: YouTube ground truth
 The ground-truth set (heatmaps, the channels' own Shorts, view counts) needs YouTube. After the first prep burst YouTube answered every anonymous request with
 "Sign in to confirm you're not a bot". I did not work around it (no cookies, no client switching). A poller retries politely every 4 minutes (`tools/shots_eval/auto_prep.py`).
+
+## Results without YouTube (2026-11-24, real providers, four local videos: 2 English, 2 Arabic, 50 minutes to 2 hours)
+**Scout vs current engine** (route own+topic vs own+topic+scout; top 6 per video, rank against rank, blind judge in both orders, ties count half):
+scout win-rate **0.60 over 15 judged pairs** (3 pairs were the same clip). Cost per video about the same (0.06 to 0.09 USD). The judge is gpt-5-mini, the same family as the engine's own rater, and 15 pairs is a small sample: **not enough to switch the default route**. `scout` stays off the default routes until the YouTube set (heatmap and official Shorts) exists. Files: `judge_base_vs_scout.json`.
+
+**Story Director on the 28 clips the base engine kept** (`story-director.json`): re-hook punch planned on 24, cold open on **1** (the judge preferred it, 1 of 1: no evidence), ending trim on 0. The cold open is deliberately strict (only when the opening is weak and a later 1.2 to 4 s sentence is clearly stronger), so it rarely fires on lectures and calm interviews. The render is proven on synthetic footage: picture and sound stay together through the rewind (`tests/test_20b_story_director.py`). Nothing here shows the techniques raise retention; that needs the market corpus and real posting results.
+
+## Proposed portfolio rule
+`pipeline.portfolio_allowance` (tests in `test_12d_portfolio_allowance.py`): the 40 % share only limits a campaign once the week has 8 clips; before that only the weekly cap applies. Not wired in; the existing rule and its test stay until the owner decides.
