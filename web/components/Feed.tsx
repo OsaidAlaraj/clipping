@@ -28,6 +28,8 @@ export const REASONS: [string, string][] = [
 type Summary = { clips_reviewed: number; accepted: number; rejected: number; parked: number; posts_due: number; minutes_logged: number; hours_today: number; pay_per_clip?: { name: string; rate_per_1k: number | null; max_payout_per_clip: number | null }[] };
 type Sheet = null | "reject" | "hooks" | "edit" | "report" | "filtered";
 type Decision = "accept" | "reject" | "later";
+import { shuffleAhead } from "@/lib/shuffle";
+
 const SKIP_GAP = 5;        // a skipped clip returns after this many other clips
 const MAX_RETURNS = 2;     // it returns at most twice; the next skip moves it to Review Later
 /** The last decision, kept for Undo. `review` settles when the server (or the offline outbox) has recorded it. */
@@ -635,6 +637,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
               </button>
               <span className="chip" aria-label="Position in feed">{index + 1} of {clips.length}</span>
               {filtered.length > 0 && <button className="chip" onClick={() => setSheet("filtered")}>{t("filtered")} {filtered.length}</button>}
+              <button className="chip" onClick={() => setClips((list) => (list ? shuffleAhead(list, index) : list))}>{t("shuffle")}</button>
               <button className="chip" onClick={() => endSession()}>{t("stopHere")}</button>
             </span>
           </div>
