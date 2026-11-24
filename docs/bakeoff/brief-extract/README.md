@@ -10,7 +10,7 @@ Scoring code: `backend/tests/test_30_brief_spec.py` (`MUST`). Run: `python ../do
 | 2 (after fixes: ellipsis quotes, typographic quotes, enum values listed to the model, lower-case enums) | **51/52, invented 0** (`results.md`) | Only miss: Topps content-bank whitelist. The model returned no `sources.whitelist` item in that call (the same brief gave them in run 1 and in a diagnostic call): LLM variance, not a validator drop. |
 | 3 (Topps only, after the whitelist prompt hint + rule for linked source videos) | **13/13, invented 0** (`results-topps.md`) | |
 
-Other facts from the runs: 0 invented values in all 15 brief-runs; the model gave 13 to 44 items per brief and the validator dropped 0 to 70 % of them
+Other facts from the runs: 0 invented values in all 15 brief-runs; the model gave 13 to 44 items per brief and the validator dropped 0 to 77 % of them (most of those were quotes or enum answers that were too loose)
 (dropped = no verbatim quote or number not in its quote; early runs dropped the most); where rules and model disagreed the item became `conflict`
 with both readings (for example the model answered `["tiktok","instagram"]` for a platform line that lists YouTube too: the rule reading won and the model's was kept as the alternative);
 fields the brief does not state were reported `unclear` (CSGOBIG payout model and rate; Reach and Topps language, length, budget).
