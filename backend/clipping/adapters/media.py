@@ -396,7 +396,7 @@ def build_ass(width: int, height: int, duration: float, events: list[dict], labe
     if label:
         lines.append(f"Dialogue: 5,{_ts(0)},{_ts(duration + 1.0)},Label,,0,0,0,,{_esc(label)}")   # runs past the last frame: the full clip
     if hook and t["title_card"]:
-        shown = max(hook_rules.show_seconds(hook) + 0.5, 2.0)   # long enough to read: words / 3 s plus the fades
+        shown = hook_rules.show_seconds(hook) + 0.6   # long enough to read (3 to 5 s) plus the fades
         lines.append(f"Dialogue: 3,{_ts(0)},{_ts(min(shown, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
     if t["progress_bar"]:
         lines.append(f"Dialogue: 4,{_ts(0)},{_ts(duration + 1.0)},Bar,,0,0,0,,{{\\an7\\pos(0,{height - bar})\\fscx0.1"

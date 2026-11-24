@@ -27,10 +27,10 @@ def test_problems_flags_each_rule(text, expected):
 
 
 def test_reading_speed_rule_and_safe_area():
-    assert hook_rules.show_seconds("Stop doing this") == 1.2          # 3 words: floor of 1.2 s
-    assert hook_rules.show_seconds("one two three four five six seven eight nine") == 3.0
-    assert hook_rules.problems("one two three four five six seven eight nine", available_s=2.0)
-    assert not hook_rules.problems("one two three four five six seven eight nine", available_s=3.0)
+    assert hook_rules.show_seconds("Stop doing this") == 3.0          # 3 words: floor of 3 s
+    assert hook_rules.show_seconds("one two three four five six seven eight nine") == 4.5
+    assert hook_rules.problems("one two three four five six seven eight nine", available_s=3.0)
+    assert not hook_rules.problems("one two three four five six seven eight nine", available_s=4.5)
     long_words = "extraordinarily unbelievable incomprehensible misunderstanding responsibilities"
     assert hook_rules.problems(long_words, frame_w=1080, title_size=69)    # would need more than two lines
 
@@ -49,7 +49,7 @@ def test_agent_validate_rewrites_rejects_and_never_repeats():
 def test_title_card_stays_long_enough_to_read():
     ass = media.build_ass(1080, 1920, 30, [], None, False, {}, "one two three four five six seven eight nine")
     line = next(x for x in ass.splitlines() if ",Title," in x)
-    assert line.split(",")[2] == "0:00:03.50"       # 9 words: 3.0 s plus the fades
+    assert line.split(",")[2] == "0:00:05.10"       # 9 words: 4.5 s plus the fades
 
 
 def test_regenerate_gives_new_hooks_each_time(produced):

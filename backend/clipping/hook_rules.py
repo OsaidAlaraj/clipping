@@ -1,7 +1,7 @@
 """The hook rules: what a short-form editor would accept as an on-screen hook, enforced in code (owner notes 1 and 10).
 
 A hook is 3 to 9 words, one idea, spoken style, no dashes, semicolons, colons or quotation marks, at most two lines at the
-title size inside the safe area, and on screen long enough to read (at least words / 3 seconds, never under 1.2 s).
+title size inside the safe area, and on screen long enough to read (words / 2 seconds, 3 s at the least, 5 s at the most).
 `clean` rewrites what can be fixed safely (punctuation only, never the words); `problems` lists what is still wrong;
 `check` does both. A hook that still fails is rejected and the generator is asked again with the problems named."""
 from __future__ import annotations
@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 
 MIN_WORDS, MAX_WORDS = 3, 9
-MIN_SHOW_S, WORDS_PER_S, MAX_SHOW_S = 1.2, 3.0, 4.0
+MIN_SHOW_S, WORDS_PER_S, MAX_SHOW_S = 3.0, 2.0, 5.0   # a viewer reads about 2 words a second on a moving picture; a hook is up for 3 to 5 s
 MAX_LINES = 2
 TITLE_FLOOR = 0.55                      # the renderer never shrinks the title below this share of its base size
 TITLE_MAX_W = 0.8                       # share of the frame width the title may use (the renderer's safe width)
@@ -38,7 +38,7 @@ def clean(text: str) -> str:
 
 
 def show_seconds(text: str) -> float:
-    """How long the hook must stay on screen to be read: words / 3 s, at least 1.2 s, at most 4 s."""
+    """How long the hook must stay on screen to be read: words / 2 s, at least 3 s, at most 5 s."""
     return round(min(max(MIN_SHOW_S, len(words(text)) / WORDS_PER_S), MAX_SHOW_S), 2)
 
 
