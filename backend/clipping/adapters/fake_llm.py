@@ -343,7 +343,54 @@ def commentary(payload: dict) -> dict:
     return {"commentary": text}
 
 
+def brief_spec(payload: dict) -> dict:
+    """Stand-in for the LLM's reading of a brief (the semantic layers). Section-aware and deterministic: a numbered section's
+    title says what its sentences are. It only returns text that is in the brief, with the sentence as the quote."""
+    import re
+
+    text = str(payload.get("brief_text") or "")
+    plain = re.sub(r"\[([^\]]*)\]\(https?://[^)\s]+\)", r"\1", text)
+    items: list[dict] = []
+
+    def add(key: str, value, quote: str, conf: float = 0.8) -> None:
+        items.append({"key": key, "value": value, "quote": quote.strip(), "confidence": conf})
+
+    def sentences(chunk: str) -> list[str]:
+        return [s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z$#\"])", chunk) if s.strip()]
+
+    heads = list(re.finditer(r"(?m)^(\d+)\s+([A-Z][^:\n]{3,60}):", plain))
+    for i, m in enumerate(heads):
+        title = m.group(2).lower()
+        end = heads[i + 1].start() if i + 1 < len(heads) else len(plain)
+        body = plain[m.end():end].strip()
+        first_line = body.split("\n")[0].strip()
+        if "clip the story" in title:
+            for s in sentences(body):
+                if re.search(r"\bnot\b|\bnever\b", s, re.I):
+                    add("hook.constraints", "Do not make the dollar value the headline" if "dollar" in s else s.rstrip("."), s)
+        elif "how to edit" in title:
+            for line in [ln.strip() for ln in body.split("\n") if ln.strip()]:
+                for part in re.split(r"\s*;\s*", line.rstrip(".")):
+                    if part.strip():
+                        add("edit_style.guidance", part.strip(), line)
+                hook = re.search(r"hook in (\d+) seconds?[^;]*", line, re.I)
+                if hook:
+                    add("hook.constraints", hook.group(0).strip(), line)
+        elif "content bank" in title:
+            for line in body.split("\n"):
+                for segment in re.split(r"\s{2,}", line.strip()):   # one pasted line can hold several lists
+                    marker = re.search(r"(?:NEW CONTENT[^:]*|[A-Za-z ]*(?:pulls|moments)[^:(]*(?:\([^)]*\))?):\s*([^\n]+)", segment)
+                    if marker:
+                        for chunk in re.split(r"\s*;\s*", marker.group(1)):
+                            name = chunk.replace("[...]", "").strip().rstrip(".")
+                            if len(name) > 3:
+                                add("sources.whitelist", {"title": name, "url": None}, segment.strip())
+    for m in re.finditer(r"Content must clearly convey[^.\n]*", plain):
+        add("content.allowed_categories", ["social media addiction awareness"], m.group(0).strip(), 0.7)
+    return {"items": items}
+
+
 def complete(task: str, payload: dict) -> dict:
     return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments,
             "moment_score": moment_score, "moment_compare": moment_compare, "caption_lab": caption_lab,
-            "caption_check": caption_check, "commentary": commentary}[task](payload)
+            "caption_check": caption_check, "commentary": commentary, "brief_spec": brief_spec}[task](payload)
