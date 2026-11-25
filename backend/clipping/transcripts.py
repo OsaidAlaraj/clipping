@@ -24,6 +24,7 @@ from psycopg.types.json import Jsonb
 from . import config
 from .adapters.transcription import utterances_from_words
 from .alerts import registry
+from .caption_text import repair_stray_tokens
 from .core import AppError, audit
 
 MAX_SPEAKER_NAME = 60
@@ -176,6 +177,8 @@ def find(conn, source: dict) -> dict | None:
 def create(conn, source: dict, result: dict) -> dict:
     """Store a provider's result as version 1. An empty result is refused: nothing downstream can use it."""
     words = clean_words(result["words"])
+    if source["language"] == "ar":
+        words = repair_stray_tokens(words)
     if not words:
         raise AppError("The transcript is empty. Check that the footage has speech.", "empty_transcript")
     utterances = _clean_utterances(result.get("utterances")) or utterances_from_words(words)

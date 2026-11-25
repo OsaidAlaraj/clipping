@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 
 from .. import faces, ffmpeg, gaming_layout, music, polish
+from ..caption_text import repair_stray_tokens
 from ..core import AppError
 from .base import Adapter, register
 
@@ -273,6 +274,10 @@ def fit_size(text: str, avail_w: float, base: int, max_lines: int = 3, floor: fl
     return int(max(size, base * floor))
 
 
+# libass reads a style's Encoding as the paragraph direction: 0 and 1 mean left to right, -1 means detect it from the first strong
+# letter. With 1 every colour change inside an Arabic line cut it into segments laid out left to right (measured: a three-word
+# line came out as words 2-3-1 when the first was highlighted), so each caption style carries -1.
+AUTO_DIRECTION = -1
 SOCIAL_PLATFORMS = ("tiktok", "instagram_reels")   # R6: social-style captions; the words themselves are never changed
 _LIGHT = str.maketrans("", "", ".,;:،؛")
 _EMPH_WINDOW_S = 0.5
@@ -282,7 +287,7 @@ def caption_chunks(words: list[dict], clip_start: float, clip_end: float, max_wo
     """Group words into short caption lines, timed relative to the clip. Each chunk keeps its words."""
     groups: list[list[dict]] = []
     current: list[dict] = []
-    for word in words:
+    for word in repair_stray_tokens(words):     # older transcripts still hold lone punctuation and cut-off articles
         if word["end"] <= clip_start or word["start"] >= clip_end:
             continue
         if current and (len(current) >= max_words or word["end"] - current[0]["start"] > max_s
@@ -377,11 +382,11 @@ def build_ass(width: int, height: int, duration: float, events: list[dict], labe
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, "
         "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
         f"Style: Caption,{font},{cap},{primary},{primary},&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,{max(cap // 12, 2)},0,"
-        f"{2 if lower else 5},{width // 12},{width // 12},{int(height * 0.16) if lower else 0},1",
+        f"{2 if lower else 5},{width // 12},{width // 12},{int(height * 0.16) if lower else 0},{AUTO_DIRECTION}",
         f"Style: Label,{font},{label_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,{_box(label_size)},0,"
-        f"{9 if rtl else 7},{width // 24},{width // 24},{int(height * 0.035)},1",
+        f"{9 if rtl else 7},{width // 24},{width // 24},{int(height * 0.035)},{AUTO_DIRECTION}",
         f"Style: Title,{font},{title_size},{_ass_colour(_contrast(t['accent']))},&H00FFFFFF,{accent},{accent},1,0,0,0,100,100,0,0,3,"
-        f"{_box(title_size)},0,8,{width // 10},{width // 10},{int(height * 0.1)},1",
+        f"{_box(title_size)},0,8,{width // 10},{width // 10},{int(height * 0.1)},{AUTO_DIRECTION}",
         f"Style: Bar,{font},20,{accent},{accent},{accent},{accent},0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1",
         "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
     ]
@@ -422,7 +427,7 @@ def build_cover_ass(width: int, height: int, hook: str | None, template: dict) -
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, "
         "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
         f"Style: Cover,{t['font']},{size},{colour},{colour},{fill},{fill},1,0,0,0,100,100,0,0,{3 if band else 1},"
-        f"{max(size // 5, 2) if band else max(size // 10, 3)},0,2,{width // 12},{width // 12},{int(height * 0.18)},1",
+        f"{max(size // 5, 2) if band else max(size // 10, 3)},0,2,{width // 12},{width // 12},{int(height * 0.18)},{AUTO_DIRECTION}",
         "", "[Events]", "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
     ]
     if text:
