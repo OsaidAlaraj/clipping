@@ -13,7 +13,8 @@ Section A is the audit of the app **before** the redesign (branch tip 06cd35d). 
 | `/explore` | Explore | marketplace listings, filter sheet, table on desktop |
 | `/listing?id` | ListingPage | one listing, "Add to my campaigns" |
 | `/new` | NewPlace | 3 tabs: Add campaign / Add video / Practice |
-| `/review`, `/feed` | Feed | the swipe review feed (the quality bar); `/feed` is an alias |
+| `/review`, `/feed` | Feed | the swipe review feed (the quality bar); `/feed` is an alias |
+| (sheet in Feed) | Hooks sheet (`HooksSheet` + `HookEditor.tsx`) | the one place to change a clip's hook: own text, show-from, show-for, position, with a live overlay on the playing video; one render on Apply (stored in `clips.render_meta`: hook_text, hook_from_s, hook_for_s, hook_position; overrides the global `hook_show_s`). Tap on the video pauses; Mute is the header chip |
 | `/profile` | Profile | numbers, 6 list links, accounts, add account |
 | `/library` | Library | accepted clips scroll |
 | `/queue` | Queue | posting queue + checklist |

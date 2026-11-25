@@ -67,3 +67,53 @@ def test_regenerate_gives_new_hooks_each_time(produced):
     texts = [h["text"].lower() for h in second]
     assert len(texts) == len(set(texts)) and len(set(texts)) > len(before)
     assert not hook_rules.problems(second[-1]["text"]) and len(first) < len(second)
+
+
+# ------------------------------------------------------------------ the owner's own hook for one clip
+
+def test_hook_position_and_start_time_reach_the_subtitle_script():
+    ass = media.build_ass(1080, 1920, 30, [], None, False, {}, "one two three", None, 4.0, 2.5, "middle")
+    line = next(x for x in ass.splitlines() if ",Title," in x)
+    assert line.split(",")[1] == "0:00:02.50" and line.split(",")[2] == "0:00:07.10"      # starts at 2.5 s, stays 4 s plus fades
+    style = next(x for x in ass.splitlines() if x.startswith("Style: Title"))
+    assert style.split(",")[18] == "5"                                                     # alignment 5 = middle
+    top = next(x for x in media.build_ass(1080, 1920, 30, [], None, False, {}, "one two three").splitlines() if x.startswith("Style: Title"))
+    assert top.split(",")[18] == "8"                                                       # unchanged default: top
+
+
+def test_hook_start_never_runs_past_the_clip():
+    ass = media.build_ass(1080, 1920, 10, [], None, False, {}, "one two three", None, 5.0, 9.9, None)
+    line = next(x for x in ass.splitlines() if ",Title," in x)
+    assert line.split(",")[1] == "0:00:09.50" and line.split(",")[2] == "0:00:10.00"
+
+
+def test_owner_hook_is_a_new_version_with_its_own_time_and_overrides_the_global_setting(produced):
+    with produced.db.session(produced.owner) as conn:
+        target = review.feed(conn, produced.owner.operator_id)[0]
+        v2 = review.edit(conn, produced.owner, target["id"], hook={"text": "Nobody told me this about rent", "from_s": 1, "for_s": 6, "position": "bottom"})
+        meta = v2["render_meta"]
+        assert v2["status"] == "rendering" and v2["version_no"] == 2
+        assert meta["hook_text"] == "Nobody told me this about rent" and meta["hook_custom"] is True and "hook_id" not in meta
+        assert (meta["hook_from_s"], meta["hook_for_s"], meta["hook_position"]) == (1.0, 6.0, "bottom")
+        _, source, _, _ = pipeline._clip_ctx(conn, v2["id"])
+        request = pipeline._render_request(conn, v2, source, None, meta["hook_text"])
+        assert (request["hook_show_s"], request["hook_from_s"], request["hook_position"]) == (6.0, 1.0, "bottom")
+        plain = pipeline._render_request(conn, dict(v2, render_meta={}), source, None, None)
+        assert plain["hook_from_s"] is None and plain["hook_position"] is None      # a clip with no choices keeps the automatic time
+    pipeline.run_until_idle(produced.db)
+    with produced.db.session(produced.owner) as conn:
+        done = review.get_clip(conn, v2["id"])
+        assert done["status"] == "ready_for_review" and done["hook_text"] == "Nobody told me this about rent"
+        assert done["render_meta"]["hook_for_s"] == 6.0 and done["render_meta"]["overlay_burned"]    # rendered once, choices kept
+
+
+@pytest.mark.parametrize("hook, code", [({"text": "   "}, "bad_hook"), ({"text": "x" * 200}, "bad_hook"), ({"for_s": 99}, "bad_hook_timing"),
+                                         ({"from_s": -1}, "bad_hook_timing"), ({"from_s": "soon"}, "bad_hook_timing"), ({"position": "left"}, "bad_hook_position")])
+def test_owner_hook_refuses_bad_input_in_plain_words(produced, hook, code):
+    from clipping.core import AppError
+
+    with produced.db.session(produced.owner) as conn:
+        target = review.feed(conn, produced.owner.operator_id)[0]
+        with pytest.raises(AppError) as err:
+            review.edit(conn, produced.owner, target["id"], hook=hook)
+        assert err.value.code == code and err.value.args[0].endswith(".")

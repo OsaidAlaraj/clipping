@@ -10,7 +10,7 @@ from statistics import NormalDist
 
 from psycopg.types.json import Jsonb
 
-from . import quality_gate, ranking
+from . import hook_rules, quality_gate, ranking
 from .alerts import registry
 from .core import AppError, GateError, audit, enqueue, get_setting, kill_switch_on
 
@@ -389,19 +389,65 @@ def undo(conn, actor, review_id, client_action_id=None) -> dict:
 
 # ------------------------------------------------------------------ edits (FR-34): every edit is a new clip version
 
-def edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None) -> dict:
+HOOK_POSITIONS = ("top", "middle", "bottom")
+HOOK_MAX_CHARS = 140
+HOOK_FOR_RANGE = (0.5, 10.0)
+
+
+def _number(value, label: str, low: float, high: float) -> float | None:
+    if value is None or value == "":
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        raise AppError(f"{label} must be a number.", "bad_hook_timing") from None
+    if not low <= number <= high:
+        raise AppError(f"{label} must be between {low:g} and {high:g} seconds.", "bad_hook_timing")
+    return round(number, 2)
+
+
+def apply_hook_settings(meta: dict, hook: dict, duration_s: float) -> bool:
+    """The owner's own hook for this clip, kept in render_meta: the text (hook_text, no hook_id), when it appears (hook_from_s),
+    how long it stays (hook_for_s) and where (hook_position). Timing and position override the global hook_show_s; a missing
+    value clears that override. Returns True when the text changed (the caption is then rebuilt around it)."""
+    changed = False
+    text = hook.get("text")
+    if text is not None:
+        cleaned = hook_rules.clean(str(text))
+        if not cleaned:
+            raise AppError("Write the hook, or pick one from the list.", "bad_hook")
+        if len(cleaned) > HOOK_MAX_CHARS:
+            raise AppError(f"The hook is too long. Keep it under {HOOK_MAX_CHARS} characters.", "bad_hook")
+        if cleaned != (meta.get("hook_text") or ""):
+            meta.update(hook_text=cleaned, hook_custom=True)
+            meta.pop("hook_id", None)
+            changed = True
+    start = _number(hook.get("from_s"), "The hook start", 0, max(duration_s - 0.5, 0))
+    show = _number(hook.get("for_s"), "The hook time", *HOOK_FOR_RANGE)
+    position = hook.get("position") or None
+    if position is not None and position not in HOOK_POSITIONS:
+        raise AppError("The hook position must be top, middle or bottom.", "bad_hook_position")
+    for key, value in (("hook_from_s", start), ("hook_for_s", show), ("hook_position", position)):
+        if value is None:
+            meta.pop(key, None)
+        else:
+            meta[key] = value
+    return changed
+
+
+def edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None, hook: dict | None = None) -> dict:
     """A refused edit (for example one that drops the disclosure) is rolled back: the original clip stays as it was."""
     with conn.transaction():
-        return _edit(conn, actor, clip_id, trim, hook_id, caption)
+        return _edit(conn, actor, clip_id, trim, hook_id, caption, hook)
 
 
-def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None) -> dict:
+def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None, hook: dict | None = None) -> dict:
     clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
     if clip is None:
         raise AppError("Clip not found.", "not_found")
     if clip["status"] not in ("ready_for_review", "review_later"):
         raise AppError(f"A clip that is {clip['status']} cannot be edited.", "bad_status")
-    if not (trim or hook_id or caption is not None):
+    if not (trim or hook_id or hook or caption is not None):
         raise AppError("Nothing to change.", "no_change")
     meta = dict(clip["render_meta"] or {})
     start, end = float(clip["start_s"]), float(clip["end_s"])
@@ -411,15 +457,17 @@ def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption:
         if end - start < 1:
             raise AppError("The trimmed clip is too short.", "bad_trim")
     if hook_id:
-        hook = conn.execute("select * from hooks where id = %s and candidate_id = %s", (hook_id, clip["candidate_id"])).fetchone()
-        if hook is None:
+        hook_row = conn.execute("select * from hooks where id = %s and candidate_id = %s", (hook_id, clip["candidate_id"])).fetchone()
+        if hook_row is None:
             raise AppError("That hook does not belong to this clip.", "bad_hook")
-        meta.update(hook_id=str(hook["id"]), hook_text=hook["text"])
-        hook_score = hook["score"]
-    needs_render = bool(trim or hook_id)
+        meta.update(hook_id=str(hook_row["id"]), hook_text=hook_row["text"])
+        hook_score = hook_row["score"]
+        meta.pop("hook_custom", None)
+    text_changed = apply_hook_settings(meta, hook, end - start) if hook else False
+    needs_render = bool(trim or hook_id or hook)
     if caption is not None:
         meta["caption_edited"] = True
-    elif hook_id:
+    elif hook_id or text_changed:
         meta.pop("caption_edited", None)   # the caption is rebuilt around the new hook
     new = conn.execute(
         """insert into clips (candidate_id, campaign_id, campaign_version_id, owner_operator_id, parent_clip_id, version_no,
@@ -437,7 +485,7 @@ def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption:
     ).fetchone()
     conn.execute("update clips set status = 'archived' where id = %s", (clip["id"],))
     audit(conn, "clip.edited", "clips", new["id"],
-          {"from_version": clip["version_no"], "trim": bool(trim), "hook": bool(hook_id), "caption": caption is not None},
+          {"from_version": clip["version_no"], "trim": bool(trim), "hook": bool(hook_id or hook), "caption": caption is not None},
           rule_version_id=clip["campaign_version_id"])
     if needs_render:
         source_id = conn.execute("select source_id from candidates where id = %s", (clip["candidate_id"],)).fetchone()["source_id"]
