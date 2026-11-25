@@ -1,0 +1,1434 @@
+[
+ {
+  "id": "acb444_3799",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "And I'm grateful that you're in my life, and I'll always be here for you. And I love Layla too, and you're really important in the world. I just want you to know. I meant what I said in the beginning. There's a lot of people that are really good at this business stuff. You're you're on a level that ",
+  "hooks": {
+   "old": {
+    "hook": "Bro actually told Layla that",
+    "all": [
+     "Bro actually told Layla that",
+     "Wait for the ask to share",
+     "Why he says I meant that"
+    ]
+   },
+   "quote": {
+    "hook": "I love Layla too"
+   },
+   "spec": {
+    "hook": "Your capacity is even greater than this",
+    "all": [
+     "I meant what I said in the beginning",
+     "Your capacity is even greater than this",
+     "Layla you are important in the world",
+     "You know where to find Alex",
+     "Will you expand into your capacity",
+     "Share this episode"
+    ],
+    "brief": {
+     "punchline": "I'm grateful that you're in my life, I meant what I said in the beginning, and your capacity is even greater than this.",
+     "anchors": [
+      "Layla",
+      "Alex",
+      "I meant what I said in the beginning.",
+      "your capacity is even greater than this.",
+      "Share this episode."
+     ],
+     "best_line": "And I'm grateful that you're in my life, and I'll always be here for you.",
+     "tension": "Are they truly valued and will they keep expanding into their greater capacity?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Your mentor actually means it",
+    "all": [
+     "pov | POV: your mentor actually means it",
+     "pov | POV: your hype man just went serious",
+     "nobody | Nobody: Him promising to always be there",
+     "nobody | Nobody: Everyone quiet he says I'll always be here",
+     "hidden_consequence | And that praise just became pressure",
+     "hidden_consequence | And now you have to be perfect",
+     "open_question | What now after great job?",
+     "open_question | Is great job the finish line?",
+     "reaction | Bro literally ended with share this episode",
+     "reaction | He just signed off with share this episode"
+    ],
+    "mood": "uplifting"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 2,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "34137a_2117",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "I wanna die. I wanna be, like, blonde. Bro, you're Oh, wash it. Wash it. Wash it. No. How long does that get to the sides? No. They got everything. They got everything, bro. I ain't gonna lie. They got everything, bro. Oh. By 08:50. What? I'm putting my heels on my my Oh, yellow. Yeah. It's a yellow",
+  "hooks": {
+   "old": {
+    "hook": "Why he said I wanna be blonde",
+    "all": [
+     "Why he said I wanna be blonde",
+     "08 50 is when he panicked",
+     "Bet you replay when he says yellow"
+    ]
+   }
+  },
+  "points": {},
+  "error": "ContentFiltered('The AI safety filter flagged this moment (self_harm).')"
+ },
+ {
+  "id": "a24ed8_1641",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "لان هو عمل طلعت ميتابوليت وال ميتابوليت هي اللي عملت الباز داليشن مش السمباساتيك عشان كده قلت عليه ايه ان دايليشن ايه الحاجة اللي عملت حاجة عملت حاجة يبقى السمباساتيك عملت متابوليك اكتيفيتي لان تنشط الهارد والميتابوليك اكتيفيتي هي اللي عملت الباز دايليشن سيحسمباساتيك لوحده كان عامل فاز كونستركشن لكن",
+  "hooks": {
+   "old": {
+    "hook": "ليش الميتابوليت غلب السمباساتيك",
+    "all": [
+     "ليش الميتابوليت غلب السمباساتيك",
+     "السمباساتيك مش اللي عمل دايليشن",
+     "يا زلمة عنجد الميتابوليت عمل دايليشن"
+    ]
+   },
+   "quote": {
+    "hook": "مش السمباساتيك عشان كده قلت"
+   },
+   "spec": {
+    "hook": "الميتابوليك اكتيفيتي عملت الباز دايليشن مش السمباساتيك",
+    "all": [
+     "الميتابوليك اكتيفيتي هي اللي عملت الباز دايليشن",
+     "السمباساتيك ما عملش الباز دايليشن",
+     "الباز دايليشن حصل بسبب الميتابوليك اكتيفيتي",
+     "مين السبب الحقيقي للباز دايليشن",
+     "النور الادرينالين يشغّل الكونستركشن لوحده",
+     "لوحده كان عامل فاز كونستركشن"
+    ],
+    "brief": {
+     "punchline": "الميتابوليك اكتيفيتي هي اللي عملت الباز دايليشن مش السمباساتيك.",
+     "anchors": [
+      "الميتابوليك اكتيفيتي",
+      "الباز دايليشن",
+      "السمباساتيك",
+      "فاز كونستركشن",
+      "النور الادرينالين"
+     ],
+     "best_line": "الميتابوليك اكتيفيتي هي اللي عملت الباز دايليشن",
+     "tension": "هل الباز داليشن سببه السمباساتيك ولا الميتابوليك اكتيفيتي؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "الميتابوليت بتغلب السمباساتيك",
+    "all": [
+     "pov | POV: الميتابوليت عملت فاز دايليشن",
+     "pov | POV: الميتابوليت بتغلب السمباساتيك",
+     "nobody | Nobody: ما حدا فاهم الباز داليشن",
+     "nobody | Nobody: الباز داليشن عملها الميتابوليك",
+     "hidden_consequence | يعني الفاز كونستركشن خسر المعركة",
+     "hidden_consequence | وبعدين الجسم يضيع تحكم الأوعية",
+     "contrarian | الميتابوليك اكتيفيتي عملت الباز داليشن",
+     "contrarian | السمباساتيك عملت متابوليك اكتيفيتي",
+     "open_question | شو بصير بالادرينالين لو فشلت الدورة الدموية",
+     "open_question | مين بيتحكم بالادرينالين وقت فشل الدورة الدموية"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "b8931e_60",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "إن شاء الله أنها تفيده على الأقل لأنه يحس أن عنده مشكلة الذاكرة الحين يقول يمكن بي 12 ولا ما أدري أيش عندي ناقص؟ يمكن عندي بداية الزهايمر، صدق مبالغة يعني حتى في وحدة من الحلقات صحيح، لا إن شاء الله كنت أسأل واحد من الضيوف أن هل في أعراض تطلع مرة بدري؟ يعني يعني اهلين في الشرقيه فيوم امي ترسلني مثلا",
+  "hooks": {
+   "old": {
+    "hook": "ليش عم يذكر رقم 12 فجأة",
+    "all": [
+     "ليش عم يذكر رقم 12 فجأة",
+     "استنى لآخر القصة عن 12",
+     "اسمعني شوي يمكن بداية الزهايمر"
+    ]
+   },
+   "quote": {
+    "hook": "يمكن عندي بداية الزهايمر"
+   },
+   "spec": {
+    "hook": "يمكن عندي بداية الزهايمر",
+    "all": [
+     "يمكن عندي بداية الزهايمر",
+     "ما اقدر الا اني اكتبها",
+     "عنده مشكلة الذاكرة",
+     "فيوم امي ترسلني",
+     "أدري أني أول الناس أواجه مشكلة",
+     "هل بداية الزهايمر"
+    ],
+    "brief": {
+     "punchline": "بيقول يمكن عندي بداية الزهايمر لأنه الذاكرة صارت ضعيفة وباضطر أكتب كل شيء عشان ما أنساه.",
+     "anchors": [
+      "الذاكرة",
+      "بداية الزهايمر",
+      "واحد من الضيوف",
+      "الشرقيه",
+      "أمي ترسلني",
+      "ما اقدر الا اني اكتبها"
+     ],
+     "best_line": "يمكن عندي بداية الزهايمر، صدق مبالغة يعني",
+     "tension": "هل النسيان اللي حسّ فيه فعلاً بداية زهايمر ولا بس قلق ومبالغة، وإيش الحل لو فعلاً بدأ يتفاقم؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "صرت معتمد على غيري",
+    "all": [
+     "open_question | شو لو هالنسيان مو زهايمر",
+     "open_question | كيف تعرف إذا نسيانك بسيط",
+     "hidden_consequence | ما اقدر الا اني اكتبها صرت معتمد على غيري",
+     "hidden_consequence | ما اقدر الا اني اكتبها وفقدت استقلالي",
+     "contrarian | أول واحد يحس ما ينفع لوحده",
+     "contrarian | أول واحد يحس ما حد يسمع له",
+     "hidden_consequence | وهيك يصير كل نسيان كارثة",
+     "hidden_consequence | أمي ترسلني وكل نسيان كارثة",
+     "open_question | نسأل دكتور لو الأعراض تطلع بدري؟",
+     "open_question | نستنى ولا نروح للطبيب الحين؟"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 2,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "acb444_2272",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "And they're like, the old when's enough is enough and all that other stuff. And I'm like, I really don't feel like I'm working. But having said that, my capacity has expanded over the years to the extent where I feel like I have to take on more almost in order to remain challenged, but also to live ",
+  "hooks": {
+   "old": {
+    "hook": "Wait for him to say theoretically",
+    "all": [
+     "Wait for him to say theoretically",
+     "Why he says he doesn't feel like working",
+     "Bro really said theoretically"
+    ]
+   },
+   "quote": {
+    "hook": "I really don't feel like I'm working"
+   },
+   "spec": {
+    "hook": "I don't feel like I'm working",
+    "all": [
+     "the old when's enough is enough",
+     "I really don't feel like I'm working",
+     "My capacity has expanded",
+     "I have to take on more",
+     "How do I remain challenged",
+     "To honor the skills I've developed"
+    ],
+    "brief": {
+     "punchline": "Even when people say the old 'when's enough is enough', I don't feel like I'm working — my capacity has expanded so I almost have to take on more to remain challenged and honor the skills I've developed.",
+     "anchors": [
+      "the old when's enough is enough",
+      "I really don't feel like I'm working",
+      "my capacity has expanded",
+      "have to take on more",
+      "remain challenged",
+      "honor the perspective, nuances, wisdom, skills I've developed"
+     ],
+     "best_line": "But having said that, my capacity has expanded over the years to the extent where I feel like I have to take on more almost in order to remain challenged, but also to live up to the blessings and and honor the perspective, nuances, wisdom, skills I've developed theoretically. Right?",
+     "tension": "When's 'enough is enough' versus having to 'take on more' to 'remain challenged' and 'honor the perspective, nuances, wisdom, skills I've developed'?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "You leveled up and lost your evenings",
+    "all": [
+     "pov | POV: you don’t even feel like working",
+     "pov | POV: you expand just to stay challenged",
+     "nobody | Nobody: He says he never feels like working",
+     "nobody | Nobody: So he just keeps taking more",
+     "hidden_consequence | Nice growth zero chill left",
+     "hidden_consequence | You leveled up and lost your evenings",
+     "contrarian | Getting better means betting bigger",
+     "contrarian | Getting good means taking bigger swings",
+     "open_question | When does growth become busywork?",
+     "open_question | Are you chasing challenge or chores?"
+    ],
+    "mood": "reflective"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 1,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "31d86f_506",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "And most people don't know that. They just think, woolly mammoth. I heard Ray Romano. I've seen ice age. It's gotta be, like, frozen or, like, the thing can't live. Right? But that's actually just not the case. So we kinda use this as a great opportunity to to do ecological field studies. We You hav",
+  "hooks": {
+   "old": {
+    "hook": "Bet you think mammoths are all dead",
+    "all": [
+     "Bet you think mammoths are all dead",
+     "Woolly mammoths aren't actually frozen",
+     "He literally said Ray Romano"
+    ]
+   },
+   "quote": {
+    "hook": "You have 95 scientific advisers"
+   },
+   "spec": {
+    "hook": "Woolly mammoths aren't just frozen",
+    "all": [
+     "They just think woolly mammoth",
+     "I heard Ray Romano",
+     "95 scientific advisers",
+     "Field studies with 17 academic partners",
+     "Is it actually frozen and dead",
+     "Not just an Ice Age relic"
+    ],
+    "brief": {
+     "punchline": "People assume a woolly mammoth is just frozen and can't live, but that's not the case — we're actually using it as a chance to do ecological field studies.",
+     "anchors": [
+      "woolly mammoth",
+      "Ray Romano",
+      "ice age",
+      "frozen or, like, the thing can't live",
+      "95 scientific advisers",
+      "17 academic partners around the world"
+     ],
+     "best_line": "We kinda use this as a great opportunity to to do ecological field studies.",
+     "tension": "Is the woolly mammoth just a frozen, dead icon from Ice Age movies, or can it actually be involved in real ecological field studies?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Mammoths aren't frozen relics they're ecological tools",
+    "all": [
+     "pov | POV: you thought Ice Age explained everything",
+     "pov | POV: you think Ray Romano taught you mammoths",
+     "nobody | Nobody: Thinks mammoths are frozen we kinda do fieldwork",
+     "nobody | Nobody: They say Ice Age we say field ecology",
+     "hidden_consequence | And that is how 95 advisers made it serious",
+     "hidden_consequence | And that is how 17 partners turned it global",
+     "open_question | Is a pretty dodo enough?",
+     "open_question | Are we selling future generations fake dodos?",
+     "reaction | Bro they build rewilding models not thawing mammoths",
+     "reaction | Bro really turned mammoths into rewilding science"
+    ],
+    "mood": "informative"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 1,
+   "spec:j2": 1,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "02c0d2_359",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "شره انه ما كثير فرقت بس عن جد انا باي حدا كثير صارم وبعدني لهلا انا باي بعده بيخوفني عمري 35 اذا بي بيبعت فويس نوت بجلس قبل ما اسمعها انا مني معه بجلس لا شعوريا يعني والله انا وصيت كثير خافق بالبيت نحن كان ممنوع نسب ابدا ابدا ابدا بيي كان كثير صارم بهذه الرؤيه وممنوع عندهم سبات وبتذكر اول مره سبيت ا",
+  "hooks": {
+   "old": {
+    "hook": "ليش فويس نوت بخوفها حتى بعمر 35",
+    "all": [
+     "ليش فويس نوت بخوفها حتى بعمر 35",
+     "عمري 35 ولسا بخاف من فويسه",
+     "استنى لآخر القصة أول مرة سبيت"
+    ]
+   },
+   "quote": {
+    "hook": "ممنوع نسب ابدا ابدا ابدا"
+   },
+   "spec": {
+    "hook": "عمري 35 وبخاف فويس بابا",
+    "all": [
+     "اذا بي بيبعت فويس نوت بجلس قبل ما اسمعها",
+     "عمري 35 وبعده بيخوفني",
+     "بيي كان كثير صارم",
+     "أول مرّة سبيت بالبيت",
+     "ليش بعده بيخوفني فويس نوت",
+     "ممنوع نسب ابدا ابدا ابدا"
+    ],
+    "brief": {
+     "punchline": "عمري 35 اذا بي بيبعت فويس نوت بجلس قبل ما اسمعها",
+     "anchors": [
+      "عمري 35",
+      "بيبعت فويس نوت",
+      "بيي كان كثير صارم",
+      "ممنوع نسب ابدا ابدا ابدا",
+      "اول مره سبيت انا بالبيت"
+     ],
+     "best_line": "اذا بي بيبعت فويس نوت بجلس قبل ما اسمعها",
+     "tension": "بعده بيخوفني اذا بيبعت فويس نوت",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "كل فويس من بابا بتخوفني",
+    "all": [
+     "hidden_consequence | كل فويس من بابا بتخوفني",
+     "hidden_consequence | عمري 35 وبجلس قبل ما اسمع فويس بابا",
+     "hidden_consequence | كان عمري 22 وضربني بالأوضة وخسرت دفتر سواق",
+     "hidden_consequence | ضربني بالأوضة وبالآخر ضاعت دفتر سواق",
+     "contrarian | صرامة ابوي عملتنا خافين مش آمنين",
+     "contrarian | ممنوع نسب جاب سرية وخوف",
+     "open_question | ليش بعده بيخوفك؟",
+     "open_question | كيف بعده لسه يخوفك؟",
+     "contrarian | كنا ثلاث صبيان والأب صارم وما نفع",
+     "contrarian | كنا ثلاث صبيان والتربية الصارمة فشلت"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 2,
+   "spec:j2": 1,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "02c0d2_2254",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "حسه عند الجو ما شفتها جاية ولا شوي أنا ملأح فجأة الصبح قبل الضوء وانا انه جو حبيبي تقبرني انت عمّول ما جسمك وحرّف لي شو ما بدك عمّول بس انا ولا مرة حاضر ولا شايف شب حاطط فايبريتر على بيضاته تهيش وقل على نهاره شو عم طعموا قبل الضوء؟ جهاز واحد ما عاد فيه مع قمت فتحت عليه باب الحمام طلعت",
+  "hooks": {
+   "old": {
+    "hook": "استنى لآخر ثانية البيضة تهيش",
+    "all": [
+     "استنى لآخر ثانية البيضة تهيش",
+     "جهاز واحد خرب الصبح قبل الضوء",
+     "يا زلمة البيضة عم تهيش"
+    ]
+   },
+   "quote": {
+    "hook": "شب حاطط فايبريتر على بيضاته"
+   },
+   "spec": {
+    "hook": "فتحت الحمام لقيته شب حاطط فايبريتر على بيضاته",
+    "all": [
+     "ولا شايف شب حاطط فايبريتر على بيضاته",
+     "شو صار لما فتحت باب الحمام",
+     "واحد حاطط فايبريتر على بيضاته",
+     "طلعت لقيته حاطط الفايبريتر",
+     "فجأة الصبح قبل الضوء",
+     "واحد لقيته بالحمام"
+    ],
+    "brief": {
+     "punchline": "فجأة الصبح قبل الضوء فتحت عليه باب الحمام وطلعت لقيت شب حاطط فايبريتر على بيضاته.",
+     "anchors": [
+      "فجأة الصبح قبل الضوء",
+      "فايبريتر",
+      "بيضاته",
+      "فتحت عليه باب الحمام",
+      "طلعت"
+     ],
+     "best_line": "ولا شايف شب حاطط فايبريتر على بيضاته",
+     "tension": "إيش صار لما فتحت عليه باب الحمام قبل الضوء؟",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "مين متوقع تلاقي هيك بالحمّام؟",
+    "all": [
+     "pov | POV: فجأة الصبح قبل الضوء فتحت عليه باب الحمام",
+     "pov | POV: فتحت عليه باب الحمام وما شفتها جاية",
+     "nobody | Nobody: حبيبي تقبرني فجأة قبل الضوء",
+     "nobody | Nobody: ما بتحب تصحى على حبيبي تقبرني",
+     "hidden_consequence | حاطط فايبريتر على بيضاته صارت نِكتة",
+     "hidden_consequence | وهالشي حاطط فايبريتر على بيضاته رح يلاحقه",
+     "contrarian | قبل الضوء ما شفتها جاية",
+     "contrarian | قبل الضوء فجأة فتحت باب الحمام",
+     "open_question | شو طلع لما فتحت عليه؟",
+     "open_question | مين متوقع تلاقي هيك بالحمّام؟"
+    ],
+    "mood": "فكاهي"
+   }
+  },
+  "points": {
+   "quote:j1": 2,
+   "quote:j2": 2,
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "0dee5f_4403",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "Yeah. But someone might have selected. Yeah. I just don't think we know actually what's gonna... I did... So maybe too personal, but it's true I wanna know. With with our kids. We did we we did... Because you can do the the testing, the morphologic. We actually had a miscarriage. Uh-huh. My wife jus",
+  "hooks": {
+   "old": {
+    "hook": "Wait for the moment he says Ambrose",
+    "all": [
+     "Wait for the moment he says Ambrose",
+     "Wait they picked Ambrose",
+     "Why his wife didn't want testing"
+    ]
+   },
+   "quote": {
+    "hook": "We actually had a miscarriage"
+   },
+   "spec": {
+    "hook": "We chose Ambrose through IVF",
+    "all": [
+     "We actually had a miscarriage",
+     "My wife just didn't wanna go through it",
+     "Went through the process of selecting Ambrose",
+     "They selected Ambrose through IVF",
+     "Selected Ambrose after miscarriage",
+     "Did they do morphologic testing"
+    ],
+    "brief": {
+     "punchline": "We went through IVF and went through the process of selecting Ambrose.",
+     "anchors": [
+      "We actually had a miscarriage",
+      "My wife just didn't wanna go through it",
+      "testing, the morphologic",
+      "IVF",
+      "selecting Ambrose"
+     ],
+     "best_line": "so we went through IVF, went through the process of selecting Ambrose.",
+     "tension": "Whether to go through testing and another pregnancy after a miscarriage — they decide instead to pursue IVF and selection.",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "They picked embryos to avoid that pain",
+    "all": [
+     "open_question | Would you screen embryos for a titan mutation?",
+     "open_question | Who decides about our titan gene?",
+     "hidden_consequence | One miscarriage rewired their whole plan",
+     "hidden_consequence | They picked embryos to avoid that pain",
+     "contrarian | Designer baby more like disease prevention",
+     "contrarian | Orchid testing felt like safety not vanity",
+     "open_question | You actually invested in the embryo lab?",
+     "open_question | Would you fund the lab that screened your embryos?",
+     "hidden_consequence | And that is how clinics leave you guessing",
+     "hidden_consequence | And that is how testing missed the answers"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 2,
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "34137a_1116",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "You don't move. I know. What you Ray? Racai. What? No. Don't move. Yeah. You... Yeah? Oh, okay. I know. Okay. Yeah. My my boy. Wait. Kai, can you bite? Can have perm or no? Can you have perm? I don't know. Oh, hold on.",
+  "hooks": {
+   "old": {
+    "hook": "Wait for him to say Racai",
+    "all": [
+     "Wait for him to say Racai",
+     "Bro asked Kai to bite",
+     "Try not to laugh at Racai"
+    ]
+   },
+   "quote": {
+    "hook": "Kai, can you bite?"
+   },
+   "spec": {
+    "hook": "You don't move, can you have perm",
+    "all": [
+     "You don't move",
+     "Can you have perm",
+     "Kai interrupts with a question",
+     "Ends with my my boy",
+     "Who is Racai"
+    ],
+    "brief": {
+     "punchline": "Someone keeps saying \"Don't move\" while suddenly asking, \"Can you have perm?\"",
+     "anchors": [
+      "You don't move.",
+      "What you Ray? Racai.",
+      "Don't move.",
+      "My my boy.",
+      "Kai, can you bite?",
+      "Can you have perm?"
+     ],
+     "best_line": "You don't move.",
+     "tension": "Can you have perm?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "And that is how you lost the perm",
+    "all": [
+     "pov | POV: frozen while they stutter",
+     "pov | POV: holding still as they hesitate",
+     "nobody | Nobody: He freezes then asks about a perm",
+     "nobody | Nobody: Frozen statue then desperately asks can I perm",
+     "hidden_consequence | And that is how you lost the perm",
+     "hidden_consequence | And that is how permission quietly vanished",
+     "contrarian | He froze but stayed in charge",
+     "contrarian | Pausing to call the shots",
+     "reaction | Bro really said my my boy",
+     "reaction | He kept yelling Kai for help"
+    ],
+    "mood": "awkward"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a777be_3334",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "Yeah. Yeah. Yeah. You know? Like, when I was a girl Let's see around, like, the 2004, 2006. Oh, yeah. I think... What? Look that up, and we don't have to say the word, but look it up early blanks. Oh, here we go. What? Oh, you got Beastie Boys. Yeah. Yeah. Beastie Boys was definitely that. Rapaport.",
+  "hooks": {
+   "old": {
+    "hook": "Why did she say 101?",
+    "all": [
+     "Why did she say 101?",
+     "She just said Rapaport?",
+     "Bet you missed the Beastie Boys line"
+    ]
+   },
+   "quote": {
+    "hook": "we don't have to say the word"
+   },
+   "spec": {
+    "hook": "Beastie Boys were my soundtrack 2004 to 2006",
+    "all": [
+     "Beastie Boys was definitely that",
+     "when I was a girl",
+     "2004 to 2006 was Beastie Boys",
+     "She says Rapaport",
+     "Look that up",
+     "Why does she say 101"
+    ],
+    "brief": {
+     "punchline": "She remembers being a girl around 2004–2006 and sums it up: Beastie Boys was definitely that.",
+     "anchors": [
+      "when I was a girl",
+      "2004, 2006",
+      "Beastie Boys",
+      "Rapaport",
+      "101",
+      "Look that up"
+     ],
+     "best_line": "Beastie Boys was definitely that.",
+     "tension": "What music defined her when she was a girl around 2004, 2006?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "One shrug and look that up becomes gospel",
+    "all": [
+     "pov | POV: when I was a girl and Beastie Boys",
+     "pov | POV: when I was a girl digging 2004 mixtapes",
+     "nobody | Nobody: mixes Beastie Boys with 101",
+     "nobody | Nobody: him blurring Beastie Boys and dates",
+     "hidden_consequence | One shrug and look that up becomes gospel",
+     "hidden_consequence | Casual look that up makes memory fiction",
+     "contrarian | Mixing up 101 Dalmatians makes it real",
+     "contrarian | Being wrong about hundred one Dalmatians is adorable",
+     "reaction | She literally said does that count",
+     "reaction | Wait she just said does that count"
+    ],
+    "mood": "playful"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 1,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "5a0f95_384",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "Oh, it's always big when Netflix is picking up companies and when they bought the Miller verse from Mike Miller, if I'm staying wrong, that was a big deal. So I'm really curious what kind of other properties we're gonna see made on Netflix and then remade and canceled and remade, etcetera. Yeah. Tha",
+  "hooks": {
+   "old": {
+    "hook": "Bro Netflix bought the Miller verse",
+    "all": [
+     "Bro Netflix bought the Miller verse",
+     "What came after Netflix bought Miller",
+     "Try not to notice Netflix remakes"
+    ]
+   },
+   "quote": {
+    "hook": "bought the Miller verse from Mike Miller"
+   },
+   "spec": {
+    "hook": "Netflix will remake the Miller verse",
+    "all": [
+     "It's always big when Netflix",
+     "bought the Miller verse from Mike Miller",
+     "More Netflix remakes are coming",
+     "Miller verse now on Netflix",
+     "Which Miller properties get remade",
+     "that was a big deal"
+    ],
+    "brief": {
+     "punchline": "Netflix buying the Miller verse from Mike Miller likely means more properties will be made, remade, canceled and remade.",
+     "anchors": [
+      "Netflix",
+      "bought the Miller verse from Mike Miller",
+      "that was a big deal",
+      "remade and canceled and remade",
+      "portion of the other shoe"
+     ],
+     "best_line": "Oh, it's always big when Netflix is picking up companies and when they bought the Miller verse from Mike Miller, if I'm staying wrong, that was a big deal.",
+     "tension": "What kind of other properties we're gonna see made on Netflix and then remade and canceled and remade, etcetera?",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Netflix owns your childhood",
+    "all": [
+     "pov | POV: Netflix owns your childhood now",
+     "pov | POV: Netflix ate your childhood series",
+     "nobody | Nobody: wants another Roald Dahl reboot",
+     "nobody | Nobody: please not another Millerverse remake",
+     "hidden_consequence | Netflix buys Millerverse then buries creators",
+     "hidden_consequence | One buy and new voices vanish",
+     "contrarian | Buying Millerverse screams panic not confidence",
+     "contrarian | Bridgerton 82 million masks Netflix panic",
+     "open_question | Which franchise replaces Miller on Netflix?",
+     "open_question | After Miller who gets rebooted next?"
+    ],
+    "mood": "speculative"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "910409_1581",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "Maybe not 1,600,000,000,000, but maybe they would be at 1,000,000,000,000 or whatever the number is. And and so I'm just wondering, you know, how we as a society move that in in this direction. Well, I mean, I I... You know, shout out to Roland Peralta, our dear friend who sold his company to Unilev",
+  "hooks": {
+   "old": {
+    "hook": "He sold to Unilever then started When Justice?",
+    "all": [
+     "He sold to Unilever then started When Justice?",
+     "Hear me out, microdonations hire top lawyers",
+     "Why Roland Peralta left retirement"
+    ]
+   },
+   "quote": {
+    "hook": "maybe they would be at 1,000,000,000,000"
+   },
+   "spec": {
+    "hook": "Roland Peralta sold to Unilever now funds lawsuits",
+    "all": [
+     "shout out to Roland Peralta",
+     "sold his company to Unilever",
+     "Roland Peralta started When Justice",
+     "LPs and micro donations fund legal fights",
+     "Maybe not 1,600,000,000,000",
+     "How do we mobilize one trillion"
+    ],
+    "brief": {
+     "punchline": "Roland Peralta sold his company to Unilever and could have just retired, but he started a nonprofit called When Justice that raises money to retain the best legal counsel in the world to go after bad actors.",
+     "anchors": [
+      "1,600,000,000,000",
+      "1,000,000,000,000",
+      "Roland Peralta",
+      "Unilever",
+      "nonprofit called When Justice",
+      "raises money from LPs and from micro donations"
+     ],
+     "best_line": "You know, shout out to Roland Peralta, our dear friend who sold his company to Unilever and and could have just retired, but he's started a nonprofit called When Justice, where he raises money from LPs and from micro donations and retains the best legal counsel in the world to go after bad actors.",
+     "tension": "How do we as a society move that in this direction—mobilizing funding and effort to hold bad actors accountable?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Turns out money buys lawsuits too",
+    "all": [
+     "contrarian | Let crowdfunded lawyers handle it",
+     "contrarian | Fund private suits to stop bad actors",
+     "hidden_consequence | Turns out money buys lawsuits too",
+     "hidden_consequence | Micro donations now finance top lawyers",
+     "open_question | Who wins when donors hire armies of lawyers?",
+     "open_question | Does fighting lawfare just make more lawfare?",
+     "contrarian | Honestly just get coders to care",
+     "contrarian | Policy won't save us make engineers care",
+     "hidden_consequence | And now justice competes for donors",
+     "hidden_consequence | Wait so justice needs crowdfunding now"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "0dee5f_5341",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "But if you're, like, before the dolls. Yeah. But it's like They're they're 95 years old. They're quite old dogs. They're not clone, but we have We have we have super And if they're they cynicism. But they are... But but they're both rescues, they're amazing. Right? Yeah. So I'm very pro rescue. Sure",
+  "hooks": {
+   "old": {
+    "hook": "Bet you wouldn't clone a 95 year old dog",
+    "all": [
+     "Bet you wouldn't clone a 95 year old dog",
+     "Hear me out cloning 95 year old dogs",
+     "Wait till he mentions American Humane"
+    ]
+   },
+   "quote": {
+    "hook": "would you clone your dogs"
+   },
+   "spec": {
+    "hook": "Would you clone your dogs?",
+    "all": [
+     "Would you clone your dogs",
+     "They're 95 years old",
+     "They're quite old dogs",
+     "They're both rescues",
+     "I'm very pro rescue",
+     "We work with American Humane Society"
+    ],
+    "brief": {
+     "punchline": "So people ask me, would you clone your dogs?",
+     "anchors": [
+      "They're they're 95 years old.",
+      "they're quite old dogs.",
+      "they're both rescues",
+      "I'm very pro rescue.",
+      "American Humane Society"
+     ],
+     "best_line": "So people ask me, would you clone your dogs?",
+     "tension": "Would you clone your dogs? (cloning beloved pets vs. supporting rescue)",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Pro rescue but might clone my dog",
+    "all": [
+     "pov | POV: you want the rescue and the clone",
+     "pov | POV: you want to adopt and secretly clone",
+     "nobody | Nobody: Very pro rescue but open to clones",
+     "nobody | Nobody: Very pro rescue yet curious about clones",
+     "hidden_consequence | Cloning dogs steals from American Humane",
+     "hidden_consequence | Clone your dog and rescues lose out",
+     "contrarian | Save the playing God lecture please",
+     "contrarian | We were playing God long before cloning",
+     "open_question | Would adopting actually satisfy my kid?",
+     "open_question | Would my kid demand a clone?"
+    ],
+    "mood": "thoughtful, conversational"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 2,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "910409_220",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "That's already gone through resolution, so that was probably the largest full case I did which lasted years, maybe five or six years. We have a current litigation against video game companies where we have over 100,000 clients. So represent a lot of people. How did you get into sticking it to the th",
+  "hooks": {
+   "old": {
+    "hook": "Why 100,000 players joined his suit",
+    "all": [
+     "Why 100,000 players joined his suit",
+     "Is this the 100,000 client case",
+     "Wait till he says five years"
+    ]
+   },
+   "quote": {
+    "hook": "we have over 100,000 clients"
+   },
+   "spec": {
+    "hook": "Suing video game companies for over 100,000 clients",
+    "all": [
+     "Over 100,000 clients",
+     "Current litigation against video game companies",
+     "Five or six years of litigation",
+     "How do you stick it to the big guys",
+     "Largest full case I did",
+     "Suing video game companies"
+    ],
+    "brief": {
+     "punchline": "We're suing video game companies on behalf of over 100,000 clients.",
+     "anchors": [
+      "largest full case I did",
+      "lasted years, maybe five or six years",
+      "current litigation against video game companies",
+      "over 100,000 clients",
+      "sticking it to the the big guys?"
+     ],
+     "best_line": "We have a current litigation against video game companies where we have over 100,000 clients.",
+     "tension": "How did you get into sticking it to the the big guys when they have, seemingly endless, pockets?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "POV: you're one of over 100,000 clients",
+    "all": [
+     "pov | POV: you're one of over 100,000 clients",
+     "pov | POV: you call as one of 100k clients",
+     "nobody | Nobody: Him sticking it to the big guys",
+     "nobody | Nobody: Him signing up to sue the big guys",
+     "hidden_consequence | Six years and their lives paused",
+     "hidden_consequence | Kids grow up while cases drag",
+     "contrarian | Big firm size is their weakness",
+     "contrarian | Their best firms are painfully predictable",
+     "open_question | What happened when your grandfather took those drugs?",
+     "open_question | Okay but did your grandfather survive those drugs?"
+    ],
+    "mood": "defiant"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "5a0f95_1338",
+  "lang": "en",
+  "split": "dev",
+  "excerpt": "It's working, and, obviously, it's got Google money. So, you know, Universal wanted that Google money, not exactly too weird to hear. And if they... If if Google is sending people to Peacock, warning, Peacock is a terrible, terrible app on at least Android and on Apple TV. So if you use it, I'm I'm ",
+  "hooks": {
+   "old": {
+    "hook": "Why Universal wanted Google money",
+    "all": [
+     "Why Universal wanted Google money",
+     "Google traffic made Peacock worse",
+     "Bro uses Peacock on Apple TV"
+    ]
+   },
+   "quote": {
+    "hook": "Peacock is a terrible, terrible app"
+   },
+   "spec": {
+    "hook": "Peacock is terrible on Android and Apple TV",
+    "all": [
+     "Peacock is a terrible terrible app",
+     "Universal wanted that Google money",
+     "Google is sending people to Peacock",
+     "Terrible Peacock app on Android",
+     "Terrible Peacock app on Apple TV",
+     "Will Universal take Google money"
+    ],
+    "brief": {
+     "punchline": "If Google is sending people to Peacock, warning, Peacock is a terrible, terrible app.",
+     "anchors": [
+      "Google money",
+      "Universal",
+      "Peacock",
+      "Android",
+      "Apple TV",
+      "margins are running thin"
+     ],
+     "best_line": "warning, Peacock is a terrible, terrible app on at least Android and on Apple TV.",
+     "tension": "Will Universal get that Google money if Google is sending people to Peacock, even though margins are running thin?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Google funnels you into Peacock's terrible app",
+    "all": [
+     "pov | POV: You click Google and get stuck on Peacock",
+     "pov | POV: Google funnels you into the terrible Peacock app",
+     "nobody | Nobody: cares about app quality after checks",
+     "nobody | Nobody: sorry you have to use Peacock",
+     "hidden_consequence | And that's how Peacock loses trust",
+     "hidden_consequence | That's how thin margins wreck apps",
+     "contrarian | Google money won't hide a bad app",
+     "contrarian | Buying clicks won't fix Peacock's mess",
+     "reaction | Bro literally directs people to Peacock",
+     "reaction | Bro funnels Google traffic into Peacock's terrible app"
+    ],
+    "mood": "skeptical"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 2,
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "a24ed8_855",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "2× 12.5 29 صح؟ صح صح صح بقى معايا شوية ما هو مش كل حاجة تبقى سهلة كده يعني لازم نشغل دخانا شوية يعني نفكر ده رقم تاني تقدروا تحسبوه التوتال اوكشن سابلاي 39 جت من هنا 39 دي ما كل الاوكسين رايح النهارده 39 هو بياخد منهم كام؟",
+  "hooks": {
+   "old": {
+    "hook": "2 في 12.5 طلع 29",
+    "all": [
+     "2 في 12.5 طلع 29",
+     "جرب تحسب التوتال 39 بدون غلطة",
+     "يا زلمة هو بياخد منهم كام"
+    ]
+   },
+   "quote": {
+    "hook": "39 هو بياخد منهم كام"
+   },
+   "spec": {
+    "hook": "مين بياخد كام من الـ39؟",
+    "all": [
+     "39 هو بياخد منهم كام؟",
+     "التوتال اوكشن سابلاي 39",
+     "39 جت من هنا",
+     "2× 12.5 29",
+     "بقى معايا شوية",
+     "لازم نشغل دخانا شوية"
+    ],
+    "brief": {
+     "punchline": "واحد بيحاول يحسب 'التوتال اوكشن سابلاي 39' وبيقول: 39 هو بياخد منهم كام؟",
+     "anchors": [
+      "2× 12.5 29",
+      "صح؟ صح صح",
+      "بقى معايا شوية",
+      "لازم نشغل دخانا شوية",
+      "التوتال اوكشن سابلاي 39",
+      "39 جت من هنا"
+     ],
+     "best_line": "39 هو بياخد منهم كام?",
+     "tension": "مين ياخد قد إيه من الـ39؟",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "بص 50% على 25 بيظلم",
+    "all": [
+     "pov | POV: بقى معايا شوية 2× 12.5",
+     "pov | POV: هو بياخد منهم كام",
+     "nobody | Nobody: هو بيحسب 25 من 39",
+     "nobody | Nobody: بيرجع يحسب 25 وكأنها سهلة خالص",
+     "hidden_consequence | وبكده نص من 39 ما يوصل",
+     "hidden_consequence | وبكده 25 من 39 بتضغط السيولة",
+     "contrarian | بص 50% على 25 بيظلم",
+     "contrarian | الـ39 مش للجميع",
+     "open_question | الـ39 جت منين؟",
+     "open_question | 12.5 في 2 جت منين؟"
+    ],
+    "mood": "تقني عامي"
+   }
+  },
+  "points": {
+   "quote:j1": 1,
+   "quote:j2": 1,
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a24ed8_31",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "الهاه؟ دا زي ما انا اديتلكم exambles في اول المحاضرة بتاع الكابلري وقلتلكم ان في بعض الكابلري بتعمل فلتريشن بس متعملش فلتريشن ري أبزوربشن زي الغلوميريلر كابيلاريز اللي في الكيدني مثلا وفيه بعض الكابلريز بتعمل ريأبزوربشن بس زي ما قلنا في الكيدني برضو بتتقسم الكابلري الاتنين واحدة تعمل فلتريشن واحدة ت",
+  "hooks": {
+   "old": {
+    "hook": "5 لتر لللنط و5 لتر لللفت",
+    "all": [
+     "5 لتر لللنط و5 لتر لللفت",
+     "جرب تشرح ريأبزوربشن بكلمة وحدة",
+     "ليش بعض الكابلري ما بتفلترشن"
+    ]
+   },
+   "quote": {
+    "hook": "اللنط بيدوخ 5 لتر واللفت بيدوخ 5 لتر"
+   },
+   "spec": {
+    "hook": "الغلوميريلر كابيلاريز في الكيدني بتفلتر",
+    "all": [
+     "زي الغلوميريلر كابيلاريز اللي في الكيدني",
+     "فيه بعض الكابلري بتعمل فلتريشن",
+     "التانية بتعمل ريأبزوربشن",
+     "قال 5 لتر هنا",
+     "exambles في اول المحاضرة",
+     "واحدة تعمل ايه"
+    ],
+    "brief": {
+     "punchline": "فيه كابلري بتعمل فلتريشن وفيه كابلري بتعمل ريأبزوربشن، زي الغلوميريلر كابيلاريز اللي في الكيدني.",
+     "anchors": [
+      "exambles",
+      "اول المحاضرة بتاع الكابلري",
+      "فيه بعض الكابلري بتعمل فلتريشن",
+      "ريأبزوربشن",
+      "الغلوميريلر كابيلاريز اللي في الكيدني",
+      "5 لتر"
+     ],
+     "best_line": "زي الغلوميريلر كابيلاريز اللي في الكيدني مثلا",
+     "tension": "واحدة تعمل فلتريشن واحدة تعمل ايه؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "مش كل الكابلري بتفلتر",
+    "all": [
+     "pov | POV: انا قلتلكم بعض الكابلري بتعمل فلتريشن",
+     "pov | POV: بعض الكابلري بتعمل فلتريشن بس متعملش ري أبزوربشن",
+     "nobody | Nobody: واحدة تعمل فلتريشن واحدة تعمل ايه",
+     "nobody | Nobody: واحدة تعمل فلتريشن واحدة تعمل ريأبزوربشن",
+     "hidden_consequence | تجاهل الغلوميريلر في الكيدني يبوّظ العلاج",
+     "hidden_consequence | الغلوميريلر المنسية في الكيدني تغيّر التشخيص",
+     "contrarian | مش كل الكابلري بتفلتر",
+     "contrarian | بالعكس فيه كابلري بتعمل ريأبزوربشن",
+     "open_question | إزاي نفرّق بين الكابلري في الكيدني؟",
+     "open_question | هتاخدوها في الكيدني ازاي؟"
+    ],
+    "mood": "تعليمي"
+   }
+  },
+  "points": {
+   "quote:j1": 2,
+   "quote:j2": 1,
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "b8931e_1844",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "في عدة أشياء حقيقة، نبي نجي الحين على الأشياء الحقيقية ما فيها لعب، ما فيها أي شيء حقيقة من ضمنها الأشياء اللي هي اليقظة الذهنية وهي هذه اللي أنا أسويها اللي هو أنا سويت اثنتين كلها نفس بعد تقريبًا تجفيف منابع التشتت وتوحيد الانتباه لكن توحيد الانتباه كأن هي الأفضل من ناحية كمسمى عملي وعلمي أصلًا أن",
+  "hooks": {
+   "old": {
+    "hook": "اليقظة مش قعدة تأمل بس",
+    "all": [
+     "اليقظة مش قعدة تأمل بس",
+     "جرب توحد انتباهك بالاستحمام",
+     "اثنتين جربتهم بنفس الطريقة"
+    ]
+   },
+   "quote": {
+    "hook": "تجفيف منابع التشتت وتوحيد الانتباه"
+   },
+   "spec": {
+    "hook": "وحد انتباهك في روتينك اليومي",
+    "all": [
+     "اليقظة الذهنية روتينك اليومي",
+     "أنت توحد انتباهك",
+     "تفريش أسنانك الاستحمام الوضوء",
+     "الاستحمام يجمّع انتباهك",
+     "تقدر توحد انتباهك أثناء الوضوء؟",
+     "إذا تجيت تشرب قهوتك هيّئ"
+    ],
+    "brief": {
+     "punchline": "اليقظة الذهنية الحقيقية هي توحيد انتباهك على الروتين اليومي — تفريش أسنانك، الاستحمام، الوضوء، الشرب، الأكل.",
+     "anchors": [
+      "اليقظة الذهنية",
+      "توحيد الانتباه",
+      "تفريش أسنانك",
+      "الاستحمام",
+      "الوضوء",
+      "إذا تجيت تشرب قهوتك، هيّئ"
+     ],
+     "best_line": "أصلًا أنك أنت توحد انتباهك على الأشياء الروتينية اللي أنت تسويها تفريش أسنانك، الاستحمام، الوضوء، الشرب، الأكل، كل هذه الأشياء",
+     "tension": "هل تقدر توحد انتباهك خلال الأعمال الروتينية بدل ما تتشتت؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "لو حصرّت تركيزك بالروتين بتتهز بأي شي جديد",
+    "all": [
+     "pov | POV: توحيد الانتباه بتفريش أسنانك",
+     "pov | POV: توحيد الانتباه بالاستحمام والوضوء",
+     "nobody | Nobody: توحد انتباهك بتفريش أسنانك",
+     "nobody | Nobody: أها خلاص ركّز بالاستحمام",
+     "hidden_consequence | تجفيف منابع التشتت بيخليك عاجز قدام التشتيت الكبير",
+     "hidden_consequence | لو حصرّت تركيزك بالروتين بتتهز بأي شي جديد",
+     "contrarian | توحيد الانتباه هي الأفضل",
+     "contrarian | توحيد الانتباه على الأشياء الروتينية",
+     "open_question | إذا راح تتشتت كيف المحاولات تقوّي الانتباه",
+     "open_question | كيف المحاولات فيها راح تقوي الانتباه"
+    ],
+    "mood": "تأملي"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "b8931e_4127",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "ممتاز، جميل جدًّا المحصول العلمي يؤهلك أن تحصل على هذا الشيء، دانيال جولمان عملي، ميداني تتذكرون الدكتور سعدة سويان كان عملي وميداني فيروح لأهل الشمال، ويروح لأهل نجد ويدخل عليهم ويدوّن وهذه الحاجة نفس الحكاية دانيول قلمان يدوّن ويروح حتى مثلًا شرق آسيا وسوّى التخطيط على أدمغة بعض الرهبان علشان",
+  "hooks": {
+   "old": {
+    "hook": "ليش دانيال جولمان سافر شرق آسيا",
+    "all": [
+     "ليش دانيال جولمان سافر شرق آسيا",
+     "جرب تصدق التخطيط على رهبان",
+     "يا زلمة دكتور سعدة راح لأهل الشمال"
+    ]
+   },
+   "quote": {
+    "hook": "وسوّى التخطيط على أدمغة بعض الرهبان"
+   },
+   "spec": {
+    "hook": "دانيال جولمان سوّى تخطيط على أدمغة رهبان",
+    "all": [
+     "تتذكرون الدكتور سعدة سويان",
+     "فيروح لأهل الشمال",
+     "دانيال جولمان راح شرق آسيا",
+     "التخطيط على أدمغة بعض الرهبان",
+     "ويروح لأهل نجد ويدخل عليهم",
+     "هل عملي وميداني يوصل لأدمغة رهبان"
+    ],
+    "brief": {
+     "punchline": "دانيال جولمان يدوّن ويروح حتى مثلًا شرق آسيا وسوّى التخطيط على أدمغة بعض الرهبان",
+     "anchors": [
+      "دانيال جولمان",
+      "دكتور سعدة سويان",
+      "أهل الشمال",
+      "أهل نجد",
+      "شرق آسيا",
+      "التخطيط على أدمغة بعض الرهبان"
+     ],
+     "best_line": "تتذكرون الدكتور سعدة سويان كان عملي وميداني فيروح لأهل الشمال، ويروح لأهل نجد ويدخل عليهم ويدوّن",
+     "tension": "هل العمل الميداني يوصل لدرجة التخطيط على أدمغة بعض الرهبان؟",
+     "mood": "shocking"
+    }
+   },
+   "angle": {
+    "hook": "وبالآخر التخطيط يسرق يقظتهم",
+    "all": [
+     "pov | POV: عم تجرب 25 دقيقة وبعدين بريك خمس",
+     "pov | POV: بتضل دايخ بعد بريك خمس دقايق",
+     "nobody | Nobody: دانيال جولمان يدوّن ويسافر لشرق آسيا",
+     "nobody | Nobody: دانيال جولمان يدوّن و ما حدا منتبه",
+     "hidden_consequence | هيك التخطيط يخرب يقظتهم",
+     "hidden_consequence | وبالآخر التخطيط يسرق يقظتهم",
+     "contrarian | المحصول العلمي ميداني مش دايماً عملي",
+     "contrarian | دانيال جولمان كلام حلو لكن مش كفاية",
+     "reaction | يا زلمة قال تركيزك دايخ",
+     "reaction | بصراحة ما توقعت تركيزك دايخ"
+    ],
+    "mood": "فضولي"
+   }
+  },
+  "points": {
+   "quote:j1": 2,
+   "quote:j2": 0,
+   "spec:j1": 2,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "b8931e_660",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "ولّا... كانت النفسية قلق، أي كان قلق وتوتر من غير أشياء دائم خوف من المستقبل، أيش غادي يكون خوف من المستقبل؟ نعم، فتعلمت؟ أنا من الناس عندي مشكلة أني ما أطلب مساعدة، هذه مشكلة وذكرت أنا تمنيت أني لو طالب مساعدة في تلك الأيام كان اختصرت على نفسي مسيرة هي تقريبًا مسيرتي أكثر من 8 سنوات إلى 10 سنين تقر",
+  "hooks": {
+   "old": {
+    "hook": "ضاعت مني 8 ل10 سنين",
+    "all": [
+     "ضاعت مني 8 ل10 سنين",
+     "ليش ما طلبت مساعدة سابقا",
+     "اسمعني شوي أنا خسرت 8 سنين"
+    ]
+   },
+   "quote": {
+    "hook": "أنا من الناس عندي مشكلة أني ما أطلب مساعدة"
+   },
+   "spec": {
+    "hook": "لو طلبت مساعدة اختصرت ٨ ل١٠ سنين",
+    "all": [
+     "ما أطلب مساعدة",
+     "كانت النفسية قلق",
+     "اختصرت علي 8 ل10 سنين لو طلبت مساعدة",
+     "مسيرتي أخدت 8 ل10 سنين",
+     "ليش ما طلبت مساعدة بالبداية",
+     "أروح من مكان لمكان 8 سنين"
+    ],
+    "brief": {
+     "punchline": "تمنيت أني لو طالب مساعدة اختصرت على نفسي تقريبًا أكثر من 8 سنوات إلى 10 سنين.",
+     "anchors": [
+      "كانت النفسية قلق",
+      "دائم خوف من المستقبل",
+      "ما أطلب مساعدة",
+      "أكثر من 8 سنوات إلى 10 سنين تقريبًا",
+      "وأروح من مكان لمكان"
+     ],
+     "best_line": "وذكرت أنا تمنيت أني لو طالب مساعدة في تلك الأيام كان اختصرت على نفسي مسيرة هي تقريبًا مسيرتي أكثر من 8 سنوات إلى 10 سنين تقريبًا بخلال البحث والاطلاع، وأروح من مكان لمكان فما خليت شيء، فعرفت",
+     "tension": "هل أطلب مساعدة ولا أظل 'ما أطلب مساعدة' مع خوف من المستقبل اللي خلّى مسيرتي تقريبًا أكثر من 8 سنوات إلى 10 سنين؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "لو طلبت مساعدة اختصرت عشر سنين",
+    "all": [
+     "hidden_consequence | وهيك ضاعت عليّ أكتر من 8 سنين",
+     "hidden_consequence | تخيل ضاعت عليّ حوالي 10 سنين",
+     "hidden_consequence | خوف المستقبل سرق مني عشر سنين",
+     "hidden_consequence | لو طلبت مساعدة اختصرت عشر سنين",
+     "contrarian | تمنيت أني لو طالب مساعدة",
+     "contrarian | ما أطلب مساعدة كانت مشكلة",
+     "contrarian | مش كل عشر سنين بتساوي خبرة",
+     "contrarian | مسيرتي اللي استمرت عشر سنين ما علّمتني",
+     "open_question | لو كنت مكانها بتطلب مساعدة؟",
+     "open_question | بتطلب مساعدة ولا بتقاسي لوحدك؟"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "quote:j1": 0,
+   "quote:j2": 0,
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "02c0d2_2347",
+  "lang": "ar",
+  "split": "dev",
+  "excerpt": "معلم معلم قلت انك حفرتي على توتيا انت واختك الصبح ولا اختك معك بتاخد شو لعبي ولعبي اختك معك شو بكي ابدا لبناني مستحيل ساس ما تركري مع المشترك افكار س انت بتحطي كاحلك بالمشترك كل يوم ثلث ساعه لتستفيدي من المشترك انت مش نايمه رقبتك او قلت رواء ما مع اول ما انه مع اول",
+  "hooks": {
+   "old": {
+    "hook": "ليش اختك الصبح حكت عن توتيا",
+    "all": [
+     "ليش اختك الصبح حكت عن توتيا",
+     "بتراهن ما تضحك على توتيا",
+     "اسمعني يا زلمة حفرتي توتيا"
+    ]
+   },
+   "quote": {
+    "hook": "انت بتحطي كاحلك بالمشترك كل يوم ثلث ساعه"
+   },
+   "spec": {
+    "hook": "انت بتحطي كاحلك بالمشترك تلت ساعة",
+    "all": [
+     "كل يوم ثلث ساعه",
+     "كل يوم ثلث ساعه لتستفيدي",
+     "انت واختك الصبح ولا اختك معك"
+    ],
+    "brief": {
+     "punchline": "انت بتحطي كاحلك بالمشترك كل يوم ثلث ساعه لتستفيدي من المشترك.",
+     "anchors": [
+      "معلم معلم",
+      "انت واختك الصبح",
+      "بتاخد شو",
+      "لبناني مستحيل",
+      "كل يوم ثلث ساعه"
+     ],
+     "best_line": "انت بتحطي كاحلك بالمشترك كل يوم ثلث ساعه لتستفيدي من المشترك",
+     "tension": "انت واختك الصبح ولا اختك معك",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "يا زلمي عم نبش وبيعيط نيكولا",
+    "all": [
+     "pov | POV: عم نبش عالجينز ولا أشتري سهم",
+     "pov | POV: بدور على الجينز وبفكر بالأسهم",
+     "nobody | Nobody: بتفوت السولد وبتشتري جينز",
+     "nobody | Nobody: سولد مرتب فورا بشتري جينز",
+     "hidden_consequence | وهيك كل نبش بيكلفك مصاري",
+     "hidden_consequence | ورح يخلي نبشك يطلعلك أسهم",
+     "contrarian | سولد مرتب يخليك تصرف أكتر",
+     "contrarian | في سولد وفي سولد مرتب",
+     "reaction | يا زلمي عم نبش وبيعيط نيكولا",
+     "reaction | عم دور على الجينز وبيعيط نيكولا"
+    ],
+    "mood": "playful"
+   }
+  },
+  "points": {
+   "quote:j1": 2,
+   "quote:j2": 2,
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ }
+]

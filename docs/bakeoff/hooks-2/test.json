@@ -1,0 +1,3654 @@
+[
+ {
+  "id": "5a0f95_1524",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "It's gonna be better than Babylon five. Gonna make people remember CW is around. It's that's what it's gonna do. What what I wanna know is CW's approach up until now has been free streaming for the first five episodes or the most recent five episodes with commercials or get it over the air or on a c",
+  "hooks": {
+   "old": {
+    "hook": "Bro thinks it's better than Babylon 5?",
+    "all": [
+     "Bro thinks it's better than Babylon 5?",
+     "Why CW never partnered with paid streaming",
+     "5 free episodes then ads on CW"
+    ]
+   },
+   "spec": {
+    "hook": "CW's show beats Babylon Five",
+    "all": [
+     "gonna be better than Babylon five",
+     "CW has not done a streaming package",
+     "free streaming for the first five episodes",
+     "Most recent five run with commercials",
+     "the most recent five episodes",
+     "Will CW launch a streaming package"
+    ],
+    "brief": {
+     "punchline": "It's gonna be better than Babylon five.",
+     "anchors": [
+      "Babylon five",
+      "CW",
+      "free streaming for the first five episodes",
+      "the most recent five episodes",
+      "with commercials",
+      "streaming package"
+     ],
+     "best_line": "They have not done a streaming series, or streaming package.",
+     "tension": "Will CW move beyond free streaming the first five (or most recent five) episodes with commercials/over-the-air and actually launch or partner on a paid streaming series or package?",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Five free episodes beat launching apps",
+    "all": [
+     "pov | POV: you're the CW exec choosing paid relaunch",
+     "pov | POV: you bet CW on a paid relaunch",
+     "nobody | Nobody: seriously wants another streaming subscription",
+     "nobody | Nobody: claimed it's better than Babylon five",
+     "hidden_consequence | Back catalog goes paywalled casuals gone",
+     "hidden_consequence | Back catalog behind paywall watch fans evaporate",
+     "contrarian | Stop building apps give five free episodes",
+     "contrarian | Five free episodes with ads beats launching apps",
+     "open_question | Is CW gonna make us pay to ditch ads",
+     "open_question | Will CW charge to get rid of ads?"
+    ],
+    "mood": "speculative"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "a777be_657",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Yeah. It's sad. I've seen clips of it. I can't I can't watch shit like that. It's sad though, man. After she dropped on stage, I stopped watching everything from her. It's heartbreaking. She, yeah. She was doing her live show and she just collapsed and then She did? I didn't know that. Yeah. Yeah. S",
+  "hooks": {
+   "old": {
+    "hook": "Why did Wendy fall backwards onstage",
+    "all": [
+     "Why did Wendy fall backwards onstage",
+     "Is this Wendy Williams collapsing",
+     "Wait for the exact moment she collapsed"
+    ]
+   },
+   "spec": {
+    "hook": "I stopped watching her after she dropped",
+    "all": [
+     "After she dropped on stage",
+     "she fell backwards",
+     "Wendy Williams dropped onstage",
+     "Stopped watching everything from her",
+     "I can't watch shit like that",
+     "Should we pull up the clip"
+    ],
+    "brief": {
+     "punchline": "Wendy Williams collapsed on stage — the speaker says, \"After she dropped on stage, I stopped watching everything from her\" and can't watch shit like that.",
+     "anchors": [
+      "Wendy Williams",
+      "dropped on stage",
+      "fell backwards",
+      "it's heartbreaking",
+      "pull up the clip"
+     ],
+     "best_line": "After she dropped on stage, I stopped watching everything from her.",
+     "tension": "Do we pull up the collapse clip to see what happened, or avoid it because \"it's heartbreaking\"?",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Don't pull up that clip",
+    "all": [
+     "open_question | Who thought her collapse was content?",
+     "open_question | Why are we memeing her collapse?",
+     "hidden_consequence | One collapse and I ghosted her",
+     "hidden_consequence | That fall erased her for me",
+     "contrarian | Don't pull up that clip",
+     "contrarian | Leave Wendy's collapse alone",
+     "hidden_consequence | That collapse ruined my comfort viewing",
+     "hidden_consequence | I'm done with live show collapses",
+     "open_question | You think that was a stroke?",
+     "open_question | You sure that was a stroke?"
+    ],
+    "mood": "sad"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 1,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "acb444_3552",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Sure if I wanna spend more. Right. Like what would it take? Which is one my favorite questions in the world to ask. It assumes the success and you work backwards. The second thing was what is, you know, what is it gonna look like in an age of AI? I will give an unsexy but accurate answer of what I'm",
+  "hooks": {
+   "old": {
+    "hook": "Wait for the unsexy but accurate answer",
+    "all": [
+     "Wait for the unsexy but accurate answer",
+     "Why he asks what would it take",
+     "Assuming success makes AI less scary"
+    ]
+   },
+   "spec": {
+    "hook": "Assume success then work backwards",
+    "all": [
+     "Like what would it take",
+     "Which is one my favorite questions",
+     "It assumes the success and you work backwards",
+     "One question for the age of AI",
+     "An unsexy but accurate answer",
+     "the future is very uncertain"
+    ],
+    "brief": {
+     "punchline": "Ask \"what would it take?\" — assume the success and work backwards to plan for an uncertain, AI-driven future.",
+     "anchors": [
+      "Like what would it take?",
+      "Which is one my favorite questions in the world to ask",
+      "It assumes the success and you work backwards.",
+      "age of AI",
+      "an unsexy but accurate answer",
+      "the future is very uncertain"
+     ],
+     "best_line": "It assumes the success and you work backwards.",
+     "tension": "How do you figure out what to do or spend now when the future — especially in an age of AI — is so uncertain?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "POV You act like it's already done",
+    "all": [
+     "pov | POV: You act like it's already done",
+     "pov | POV: Assume success then map steps",
+     "nobody | Nobody: He asks what won't change",
+     "nobody | Nobody: Customers just want cheaper faster choice",
+     "hidden_consequence | And that's how cheaper and faster ruin you",
+     "hidden_consequence | Congrats cheaper faster just sold you out",
+     "contrarian | Ignore AI hype buy canned goods",
+     "contrarian | While they chase AI I buy land",
+     "open_question | Which one thing will never change?",
+     "open_question | What actually won't change in AI?"
+    ],
+    "mood": "strategic"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "0dee5f_233",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "And they're they're the best. Right? They're the absolute best. Salt of the earth. They sound fun. Well, so we did the same thing. We... They retired. We just got them to move down to Dallas to be near us. Yes. I grew up with, you know, my grandparents. Like, you know, they had a farm outside of Dal",
+  "hooks": {
+   "old": {
+    "hook": "Wait for the frog part",
+    "all": [
+     "Wait for the frog part",
+     "Hear me out, move grandparents to Dallas",
+     "Bet you miss catching frogs"
+    ]
+   },
+   "spec": {
+    "hook": "We moved our grandparents to Dallas",
+    "all": [
+     "Salt of the earth",
+     "Grandparents moved to Dallas",
+     "Kids growing up on Dallas farm",
+     "Grew up catching frogs",
+     "How did we get them to move",
+     "They retired and moved near us"
+    ],
+    "brief": {
+     "punchline": "They retired and we just got them to move down to Dallas to be near us.",
+     "anchors": [
+      "Salt of the earth.",
+      "They retired.",
+      "We just got them to move down to Dallas to be near us.",
+      "farm outside of Dallas",
+      "catch frogs"
+     ],
+     "best_line": "We just got them to move down to Dallas to be near us.",
+     "tension": "Can I give my kids what I had — growing up on a farm outside of Dallas and catching frogs?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Grandparents swapped screens for frog lessons",
+    "all": [
+     "pov | POV: catching frogs now grandparents live in Dallas",
+     "pov | POV: grandparents moved to Dallas now we catch frogs",
+     "nobody | Nobody: brings their retired parents to catch frogs",
+     "nobody | Nobody: literally moved parents for frog time",
+     "hidden_consequence | They outsourced screen time to grandparents",
+     "hidden_consequence | Grandparents swapped screens for frog lessons",
+     "contrarian | Playdates are overrated let them catch frogs",
+     "contrarian | Move the grandparents not the schedule",
+     "open_question | What if your parents moved next door?",
+     "open_question | Would your kids grow up catching frogs?"
+    ],
+    "mood": "warm"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a777be_4759",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Oh, I know about this. What about the Tulane Green Wave? Oh, they so sucked. Yeah. Oh, damn. And the buzzer so enough sucked. That's what we call the buzzards. Oh, the Auburn? Yeah. The buzzards? Yeah. The tigers. Now what about them Ole Miss rebels, Willie? Ole Miss rebel? I ain't got no use for th",
+  "hooks": {
+   "old": {
+    "hook": "Why he calls the buzzer buzzards",
+    "all": [
+     "Why he calls the buzzer buzzards",
+     "Bro really called the buzzer buzzards",
+     "Try not to laugh at Praise god"
+    ]
+   },
+   "spec": {
+    "hook": "I ain't got no use for them neither",
+    "all": [
+     "Tulane Green Wave so sucked",
+     "they so sucked",
+     "we call the buzzards",
+     "Calls Auburn the tigers",
+     "They call them the tigers",
+     "Does he like Ole Miss rebels"
+    ],
+    "brief": {
+     "punchline": "Calls the Tulane Green Wave \"they so sucked\", labels them \"the buzzards\", and then deadpans, \"I ain't got no use for them neither. Praise god.\",",
+     "anchors": [
+      "Tulane Green Wave",
+      "they so sucked",
+      "the buzzards",
+      "Auburn",
+      "the tigers",
+      "Ole Miss rebels"
+     ],
+     "best_line": "I ain't got no use for them neither.",
+     "tension": "Are these college teams any good — Tulane, Auburn, or Ole Miss — or does he think \"they so sucked\" and \"ain't got no use for them\"?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "I ain't got no use for Ole Miss",
+    "all": [
+     "pov | POV: Willie says Tulane they so sucked",
+     "pov | POV: Willie has no use for Ole Miss",
+     "nobody | Nobody: Him saying Tulane they so sucked",
+     "nobody | Nobody: Him I ain't got no use for Rebels",
+     "hidden_consequence | Saying they so sucked emptied the room",
+     "hidden_consequence | I ain't got no use for them killed vibes",
+     "contrarian | I'm team Tulane Green Wave now",
+     "contrarian | Ole Miss rebels are lowkey impressive",
+     "reaction | Bro picked Georgia before his first drink",
+     "reaction | Bro picked Georgia while sober"
+    ],
+    "mood": "raucous"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "208322_1919",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "We know we're at... That's happening and, and then not have these tools. And... But I think I'm I'm more pragmatic about this. I guess to put this into practice, one of the really cool things that I saw when we were walking through the lobby was with the direwolf. You see this like this, you guys ha",
+  "hooks": {
+   "old": {
+    "hook": "Bet you miss the direwolf detail",
+    "all": [
+     "Bet you miss the direwolf detail",
+     "They actually have a direwolf model?",
+     "Wait till the lobby direwolf appears"
+    ]
+   },
+   "spec": {
+    "hook": "Lobby model shows how dire wolves shaped land",
+    "all": [
+     "with the direwolf",
+     "walking through the lobby",
+     "One little model mattered",
+     "Land evolved over time",
+     "Dire wolf benefited the land",
+     "How did dire wolves shape the land"
+    ],
+    "brief": {
+     "punchline": "They found a little lobby model showing how dire wolves actually shaped the land.",
+     "anchors": [
+      "direwolf",
+      "walking through the lobby",
+      "little model",
+      "how land has evolved over time",
+      "benefits of the dire wolf on the land"
+     ],
+     "best_line": "I guess to put this into practice, one of the really cool things that I saw when we were walking through the lobby was with the direwolf.",
+     "tension": "How do we put ideas into practice — especially when we don't have the tools?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "So who gets to veto rewilding",
+    "all": [
+     "open_question | Who actually approves releasing these animals",
+     "open_question | Do locals get to say no",
+     "hidden_consequence | And suddenly governments indigenous groups must negotiate",
+     "hidden_consequence | Bringing back species forces governments tribes and landowners",
+     "contrarian | Treating wolves like national security",
+     "contrarian | So they briefed the Pentagon on wolves",
+     "pov | POV: you're in the lobby nodding at a direwolf",
+     "pov | POV: you just volunteered your yard for a direwolf",
+     "reaction | Bro they want vetoes on rewilding",
+     "reaction | So who gets to veto rewilding"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "34137a_2877",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Come right here. Come right here. Sit down. Sit right here. Sit. Sit. Sit. Okay. Hold on. We go... Hold on. We gotta hype it up. We gotta hype it up because I think his shit gonna be crazy. Alright. Let's go ahead and hype this shit up. You alright? I need a good song right here. Oh my gosh.",
+  "hooks": {
+   "old": {
+    "hook": "Bro really hyped his shit",
+    "all": [
+     "Bro really hyped his shit",
+     "Why they said Sit five times",
+     "Bet you missed the song cue"
+    ]
+   },
+   "spec": {
+    "hook": "Gotta hype him his shit's gonna be crazy",
+    "all": [
+     "I think his shit gonna be crazy",
+     "We gotta hype it up",
+     "Come right here",
+     "Good song turns energy up",
+     "One hype moment pays off",
+     "Will his shit actually be crazy"
+    ],
+    "brief": {
+     "punchline": "We gotta hype it up because I think his shit gonna be crazy.",
+     "anchors": [
+      "Come right here.",
+      "Sit down.",
+      "We gotta hype it up",
+      "I think his shit gonna be crazy.",
+      "I need a good song right here."
+     ],
+     "best_line": "We gotta hype it up because I think his shit gonna be crazy.",
+     "tension": "Is his shit gonna be crazy?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "He says I'm fucking scared",
+    "all": [
+     "pov | POV: everyone yelling hype and you panic",
+     "pov | POV: shoved center while they hype his shit",
+     "nobody | Nobody: he goes I'm fucking scared",
+     "nobody | Nobody: crew hyping him he says I'm fucking scared",
+     "hidden_consequence | That's the one gonna fall out",
+     "hidden_consequence | This chant just picked a victim",
+     "open_question | Who yelled shampoo it out?",
+     "open_question | Who just screamed shampoo it out?",
+     "reaction | Bro said hold on mid hype",
+     "reaction | He keeps saying hold on nonstop"
+    ],
+    "mood": "hyped and nervous"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "31d86f_1119",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Kills more than poaching, think, twenty percent. So we have now, tested successfully an mRNA vaccine in elephants that's conferring a hundred percent resistance, to that. And that came from studying both living and extinct, variants of of them and finding, targets, that we could go attack, in EHP. S",
+  "hooks": {
+   "old": {
+    "hook": "Elephants now 100 percent resistant to EHV",
+    "all": [
+     "Elephants now 100 percent resistant to EHV",
+     "100 percent resistance in elephants",
+     "Mammoths were susceptible to this virus?"
+    ]
+   },
+   "spec": {
+    "hook": "mRNA vaccine gives elephants 100% resistance",
+    "all": [
+     "tested successfully an mRNA vaccine",
+     "Elephants now vaccinated",
+     "A hundred percent resistance",
+     "Can we stop that twenty percent",
+     "Ancient DNA guided the vaccine",
+     "mammoths and other animals susceptible"
+    ],
+    "brief": {
+     "punchline": "They've tested an mRNA vaccine in elephants that is conferring a hundred percent resistance to the virus.",
+     "anchors": [
+      "mRNA vaccine",
+      "elephants",
+      "a hundred percent resistance",
+      "Kills more than poaching, think, twenty percent",
+      "ancient DNA",
+      "mammoths"
+     ],
+     "best_line": "So we have now, tested successfully an mRNA vaccine in elephants that's conferring a hundred percent resistance, to that.",
+     "tension": "Can an mRNA vaccine, informed by studying ancient DNA and targets from extinct and living relatives, stop the pathogen that \"Kills more than poaching, think, twenty percent\" in elephants?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Chasing mammoth DNA while elephants die",
+    "all": [
+     "pov | POV: EHV can't touch me now",
+     "pov | POV: Vet gave my trunk the shot",
+     "nobody | Nobody: Freaks over poaching lab quietly made mRNA 100%",
+     "nobody | Nobody: Everyone screams poaching lab gave elephants mRNA 100%",
+     "hidden_consequence | We made elephants immune now forget forests",
+     "hidden_consequence | Hundred percent vaccine then habitat gets ignored",
+     "contrarian | Chasing mammoth DNA while elephants die",
+     "contrarian | Protect living elephants not mammoth mysteries",
+     "open_question | Who decides which species get these tools?",
+     "open_question | Who picks which animals get DNA vaccines?"
+    ],
+    "mood": "hopeful"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "767360_1548",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "You come here, buddy, bunny, you sacrificial bunny. Come here. Yeah. Yeah. You know you want it. It's delicious carrot. Perfect. Just as I always plan the whole day. Oh, look at the happy. You're happy now. Oh, you were crying for me. Okay. Still a little sad. And I've made it.",
+  "hooks": {
+   "old": {
+    "hook": "Why he calls it sacrificial bunny",
+    "all": [
+     "Why he calls it sacrificial bunny",
+     "Planned the whole day for a carrot",
+     "Wait for the happy bunny face"
+    ]
+   },
+   "spec": {
+    "hook": "Sacrificial bunny wants his carrot",
+    "all": [
+     "You come here buddy bunny",
+     "You sacrificial bunny",
+     "It's delicious carrot",
+     "I always plan the whole day",
+     "Now you're happy not crying",
+     "Will he stop being a little sad"
+    ],
+    "brief": {
+     "punchline": "The speaker keeps calling the rabbit a \"sacrificial bunny\" while trying to cheer it up with a \"delicious carrot\".",
+     "anchors": [
+      "sacrificial bunny",
+      "delicious carrot",
+      "You come here, buddy, bunny",
+      "Perfect. Just as I always plan the whole day.",
+      "you were crying for me",
+      "Still a little sad."
+     ],
+     "best_line": "You come here, buddy, bunny, you sacrificial bunny.",
+     "tension": "Will the bunny stop crying and become happy after the carrot?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Bro really said look at the happy",
+    "all": [
+     "pov | POV: you finally get the delicious carrot",
+     "pov | POV: bribed with the perfect carrot",
+     "nobody | Nobody: you sacrificial bunny stealing the show",
+     "nobody | Nobody: you sacrificial bunny sold out for carrot",
+     "sarcastic | Sure you planned the whole day",
+     "sarcastic | Big day planned just for carrots",
+     "reaction | Bro really said look at the happy",
+     "reaction | Did he just say look at the happy",
+     "open_question | Why were you crying for me?",
+     "open_question | Bro why were you crying for me"
+    ],
+    "mood": "playful"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "31d86f_715",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Yeah. The environment. Like, look. We are going to lose half of biodiversity. If you don't remember anything from anything, you should definitely remember this. We're gonna lose half of biodiversity in the next twenty five years. And so conservation is awesome. Right? Like, conservation is great, bu",
+  "hooks": {
+   "old": {
+    "hook": "Half of biodiversity lost in 25 years",
+    "all": [
+     "Half of biodiversity lost in 25 years",
+     "Why will half of biodiversity vanish",
+     "Wait for the 25 year claim"
+    ]
+   },
+   "spec": {
+    "hook": "We're gonna lose half of biodiversity in 25 years",
+    "all": [
+     "We're gonna lose half of biodiversity",
+     "conservation is awesome",
+     "it ain't working",
+     "Half of biodiversity lost in 25 years",
+     "Half of biodiversity lost",
+     "Is protecting lands enough"
+    ],
+    "brief": {
+     "punchline": "Conservation is great, but it ain't working — we're gonna lose half of biodiversity in the next twenty five years.",
+     "anchors": [
+      "The environment",
+      "We're gonna lose half of biodiversity in the next twenty five years",
+      "conservation is awesome",
+      "it ain't working",
+      "protecting lands"
+     ],
+     "best_line": "We're gonna lose half of biodiversity in the next twenty five years.",
+     "tension": "Will protecting lands and not innovating and building technologies for conservation be enough to stop losing half of biodiversity in the next twenty five years, when conservation \"ain't working\"?",
+     "mood": "shocking"
+    }
+   },
+   "angle": {
+    "hook": "Still clapping for tiny wins while half dies",
+    "all": [
+     "pov | POV: you just heard we're losing half of biodiversity",
+     "pov | Still clapping for tiny wins while half dies",
+     "hidden_consequence | And that's how our medicines vanish",
+     "hidden_consequence | And that's how crops fail",
+     "contrarian | Turns out fences don't save species",
+     "contrarian | Protecting land while ignoring tech kills",
+     "open_question | Who pays to revive extinct species?",
+     "open_question | Who signs the checks for species revival?",
+     "reaction | Bro wants tech not parks",
+     "reaction | Bro just admitted parks alone fail"
+    ],
+    "mood": "urgent"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "767360_2022",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Alright. Okay. With only minor casualties, we have done it magically. I feel so good about myself and all of the decisions that I've made. I can't wait to see how this is gonna turn out good for all of us. Oh, I hate that one the most. Oh, god. Oh, god.",
+  "hooks": {
+   "old": {
+    "hook": "He actually said minor casualties?",
+    "all": [
+     "He actually said minor casualties?",
+     "They did it with minor casualties",
+     "Feeling great after casualties is suspicious"
+    ]
+   },
+   "spec": {
+    "hook": "We did it magically with minor casualties",
+    "all": [
+     "With only minor casualties",
+     "we have done it magically",
+     "I feel so good about myself",
+     "All my decisions paid off",
+     "Done magically with minor casualties",
+     "Will this turn out good for us"
+    ],
+    "brief": {
+     "punchline": "We pulled it off 'magically' — and only had 'minor casualties'.",
+     "anchors": [
+      "With only minor casualties",
+      "we have done it magically",
+      "I feel so good about myself",
+      "all of the decisions that I've made",
+      "I can't wait to see how this is gonna turn out good for all of us"
+     ],
+     "best_line": "With only minor casualties, we have done it magically.",
+     "tension": "Will this 'magical' success with 'only minor casualties' actually turn out good for all of us?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Bro hyped it then instantly panicked",
+    "all": [
+     "pov | POV: you say only minor casualties then panic",
+     "pov | POV: you call it only minor casualties and regret",
+     "nobody | Nobody: insists it's genius then hates it",
+     "nobody | Nobody: brags about choices then groans",
+     "hidden_consequence | That minor casualties line ruins everything",
+     "hidden_consequence | One casual minor casualties comment buries us",
+     "sarcastic | Oh great we did it magically",
+     "sarcastic | Cheers to our magical minor casualties",
+     "reaction | Bro hyped it then instantly panicked",
+     "reaction | He said we all win then froze"
+    ],
+    "mood": "awkward, anxious — triumph flipping to regret"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "34137a_1487",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "You got it. Got it. Construction. Construction. Wow. It should smell like, but don't put it in there yet. Get the nigga Right. I just want to get smell like? You know that green oil your mom used to use in your hand when you used Yeah. It smell like --. Nigga, it's fine. I'm trying to tell you, nigg",
+  "hooks": {},
+  "points": {},
+  "error": "ContentFiltered('The AI safety filter flagged this moment (hate).')"
+ },
+ {
+  "id": "0dee5f_556",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Like... And he thinks that it's, like, you're, like, getting into a save state, like, a video game, like, when you're sleeping. Yeah. Yeah. Yeah. Then it comes back. He's awesome. So George has got a very prolific lab. He's seen as, like, the father of synthetic biology using directed evolution in i",
+  "hooks": {
+   "old": {
+    "hook": "Why he calls sleep a save state",
+    "all": [
+     "Why he calls sleep a save state",
+     "Hear me out George calls sleep a save state",
+     "Bro thinks sleep is a save state"
+    ]
+   },
+   "spec": {
+    "hook": "Sleep is a video game save",
+    "all": [
+     "getting into a save state",
+     "a video game",
+     "Is sleeping a save state",
+     "George runs a prolific lab",
+     "Very prolific lab in synthetic biology",
+     "Engineer life using directed evolution"
+    ],
+    "brief": {
+     "punchline": "He thinks sleeping is like entering a video game save state.",
+     "anchors": [
+      "save state",
+      "video game",
+      "sleeping",
+      "George",
+      "very prolific lab",
+      "directed evolution"
+     ],
+     "best_line": "He's seen as, like, the father of synthetic biology using directed evolution in in genetic engineering and computational biology to engineer life in a direction that we want.",
+     "tension": "Can we engineer life in a direction that we want using directed evolution and computational biology?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "George basically gets to rewrite life",
+    "all": [
+     "pov | POV: grad student hearing George say save state",
+     "pov | POV: you're in George's lab hearing save state",
+     "nobody | Nobody: father of synthetic biology hits save",
+     "nobody | Nobody: prolific lab leader treats sleep like save",
+     "hidden_consequence | So one lab just runs evolution",
+     "hidden_consequence | George basically gets to rewrite life",
+     "contrarian | Harvard bio guy needs dim lights",
+     "contrarian | The Harvard genius just wants naps",
+     "open_question | How did George shape the CRISPR wars?",
+     "open_question | Did George quietly spark the CRISPR wars?"
+    ],
+    "mood": "playful, admiring"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "767360_1457",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Oh, but... I gotta give it to them. I see. I see. I see. I see. I see. I I know what I'm doing. You gotta let me do it. You gotta give me a chance. You gotta give me... Let me understand. I could have Lexia and edit out all my mistakes. I could have it happen. He'd do that for me. He'd do that for m",
+  "hooks": {
+   "old": {
+    "hook": "Bro, he said You'd do that",
+    "all": [
+     "Bro, he said You'd do that",
+     "He said I see five times",
+     "Wait for him to say You'd do that"
+    ]
+   },
+   "spec": {
+    "hook": "Let Lexia edit my mistakes",
+    "all": [
+     "I could have Lexia",
+     "You gotta give me a chance",
+     "You gotta let me do it",
+     "Lexia will edit my mistakes",
+     "He'd do that for me",
+     "Will they give me a chance"
+    ],
+    "brief": {
+     "punchline": "She insists she should be given a chance because she can \"have Lexia edit out all my mistakes.\"",
+     "anchors": [
+      "You gotta give me a chance.",
+      "You gotta let me do it.",
+      "I could have Lexia and edit out all my mistakes.",
+      "I know what I'm doing.",
+      "He'd do that for me."
+     ],
+     "best_line": "I could have Lexia and edit out all my mistakes.",
+     "tension": "Will they give her the chance to do it — and let Lexia fix any mistakes?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "You gotta let me do it",
+    "all": [
+     "pov | POV: begging please let me try Lexia",
+     "pov | POV: you begging Lexia to erase mistakes",
+     "nobody | Nobody: He thinks Lexia erases his flubs",
+     "nobody | Nobody: Let Lexia clean up my disasters",
+     "hidden_consequence | And that is how Lexia steals practice",
+     "hidden_consequence | And that is how Lexia erases learning",
+     "sarcastic | Sure Lexia will erase my mistakes",
+     "sarcastic | Give me a chance Lexia will fix it",
+     "open_question | Is he gonna make it to the last bunny?",
+     "open_question | Does where they get eaten change everything?"
+    ],
+    "mood": "nervous-playful"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "31d86f_1526",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Maybe someone will listen to me one day, but maybe investors will listen to me one day on it. But what's interesting is, like, the the the idea that we can do directed evolution and, and build programmable life, right, so that you could have drought resistant cattle or, you know, you can have agricu",
+  "hooks": {
+   "old": {
+    "hook": "How they break plastic chemical bonds",
+    "all": [
+     "How they break plastic chemical bonds",
+     "40% faster agriculture is real",
+     "Plastics that break chemical bonds"
+    ]
+   },
+   "spec": {
+    "hook": "Crops grow 40 to 50 percent faster",
+    "all": [
+     "we can do directed evolution",
+     "Will investors back programmable life",
+     "drought resistant cattle",
+     "Crops 40 to 50 percent faster",
+     "add more nutritional value to plants",
+     "Plastics that break the chemical bonds"
+    ],
+    "brief": {
+     "punchline": "We can do directed evolution and build programmable life — drought resistant cattle and agriculture that grows 40%, 50% faster.",
+     "anchors": [
+      "directed evolution",
+      "programmable life",
+      "drought resistant cattle",
+      "agriculture that grows 40%, 50% faster",
+      "add more nutritional value to plants",
+      "plastics that break the chemical bonds of plastic"
+     ],
+     "best_line": "But what's interesting is, like, the the the idea that we can do directed evolution and, and build programmable life, right, so that you could have drought resistant cattle or, you know, you can have agriculture that grows 40%, 50% faster.",
+     "tension": "Will someone — especially investors — listen and actually back the development of these programmable-life ideas?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "POV: your crops just cheated evolution",
+    "all": [
+     "pov | POV: your farm grows 50 percent faster",
+     "pov | POV: your crops just cheated evolution",
+     "nobody | Nobody: Him turning plastics into dust",
+     "nobody | Nobody: Him like I just broke plastic",
+     "hidden_consequence | And that is how islands change forever",
+     "hidden_consequence | And that is how we inherit permanent obligations",
+     "contrarian | They pitch mammoths like revenue streams",
+     "contrarian | Saving species or selling market share",
+     "open_question | Who chooses which species we back up?",
+     "open_question | Twelve governments picking which species survive?"
+    ],
+    "mood": "visionary"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 2,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "5a0f95_850",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Saucy. Sounds good. Teaser for Emily in Paris season two, which will be coming November 22. Okay. Who cares? Long audience. Teaser from Imelda Staunton, who will play Queen Elizabeth in season five of the crown, announcing that it will be coming in November 2022, November next year. Who's that? Impe",
+  "hooks": {
+   "old": {
+    "hook": "Bro Imelda Staunton is the Queen",
+    "all": [
+     "Bro Imelda Staunton is the Queen",
+     "Wait for the Imperialism line",
+     "Why Imelda says November 2022"
+    ]
+   },
+   "spec": {
+    "hook": "Imelda Staunton plays Queen Elizabeth November 2022",
+    "all": [
+     "Teaser for Emily in Paris season two",
+     "Teaser from Imelda Staunton",
+     "who will play Queen Elizabeth",
+     "Comes November 22 next year",
+     "Imelda Staunton plays Queen Elizabeth",
+     "Who cares about Emily in Paris season two"
+    ],
+    "brief": {
+     "punchline": "Imelda Staunton will play Queen Elizabeth in season five of The Crown, arriving in November 2022.",
+     "anchors": [
+      "Emily in Paris season two",
+      "November 22",
+      "Imelda Staunton",
+      "Queen Elizabeth",
+      "season five of the crown"
+     ],
+     "best_line": "Teaser from Imelda Staunton, who will play Queen Elizabeth in season five of the crown, announcing that it will be coming in November 2022, November next year.",
+     "tension": "Who cares?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Netflix drops Emily again sigh",
+    "all": [
+     "pov | POV: Nov 22 Emily is back sigh",
+     "pov | POV: Netflix drops Emily again sigh",
+     "nobody | Nobody: acts like Imelda is headline news",
+     "nobody | Nobody: another Crown casting nobody asked for",
+     "sarcastic | Oh great another Hemsworth rescue mission",
+     "sarcastic | Extraction again because originality is overrated",
+     "hidden_consequence | And that is how teasers kill buzz",
+     "hidden_consequence | And that is how who cares nuked hype",
+     "open_question | Who actually cares about Nov 25 teasers?",
+     "open_question | Who signs off on another Nov 25 teaser?"
+    ],
+    "mood": "snarky"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a777be_4861",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Best friends I had. Yeah. Why why? Because they was always there for me. Yeah. Mhmm. And I was there for them. Deal. I said a brother's always... Ain't never gonna expire. Hey. Hey. I used to get Black don't crack. Mhmm. I used to get in a fight and go here be wanting to fight. He was black, you kno",
+  "hooks": {
+   "old": {
+    "hook": "Hear me out, Black don't crack line",
+    "all": [
+     "Hear me out, Black don't crack line",
+     "Try not to smile at Black don't crack",
+     "Why he said brothers ain't never expire"
+    ]
+   },
+   "spec": {
+    "hook": "A brother ain't never gonna expire",
+    "all": [
+     "Best friends I had",
+     "Ain't never gonna expire",
+     "One brother never expires",
+     "You ain't messing with him now",
+     "Always there for me?",
+     "Black don't crack"
+    ],
+    "brief": {
+     "punchline": "A brother's always... ain't never gonna expire.",
+     "anchors": [
+      "Best friends I had.",
+      "always there for me.",
+      "A brother's always... Ain't never gonna expire.",
+      "I used to get Black don't crack.",
+      "you ain't messing with him now."
+     ],
+     "best_line": "Ain't never gonna expire.",
+     "tension": "Are friends really gonna always be there and have your back in fights?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "You ain't messing with him now",
+    "all": [
+     "pov | POV: you swear a brother's always ain't never expire",
+     "pov | POV: you promise a brother ain't never gonna expire",
+     "nobody | Nobody: you ain't messing with him now",
+     "nobody | Nobody: dude said you ain't messing with him now",
+     "hidden_consequence | Calling him the black boy shrank him",
+     "hidden_consequence | That black boy label did the damage",
+     "contrarian | Black don't crack but loyalty wins",
+     "contrarian | Black don't crack but who stayed mattered",
+     "open_question | Does a brother's promise ever expire?",
+     "open_question | Do those ride or die bonds last?"
+    ],
+    "mood": "nostalgic"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "910409_1389",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Yeah. You know, and I'm just thinking, you know, with the with the rise in in AI right now and how that's, you know, shifting the landscape and how we kind of interact with the world around us and even on social media. Right? What are you what are you seeing come down the pipeline? I know this is su",
+  "hooks": {
+   "old": {
+    "hook": "AI started with Facebook ads",
+    "all": [
+     "AI started with Facebook ads",
+     "Why he mentioned the Facebook ad platform",
+     "Bro remembers Facebook's machine learning"
+    ]
+   },
+   "spec": {
+    "hook": "Facebook ads learned to target you",
+    "all": [
+     "AI is coming out",
+     "even on social media",
+     "Facebook ad platform changed targeting",
+     "Ads got smarter from machine learning",
+     "What comes after Facebook ads"
+    ],
+    "brief": {
+     "punchline": "AI is already coming out and reshaping how we interact with the world and social media, even in ad platforms.",
+     "anchors": [
+      "AI",
+      "social media",
+      "shifting the landscape",
+      "Facebook ad platform",
+      "the machine learning they were doing there"
+     ],
+     "best_line": "You know, and I'm just thinking, you know, with the with the rise in in AI right now and how that's, you know, shifting the landscape and how we kind of interact with the world around us and even on social media.",
+     "tension": "What are you what are you seeing come down the pipeline?",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Every post suddenly reads you",
+    "all": [
+     "pov | POV: your feed rewrites itself overnight",
+     "pov | POV: every post suddenly reads you",
+     "nobody | Nobody: Him asking what's coming down the pipeline",
+     "nobody | Nobody: Him asking who's pulling the levers",
+     "hidden_consequence | And that's how Facebook sold your attention",
+     "hidden_consequence | And that's how Facebook's ads rewired our habits",
+     "open_question | Who decides it actually makes a dent?",
+     "open_question | Who wins when everything's shifting?",
+     "contrarian | Another AI release same problems",
+     "contrarian | Feels like Facebook ad deja vu"
+    ],
+    "mood": "concerned"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "208322_818",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "What is the business model? I mean, the technology in these guys, I would argue, is probably the most revolutionary technology ever. There's a new term... We were in an article recently and there's... We did not invent this this, but there's a new term called civilization tech. Have you heard this? ",
+  "hooks": {
+   "old": {
+    "hook": "Bet you don't know civ tech origin",
+    "all": [
+     "Bet you don't know civ tech origin",
+     "Wait till he says Anthropic was in it",
+     "Civilization tech is not just hype"
+    ]
+   },
+   "spec": {
+    "hook": "Probably the most revolutionary technology ever",
+    "all": [
+     "What is the business model",
+     "probably the most revolutionary technology ever",
+     "Moonshot evolved into civilization tech",
+     "Anthropic is in civ tech",
+     "A new category emerged"
+    ],
+    "brief": {
+     "punchline": "He argues this is probably the most revolutionary technology ever and people are even calling it a new category — \"civilization tech.\"",
+     "anchors": [
+      "What is the business model?",
+      "the technology in these guys, I would argue, is probably the most revolutionary technology ever",
+      "civilization tech",
+      "civ tech",
+      "Anthropic",
+      "moonshot category"
+     ],
+     "best_line": "the technology in these guys, I would argue, is probably the most revolutionary technology ever.",
+     "tension": "What is the business model?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "POV you hear civilization tech for first time",
+    "all": [
+     "pov | POV: investor casually invents civilization tech",
+     "pov | POV: you hear civilization tech for first time",
+     "nobody | Nobody: calm down it's just another startup",
+     "nobody | Nobody: calling it civ tech now seriously",
+     "hidden_consequence | Genome printers outrun the regulators",
+     "hidden_consequence | Oh great we can print genomes now",
+     "contrarian | Civ tech is a fundraising label",
+     "contrarian | Civ tech just sucks up the biggest cash",
+     "open_question | Who signs off on civ tech?",
+     "open_question | Who gets paid by civilization tech?"
+    ],
+    "mood": "visionary"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "31d86f_334",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "So they're in a secure, expansive ecological preserve. We had a lot of people show up at our lab really excited about the woolly mice. So with Game of Thrones and all this other stuff, we thought we probably shouldn't share exactly where the direwolves are, but they're doing quite well. But what's i",
+  "hooks": {
+   "old": {
+    "hook": "Why they won't reveal the direwolves",
+    "all": [
+     "Why they won't reveal the direwolves",
+     "Bet you say Game of Thrones",
+     "1 secret about the direwolves"
+    ]
+   },
+   "spec": {
+    "hook": "Not saying where the direwolves are",
+    "all": [
+     "secure expansive ecological preserve",
+     "people show up at our lab",
+     "shouldn't share exactly where the direwolves are",
+     "Game of Thrones made hiding locations necessary",
+     "Woolly mice drew big crowds",
+     "Why we won't reveal the direwolves location"
+    ],
+    "brief": {
+     "punchline": "We’re not telling where the ‘direwolves’ are — but they’re doing quite well.",
+     "anchors": [
+      "secure, expansive ecological preserve",
+      "woolly mice",
+      "Game of Thrones",
+      "direwolves",
+      "we had a lot of people show up at our lab"
+     ],
+     "best_line": "we thought we probably shouldn't share exactly where the direwolves are, but they're doing quite well.",
+     "tension": "Should they share exactly where the animals are or keep the location secret to protect them while coordinating with government, private landowners, fish and wildlife and indigenous people groups?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "We spend more time wrangling landowners than wolves",
+    "all": [
+     "hidden_consequence | And that is how fieldwork becomes bureaucracy",
+     "hidden_consequence | And that is how you become a diplomat",
+     "contrarian | Most people think of us as just the lab",
+     "contrarian | We spend more time wrangling landowners",
+     "open_question | Who signs off on releasing direwolves?",
+     "open_question | Who decides to let direwolves loose?",
+     "hidden_consequence | Spiritual ties shut the cameras down",
+     "hidden_consequence | They're sacred so we can't film",
+     "contrarian | Decades of care not a comeback",
+     "contrarian | This is stewardship not spectacle"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 0,
+   "angle:j1": 2,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "b8931e_2877",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "طيب، في بداية الأمر، كان جدًّا سهل لكن بعد هذه المحاولات دخلنا في تفاصيل على إيجاد حل هذا اللي نبيه احنا هذه النمطية للألغاز لو استمرت بشكل كبير جدًّا انعكس على حياتك اليومية تبدأ قراءتك ما تكون القراءة اللي قبل تبدأ تقرأ بين السطور أصلًا وتبدأ تلاحظ، وين الضعف اللي في النصوص إذا أنت مهتم في الجانب ",
+  "hooks": {
+   "old": {
+    "hook": "ليش النمطية عم تخرب قراءتك",
+    "all": [
+     "ليش النمطية عم تخرب قراءتك",
+     "اسمعني شوي النمطية مفيدة",
+     "يا زلمة ما كنت لاحظ النمطية قبل"
+    ]
+   },
+   "spec": {
+    "hook": "النمطية بالألغاز تخليك تقرأ بين السطور",
+    "all": [
+     "في بداية الأمر كان جدًّا سهل",
+     "المحاولات خلتنا نغوص بالتفاصيل",
+     "هذه النمطية بتأثر على قراءتك",
+     "انعکس على حياتك اليومية",
+     "ليش بتبلش تقرأ بين السطور",
+     "دخلنا بتفاصيل لإيجاد الحل"
+    ],
+    "brief": {
+     "punchline": "حل الألغاز بشكل نمطي بيخليك تقرأ بين السطور وتلاحظ ضعف النصوص، وحتى ممكن ينعكس على حياتك اليومية.",
+     "anchors": [
+      "في بداية الأمر، كان جدًّا سهل",
+      "بعد هذه المحاولات دخلنا في تفاصيل على إيجاد حل",
+      "هذه النمطية للألغاز",
+      "انعكس على حياتك اليومية",
+      "تبدأ تقرأ بين السطور"
+     ],
+     "best_line": "لو استمرت بشكل كبير جدًّا انعکس على حياتك اليومية",
+     "tension": "هل استمرارية النمطية بالألغاز رح تنعكس على قراءتك وحياتك اليومية؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "بتبدأ تقرأ بين السطور",
+    "all": [
+     "pov | POV: تبدأ تلاحظ وين الضعف في النصوص",
+     "pov | POV: تقرأ بين السطور وتلاحظ الضعف",
+     "nobody | ما حدا: بتبدأ تقرأ بين السطور",
+     "nobody | ما حدا: النمطية بالألغاز انعكست على حياتك",
+     "hidden_consequence | تبدأ تقرأ بين السطور",
+     "hidden_consequence | لو استمرت بشكل كبير جدًّا انعكس على حياتك اليومية",
+     "contrarian | النمطية للألغاز بتنعكس على الجانب الروائي",
+     "contrarian | إذا أنت مهتم في الجانب الروائي انتبه للنمطية",
+     "open_question | ليش حتى على العبادات بتصلي بخشوع؟",
+     "open_question | كيف النمطية بتنعكس على عبادتك؟"
+    ],
+    "mood": "تأملي"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "b8931e_2168",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "أنا أبي مثلًا الكوب القهوة أحاول أني أركز فيه أستلم فيه أتطعم طعم القهوة أنا عادةً مثلًا لما أشرب قهوتي دائم أسمع دائم أشوف، دائم أتكلم هذه المرة خلني أتطعم فيها، أحاول فيها، أركز، أتلذذ فيها كذا أنا أبدأ أرفع مسألة التذوق، أبدأ أركز فيها شوي كذا أيضًا، هذا بالنسبة للمشروبات أو أي مشروبات أشربها الا",
+  "hooks": {
+   "old": {
+    "hook": "يا زلمة ركّزت على طعمة القهوة",
+    "all": [
+     "يا زلمة ركّزت على طعمة القهوة",
+     "ليش فجأة ركزت بس عالقهوة",
+     "جرب ما تحكي وتذوق الكوب"
+    ]
+   },
+   "spec": {
+    "hook": "هالمرة خلني أتطعم القهوة",
+    "all": [
+     "هذه المرة خلني أتطعم فيها",
+     "أحاول أني أركز فيه",
+     "ركز على الكوب القهوة",
+     "لما أشرب قهوتي أتطعم",
+     "دائم أسمع دائم أشوف دائم أتكلم",
+     "أتلذذ فيها كذا"
+    ],
+    "brief": {
+     "punchline": "هالمرة خلني أتطعم القهوة بدل ما أسمع أو أشوف أو أتكلم.",
+     "anchors": [
+      "الكوب القهوة",
+      "أركز فيه",
+      "أتطعم طعم القهوة",
+      "لما أشرب قهوتي",
+      "دائم أسمع دائم أشوف، دائم أتكلم",
+      "أتلذذ فيها"
+     ],
+     "best_line": "هذه المرة خلني أتطعم فيها، أحاول فيها، أركز، أتلذذ فيها كذا",
+     "tension": "كيف أكون حاضر وأتلذذ بمذاق القهوة بدل ما أضل دائم أسمع دائم أشوف دائم أتكلم؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "بلاش كلام وذوق القهوة",
+    "all": [
+     "pov | POV: الكوب القهوة أركز فيه",
+     "pov | POV: أتطعم طعم القهوة",
+     "nobody | Nobody: خلني أتطعم فيها",
+     "nobody | Nobody: ما عندي وقت خلني أتطعم",
+     "hidden_consequence | وبهيك نخسر لذة الموية على وجهي",
+     "hidden_consequence | وبهيك بننسى نتلذذ بالقهوة",
+     "contrarian | بلاش كلام وذوق القهوة",
+     "contrarian | خلّ الكلام وخلّ الطعم يحكي",
+     "open_question | مين بيفكر بالوضوء تتخلص من الذنوب",
+     "open_question | مين بيتذوق الاستحمام بدل ما يتفكر"
+    ],
+    "mood": "تأملي"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "02c0d2_2628",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "اهل امه لان عائلتنا كثير كبيره عندنا خمسه انا عندي خمسه خالات وخلان والعائله كثير كبيره شو بصير كل حدا من الخليط انه الخال بجيب معه اكل او بلام عين فبن ستمانيو سو بيكون في كذا صحن لكذا نوع بروتين كل حدا عامل وبيكون في كذا طاسه لانواع السوق هيك عرفتي كيف بتقول لي ايه فيك شيء سثمني وبشري بتذبح حدا من ",
+  "hooks": {
+   "old": {
+    "hook": "ليش كل خال جاب نوع بروتين",
+    "all": [
+     "ليش كل خال جاب نوع بروتين",
+     "عنا خمسة خالات وخلان",
+     "استنى لتشوف مين جاب الطاسة الكبيرة"
+    ]
+   },
+   "spec": {
+    "hook": "كذا صحن لكذا نوع بروتين",
+    "all": [
+     "كذا صحن لكذا نوع بروتين",
+     "انا عندي خمسه خالات وخلان",
+     "عائلتنا كثير كبيره وكل واحد بيجيب أكل",
+     "المائدة بتصير مليانة كذا طاسه",
+     "شو بصير بكذا صحن لكذا نوع بروتين",
+     "بتذبح حدا من العائله ونتغديه"
+    ],
+    "brief": {
+     "punchline": "عندنا عيلة كتير كبيرة وكل خال أو خالة بيجيب أكل مختلف لدرجة إنه بيصير عندنا كذا صحن لكذا نوع بروتين وكذا طاسه.",
+     "anchors": [
+      "اهل امه",
+      "عائلتنا كثير كبيره",
+      "انا عندي خمسه خالات وخلان",
+      "كذا صحن لكذا نوع بروتين",
+      "كذا طاسه",
+      "بتذبح حدا من العائله ونتغديه"
+     ],
+     "best_line": "كذا صحن لكذا نوع بروتين",
+     "tension": "شو بصير وكيف نتعامل لما العيلة تكون كبيرة وكل واحد بيجيب أكل مختلف وبيطلع عندنا كذا صحن وكذا طاسه؟",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "مين بيرتب بعد ما بيصفقك بصحن الحمص؟",
+    "all": [
+     "pov | POV: عائلتنا كثير كبيره والطاوله ملانة",
+     "pov | POV: كل واحد جايب صحن مختلف",
+     "nobody | ما حدا: في كذا صحن وما حدا بيعرف",
+     "nobody | ما حدا: في كذا صحن وكل واحد جايب شي",
+     "sarcastic | آه طبعاً الخال بجيب معه اكل",
+     "sarcastic | يا سلام كل مرة الخال بجيب معه اكل",
+     "hidden_consequence | هيك كل حدا عامل صحن و اكل",
+     "hidden_consequence | كل حدا عامل ونتغديه بغضب العائله",
+     "open_question | مين بيرتب بعد ما بيصفقك بصحن الحمص؟",
+     "open_question | وبعدين مين بيرتب بعد ما بيصفقك بصحن الحمص؟"
+    ],
+    "mood": "مرح وفوضوي"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "34137a_3105",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "You did not need a mask to look like that. What the did you do to my hair? Word. You you go Come on, bro. Punga, you did not need that mask to look like that. Serious? What? I wanna eat a pig. You don't have a a pic with Wait. Sit down. Sit down. We gotta shampoo it. Like, go home. No. You definitel",
+  "hooks": {
+   "old": {
+    "hook": "What did they do to Punga's hair",
+    "all": [
+     "What did they do to Punga's hair",
+     "Bro really did that to Punga",
+     "Try not to laugh at Punga's hair"
+    ]
+   },
+   "spec": {
+    "hook": "You did not need that mask",
+    "all": [
+     "You did not need a mask",
+     "What the did you do to my hair",
+     "Punga did not need that mask",
+     "Looks better after shampoo",
+     "I wanna eat a pig",
+     "Will it look better when it dries"
+    ],
+    "brief": {
+     "punchline": "You did not need a mask to look like that.",
+     "anchors": [
+      "You did not need a mask to look like that.",
+      "What the did you do to my hair?",
+      "Punga, you did not need that mask to look like that.",
+      "We gotta shampoo it.",
+      "I wanna eat a pig."
+     ],
+     "best_line": "You did not need a mask to look like that.",
+     "tension": "Did the mask (or whatever they did) ruin the hair, or will shampooing, conditioning and drying make it look better?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Bro said you did not need that mask",
+    "all": [
+     "pov | POV: you have a walkway in your head",
+     "pov | POV: they want to shampoo the walkway",
+     "nobody | Nobody: Bro said you did not need that mask",
+     "nobody | Nobody: He roasted your haircut no mask needed",
+     "sarcastic | Mask off hair disaster I wanna eat a pig",
+     "sarcastic | Nice haircut now I wanna eat a pig",
+     "reaction | Oh my gosh come on bro",
+     "reaction | Oh my gosh what did you do",
+     "open_question | It actually looks better when dry?",
+     "open_question | You think drying fixes that haircut?"
+    ],
+    "mood": "playful"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "910409_2239",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "And how can we show that more and more Mhmm. You can actually get positive returns while also doing actual, real, impactful good, you know, and and how can we kind of create that as a cultural norm versus kind of being the, like, the the unusual unique thing that people invest in. Right? And how can",
+  "hooks": {
+   "old": {
+    "hook": "Why more investors pick profit and impact",
+    "all": [
+     "Why more investors pick profit and impact",
+     "Doing good does not mean lower returns",
+     "Bet you think impact costs returns"
+    ]
+   },
+   "spec": {
+    "hook": "Positive returns with real impact",
+    "all": [
+     "You can actually get positive returns",
+     "actual real impactful good",
+     "Positive returns and real impact",
+     "Make impact investing number one",
+     "Bend capitalism one investment at a time",
+     "How do we prove impact pays"
+    ],
+    "brief": {
+     "punchline": "You can actually get positive returns while also doing actual, real, impactful good.",
+     "anchors": [
+      "positive returns",
+      "actual, real, impactful good",
+      "create that as a cultural norm",
+      "the unusual unique thing that people invest in",
+      "bend the needle in cap... Capitalism in the right direction"
+     ],
+     "best_line": "You can actually get positive returns while also doing actual, real, impactful good, you know, and and how can we kind of create that as a cultural norm versus kind of being the, like, the the unusual unique thing that people invest in.",
+     "tension": "How can we prove that impact investments deliver positive returns and make that the cultural norm instead of an unusual niche?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Nobody: Stop treating it like charity",
+    "all": [
+     "pov | POV: You profit while actually doing good",
+     "pov | POV: Making bank while fixing real problems",
+     "nobody | Nobody: Make impact investing the norm",
+     "nobody | Nobody: Stop treating it like charity",
+     "hidden_consequence | Fail to normalize impact capitalism doubles down",
+     "hidden_consequence | And that is how capital buries good",
+     "open_question | What proof makes investors actually act?",
+     "open_question | What proof convinces CEOs to act?",
+     "reaction | Bro actually called lawyers the iPhone",
+     "reaction | Wait he wants lawyers to be iPhones"
+    ],
+    "mood": "optimistic"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "02c0d2_1551",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "بدك تعمل لي واحد ما في مجال ليه عم تطمن عصافرتي اربعه وجده قال لي استاذ لوين واصلين تعوا بس على بتحكي بالجماد ما بتعرفكم اذا حدايلكم مش رح نختلف يا ويللي شو رح نختلف فادي انا واصلين على داره شو بدك هي قال لي ما فييه امشي على سعرة الآب الوضع منهم منيح ت خايبي امرك بس انه على داره 7 دقائق صورنا ببره م",
+  "hooks": {
+   "old": {
+    "hook": "عصافرتي اربعة وين صارت",
+    "all": [
+     "عصافرتي اربعة وين صارت",
+     "ليش قال لي ما فييه امشي",
+     "يا زلمة فادي وصل على داره"
+    ]
+   },
+   "spec": {
+    "hook": "عصافرتي أربعة واصلين على داره بعد 7 دقايق",
+    "all": [
+     "ما في مجال",
+     "استاذ لوين واصلين",
+     "على داره 7 دقائق",
+     "استاذ لوين واصلين"
+    ],
+    "brief": {
+     "punchline": "عصافرتي اربعه، واصلين على داره، على داره 7 دقائق، وصورنا ببره.",
+     "anchors": [
+      "ما في مجال",
+      "عصافرتي اربعه",
+      "استاذ لوين واصلين",
+      "على داره 7 دقائق",
+      "صورنا ببره"
+     ],
+     "best_line": "مش رح نختلف يا ويللي شو رح نختلف",
+     "tension": "مش رح نختلف يا ويللي شو رح نختلف؟",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "مين رح يدفع 700000 له",
+    "all": [
+     "pov | POV: قال لي اوكي انا بدي 700000 وبس",
+     "pov | POV: قال لي اوكي انا بدي 700000 وانت شو",
+     "nobody | Nobody: كلشي كلام وهو راجع على دبي",
+     "nobody | Nobody: يحكي عن حل وبالآخر راجع دبي",
+     "hidden_consequence | وهالكلمة ضيّعت عشت بدباي بست سنين",
+     "hidden_consequence | بقرار واحد خسّرنا عشت بدباي بست سنين",
+     "contrarian | مش كل مبلغ كبير يعني أمان",
+     "contrarian | كانت أأمن وأرخص وإنت عم تدفع",
+     "open_question | ليش قال لي اوكي انا بدي 700000؟",
+     "open_question | مين رح يدفع 700000 له؟"
+    ],
+    "mood": "عفوي، تفاوضي"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a24ed8_1110",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "الف يبقى انت عندك NESELVA 800 بس ده النيسيف فين? في البلاد فلوريسيف مش في الاوكسين? في رسالة صح? معنى الكلام ده ايه انه الهارد بيعتمد اثناء الاكسرسيس والايموشنز والانفعال والميتابوليك اكتيفيتي على زياده الاكسجين عن طريق زياده البلاد فلو لأنك لو انت deouring exercise او deouring acticeity ما قدرتش تز",
+  "hooks": {
+   "old": {
+    "hook": "NESELVA 800 الرقم اللي حكوا عنه",
+    "all": [
+     "NESELVA 800 الرقم اللي حكوا عنه",
+     "ليش النيسيف مش في الاوكسين",
+     "يا زلمة ٢٠٠ ل١٠٠ ما عم افهم"
+    ]
+   },
+   "spec": {
+    "hook": "لو ما قدرتش تزود mlin ٢٠٠ ل١٠٠ الهارد هيعاني",
+    "all": [
+     "انت عندك NESELVA 800",
+     "الهارد بيعتمد اثناء الاكسرسيس",
+     "ما قدرتش تزود mlin ٢٠٠ ل ١٠٠ الهارد هيعاني",
+     "البلاد فلوريسيف بتزود الاكسجين",
+     "مش في الاوكسين",
+     "النيسيف فين بالظبط"
+    ],
+    "brief": {
+     "punchline": "معنى الكلام ده انه الهارد بيعتمد اثناء الاكسرسيس والايموشنز والانفعال والميتابوليك اكتيفيتي على زياده الاكسجين عن طريق زياده البلاد، فلو ما قدرتش تزود mlin ٢٠٠ ل ١٠٠ يبقى الهارد بتاعك هيعاني جدا.",
+     "anchors": [
+      "NESELVA 800",
+      "النيسيف فين?",
+      "البلاد فلوريسيف",
+      "الاوكسين?",
+      "الهارد بيعتمد اثناء الاكسرسيس والايموشنز والانفعال والميتابوليك اكتيفيتي",
+      "ما قدرتش تزود mlin ٢٠٠ ل ١٠٠"
+     ],
+     "best_line": "معنى الكلام ده ايه انه الهارد بيعتمد اثناء الاكسرسيس والايموشنز والانفعال والميتابوليك اكتيفيتي على زياده الاكسجين عن طريق زياده البلاد",
+     "tension": "هل لو ما قدرتش تزود mlin ٢٠٠ ل ١٠٠ يبقى الهارد بتاعك هيعاني؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "القلب يبدأ يعاني عند 156 مل",
+    "all": [
+     "contrarian | مش كل مشاكل القلب تحتاج عملية",
+     "contrarian | مش كل ضعف القلب من انسداد",
+     "hidden_consequence | مش مزحة يوصل لـ 156 مل في الدقيقة",
+     "hidden_consequence | بيبدأ الخطر لو يوصل لـ 156 مل في الدقيقة",
+     "open_question | يعني mlin ٢٠٠ ل ١٠٠ بيعمل إيه؟",
+     "open_question | القلب بيتأثر بـ mlin ٢٠٠ ل ١٠٠ إزاي؟",
+     "contrarian | ما تفكر بكل الشرايين ركّز على الكرونالي",
+     "contrarian | لو الكرونالي ما زاد الدم النظام بخرب",
+     "hidden_consequence | وبهيك الهارد بتاعك هيعاني",
+     "hidden_consequence | وهيصير عندك مشكلة بالأكسجين"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "5a0f95_118",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Yeah. Well, folks, people used to joke in the early days of Cord Killers and its and its predecessor, Frame Rate, that we were just a Netflix show. All we did was talk about Netflix. Well, this time, it's true. Time for our primary target. Netflix made all the news this week, in part thanks to a fan",
+  "hooks": {
+   "old": {
+    "hook": "Bet you haven't heard Ta Dumb",
+    "all": [
+     "Bet you haven't heard Ta Dumb",
+     "Why fans called it Ta Dumb",
+     "Wait till the Netflix sound"
+    ]
+   },
+   "spec": {
+    "hook": "Ta Dumb hijacked Netflix headlines",
+    "all": [
+     "we were just a Netflix show",
+     "Cord Killers joked they were Netflix",
+     "Frame Rate was our predecessor",
+     "called Ta Dumb after the sound",
+     "Are we finally targeting Netflix",
+     "Netflix made all the news"
+    ],
+    "brief": {
+     "punchline": "They used to joke they were 'just a Netflix show,' and this time it's true — Netflix dominated the news thanks to a fan event called 'Ta Dumb' after the Netflix sound.",
+     "anchors": [
+      "Cord Killers",
+      "Frame Rate",
+      "a Netflix show",
+      "Time for our primary target",
+      "Ta Dumb"
+     ],
+     "best_line": "Netflix made all the news this week, in part thanks to a fan event called Ta Dumb after the sound, you know, the Netflix sound.",
+     "tension": "Will they spend the episode on Netflix — their 'primary target' — now that Netflix made all the news this week because of the 'Ta Dumb' fan event?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Nobody: Everything became Netflix again",
+    "all": [
+     "pov | POV: front row cheering Ta Dumb",
+     "pov | POV: Ta Dumb is headlining tonight",
+     "nobody | Nobody: We said no Netflix talk",
+     "nobody | Nobody: Everything became Netflix again",
+     "hidden_consequence | And that is how Oculus freebies ruin value",
+     "hidden_consequence | And that is how giving Eden Unearthed away backfires",
+     "contrarian | Netflix not just chasing phones",
+     "contrarian | They actually dropped a Quest game",
+     "open_question | Is Netflix testing fandom via App Lab?",
+     "open_question | Is Eden Unearthed a stealth fandom test?"
+    ],
+    "mood": "wry"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "b8931e_3863",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "بتعرفها أنت كقائد بتعرف وين الإشكالية فيه بالضبط، وبوضوح دانيال جولمان عنده التركيز الداخلي والتركيز على الآخرين والتركيز اللي حول البيئة كيف؟ لازم أنا أعرف انفعالاتي، لازم أعرف فهم أفكاري ومشاعري بشكل واضح، وعرف الآخرين إذا عرفت نفسي، عرفت الآخرين والمرحلة الجدة متقدمة اللي هو أيش؟",
+  "hooks": {
+   "old": {
+    "hook": "أقوى قائد مش بيعرف نفسه",
+    "all": [
+     "أقوى قائد مش بيعرف نفسه",
+     "ليش دانيال جولمان حط ثلاث تركيزات",
+     "٣ أنواع تركيز عند دانيال جولمان"
+    ]
+   },
+   "spec": {
+    "hook": "لازم أعرف انفعالاتي لأفهم الآخرين",
+    "all": [
+     "بتعرفها أنت كقائد",
+     "لازم أنا أعرف انفعالاتي",
+     "التركيز على الآخرين",
+     "إذا عرفت نفسي عرفت الآخرين",
+     "دانيال جولمان ميز ثلاث أنواع تركيز",
+     "كيف أعرف انفعالاتي كقائد"
+    ],
+    "brief": {
+     "punchline": "كقائد لازم أعرف انفعالاتي أولاً عشان أقدر أفهم الآخرين والبيئة.",
+     "anchors": [
+      "كقائد",
+      "دانيال جولمان",
+      "التركيز الداخلي",
+      "التركيز على الآخرين",
+      "لازم أنا أعرف انفعالاتي"
+     ],
+     "best_line": "إذا عرفت نفسي، عرفت الآخرين",
+     "tension": "كيف بقدر كقائد أعرف انفعالاتي لأفهم الآخرين والبيئة؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "بدون معرفتك لنفسك ما بتقود",
+    "all": [
+     "contrarian | التركيز الداخلي مش رفاهية",
+     "contrarian | بدون معرفتك لنفسك ما بتقود",
+     "hidden_consequence | لازم أنا أعرف انفعالاتي وإلا بنعمل نفس الغلط",
+     "hidden_consequence | لازم أنا أعرف انفعالاتي قبل كل قرار",
+     "open_question | كيف بنطبّق كلام دانيال جولمان؟",
+     "open_question | وين نبلّش بتطبيق دانيال جولمان؟",
+     "contrarian | عرف الآخرين إذا عرفت نفسي",
+     "contrarian | إذا عرفت نفسي بتعرف الآخرين",
+     "hidden_consequence | لما القائد ما يعرف المشكلة المنظمة بتتوه",
+     "hidden_consequence | بدون تحديد المشكلة المنظمة بتخسر فرص"
+    ],
+    "mood": "جدي"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "31d86f_1399",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "No dino DNA, and it makes K. Like, Beth Shapiro said this at, like, some conference, and everyone, like, got mad and booed. Like, she got booed. Like, she's, like, the number one ancient DNA expert in world got booed because she said there was no dino DNA. No dynasty being. Well, they they degrades.",
+  "hooks": {
+   "old": {
+    "hook": "Hear me out Beth Shapiro got booed",
+    "all": [
+     "Hear me out Beth Shapiro got booed",
+     "Wait till Beth Shapiro gets booed",
+     "Beth Shapiro publicly booed for saying no dino DNA"
+    ]
+   },
+   "spec": {
+    "hook": "Beth Shapiro booed for no dino DNA",
+    "all": [
+     "No dino DNA",
+     "Beth Shapiro said no dino DNA",
+     "She got booed",
+     "the number one ancient DNA expert",
+     "Oldest DNA we work with 1,300,000 years",
+     "Could DNA survive 65,000,000 years"
+    ],
+    "brief": {
+     "punchline": "Beth Shapiro, the number one ancient DNA expert in world, got booed for saying 'no dino DNA'.",
+     "anchors": [
+      "No dino DNA",
+      "Beth Shapiro",
+      "got booed",
+      "the number one ancient DNA expert in world",
+      "1,300,000 years",
+      "65,000,000 years"
+     ],
+     "best_line": "Like, she's, like, the number one ancient DNA expert in world got booed because she said there was no dino DNA.",
+     "tension": "Can we ever 'stumble across' dinosaur DNA after 65,000,000 years when the oldest DNA we work with is about 1,300,000 years?",
+     "mood": "shocking"
+    }
+   },
+   "angle": {
+    "hook": "She got booed for telling the truth",
+    "all": [
+     "pov | POV: you tell them no dino DNA",
+     "pov | POV: you calmly say no dino DNA",
+     "nobody | Nobody: still expects dino DNA after 65 million years",
+     "nobody | Nobody: thinks DNA lasts beyond 1,300,000 years",
+     "hidden_consequence | She got booed now they want dinosaurs",
+     "hidden_consequence | Now her honesty spawns Pikachu fan mail",
+     "open_question | Who really expects dino DNA in Antarctica?",
+     "open_question | Who actually thinks Antarctica saved dinosaur DNA?",
+     "reaction | Bro they booed her for Pikachu",
+     "reaction | They literally asked for Megalodon next"
+    ],
+    "mood": "bemused"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "a777be_2885",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "I mean, an exception to Good guy, though. Right. That's a connector piece, I think, sometimes between cultures Mhmm. Is if somebody's been through something. Yep. But he does believe he's black, which is like, it's cool, but... You know? He may be Like albino? Or just color... Or he may be... What's",
+  "hooks": {
+   "old": {
+    "hook": "Wait for the albino line",
+    "all": [
+     "Wait for the albino line",
+     "Why he calls himself black then says albino",
+     "Bro really thinks he's albino"
+    ]
+   },
+   "spec": {
+    "hook": "He thinks he's Black but might be albino",
+    "all": [
+     "But he does believe he's black",
+     "You can't see what color you are",
+     "One possibility he's albino",
+     "Becomes a connector between cultures",
+     "an exception to Good guy",
+     "That's a connector piece"
+    ],
+    "brief": {
+     "punchline": "He does believe he's black — but he might actually be albino or color blind.",
+     "anchors": [
+      "Good guy",
+      "connector piece",
+      "between cultures",
+      "he does believe he's black",
+      "Color blind",
+      "albino"
+     ],
+     "best_line": "But he does believe he's black, which is like, it's cool, but...",
+     "tension": "Is he really black, or is he albino or color blind?",
+     "mood": "funny"
+    }
+   }
+  },
+  "points": {},
+  "error": "ContentFiltered('The AI safety filter flagged this moment (hate).')"
+ },
+ {
+  "id": "767360_167",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Oh my god. Oh my god. What are we doing? And why are we doing it? Oh my god. Oh my god. Well, I didn't mean to do this. Unless it was good thing, then I totally meant it and I take all the credit. What?",
+  "hooks": {
+   "old": {
+    "hook": "Why is she taking all the credit",
+    "all": [
+     "Why is she taking all the credit",
+     "Took all the credit anyway",
+     "4 Oh my gods in a row"
+    ]
+   },
+   "spec": {
+    "hook": "If it works I take all the credit",
+    "all": [
+     "Oh my god",
+     "What are we doing",
+     "I didn't mean to do this",
+     "I take all the credit",
+     "I'll take credit if it works",
+     "Why are we doing it"
+    ],
+    "brief": {
+     "punchline": "They admit it was an accident — but promise to take full credit if it turns out well.",
+     "anchors": [
+      "Oh my god.",
+      "What are we doing?",
+      "And why are we doing it?",
+      "I didn't mean to do this.",
+      "I take all the credit."
+     ],
+     "best_line": "Unless it was good thing, then I totally meant it and I take all the credit.",
+     "tension": "Did they really mess up or is this a brilliant stunt — and will they own it if it succeeds?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "POV: panic then claim all the credit",
+    "all": [
+     "pov | POV: you yell what are we doing",
+     "pov | POV: you yell what are we doing take credit",
+     "nobody | Nobody: Him screaming Oh my god nonstop",
+     "nobody | Nobody: Claims credit mid panic like always",
+     "sarcastic | Sure take credit when it works",
+     "sarcastic | Oh sure you meant it then",
+     "reaction | Bro actually just said what",
+     "reaction | Dude he really said what",
+     "open_question | Did he really not mean to do this?",
+     "open_question | He really said he didn't mean to do this?"
+    ],
+    "mood": "panicked-playful"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "5a0f95_1735",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "I watched I watched, I watched this, this trailer, and I was really struck by... There was something very familiar about it. I was like, what is it that's so familiar about it? And I said, oh, that's right. Everything. Welcome to Generic the movie. Like, play it, and they're just It's literally name",
+  "hooks": {
+   "old": {
+    "hook": "Bro really named it Invasion",
+    "all": [
+     "Bro really named it Invasion",
+     "Named Invasion and totally generic",
+     "Called Invasion but it's every movie"
+    ]
+   },
+   "spec": {
+    "hook": "Welcome to Generic the movie",
+    "all": [
+     "Welcome to Generic the movie",
+     "It's literally named invasion",
+     "oh that's right Everything",
+     "this trailer and I was",
+     "This trailer is Generic the movie",
+     "Is it literally called invasion"
+    ],
+    "brief": {
+     "punchline": "The trailer is so generic it's literally called 'invasion' — welcome to \"Generic the movie\".",
+     "anchors": [
+      "this trailer",
+      "Everything.",
+      "Welcome to Generic the movie",
+      "It's literally named invasion",
+      "It's science."
+     ],
+     "best_line": "Welcome to Generic the movie.",
+     "tension": "What is it that's so familiar about it — is it literally named 'invasion' and 'Welcome to Generic the movie'?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "POV: welcome to Generic the movie",
+    "all": [
+     "pov | POV: welcome to Generic the movie",
+     "pov | POV: it literally says Invasion",
+     "nobody | Nobody: Predictable trailer guy It's literally named invasion",
+     "nobody | Nobody: He watched and sighed It's literally named invasion",
+     "sarcastic | Great another invasion with good SEO",
+     "sarcastic | Because nothing says art like good SEO",
+     "contrarian | They call it science on purpose",
+     "contrarian | Familiar sci fi is comfort food",
+     "open_question | Why does play it, and they're just generic?",
+     "open_question | Why does play it, and they're just everything?"
+    ],
+    "mood": "skeptical"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 1,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "31d86f_232",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "And so over 1,300,000 years. And what's interesting is that as we study and do the comparative genomics and analysis of all of those genomes and the sequencing and the ancestral state reconstructions, we actually can look and see they're actually insanely different. And so if we had a living cell fr",
+  "hooks": {
+   "old": {
+    "hook": "Bet you can't spot what makes a mammoth",
+    "all": [
+     "Bet you can't spot what makes a mammoth",
+     "If you cloned one which is a mammoth",
+     "Hear me out mammoths are sum of parts"
+    ]
+   },
+   "spec": {
+    "hook": "Which one's a mammoth?",
+    "all": [
+     "Over 1,300,000 years of change",
+     "comparative genomics and analysis",
+     "the difference in them is insanely vast",
+     "if we had a living cell",
+     "Clone any of them they'd be different",
+     "Ancestral state reconstructions show differences"
+    ],
+    "brief": {
+     "punchline": "We believe that it really is the sum of the parts that make it a mammoth to mammoth.",
+     "anchors": [
+      "over 1,300,000 years",
+      "comparative genomics and analysis",
+      "ancestral state reconstructions",
+      "living cell",
+      "clone any of them",
+      "the difference in them is insanely vast"
+     ],
+     "best_line": "And so the difference in them is insanely vast.",
+     "tension": "which one's a mammoth? Right?",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Nobody: one mutation does not make a mammoth",
+    "all": [
+     "pov | POV: you must pick which one's a mammoth",
+     "pov | POV: you have to choose the real mammoth",
+     "nobody | Nobody: thinks a single gene makes a mammoth",
+     "nobody | Nobody: one mutation does not make a mammoth",
+     "hidden_consequence | And that is how we trade wildlands for labs",
+     "hidden_consequence | And that is how a bigger pack reshapes parks",
+     "open_question | Is a mammoth DNA or perception?",
+     "open_question | Genes or a kid pointing it?",
+     "reaction | Bro said Romulus and Remus out loud",
+     "reaction | Okay show Khaleesi weights and photos"
+    ],
+    "mood": "curious and optimistic"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "02c0d2_1108",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "ونص كان بعجقه سر ما حدا بيكسر على حدا ما حدا بزمر جوره ما في لك برغش ما فيه على الطرقات تحسوهم عم يلعبوا جي تي اي بدبي كلهم ماشيين نفس السرعه وخايفين من الضبط اوكي لانه اذا اجى الضبط بيموت حدا من العائله قد منه الغالي كل في هلا في عالم جايين من دبي صيفه هون اللي ما اجوا عم يدفعوا ظبوطه هالقد هالقد ف",
+  "hooks": {
+   "old": {
+    "hook": "اسمعني شوي دبي مو لعبة",
+    "all": [
+     "اسمعني شوي دبي مو لعبة",
+     "ليش كلهم ماشيين نفس السرعة",
+     "دبي سوبر سيف ما عنجد"
+    ]
+   },
+   "spec": {
+    "hook": "اذا اجى الضبط بيموت حدا من العائله",
+    "all": [
+     "تحسوهم عم يلعبوا جي تي اي بدبي",
+     "كلهم ماشيين نفس السرعه بدبي",
+     "خايفين من الضبط فكلهم يمشوا نفس السرعة",
+     "اذا اجى الضبط بيموت حدا من العائله",
+     "بدبي كل الناس بتقول دبي سوبر سيف",
+     "مين هون عايش بدباي"
+    ],
+    "brief": {
+     "punchline": "تحسوهم عم يلعبوا جي تي اي بدبي — كلهم ماشيين نفس السرعه وخايفين من الضبط، بس كل العالم بدباي بتقول انه دبي سوبر سيف.",
+     "anchors": [
+      "تحسوهم عم يلعبوا جي تي اي بدبي",
+      "كلهم ماشيين نفس السرعه",
+      "خايفين من الضبط",
+      "اذا اجى الضبط بيموت حدا من العائله",
+      "بس كل العالم بدباي بتقول انه دبي سوبر سيف",
+      "مين هون عايش بدباي"
+     ],
+     "best_line": "اذا اجى الضبط بيموت حدا من العائله",
+     "tension": "مين هون عايش بدباي؟",
+     "mood": "shocking"
+    }
+   },
+   "angle": {
+    "hook": "اذا اجى الضبط بيموت حدا من العيلة",
+    "all": [
+     "pov | POV: عم يلعبوا جي تي اي بدبي وانت بتسوق",
+     "pov | POV: كلهم ماشيين نفس السرعة وخايفين من الضبط",
+     "nobody | Nobody: كلهم بدبي عم يلعبوا جي تي اي وخايفين",
+     "nobody | Nobody: كل العالم بتقول دبي سوبر سيف وهم خايفين",
+     "hidden_consequence | اذا اجى الضبط بيموت حدا من العيلة",
+     "hidden_consequence | الخوف عم بيغير حياة الشوارع",
+     "contrarian | دبي سوبر سيف؟ بالحكي بس",
+     "contrarian | مين فعلا عايش بدبي وبيحس بالأمان",
+     "open_question | مين عم يستفيد من هالأمان؟",
+     "open_question | شنطة كاميرات وناس خايفة من الضبط؟"
+    ],
+    "mood": "نقدي"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 1,
+   "angle:j1": 2,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "b8931e_176",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "بدينا... إي، زين شاكك ما ركزت في رسالة ألمتك محاولة حاول، فالقهوة كانت جميلة فمجرد أي ضيف يدخل الاستديو هو مسجل إلى أن تطلع من السوق زين؟ نعم، حاولت جميع الحلول صراحة تذكر المكسرات، تذكر الأعشاب والحلول وما خليت موقع إلا وجربته، ما خليت أي شيء إلا وجربته حتى الرياضة، مارست الرياضة طويلة ومارست الجري",
+  "hooks": {
+   "old": {
+    "hook": "ليش رجعت للقهوة بعد كل التجارب",
+    "all": [
+     "ليش رجعت للقهوة بعد كل التجارب",
+     "الرياضة مارستها وما صارت معجزة",
+     "يا زلمة جربت المكسرات كلها"
+    ]
+   },
+   "spec": {
+    "hook": "جربت المكسرات والأعشاب والجري الطويل",
+    "all": [
+     "ما خليت أي شيء إلا وجربته",
+     "فالقهوة كانت جميلة",
+     "جربت المكسرات كحل",
+     "الأعشاب كانت ضمن التجارب",
+     "حتى الرياضة جربتها",
+     "هل الجري الطويل حسّن ذاكرتك"
+    ],
+    "brief": {
+     "punchline": "جربت كل شيء — من المكسرات والأعشاب لحد الرياضة والجري الطويل، ما خليت أي شيء إلا وجربته.",
+     "anchors": [
+      "فالقهوة كانت جميلة",
+      "المكسرات",
+      "الأعشاب",
+      "حتى الرياضة",
+      "مارست الجري الطويل"
+     ],
+     "best_line": "ما خليت أي شيء إلا وجربته",
+     "tension": "هل كل هالتجارب والحلول اللي جربتها فعلاً حسّنت الذاكرة والتركيز؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "ما خليت أي شيء إلا وجربته وما فاد",
+    "all": [
+     "hidden_consequence | ما خليت أي شيء إلا وجربته وما فاد",
+     "hidden_consequence | ما خليت أي شيء إلا وجربته وشاكك",
+     "contrarian | المكسرات والأعشاب مو هالقد بتساعد",
+     "contrarian | الرياضة والمكسرات ما بتحل المشكلة",
+     "open_question | شو بصير فيني بأول ثانية؟",
+     "open_question | ليش أختفي وما أقدر أفكر؟",
+     "hidden_consequence | رجعت من البقالة وحاس شي ناقص",
+     "hidden_consequence | طلعت عالبقالة وصرت أراجع جيبي",
+     "contrarian | جربت كل موقع وضيعت السبب",
+     "contrarian | كل الحلول عم تخفي السبب الحقيقي"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "910409_1009",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "This is, like, you know, before we knew a lot of these things. I was like, well, it's better to get her, like, used to it, like, so she can, like, defend against herself and, like... So I got her on the platform early and let her use it. And luckily, with her personality, she just didn't really get ",
+  "hooks": {
+   "old": {
+    "hook": "Why I put her on the platform",
+    "all": [
+     "Why I put her on the platform",
+     "Delayed the platform for 2 kids",
+     "Daughter never got sucked in"
+    ]
+   },
+   "spec": {
+    "hook": "First kid didn't get sucked in",
+    "all": [
+     "So I got her on the platform early",
+     "before we knew a lot of these things",
+     "defend against herself",
+     "She didn't really get sucked in",
+     "We delayed our two other kids",
+     "Delay access as long as possible"
+    ],
+    "brief": {
+     "punchline": "They put their first kid on the platform early and, luckily, with her personality she didn't get sucked in — now they delay giving the other two kids access.",
+     "anchors": [
+      "before we knew a lot of these things",
+      "So I got her on the platform early and let her use it.",
+      "defend against herself",
+      "didn't really get sucked in",
+      "my other two kids",
+      "delay as long as possible"
+     ],
+     "best_line": "So I got her on the platform early and let her use it.",
+     "tension": "Should you introduce kids early so they can 'defend against herself' or delay access to avoid them getting 'sucked in'?",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "Personality isn't a parenting plan",
+    "all": [
+     "contrarian | Getting her used to it backfired",
+     "contrarian | Putting her on early made it normal",
+     "hidden_consequence | And that is how she missed the group chat",
+     "hidden_consequence | And that is how she got excluded",
+     "open_question | What rules help parents say no?",
+     "open_question | How do parents say no to addictive apps?",
+     "contrarian | Personality isn't a parenting plan",
+     "contrarian | Saying she won't get sucked in is gambling",
+     "hidden_consequence | And that is how the bills piled up",
+     "hidden_consequence | And that is how she ended up hurt"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 0,
+   "angle:j1": 1,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "208322_2024",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "And so, like, in the screwworm example, it's like they're spending 1,000,000,005 in taxes and in eight years they're gonna, like, slow or stop the problem. Our solution, which is already made, could eradicate the entire problem in every model that we've done in six to seven months. Wow. We could sav",
+  "hooks": {
+   "old": {
+    "hook": "Eradicate screwworm in six to seven months",
+    "all": [
+     "Eradicate screwworm in six to seven months",
+     "1,000,000,005 didn't stop screwworm",
+     "1,000,000,005 spent on screwworm"
+    ]
+   },
+   "spec": {
+    "hook": "End screwworm deaths in six months",
+    "all": [
+     "Our solution which is already made",
+     "Eradicate in six to seven months",
+     "1,000,000,005 in taxes wasted",
+     "Why wait eight years",
+     "Stop painful death from the screwworm",
+     "the screwworm example"
+    ],
+    "brief": {
+     "punchline": "Our solution, which is already made, could eradicate the screwworm problem in six to seven months, instead of the eight-year approach where they're spending 1,000,000,005 in taxes—saving a decade, billions of dollars, and animals from painful death.",
+     "anchors": [
+      "screwworm",
+      "1,000,000,005 in taxes",
+      "eight years",
+      "Our solution, which is already made",
+      "six to seven months",
+      "painful death from the screwworm"
+     ],
+     "best_line": "Our solution, which is already made, could eradicate the entire problem in every model that we've done in six to seven months.",
+     "tension": "Do we keep spending 1,000,000,005 in taxes over eight years for a slow fix, or adopt the already-made solution that could eradicate the problem in six to seven months and spare animals painful death?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Fix it in months not years",
+    "all": [
+     "contrarian | Spending a billion to wait eight years",
+     "contrarian | Fix it in months not years",
+     "hidden_consequence | And that is how regulators waste a decade",
+     "hidden_consequence | And that is how taxpayers pay with animal pain",
+     "open_question | Who signs off on gene drives and cloning?",
+     "open_question | Who decides if government backs gene drives?",
+     "contrarian | Opposing it adds six to seven months of suffering",
+     "contrarian | Saying no gives animals months more pain",
+     "hidden_consequence | And that is how taxes buy dead cattle",
+     "hidden_consequence | And that is how government stalls eradication"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "910409_100",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "I'd been in court a little bit, but there's always some guy in the country that I thought was better. And I felt like it was better to help clients find that right person for their case. And that's how I kind of got into mass torts and class actions and really taking on the biggest pharmaceutical co",
+  "hooks": {
+   "old": {
+    "hook": "He took on the biggest pharmaceutical companies",
+    "all": [
+     "He took on the biggest pharmaceutical companies",
+     "He takes on pharmaceutical and oil giants",
+     "Wait for how he chose mass torts"
+    ]
+   },
+   "spec": {
+    "hook": "I take on Big Pharma Big Tech Big Oil",
+    "all": [
+     "mass torts and class actions",
+     "taking on the biggest pharmaceutical companies",
+     "Big Pharma Big Tech Big Oil",
+     "Clients find the right person",
+     "Who helps clients fight Big Pharma",
+     "I'd been in court a little bit"
+    ],
+    "brief": {
+     "punchline": "And that's how I kind of got into mass torts and class actions and really taking on the biggest pharmaceutical companies, tech companies, oil companies in the world.",
+     "anchors": [
+      "in court",
+      "help clients find that right person for their case",
+      "mass torts and class actions",
+      "biggest pharmaceutical companies",
+      "tech companies, oil companies"
+     ],
+     "best_line": "And that's how I kind of got into mass torts and class actions and really taking on the biggest pharmaceutical companies, tech companies, oil companies in the world.",
+     "tension": "Can clients find the right person for their case to take on the biggest companies?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Marketing and admin beat courtroom glory",
+    "all": [
+     "pov | POV: your lawyer finds your exact champion",
+     "pov | POV: someone says they know the perfect lawyer",
+     "nobody | Nobody: Him finding the right lawyer for you",
+     "nobody | Nobody: Him matching you with a class action ace",
+     "hidden_consequence | And that's how millions stay unpaid",
+     "hidden_consequence | And that is how harm goes unnoticed",
+     "contrarian | Call centers win mass torts",
+     "contrarian | Marketing and admin beat courtroom glory",
+     "open_question | How do you market and sue giants?",
+     "open_question | How do you juggle marketing and litigation?"
+    ],
+    "mood": "admiring, practical"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "767360_738",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Ball is beautiful. Ball is good. Ball is everything. The shadow people aren't real. The shadow people aren't real. There's always ball. Ball is with you inside and out. The shadow people are not inside you. Ball is life. Ball is everything. Okay. I'm a step on this. I did the thing. Oh, it's all my ",
+  "hooks": {
+   "old": {
+    "hook": "Bro really thinks Ball is life",
+    "all": [
+     "Bro really thinks Ball is life",
+     "Why he keeps saying Ball is everything",
+     "Wait till he notices his toys"
+    ]
+   },
+   "spec": {
+    "hook": "Ball is everything",
+    "all": [
+     "Ball is beautiful",
+     "Ball is good",
+     "Ball is with you inside and out",
+     "One thing matters Ball is everything",
+     "Shadow people or Ball which is real",
+     "The shadow people aren't real"
+    ],
+    "brief": {
+     "punchline": "The speaker insists again and again that “Ball is everything” while denying that “The shadow people” are real.",
+     "anchors": [
+      "Ball is beautiful.",
+      "Ball is good.",
+      "Ball is everything.",
+      "The shadow people aren't real.",
+      "Ball is with you inside and out."
+     ],
+     "best_line": "Ball is everything.",
+     "tension": "Are the shadow people real, or is \"Ball is everything\" the answer?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Bro just called his thoughts toys",
+    "all": [
+     "pov | POV: They chant Ball is everything at you",
+     "pov | POV: Ball worship is your entire life",
+     "nobody | Nobody: clutching a ball saying shadow people aren't real",
+     "nobody | Nobody: keeps insisting shadow people aren't real",
+     "hidden_consequence | And that is how ball ate their personality",
+     "hidden_consequence | And now their whole life is ball",
+     "open_question | Did that step just reveal toys?",
+     "open_question | What happens when I step on this?",
+     "reaction | Bro just called his thoughts toys",
+     "reaction | Wait are those toys or thoughts"
+    ],
+    "mood": "quirky-eerie"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "02c0d2_2453",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "شي سكوادين لير قلت له شنويه نوع فواكه بيطلع عننا بالضيعه ينزل ق دعومك ان شاء الله يا هون طبالا بارانس يعني ما مبين عليك عرفتوا كيف مثل ما نحن بنقولها هون يعني وهي ذات هي ذات بس مترجمه انعم عرفتوا عن جد ما عم عمي في عالم بريسس دون مكان في عالم بتعقد من مكان وانا اشتغلت بنيوس اوتلت فرانكوف",
+  "hooks": {
+   "old": {
+    "hook": "ليش قال شنويه نوع فواكه هون",
+    "all": [
+     "ليش قال شنويه نوع فواكه هون",
+     "اسمعني شوي اشتغلت بنيوس اوتلت فرانكوف",
+     "براهنك ما تضحك على بارانس"
+    ]
+   },
+   "spec": {
+    "hook": "شنويه نوع فواكه بيطلع عننا بالضيعه",
+    "all": [
+     "وهي ذات هي ذات بس مترجمه",
+     "يعني ما مبين عليك",
+     "اشتغلت بنيوس اوتلت فرانكوف",
+     "عن جد ما عم عمي",
+     "ان شاء الله",
+     "شنويه نوع فواكه بيطلع عننا بالضيعه"
+    ],
+    "brief": {
+     "punchline": "المضحك إنو واحد بيسأل \"شنويه نوع فواكه بيطلع عننا بالضيعه\" وسط كلام عن ترجمة وشغل بـ\"نيوس اوتلت فرانكوف\".",
+     "anchors": [
+      "شنويه نوع فواكه بيطلع عننا بالضيعه",
+      "ان شاء الله",
+      "يعني ما مبين عليك",
+      "وهي ذات هي ذات بس مترجمه",
+      "عن جد ما عم عمي",
+      "وانا اشتغلت بنيوس اوتلت فرانكوف"
+     ],
+     "best_line": "شنويه نوع فواكه بيطلع عننا بالضيعه",
+     "tension": "هل الحديث عن نفس الشي فعلاً ولا بس 'مترجم'، وبالنهاية شو نوع الفواكه اللي عم يحكوا عنه؟",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "POV: الصحفية الفرنسية عم تستغرب قصص الضيعة",
+    "all": [
+     "pov | POV: الصحفية الفرنسية عم تكتشف الضيعة",
+     "pov | POV: الصحفية الفرنسية عم تستغرب قصص الضيعة",
+     "nobody | ما حدا: بيقول ما فينا نعمم وبعدين",
+     "nobody | ما حدا: بيقلك ما فينا نعمم وبعدين يعمم",
+     "hidden_consequence | صغّرنا الناس وخسرنا فرصة ماكسيم",
+     "hidden_consequence | نحكم بسرعة وخسرنا ماكسيم",
+     "contrarian | الستيريوتايبس ما بينطبقوا عليهم",
+     "contrarian | كل الستيريوتايبس الفرنسية طلعوا غلط",
+     "open_question | مين بيحكي القصة لما أنا عم بصور وهو بيكتب؟",
+     "open_question | القصة بتصير لمين لما أنا عم أصور؟"
+    ],
+    "mood": "reflective"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "208322_690",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "But we... But until we had the camera system worked up in in high def, we just are are just, putting that loop. And then we have the animatronic up there so people could at least see the scale and the size, and we wanted to make something that was, like, Instagramable when people showed up. Right? B",
+  "hooks": {
+   "old": {
+    "hook": "Why we had a 130 pound wolf",
+    "all": [
+     "Why we had a 130 pound wolf",
+     "Bro really put wolves in Texas offices",
+     "Bet you missed the 8,000 square foot Bavarium"
+    ]
+   },
+   "spec": {
+    "hook": "130 pound Pleistocene wolf in Texas office",
+    "all": [
+     "giant 130 pound Pleistocene wolves",
+     "We looped a high def camera",
+     "Housed in an 8000 square foot Bavarium",
+     "we have the animatronic up there",
+     "Instagramable when people showed up",
+     "How to show scale without real wolves"
+    ],
+    "brief": {
+     "punchline": "They actually had a giant 130‑pound Pleistocene wolf in their Texas offices and even an 8,000 square foot Bavarium to house them.",
+     "anchors": [
+      "camera system",
+      "high def",
+      "animatronic",
+      "Instagramable",
+      "giant 130 pound Pleistocene wolves",
+      "8,000 square foot Bavarium"
+     ],
+     "best_line": "But, yeah, having a giant 130 pound Pleistocene wolves in our Texas offices was probably a bad idea.",
+     "tension": "Can you make a giant prehistoric-wolf display that’s Instagramable and shows scale without it being a reckless or impractical 'bad idea'?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "POV under a 130 pound Pleistocene wolf",
+    "all": [
+     "pov | POV: under a 130 pound Pleistocene wolf",
+     "pov | POV: selfie or run from 130 pound wolf",
+     "nobody | Nobody: He's selling woolly mice tees",
+     "nobody | Nobody: Says no merch then sells woolly mice",
+     "hidden_consequence | 8,000 square foot Bavarium ruins budgets",
+     "hidden_consequence | And that is how Instagramable broke us",
+     "contrarian | Making exhibits for Instagram not visitors",
+     "contrarian | Pretty exhibits nobody can visit",
+     "open_question | Who gets to call revived animals bioweapons?",
+     "open_question | Who decides if these wolves are bioweapons?"
+    ],
+    "mood": "conversational"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 0,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "208322_2920",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "But now we're connecting existing systems like, you know, most labs don't use things like Jira and so I think the hardest thing we've done is reprogram not stem cells but scientists who work in things like Jira and Smartsheet. Like traditional software like things. And then and then we're we're conn",
+  "hooks": {
+   "old": {
+    "hook": "Bro actually reprogrammed scientists not cells",
+    "all": [
+     "Bro actually reprogrammed scientists not cells",
+     "Why they put Jira in the lab",
+     "Bet you don't make scientists use Jira"
+    ]
+   },
+   "spec": {
+    "hook": "We reprogrammed scientists to use Jira and Smartsheet",
+    "all": [
+     "work in things like Jira",
+     "We reprogrammed scientists for Smartsheet",
+     "Lab notebooks now connected",
+     "through an AI layer",
+     "Mid level and senior management lacked visibility",
+     "Near real time lab visibility"
+    ],
+    "brief": {
+     "punchline": "The hardest thing we've done is reprogram not stem cells but scientists to work in tools like Jira and Smartsheet.",
+     "anchors": [
+      "Jira",
+      "Smartsheet",
+      "lab notebooks",
+      "AI layer",
+      "mid level and senior management",
+      "near real time"
+     ],
+     "best_line": "I think the hardest thing we've done is reprogram not stem cells but scientists who work in things like Jira and Smartsheet.",
+     "tension": "Can we reprogram scientists and give mid level and senior management visibility of what's happening in the lab in near real time?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "your manager sees every pipette move",
+    "all": [
+     "pov | POV: your dashboard snitches on experiments",
+     "pov | POV: your manager sees every pipette move",
+     "nobody | Nobody: reprogrammed scientists not stem cells",
+     "nobody | Nobody: we had to reprogram scientists into Jira users",
+     "hidden_consequence | And that is how months disappeared",
+     "hidden_consequence | And that is how hours turned into months",
+     "open_question | Who actually acts on AI lab visibility?",
+     "open_question | Who signs off on AI lab alerts?",
+     "contrarian | Reprogram scientists not stem cells",
+     "contrarian | Jira training beats better algorithms"
+    ],
+    "mood": "technical"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "208322_3539",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "We... There's a lot... We we could... You could spend an hour just on weird like Reddit like conspiracies around Colossal. That's fun. It's fun. We should do that. That's most fun. Okay. Well, Ben, that leaves us... We're out of time. Yeah. Thank you so much. This was so much fun. The tour was insan",
+  "hooks": {
+   "old": {
+    "hook": "1 hour on Colossal conspiracies",
+    "all": [
+     "1 hour on Colossal conspiracies",
+     "Out of time but wanted an hour",
+     "Hear me out Colossal conspiracies are fun"
+    ]
+   },
+   "spec": {
+    "hook": "An hour of Colossal Reddit conspiracies",
+    "all": [
+     "weird like Reddit like conspiracies around Colossal",
+     "Can we spend an hour",
+     "One hour on Reddit conspiracies",
+     "The tour was insane",
+     "My mind just exploded",
+     "Ben that leaves us"
+    ],
+    "brief": {
+     "punchline": "You could spend an hour just on weird like Reddit like conspiracies around Colossal — that's most fun.",
+     "anchors": [
+      "Ben",
+      "Reddit",
+      "weird like Reddit like conspiracies around Colossal",
+      "spend an hour",
+      "tour was insane",
+      "my mind just exploded"
+     ],
+     "best_line": "You could spend an hour just on weird like Reddit like conspiracies around Colossal.",
+     "tension": "Can they actually spend an hour on weird like Reddit like conspiracies around Colossal when we're out of time?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Mind blown Reddit rabbit hole time",
+    "all": [
+     "pov | POV: my mind just exploded and they want Reddit",
+     "pov | POV: my mind just exploded Reddit rabbit hole time",
+     "nobody | Nobody: wants a Reddit deep dive after tour",
+     "nobody | Nobody: suggests hour of Colossal conspiracies now",
+     "hidden_consequence | Mind exploded now chasing Colossal conspiracies",
+     "hidden_consequence | We said fun now I'm doomscrolling Colossal",
+     "open_question | Who actually reads all Colossal conspiracies?",
+     "open_question | What would an hour on Colossal Reddit reveal?",
+     "reaction | They killed our Colossal conspiracy hour",
+     "reaction | Bro they cut the conspiracy short"
+    ],
+    "mood": "upbeat"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "b8931e_4420",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "فيه بعض الناس يحس بتوتر، يحس بقلق أن شيء متعود عليه وتفقد بشكل مفاجئ مو جيد، بالعكس شيء جيد أنا من الناس اللي أحبى أسهل على الناس ما فيها عاقّدهم هم تعبانين يتعبون كثير في المذاكرة ويتعبون عندهم ظروف تجي أنت تبي تغيّر كل هذه الأشياء؟",
+  "hooks": {
+   "old": {
+    "hook": "ليش العادة راحت عليك فجأة",
+    "all": [
+     "ليش العادة راحت عليك فجأة",
+     "جرب تحكي عن ظروفك هسا",
+     "استنى للنهاية بعطيك طريقة"
+    ]
+   },
+   "spec": {
+    "hook": "تفقد شي متعود عليه مش سيء",
+    "all": [
+     "أنا من الناس اللي أحبى أسهل على الناس",
+     "بالعكس شيء جيد",
+     "فيه بعض الناس يحس بتوتر",
+     "تفقد بشكل مفاجئ ممكن يكون مفيد",
+     "طلاب يتعبون كثير في المذاكرة",
+     "أنت تبي تغيّر كل هذه الأشياء؟"
+    ],
+    "brief": {
+     "punchline": "تفقد شيء متعود عليه بشكل مفاجئ مو سيء، بالعكس شيء جيد، أنا من الناس اللي أحبى أسهل على الناس.",
+     "anchors": [
+      "يحس بتوتر",
+      "يحس بقلق",
+      "تفقد بشكل مفاجئ",
+      "بالعكس شيء جيد",
+      "يتعبون كثير في المذاكرة",
+      "عندهم ظروف"
+     ],
+     "best_line": "أنا من الناس اللي أحبى أسهل على الناس",
+     "tension": "أنت تبي تغيّر كل هذه الأشياء؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "مش لازم تعزل حالك لتنجح",
+    "all": [
+     "pov | POV: إنت طالب تعبان وفقدت روتينك",
+     "pov | POV: شوي تسهيل يخفف عنك",
+     "nobody | ما حدا: بيتعب بالمذاكرة وبخاف يغيّر روتينه",
+     "nobody | ما حدا: تعبان بالمذاكرة وما بده يبدّل شي",
+     "hidden_consequence | تعقّدهم يخليهم يتعبوا",
+     "hidden_consequence | ما فيها عاقّدهم بيتعبوا بالمذاكرة",
+     "contrarian | مش لازم تعزل حالك لتنجح",
+     "contrarian | خلي حواسك تساعدك بدل العزل",
+     "open_question | مين منع السفر كحل للراحة؟",
+     "open_question | ليش ما نخلي السفر جزء من الدعم؟"
+    ],
+    "mood": "مشجع"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "31d86f_1710",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "That bring us all kinds of ideas in ancient DNA. So it's weird. There's stuff that's going on, like, in, like, the permafrost research, and then there's stuff that's, like, in the catacombs of the Smithsonian. So every day, we're learning and seeing, oh, we didn't know there was DNA for that. So... ",
+  "hooks": {
+   "old": {
+    "hook": "They actually said no to Megalodon",
+    "all": [
+     "They actually said no to Megalodon",
+     "Wait till he says Megalodon",
+     "Try not to say Megalodon"
+    ]
+   },
+   "spec": {
+    "hook": "Don't bring back Megalodon",
+    "all": [
+     "Megalodon is definitely not on the list",
+     "we didn't know there was DNA",
+     "Smithsonian catacombs hold DNA",
+     "Ancient DNA keeps surprising us",
+     "Permafrost research finds ancient DNA",
+     "Should we bring back Megalodon"
+    ],
+    "brief": {
+     "punchline": "Megalodon is definitely not on the list; let's not bring that back.",
+     "anchors": [
+      "ancient DNA",
+      "permafrost research",
+      "catacombs of the Smithsonian",
+      "every day, we're learning and seeing, oh, we didn't know there was DNA for that",
+      "Megalodon"
+     ],
+     "best_line": "Megalodon is definitely not on the list.",
+     "tension": "Should we use ancient DNA to bring things back — and in particular, should we bring back Megalodon?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Please don't bring back Megalodon",
+    "all": [
+     "pov | POV: you find DNA in Smithsonian catacombs",
+     "pov | POV: you crack a Smithsonian specimen and there's DNA",
+     "nobody | Nobody: asks to bring back Megalodon",
+     "nobody | Nobody: wants Megalodon back he shuts it down",
+     "hidden_consequence | And that is how permafrost bites back",
+     "hidden_consequence | And that is how museums start trouble",
+     "contrarian | Skip the dig check Smithsonian drawers",
+     "contrarian | Smithsonian catacombs beat dramatic digs",
+     "open_question | Who signs off when random DNA shows up?",
+     "open_question | Who gets to resurrect whatever DNA we find?"
+    ],
+    "mood": "curious"
+   }
+  },
+  "points": {
+   "spec:j1": 1,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a777be_953",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Because some people, they have... Their eyes are really... You know, some people have, like, an antie belly button, some people have outie. Yeah. Some people got, like, outie eyes kinda. You know? Yeah. My aunt my aunt kinda... Well, not like that. Not that bad, but my aunt kinda has eyes like that.",
+  "hooks": {
+   "old": {
+    "hook": "Why compare eyes to antie belly button",
+    "all": [
+     "Why compare eyes to antie belly button",
+     "Try not to notice my aunt's eyes",
+     "1 black guy with outie eyes"
+    ]
+   },
+   "spec": {
+    "hook": "Some people got outie eyes",
+    "all": [
+     "Some people got like outie eyes",
+     "an antie belly button",
+     "One black guy not a community trait",
+     "My aunt has outie eyes",
+     "Is this a black community trait",
+     "Outie eyes are just individual"
+    ],
+    "brief": {
+     "punchline": "Some people have 'outie' eyes — like an 'outie' belly button — and that's just an individual thing, not a whole community trait.",
+     "anchors": [
+      "antie belly button",
+      "outie",
+      "outie eyes kinda",
+      "my aunt",
+      "black community",
+      "one black guy"
+     ],
+     "best_line": "Some people got, like, outie eyes kinda.",
+     "tension": "Is having 'outie' eyes a trait of the black community or just one person's individual feature?",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "POV: you smile while they judge her eyes",
+    "all": [
+     "pov | POV: your aunt's eyes everyone's whispering about",
+     "pov | POV: you smile while they judge her eyes",
+     "nobody | Nobody: Aunt turns living room into outie eye clinic",
+     "nobody | Nobody: Family casually diagnosing aunt's outie eyes",
+     "hidden_consequence | From in the Black community to drugs",
+     "hidden_consequence | Now they blame it on drugs",
+     "open_question | Who said eye shape is a drug sign?",
+     "open_question | Why you blaming eyes on drugs?",
+     "reaction | Bro blamed drugs while denying it",
+     "reaction | Bro just denied it then blamed drugs"
+    ],
+    "mood": "awkward"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "767360_2206",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Thank you. Thank you for that. I have a fork now. You want a fork? And a knife? No, you can't have both. Interesting. What? What was that? You run that by me again? Thanks. So I just need to figure out what I need.",
+  "hooks": {
+   "old": {
+    "hook": "Why he says you can't have both",
+    "all": [
+     "Why he says you can't have both",
+     "Wait till he refuses the knife",
+     "Try not to ask for the knife"
+    ]
+   },
+   "spec": {
+    "hook": "Fork or knife not both",
+    "all": [
+     "No you can't have both",
+     "I have a fork now",
+     "One fork not two",
+     "Fork wins over the knife",
+     "Which utensil will he pick",
+     "Still figuring out what I need"
+    ],
+    "brief": {
+     "punchline": "No, you can't have both.",
+     "anchors": [
+      "I have a fork now.",
+      "You want a fork?",
+      "And a knife?",
+      "No, you can't have both.",
+      "You run that by me again?",
+      "So I just need to figure out what I need."
+     ],
+     "best_line": "No, you can't have both.",
+     "tension": "Figuring out what I need.",
+     "mood": "funny"
+    }
+   },
+   "angle": {
+    "hook": "Bro really just asked that out loud",
+    "all": [
+     "pov | POV: They hand you one utensil choose wisely",
+     "pov | POV: Fork or knife you decide now",
+     "nobody | Nobody: Him flexing with a fork",
+     "nobody | Nobody: Him acting like fork royalty",
+     "sarcastic | Oh sure the fork explains everything",
+     "sarcastic | Single utensil decides my fate",
+     "reaction | Bro really just asked that out loud",
+     "reaction | He actually said run that by me again",
+     "open_question | So which utensil are they picking?",
+     "open_question | Seriously which utensil wins this?"
+    ],
+    "mood": "lighthearted-confused"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a24ed8_1941",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "Normo police لكن فيه hypotageumbard وهي نوع من inishore وطبعا دي لها اسباب ودي لها اسباب تعالوا نبتدي بالنوع الاولاني اللي هو hypo police له اسباب كتير يا شباب بس اهمها طبعا ان واحد نزف لكن مش بالضرورة يكون inishuress بس ممكن يفقد سوايل مش عن طريق مش الدبل يعني الناس الاطفال الصغيرين ممكن بالذات في ",
+  "hooks": {
+   "old": {
+    "hook": "يا زلمة شو هالhypotageumbard",
+    "all": [
+     "يا زلمة شو هالhypotageumbard",
+     "ليش الأطفال وكبار السن معرضين بهالنوع",
+     "اسمعني شوي النزف مش دايماً جرح"
+    ]
+   },
+   "spec": {
+    "hook": "اهمها ان واحد نزف",
+    "all": [
+     "اهمها طبعا ان واحد نزف",
+     "واحد نزف السبب الرئيسي",
+     "له اسباب كتير يا شباب",
+     "hypo police من نزف",
+     "Normo police لكن فيه hypotageumbard",
+     "هل لازم يكون inishore"
+    ],
+    "brief": {
+     "punchline": "أهمها طبعا: واحد نزف، حتى لو مش بالضرورة يكون inishuress.",
+     "anchors": [
+      "Normo police",
+      "hypotageumbard",
+      "inishore",
+      "hypo police",
+      "واحد نزف",
+      "يا شباب"
+     ],
+     "best_line": "له اسباب كتير يا شباب بس اهمها طبعا ان واحد نزف",
+     "tension": "هل هو بسبب نزف ولا لازم يكون inishuress؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "الحروق بتسرق سوائل الجسم وبتعمل صدمة",
+    "all": [
+     "contrarian | نزيف مش بالضرورة السبب",
+     "contrarian | ممكن تكون من فقدان سوايل",
+     "hidden_consequence | نازلة معوية بتنزل ضغط الطفل",
+     "hidden_consequence | بدون محاليل ضغط الدم يقل",
+     "open_question | نعمل إيه فوراً لو الطفل نازلة معويه",
+     "open_question | نستنى ولا ندي محاليل فوراً",
+     "hidden_consequence | الحروق بتسرق سوائل الجسم وبتعمل صدمة",
+     "hidden_consequence | الحرق مش بس جلد بيقدر يسبب صدمة",
+     "contrarian | الخطر مش بس للكبار والصغار",
+     "contrarian | أي حدا ممكن يصير له صدمة من فقد سوايل"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a24ed8_734",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "لكن لما يجيء ياخد منهم كام 12.5 ويرجع كام ويرجع 7 بس يبقي استهلاك الهارت من locals adract اعلى من كل الاورجنز التانية فالريزيرف بتاعه يبقي ايه الاحتياطي بتاعه ايه قليل قليل 7 بس بدل كم? 14 يعني نصف فالهارت دا عنده مشكلة لانه لو جينا نعمل اكسركسايز او نزود نشاط الهارد حيبقي الاحتياطي بتاعه ايه?",
+  "hooks": {
+   "old": {
+    "hook": "ليش الهارت الاحتياطي صار 7",
+    "all": [
+     "ليش الهارت الاحتياطي صار 7",
+     "من 12.5 ل7 احتياطي القلب",
+     "اسمعني شوي الهارت بس عنده 7"
+    ]
+   },
+   "spec": {
+    "hook": "الاحتياطي بتاع الهارت 7 بدل 14",
+    "all": [
+     "استهلاك الهارت من locals adract اعلى",
+     "نصف فالهارت دا عنده مشكلة",
+     "الاحتياطي 7 مشكلة",
+     "الاحتياطي بقي 7",
+     "هل 7 يكفي لو زدنا النشاط",
+     "ياخد منهم كام 12.5"
+    ],
+    "brief": {
+     "punchline": "الهارت عنده احتياطي قليل — 7 بدل 14 يعني نص، وده مشكلة لو زدنا نشاط الهارد.",
+     "anchors": [
+      "12.5",
+      "7",
+      "14",
+      "locals adract",
+      "الريزيرف بتاعه"
+     ],
+     "best_line": "يعني نصف فالهارت دا عنده مشكلة لانه لو جينا نعمل اكسركسايز او نزود نشاط الهارد حيبقي الاحتياطي بتاعه ايه?",
+     "tension": "هل الاحتياطي القليل (7 بدل 14) يكفي لو زدنا نشاط الهارد؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "التكرار بيستنزف مخزون القلب",
+    "all": [
+     "hidden_consequence | لو نعمل اكسركسايز الاحتياطي بتاعه ايه",
+     "hidden_consequence | لو نزود نشاط الهارد الاحتياطي بتاعه ايه",
+     "hidden_consequence | التراجع من 12.5 لـ7 بيأكل الاحتياطي",
+     "hidden_consequence | التكرار بيستنزف مخزون القلب",
+     "contrarian | 7 بدل كم 14 نص مش نهاية",
+     "contrarian | 7 مش نهاية نزود النشاط",
+     "open_question | لو الفينس اوكشن 14 وانت واطي تعمل ايه؟",
+     "open_question | مين رح يصلّح الفينس اوكشن الواطي؟",
+     "contrarian | القلب مش بس بياخد كتير",
+     "contrarian | المشكلة توزيع الدم مش القلب بس"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "0dee5f_1834",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "And thought, how could YouTube get any better? Well, premium has awesome features like offline downloads, just use it on a plane ride. So I can download my favorite automotive shows and videos to watch when I'm on the go. And that means I don't have to wait when I don't have Wi Fi, which is especial",
+  "hooks": {
+   "old": {
+    "hook": "Bro really paid for ad free",
+    "all": [
+     "Bro really paid for ad free",
+     "How I avoid airplane Wi Fi waiting",
+     "Wait till the ad free part"
+    ]
+   },
+   "spec": {
+    "hook": "Ad free car videos on planes",
+    "all": [
+     "YouTube premium is ad free",
+     "premium has awesome features like offline downloads",
+     "YouTube Premium works offline on planes",
+     "Watch favorite automotive shows offline",
+     "when I don't have Wi Fi",
+     "How do I watch ad free offline"
+    ],
+    "brief": {
+     "punchline": "YouTube Premium lets me download videos to watch on plane rides and is ad-free so I can watch uninterrupted.",
+     "anchors": [
+      "offline downloads",
+      "plane ride",
+      "favorite automotive shows and videos",
+      "don't have Wi Fi",
+      "ad free"
+     ],
+     "best_line": "And this is my favorite part, YouTube premium is ad free, so I can watch uninterrupted whenever, wherever.",
+     "tension": "How can I watch my favorite shows when I'm traveling or on a plane without Wi Fi and without ads interrupting me?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "POV: Stuck on a plane watching cars",
+    "all": [
+     "pov | POV: Stuck on a plane watching cars",
+     "pov | POV: No Wi Fi but car shows",
+     "nobody | Nobody: him streaming ad free like royalty",
+     "nobody | Nobody: him never pausing because no ads",
+     "hidden_consequence | And that is how your phone dies",
+     "hidden_consequence | And that is how downloads eat your space",
+     "sarcastic | Background play so my walks sound private",
+     "sarcastic | Lock my screen and feel ridiculously important",
+     "open_question | So it auto downloads my subscriptions?",
+     "open_question | Can I cancel before they bill me?"
+    ],
+    "mood": "upbeat"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "a24ed8_1746",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "لو حصل? تساوي كلمه shot يبقى كلمه shot هنا يعني ايه ؟ يعني shot shot shot shot shot shot shot ايه ما يوصلش للتشot بدرجة كافية احياناً يوصل بس ما يخرجش للتشو برضو ده معناه ان ما فيش برفيوجن يعني ايه يعني لازم البلاط يوصل للتشو ويعدي الناحية التانية ويجي البلاط جديد يوصل للتشو ويعدي الناحية التانية كل",
+  "hooks": {
+   "old": {
+    "hook": "٧ مرات كلمة shot متكررة هسا",
+    "all": [
+     "٧ مرات كلمة shot متكررة هسا",
+     "اسمعني هسا برفيوجن أهم من الشوت",
+     "جرب تشرح برفيوجن بعشر ثواني"
+    ]
+   },
+   "spec": {
+    "hook": "برفيوجن يعني حركة شوية",
+    "all": [
+     "كلمة برفيوجن معناها فيها حركة شوية",
+     "تساوي كلمه shot",
+     "shot shot shot",
+     "ما يوصلش للتشot بدرجة كافية",
+     "ما فيش برفيوجن",
+     "البلاط يوصل للتشو ويعدي الناحية التانية"
+    ],
+    "brief": {
+     "punchline": "كلمة برفيوجن معناها فيها حركة شوية",
+     "anchors": [
+      "كلمه shot",
+      "shot shot shot",
+      "ما يوصلش للتشot بدرجة كافية",
+      "ما فيش برفيوجن",
+      "البلاط يوصل للتشو ويعدي الناحية التانية"
+     ],
+     "best_line": "كلمة برفيوجن معناها فيها حركة شوية",
+     "tension": "هل البلاط يوصل للتشو ويعدي الناحية التانية ولا ممكن يروح يقف وما يجيش غيره؟",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "إنت مسعف وبتسمع كلمة shot",
+    "all": [
+     "pov | POV: إنت مسعف وبتسمع كلمة shot",
+     "pov | POV: بتسمع shot والدم مش واصل",
+     "nobody | Nobody: ما فيش برفيوجن",
+     "nobody | Nobody: هو بيقول ما فيش برفيوجن",
+     "hidden_consequence | البرفيوجن يقل والبلاط يروح يقف",
+     "hidden_consequence | البرفيوجن يقل مش معايا ولا فاهميه",
+     "contrarian | الخطر موجود حتى لو ما يوصلش للتشot بدرجة كافية",
+     "contrarian | خطر موجود حتى لو ما يوصلش للتشot",
+     "open_question | مين أصلاً بيراقب Pluth volum ده",
+     "open_question | ليه Pluth volum ما بيوصل كفاية"
+    ],
+    "mood": "تعليمي"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "a24ed8_2255",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "ماحدش عارف ماحدش حط في النوع انه ممكن يكون عنده internal hemushe طيب ايه أهم الاعراض اللي انا ممكن اكتشف بها internal hemushe اللي انا قلت لكم عليه دلوقتي كله ده لازم ده يتحط تحت الملاحظة ويتقاسوا كل شوية hart rat ويتقاسوا Whart resher ويتشاف السكين بتاعه الكولد ولا هو Whart مش عارف الbalor اللي في ",
+  "hooks": {
+   "old": {
+    "hook": "ليش حكى عن السكين الكولد",
+    "all": [
+     "ليش حكى عن السكين الكولد",
+     "انتبه لأعراض internal hemushe هسا",
+     "انكشف لما قاسوا hart rat"
+    ]
+   },
+   "spec": {
+    "hook": "تغير هارت ريت يبين internal hemushe",
+    "all": [
+     "ماحدش عارف ماحدش",
+     "كله ده لازم ده يتحط تحت الملاحظة",
+     "يتقاسوا كل شوية hart rat",
+     "internal hemushe ما يبانش كشكل",
+     "اتكتشف من تغيّر hart rat",
+     "أهم أعراض internal hemushe"
+    ],
+    "brief": {
+     "punchline": "ماحدش حط في النوع انه ممكن يكون عنده internal hemushe وكله ده لازم يتحط تحت الملاحظة ويتقاسوا كل شوية hart rat.",
+     "anchors": [
+      "ماحدش عارف",
+      "internal hemushe",
+      "كله ده لازم ده يتحط تحت الملاحظة",
+      "يتقاسوا كل شوية hart rat",
+      "ما يبانش كشكل"
+     ],
+     "best_line": "كله ده لازم ده يتحط تحت الملاحظة ويتقاسوا كل شوية hart rat ويتقاسوا Whart resher",
+     "tension": "ايه أهم الاعراض اللي انا ممكن اكتشف بها internal hemushe",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "وشه ابيض وجلده بارد يعني نزيف داخلي",
+    "all": [
+     "contrarian | لازم تشك الأول مش الكشف العادي",
+     "contrarian | ما ينفعش بالكشف العادي",
+     "hidden_consequence | ماحدش راقب هارت ريت ووقع بصدمة",
+     "hidden_consequence | وشه ابيض وجلده بارد يعني نزيف داخلي",
+     "open_question | ايه أهم أعراض internal hemushe؟",
+     "open_question | امتى أقول عنده internal hemushe؟",
+     "contrarian | بتفتح المكان وتقفل الشغلان قبل ما يبان",
+     "contrarian | بتفتح المكان وتقفل الشغلان مش تستنى الاعراض",
+     "hidden_consequence | ما تقيسوا hart rat بتصير الطوارئ أكبر",
+     "hidden_consequence | يتقاسوا كل شوية وإلا العلاج بيتعقد"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 1,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "02c0d2_1645",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "العالم مثلا بقولوا لي انه الفوت كتشر بتجمع العالم وين ما كان عن جد لا الميوزك الميوزك بتجمع العالم وين مكان الميوزك كالتشر شي مره رايحين على عرس لبنانه بلبنان لبنانه لبنانه عرس لبنانه وقتا تروح الطبل بضل بداينتك بس يبقى واحد فرنسي معزوم عم بجرب يدبك مع العيلة كلها كل العيلة هيك هوب هو بتحسوها",
+  "hooks": {
+   "old": {
+    "hook": "ليش الفرنسي بلّش يدبك مع العيلة",
+    "all": [
+     "ليش الفرنسي بلّش يدبك مع العيلة",
+     "1 فرنسي حاول يدبك بعرس لبنان",
+     "يا زلمة شوف الفرنسي عم يدبك"
+    ]
+   },
+   "spec": {
+    "hook": "فرنسي يدبك في عرس لبناني",
+    "all": [
+     "الميوزك بتجمع العالم",
+     "عرس لبنانه وقتا",
+     "حتى واحد فرنسي عم يدبك",
+     "فرنسي يدبك مع العيلة",
+     "ليش فرنسي عم يدبك",
+     "وقت تروح الطبل"
+    ],
+    "brief": {
+     "punchline": "حتى واحد فرنسي معزوم عم يحاول يدبك مع العيلة في عرس لبناني.",
+     "anchors": [
+      "الفوت كتشر",
+      "الميوزك بتجمع العالم",
+      "عرس لبنانه",
+      "الطبل",
+      "واحد فرنسي معزوم",
+      "يدبك"
+     ],
+     "best_line": "الميوزك بتجمع العالم",
+     "tension": "هل الميوزك فعلاً بتجمع الناس لدرجة إنه حتى واحد فرنسي معزوم يدبك مع العيلة؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "فرنسي عم يدبك وبتحسوها",
+    "all": [
+     "contrarian | الميوزك ما بتجمع العالم",
+     "contrarian | فرنسي عم يدبك وانت ما بتحسوها",
+     "hidden_consequence | الدبكة ما بتطفي عنصرية باريس",
+     "hidden_consequence | فرحة العرس عم تخبّي عنصرية المترو",
+     "open_question | شو صار بالمترو باري؟",
+     "open_question | ليش المترو بباري خلاه يقول العنصرية بتلمنا؟",
+     "contrarian | الدبكة حلوة بس ما بتنسي المترو",
+     "contrarian | الفرنسي عم يدبك والمترو لسه صامت",
+     "hidden_consequence | طلعت لأول مرة على فرنسا وغيرتني",
+     "hidden_consequence | المترو بباريس فضحلي فكرة التجمع"
+    ],
+    "mood": "serious"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 1
+  }
+ },
+ {
+  "id": "5a0f95_1906",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Finally, BBC announced that Russell t Davis, who was the first showrunner when doctor who returned to air in 2005, will come back to succeed Chris Chibnall as doctor who's showrunner in 2023. That'll be just in time to celebrate the sixtieth anniversary of doctor who. This is inside baseball, but th",
+  "hooks": {
+   "old": {
+    "hook": "The new showrunner is the old one",
+    "all": [
+     "The new showrunner is the old one",
+     "Try not to smile at 2005",
+     "60th anniversary lands in 2023"
+    ]
+   },
+   "spec": {
+    "hook": "Russell T Davies returns to Doctor Who",
+    "all": [
+     "Finally BBC announced",
+     "Russell t Davis returns in 2023",
+     "The first showrunner is back",
+     "doctor who returned to air in 2005",
+     "Who will succeed Chris Chibnall",
+     "Back for the sixtieth anniversary"
+    ],
+    "brief": {
+     "punchline": "Russell T Davies is coming back as Doctor Who showrunner in 2023, just in time for the show's sixtieth anniversary.",
+     "anchors": [
+      "BBC",
+      "Russell t Davis",
+      "first showrunner",
+      "doctor who returned to air in 2005",
+      "succeed Chris Chibnall",
+      "sixtieth anniversary of doctor who"
+     ],
+     "best_line": "Finally, BBC announced that Russell t Davis, who was the first showrunner when doctor who returned to air in 2005, will come back to succeed Chris Chibnall as doctor who's showrunner in 2023.",
+     "tension": "Who will succeed Chris Chibnall as Doctor Who's showrunner?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Your chest tightens at Russell T Davies",
+    "all": [
+     "pov | POV: your chest tightens at Russell T Davies",
+     "pov | POV: BBC says Russell T Davies is back",
+     "nobody | Nobody: Losing their minds I never watched Doctor Who",
+     "nobody | Nobody: Raging about Russell I never watched Doctor Who",
+     "sarcastic | Sixtieth anniversary equals recycled nostalgia",
+     "sarcastic | Great sixtieth anniversary same old faces",
+     "open_question | Is Davies bringing back the cheese?",
+     "open_question | Does replacing Chibnall mean more cheese?",
+     "hidden_consequence | And that is how you lose Tennant fans",
+     "hidden_consequence | And that is how Tennant stans ghost the show"
+    ],
+    "mood": "nostalgic"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 2,
+   "angle:j1": 0,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "02c0d2_545",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "انتم طالع صوب شكه اتسمبوين بتشوف ترابط السابع بتاخذ يمينك وبتطلع بتضل تطلع تطلع تطلع تطلع ليبينوا صدرته سميرجعجع عابطين بعضهم قربت اوكي كل ما تطلع انت كل ما يسى المناخ كل ما يسى الدماغ هذه الضايعه فوق العالم عن جد فوق قلبهم كثير طيب ونحنا كثير مضيفين وكثير هيك قلبنا طيب وبنحب نعزم بس بنفس الوقت بلا ",
+  "hooks": {
+   "old": {
+    "hook": "استنى لما تشوف صدرته",
+    "all": [
+     "استنى لما تشوف صدرته",
+     "بتراهن ما تضحك لما تسمع صدرته",
+     "ليش بالسابع الكل عم يتلخبط"
+    ]
+   },
+   "spec": {
+    "hook": "قلبنا طيب بنحب نعزم بس",
+    "all": [
+     "بتاخذ يمينك وبتطلع",
+     "بتطلع بتضل تطلع",
+     "قلبنا طيب وبنحب نعزم",
+     "كل ما يسى الدماغ",
+     "كل ما يسى المناخ",
+     "اللي بصير كل ما تطلع انت"
+    ],
+    "brief": {
+     "punchline": "قلبنا طيب وبنحب نعزم بس بنفس الوقت بلا مخ بعضلوا بعضهم",
+     "anchors": [
+      "بتاخذ يمينك",
+      "بتطلع بتضل تطلع",
+      "كل ما تطلع انت",
+      "كل ما يسى المناخ",
+      "كل ما يسى الدماغ",
+      "قلبنا طيب وبنحب نعزم"
+     ],
+     "best_line": "قلبنا طيب وبنحب نعزم",
+     "tension": "كل ما تطلع انت كل ما يسى المناخ كل ما يسى الدماغ",
+     "mood": "serious"
+    }
+   },
+   "angle": {
+    "hook": "بنحب نعزم وبعدها بنجرح بعضنا",
+    "all": [
+     "pov | POV: نحنا كثير مضيفين وبنحب نعزم وهم عم يتخانقوا",
+     "pov | POV: نحنا كثير مضيفين وبنحب نعزم وبعدين بعضلوا بعضهم",
+     "nobody | Nobody: نحنا كثير مضيفين وبلا مخ",
+     "nobody | Nobody: نحنا كثير مضيفين وبعضلوا بعضهم",
+     "hidden_consequence | نحنا كتير مضيفين وبآخره بعضلوا بعضهم",
+     "hidden_consequence | بعضلوا بعضهم فتضل الدعوة فاضية",
+     "contrarian | ملتزمه دينيا وما بيحترموها",
+     "contrarian | ملتزمه دينيا وبينعتوها نفاق",
+     "open_question | بنحب نعزم ليش بنجرّح بعض؟",
+     "open_question | بنحب نعزم ليش بننقهر بعضنا؟"
+    ],
+    "mood": "critical"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 0,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "acb444_944",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "But here's what most people miss, your liver health. It affects literally everything, your energy, your digestion, how your skin looks, even your metabolism. It's time you show it some love. Dose for your liver is a clinically backed liver health supplement. This isn't just another capsule or powder",
+  "hooks": {
+   "old": {
+    "hook": "Wait for the two ounce reveal",
+    "all": [
+     "Wait for the two ounce reveal",
+     "Try not to love a two ounce shot",
+     "Bro a liver health shot exists"
+    ]
+   },
+   "spec": {
+    "hook": "One shot stops your midday crash",
+    "all": [
+     "your liver health",
+     "Dose for your liver",
+     "Clinically backed Dose reduces crashes",
+     "Less sluggishness from two ounce shot",
+     "tastes like fresh squeezed orange juice",
+     "Can it actually reduce sluggishness"
+    ],
+    "brief": {
+     "punchline": "Dose for your liver is a clinically backed liver health supplement, a liquid taken in a two ounce shot that tastes like fresh squeezed orange juice and helps reduce sluggishness and get rid of those midday crashes.",
+     "anchors": [
+      "your liver health",
+      "Dose for your liver",
+      "clinically backed liver health supplement",
+      "two ounce shot",
+      "tastes like fresh squeezed orange juice",
+      "reduce sluggishness"
+     ],
+     "best_line": "It affects literally everything, your energy, your digestion, how your skin looks, even your metabolism.",
+     "tension": "Most people miss their liver health — can a clinically backed two ounce shot actually reduce sluggishness, get rid of those midday crashes and support your metabolism?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "Swap pills for an orange shot",
+    "all": [
+     "pov | POV: You wake up with steady energy",
+     "pov | POV: No midday crash and clearer skin",
+     "nobody | Nobody: He swaps pills for orange shots",
+     "nobody | Nobody: Two ounce orange shot beats pills",
+     "hidden_consequence | Every midday crash steals your work hours",
+     "hidden_consequence | Ignore your liver lose weeks of focus",
+     "contrarian | Skip the pills try a shot",
+     "contrarian | Turns out the shot actually has studies",
+     "open_question | Hold up this orange shot has double blind studies?",
+     "open_question | Could an orange juice shot change my energy?"
+    ],
+    "mood": "upbeat promotional"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 2,
+   "angle:j1": 2,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "acb444_1483",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "Well, thank you. I think though... I think potentially I'd have been a wealthier man had I given a little bit more autonomy to people. I think I squeezed him a little bit when I was younger. But because I am a control freak... So it's this interesting dance I've had my entire career and even to this",
+  "hooks": {
+   "old": {
+    "hook": "Why he calls himself a control freak",
+    "all": [
+     "Why he calls himself a control freak",
+     "Bet you don’t admit being a control freak",
+     "Wait for when he says control freak"
+    ]
+   },
+   "spec": {
+    "hook": "I'm a control freak learning to deal with uncertainty",
+    "all": [
+     "I'd have been a wealthier man",
+     "Given a little bit more autonomy",
+     "I am a control freak",
+     "One capacity made me grow",
+     "Growth came from dealing with uncertainty",
+     "How to control and still grow"
+    ],
+    "brief": {
+     "punchline": "He admits that although he's a control freak, the key to his progression is learning to live with uncertainty.",
+     "anchors": [
+      "wealthier man",
+      "give a little bit more autonomy to people",
+      "control freak",
+      "key to my progression, my growth, my expansion as a person and as an entrepreneur is my capacity to deal with uncertainty simultaneously",
+      "deal with uncertainty"
+     ],
+     "best_line": "So it's this interesting dance I've had my entire career and even to this day of I'm a control freak, yet I know the key to my progression, my growth, my expansion as a person and as an entrepreneur is my capacity to deal with uncertainty simultaneously.",
+     "tension": "How do you navigate wanting to control an outcome while knowing growth requires you to deal with uncertainty?",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "I squeezed him a little bit",
+    "all": [
+     "pov | POV: you squeezed him a little bit",
+     "pov | POV: you're a control freak learning to loosen",
+     "nobody | Nobody: admits micromanaging cost him money",
+     "nobody | Nobody: control freak says he lost cash",
+     "hidden_consequence | His control habit cost him wealth",
+     "hidden_consequence | He admitted autonomy would've made him richer",
+     "contrarian | Control freaks obsess where it matters",
+     "contrarian | Hold the reins on the big bets",
+     "open_question | How do you actually let go",
+     "open_question | So how do you stop choking on control"
+    ],
+    "mood": "introspective"
+   }
+  },
+  "points": {
+   "spec:j1": 2,
+   "spec:j2": 1,
+   "angle:j1": 2,
+   "angle:j2": 0
+  }
+ },
+ {
+  "id": "b8931e_1417",
+  "lang": "ar",
+  "split": "test",
+  "excerpt": "لو أقنعتهم في هذه المرونة استمروا فيها اللي يخليهم ما يستمرون فيها اللي هي الخطوات المثالية يجب أن ما تستخدم الجوال في كل شيء كذا بيحس بتوتر، وبيحس أن ما راح يتقدم بأي شيء وهذا اللي أنا ما أبيه أبيك تستخدمه، لكن بطرق ذكية جدًّا ولو تلاحظ فيه طرق، من ضمن الطرق هذه أن الأشياء أو التطبيقات اللي أنت تست",
+  "hooks": {
+   "old": {
+    "hook": "ليش نقل التطبيقات للخلف نفع",
+    "all": [
+     "ليش نقل التطبيقات للخلف نفع",
+     "جرب يوم كامل بدون الجوال",
+     "أكتر استخدام للجوال يوقف تقدمك"
+    ]
+   },
+   "spec": {
+    "hook": "دخّل التطبيقات في الصناديق",
+    "all": [
+     "ما تستخدم الجوال في كل شيء",
+     "دخّلها في الصناديق",
+     "ما تحس بتوتر",
+     "ابعد التطبيقات عن أولى القائمة",
+     "السبب اللي يخليهم ما يستمروا فيها"
+    ],
+    "brief": {
+     "punchline": "خلّها صعب: أبعد التطبيقات عن أولى القائمة ودخّلها في الصناديق عشان ما تحس بتوتر وما تحس أنك ما راح تتقدم.",
+     "anchors": [
+      "المرونة",
+      "الخطوات المثالية",
+      "يجب أن ما تستخدم الجوال في كل شيء",
+      "بيحس بتوتر",
+      "الأشياء أو التطبيقات",
+      "دخّلها في الصناديق"
+     ],
+     "best_line": "الخطوات المثالية يجب أن ما تستخدم الجوال في كل شيء",
+     "tension": "كيف تخليهم يستمروا في المرونة بدون ما الجوال يخليهم يحسّوا بتوتر وأنهم ما راح يتقدموا بأي شيء؟",
+     "mood": "inspiring"
+    }
+   },
+   "angle": {
+    "hook": "وش يصير لو تحط التطبيقات بصناديق",
+    "all": [
+     "pov | POV: عم تصعّب وصولك للتطبيقات",
+     "pov | POV: بتبعد التطبيقات عن أول القائمة",
+     "nobody | Nobody: كل التطبيقات بالصفحة الأولى بتضغطه",
+     "nobody | Nobody: الجوال بكل شي بيخليه متوتر",
+     "hidden_consequence | ما تحط التطبيقات بصناديق بتضل متوتر",
+     "hidden_consequence | تخليها سهلة ما رح تتقدّم",
+     "open_question | وش يصير لو تحط التطبيقات بصناديق",
+     "open_question | شلون تتغير عادتك لما تاكل وتتفرج",
+     "sarcastic | أها طيب خطوات مثالية وبنحط كلشي بصناديق",
+     "sarcastic | طبعا نحط كلشي بصناديق وتزبط"
+    ],
+    "mood": "تحفيزي وعملي"
+   }
+  },
+  "points": {
+   "spec:j1": 0,
+   "spec:j2": 1,
+   "angle:j1": 0,
+   "angle:j2": 2
+  }
+ },
+ {
+  "id": "a777be_2603",
+  "lang": "en",
+  "split": "test",
+  "excerpt": "He that kind of baby. You know? Oh, yeah. He He swelled too. Oh, he looked like five cent. Oh, man. Damn, bro. He looks like that. He ready to get it done, bro. And he's bowlegged too, so he's he's quick. Yeah. He's quick. He's bowlegged. Yeah. He got that fucking in and out, bro. He got good stuff.",
+  "hooks": {
+   "old": {
+    "hook": "Bro humping the furniture seriously?",
+    "all": [
+     "Bro humping the furniture seriously?",
+     "Why he was humping the furniture",
+     "Wait for the Shih Tzu line"
+    ]
+   },
+   "spec": {
+    "hook": "I saw him humping the furniture",
+    "all": [
+     "I saw him kind of humping the furniture",
+     "He got that fucking in and out bro",
+     "He's bowlegged too",
+     "Has Shih Tzu energy",
+     "Bowlegged but actually quick",
+     "How is he bowlegged and quick"
+    ],
+    "brief": {
+     "punchline": "He's bowlegged but crazy quick — even got caught humping the furniture, like he's got that Shih Tzu in him.",
+     "anchors": [
+      "bowlegged",
+      "he looked like five cent",
+      "humping the furniture",
+      "Shih Tzu",
+      "He got that fucking in and out, bro."
+     ],
+     "best_line": "Well, I saw him kind of humping the furniture.",
+     "tension": "Is this guy actually 'ready to get it done' and dangerous despite looking like 'five cent' and being bowlegged?",
+     "mood": "funny"
+    }
+   }
+  },
+  "points": {},
+  "error": "ContentFiltered('The AI safety filter flagged this moment (sexual).')"
+ }
+]

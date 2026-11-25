@@ -411,7 +411,24 @@ def brief_spec(payload: dict) -> dict:
     return {"items": items}
 
 
+def hook_brief(payload: dict) -> dict:
+    text = payload.get("transcript", "").strip()
+    return {"punchline": text[:80], "anchors": text.split()[:4], "best_line": text[:60] or None, "tension": "", "mood": "serious"}
+
+
+def hook_write(payload: dict) -> dict:
+    """Same deterministic lines the old fake wrote (three, each a different type), tagged with a mode."""
+    out = hooks({"language": payload.get("language", "en"), "segment_text": payload.get("transcript", ""), "avoid": payload.get("avoid"), "candidate_score": 0.7})["hooks"]
+    mode = {"question": "gap", "contrarian": "claim", "stakes": "result", "number": "claim", "story-open": "quote"}
+    return {"hooks": [{"text": o["text"], "mode": mode.get(o["type"], "claim"), "anchor": ""} for o in out]}
+
+
+def hook_edit(payload: dict) -> dict:
+    return {"hook": (payload.get("candidates") or [""])[0]}
+
+
 def complete(task: str, payload: dict) -> dict:
     return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments,
             "moment_score": moment_score, "moment_compare": moment_compare, "moment_scout": moment_scout, "caption_lab": caption_lab,
-            "caption_check": caption_check, "commentary": commentary, "brief_spec": brief_spec}[task](payload)
+            "caption_check": caption_check, "commentary": commentary, "brief_spec": brief_spec,
+            "hook_brief": hook_brief, "hook_write": hook_write, "hook_edit": hook_edit}[task](payload)
