@@ -102,20 +102,34 @@ def test_the_old_hook_shape_still_works():
 
 
 class _Registry:
-    def __init__(self):
-        self.payloads = []
+    def __init__(self, spec_works=True):
+        self.calls, self.spec_works = [], spec_works
 
     def call(self, conn, stage, method, payload, owner):
-        self.payloads.append(payload["payload"])
+        self.calls.append((payload["task"], payload["payload"]))
+        if payload["task"] in ("hook_brief", "hook_edit") or (payload["task"] == "hook_write" and not self.spec_works):
+            return ({"anchors": ["pricing"]} if payload["task"] == "hook_brief" else {"hook": "Stop pricing by the hour"}) if self.spec_works else {"hooks": []}, 0
+        if payload["task"] == "hook_write":
+            return {"hooks": [{"text": "Stop pricing by the hour", "mode": "claim"}, {"text": "He lost 40k in one hour", "mode": "result"}]}, 0
         return {"hooks": [_item("Stop pricing by the hour", "stop_doing", "stakes"), _item("He lost 40k in one hour", "numbered", "number")]}, 0
 
 
-def test_run_sends_formats_fewshot_niche_and_the_campaigns_hook_constraints():
+def test_run_uses_the_producer_writer_editor_chain_and_sends_the_campaigns_hook_constraints():
     registry = _Registry()
     hooks, _ = agent_b.run(None, registry, SEGMENT, "en", 0.7, patterns=["numbered", "pov"], niche="business",
                            avoid_formats=["pov"], hook_constraints=["Must say #ad in the first line"])
-    sent = registry.payloads[0]
-    assert [c["id"] for c in sent["formats"]] == ["numbered", "pov"] and sent["formats"][1]["tag"] == "POV:"
+    assert [task for task, _ in registry.calls] == ["hook_brief", "hook_write", "hook_edit"]
+    write = registry.calls[1][1]
+    assert write["constraints"] == ["Must say #ad in the first line"] and write["brief"] == {"anchors": ["pricing"]} and write["transcript"] == SEGMENT
+    assert [h["text"] for h in hooks] == ["Stop pricing by the hour", "He lost 40k in one hour"] and hooks[1]["hook_type"] == "number"
+
+
+def test_run_falls_back_to_the_lexicon_formats_when_the_chain_gives_nothing():
+    registry = _Registry(spec_works=False)
+    hooks, _ = agent_b.run(None, registry, SEGMENT, "en", 0.7, patterns=["numbered", "pov"], niche="business",
+                           avoid_formats=["pov"], hook_constraints=["Must say #ad in the first line"])
+    sent = registry.calls[-1][1]
+    assert registry.calls[-1][0] == "hooks" and [c["id"] for c in sent["formats"]] == ["numbered", "pov"] and sent["formats"][1]["tag"] == "POV:"
     assert sent["constraints"] == ["Must say #ad in the first line"] and sent["avoid_formats"] == ["pov"] and sent["niche"] == "business"
     assert len(sent["good_bad"]) >= 2 and len(hooks) == 2
 
