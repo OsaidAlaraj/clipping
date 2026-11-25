@@ -467,10 +467,12 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
     from the signals the loud moments (zooms, highlighted words) and the face, laughter, scene and loudness around it."""
     candidate = conn.execute("select style from candidates where id = %s", (clip["candidate_id"],)).fetchone()
     style = (candidate or {}).get("style") or {}
+    meta = clip.get("render_meta") or {}
     start, end = float(clip["start_s"]), float(clip["end_s"])
     request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
                "audio": style.get("audio"), "hook_text": hook_text, "emphasis": [],
-               "hook_show_s": float(get_setting(conn, "hook_show_s") or 0) or None,      # the owner's own hook time; none = automatic
+               "hook_show_s": float(meta.get("hook_for_s") or get_setting(conn, "hook_show_s") or 0) or None,   # this clip's own hook time, else the global one; none = automatic
+               "hook_from_s": meta.get("hook_from_s"), "hook_position": meta.get("hook_position"),
                "min_s": float(get_setting(conn, "clip_min_duration_s"))}      # tightening never takes the clip below the campaign minimum
     try:
         request["speaker_names"] = {str(k): str(v) for k, v in (transcripts.load(conn, source["id"]).get("speakers") or {}).items()}

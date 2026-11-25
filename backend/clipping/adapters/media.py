@@ -370,7 +370,8 @@ def _box(size: int) -> int:
 
 
 def build_ass(width: int, height: int, duration: float, events: list[dict], label: str | None, rtl: bool, template: dict,
-              hook: str | None = None, caption_style: str | None = None, hook_show_s: float | None = None) -> str:
+              hook: str | None = None, caption_style: str | None = None, hook_show_s: float | None = None,
+              hook_from_s: float | None = None, hook_position: str | None = None) -> str:
     """One subtitle script for the whole clip: captions, the disclosure label (top right for Arabic, top left otherwise, the
     whole clip), the title card with the hook and the progress bar."""
     t = normalize_template(template)
@@ -379,6 +380,7 @@ def build_ass(width: int, height: int, duration: float, events: list[dict], labe
     title_size = fit_size(_esc(hook or ""), width * 0.8, int(height * 0.036), max_lines=2)
     primary, accent = _ass_colour(t["primary"]), _ass_colour(t["accent"])
     lower = t["caption_position"] == "lower"
+    hook_align, hook_margin = {"middle": (5, 0), "bottom": (2, int(height * 0.3))}.get(hook_position or "", (8, int(height * 0.1)))   # top (the default), middle, or above the captions
     font = t["font"]
     from . import caption_render
     look = caption_render.ass_style_fields(caption_style, cap) if caption_style else {"bold": 1, "outline": max(cap // 12, 2), "shadow": 0}
@@ -392,7 +394,7 @@ def build_ass(width: int, height: int, duration: float, events: list[dict], labe
         f"Style: Label,{font},{label_size},&H00FFFFFF,&H00FFFFFF,&H00000000,&HC0000000,1,0,0,0,100,100,0,0,3,{_box(label_size)},0,"
         f"{9 if rtl else 7},{width // 24},{width // 24},{int(height * 0.035)},{AUTO_DIRECTION}",
         f"Style: Title,{font},{title_size},{_ass_colour(_contrast(t['accent']))},&H00FFFFFF,{accent},{accent},1,0,0,0,100,100,0,0,3,"
-        f"{_box(title_size)},0,8,{width // 10},{width // 10},{int(height * 0.1)},{AUTO_DIRECTION}",
+        f"{_box(title_size)},0,{hook_align},{width // 10},{width // 10},{hook_margin},{AUTO_DIRECTION}",
         f"Style: Speaker,{font},{max(int(cap * 0.62), 14)},{_ass_colour(_contrast(t['accent']))},&H00FFFFFF,{accent},{accent},1,0,0,0,100,100,0,0,3,"
         f"{_box(cap // 3)},0,5,0,0,0,{AUTO_DIRECTION}",
         f"Style: Bar,{font},20,{accent},{accent},{accent},{accent},0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1",
@@ -401,8 +403,9 @@ def build_ass(width: int, height: int, duration: float, events: list[dict], labe
     if label:
         lines.append(f"Dialogue: 5,{_ts(0)},{_ts(duration + 1.0)},Label,,0,0,0,,{_esc(label)}")   # runs past the last frame: the full clip
     if hook and t["title_card"]:
+        begin = min(max(float(hook_from_s or 0), 0.0), max(duration - 0.5, 0.0))   # the owner can start the hook later than the first frame
         shown = (hook_show_s if hook_show_s and hook_show_s > 0 else hook_rules.show_seconds(hook)) + 0.6   # the owner's own time, or 3 to 5 s from the word count, plus the fades
-        lines.append(f"Dialogue: 3,{_ts(0)},{_ts(min(shown, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
+        lines.append(f"Dialogue: 3,{_ts(begin)},{_ts(min(begin + shown, duration))},Title,,0,0,0,,{{\\fad(150,200)}}{_esc(hook)}")
     if t["progress_bar"]:
         lines.append(f"Dialogue: 4,{_ts(0)},{_ts(duration + 1.0)},Bar,,0,0,0,,{{\\an7\\pos(0,{height - bar})\\fscx0.1"
                      f"\\t(0,{int(duration * 1000)},\\fscx100)\\p1}}m 0 0 l {width} 0 {width} {bar} 0 {bar}")
@@ -571,7 +574,7 @@ class FFmpegRender(Adapter):
         else:
             events = caption_events(shown_words, c0, c1, social, shown_emphasis, tpl["accent"])
         ass = build_ass(width, height, c1 - c0, events, label, rtl, tpl, clip.get("hook_text"), chosen if chosen != caption_render.DEFAULT_STYLE else None,
-                        clip.get("hook_show_s"))
+                        clip.get("hook_show_s"), clip.get("hook_from_s"), clip.get("hook_position"))
         out_path.parent.mkdir(parents=True, exist_ok=True)
         ass_path = out_path.with_suffix(".ass")
         ass_path.write_text(ass, encoding="utf-8-sig")

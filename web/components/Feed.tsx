@@ -9,6 +9,7 @@ import { qualityText, useLang } from "@/lib/i18n";
 import { useSwipe } from "@/lib/useSwipe";
 import PostBar from "./PostBar";
 import { FeedSkeleton } from "./Skeleton";
+import { draftOf, HookControls, HookDraft, HookOverlay, setHookDraft } from "./HookEditor";
 import { Icon } from "./Shell";
 
 export const REASONS: [string, string][] = [
@@ -45,9 +46,9 @@ const AHEAD = 2;
 
 // ------------------------------------------------------------------ sheets
 
-function SheetFrame({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+function SheetFrame({ title, onClose, children, peek }: { title: string; onClose: () => void; children: React.ReactNode; peek?: boolean }) {
   return (
-    <div className="scrim" onClick={onClose}>
+    <div className={`scrim${peek ? " peek" : ""}`} onClick={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={(event) => event.stopPropagation()}>
         <div className="row between">
           <h1>{title}</h1>
@@ -86,11 +87,15 @@ export function RejectSheet({ onSubmit, onClose }: { onSubmit: (reason: string, 
   );
 }
 
-function HooksSheet({ clip, onPick, onClose }: { clip: Clip; onPick: (hookId: string) => void; onClose: () => void }) {
+function HooksSheet({ clip, onPick, onApply, onClose }: { clip: Clip; onPick: (hookId: string) => void; onApply: (hook: HookDraft) => void; onClose: () => void }) {
   const current = String(clip.render_meta?.hook_id ?? "");
   const [list, setList] = useState(clip.hooks);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [draft, setDraft] = useState<HookDraft>(() => draftOf(clip));
+  // The live preview: every change is drawn over the playing video at once; the one real render happens on Apply.
+  const change = (next: HookDraft) => { setDraft(next); setHookDraft(clip.id, next); };   // one batched commit: the sheet and the overlay together
+  useEffect(() => { setHookDraft(clip.id, draft); return () => setHookDraft(clip.id, null); }, [clip.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const rate = async (hookId: string, value: "up" | "down" | "none") => {
     const mark = value === "up" ? 1 : value === "down" ? -1 : null;
     setList((rows) => rows.map((h) => (h.id === hookId ? { ...h, rating: mark } : h)));   // optimistic: the thumb answers at once
@@ -113,8 +118,9 @@ function HooksSheet({ clip, onPick, onClose }: { clip: Clip; onPick: (hookId: st
     }
   };
   return (
-    <SheetFrame title="Hooks" onClose={onClose}>
-      <p className="small muted">Tap a hook to use it. The clip is re-rendered as a new version and returns to the feed.</p>
+    <SheetFrame title="Hooks" onClose={onClose} peek>
+      <HookControls clip={clip} draft={draft} busy={false} onChange={change} onApply={() => onApply({ ...draft, text: draft.text.trim() })} />
+      <p className="small muted">Or tap a hook to use it. The clip is re-rendered as a new version and returns to the feed.</p>
       <div className="stack">
         {list.map((hook) => (
           <div key={hook.id} className="hook-row">
@@ -326,15 +332,32 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
   const audible = soundOn && !blocked;
   const [progress, setProgress] = useState(0);
   const [textHidden, setTextHidden] = useState(false); // the caption block can be hidden to see the whole picture
-  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setSoundOn(!audible) } : {}, { tilt: true });
+  // A tap on the picture pauses and resumes it. Sound has its own button on the rail, so a tap never touches it.
+  const userPaused = useRef(false);
+  const [paused, setPaused] = useState(false);
+  const togglePlay = () => {
+    const el = video.current;
+    if (!el) return;
+    if (el.paused) {
+      userPaused.current = false;
+      setPaused(false);
+      el.play()?.catch?.(() => undefined);
+    } else {
+      userPaused.current = true;
+      setPaused(true);
+      el.pause();
+    }
+  };
+  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: togglePlay } : {}, { tilt: true });
 
   // Only the clip on screen plays; the buffered ones wait and start from their first frame the moment they are shown.
   useEffect(() => {
     const el = video.current;
     if (!el) return;
-    if (!active) { el.pause(); setProgress(0); return; }
+    if (!active) { el.pause(); setProgress(0); userPaused.current = false; setPaused(false); return; }
     el.muted = !soundOn;
     setBlocked(false);
+    if (userPaused.current) return;   // the owner paused it: a sound change or the first touch must not restart it
     el.play()?.catch?.(() => {
       // The browser refused sound: play muted, and show the tap.
       el.muted = true;
@@ -368,6 +391,8 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
       {player}
       {intent === "right" && <div className="swipe-flag yes">{t("acceptPost")}</div>}
       {intent === "left" && <div className="swipe-flag no">{t("reject")}</div>}
+      <HookOverlay clipId={clip.id} video={video} />
+      {paused && <div className="pause-flag" data-testid="paused" aria-hidden="true">{Icon.playBig}</div>}
       {!audible && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
       <div className={`bottom${textHidden ? " text-hidden" : ""}`} aria-hidden={textHidden || undefined}>
         <div className="line">
@@ -733,7 +758,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       {bar && <PostBar key={bar.clip.id} result={bar.result} clip={bar.clip} seconds={config.undo} onUndo={undoSwipe} onClose={() => setBar(null)} />}
       {undo && <UndoToast seconds={config.undo} onUndo={doUndo} label={`${t(undo.kind === "accept" ? "accepted" : undo.kind === "reject" ? "rejected" : "parked")}${undo.queued ? " · saved" : ""}`} />}
       {sheet === "reject" && <RejectSheet onSubmit={reject} onClose={() => setSheet(null)} />}
-      {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} />}
+      {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} onApply={(hook) => saveEdit({ hook })} />}
       {sheet === "edit" && clip && <EditSheet clip={clip} onClose={() => setSheet(null)} onSave={saveEdit} />}
       {sheet === "filtered" && <FilteredSheet items={filtered} onRescue={rescue} onClose={() => setSheet(null)} />}
       {sheet === "report" && clip && <ComplianceSheet clip={clip} onClose={() => setSheet(null)} />}

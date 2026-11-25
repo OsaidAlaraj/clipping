@@ -41,15 +41,15 @@ describe("feed card", () => {
     expect(screen.getByRole("progressbar")).toBeTruthy();
   });
 
-  it("has labelled rail buttons, starts with sound on (owner note 11), and a tap turns sound off and back on", async () => {
+  it("has labelled rail buttons, starts with sound on (owner note 11), and the Mute chip turns sound off and back on", async () => {
     const { card } = await open(feedRoutes(three()));
     for (const label of ["Accept", "Reject", "Hooks", "Edit", "Review later"]) expect(screen.getByRole("button", { name: label })).toBeTruthy();
     const video = card.querySelector("video")!;
     expect(video.muted).toBe(false);
     expect(video.hasAttribute("playsinline")).toBe(true);
-    swipe(card, [150, 300], [151, 301]); // a tap
+    fireEvent.click(screen.getByRole("button", { name: "Mute" }));
     await waitFor(() => expect(card.querySelector("video")!.muted).toBe(true));
-    swipe(card, [150, 300], [151, 301]); // and back
+    fireEvent.click(screen.getByRole("button", { name: "Tap for sound" })); // the same chip, now offering sound
     await waitFor(() => expect(card.querySelector("video")!.muted).toBe(false));
   });
 
@@ -173,7 +173,7 @@ describe("hooks sheet and keyboard", () => {
     const { mock } = await open(feedRoutes(three(), { "POST /api/clips/c1/edit": { id: "c1v2", status: "rendering" } }));
     fireEvent.click(screen.getByRole("button", { name: "Hooks" }));
     const dialog = await screen.findByRole("dialog", { name: "Hooks" });
-    expect(within(dialog).getByText("Hook for c1")).toBeTruthy();
+    expect(within(dialog).getByText("Hook for c1", { selector: ".choice span" })).toBeTruthy();
     fireEvent.click(within(dialog).getByText("Second hook for c1"));
     await waitFor(() => expect(mock.posts("/edit")).toHaveLength(1));
     expect(mock.posts("/edit")[0].body).toEqual({ hook_id: "c1-h2" });
