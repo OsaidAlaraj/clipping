@@ -86,6 +86,96 @@ def _quietest(env, t: float, lo: float, hi: float) -> float:
     return (i0 + int(seg.argmin()) + 0.5) / 100 if len(seg) else t
 
 
+# ------------------------------------------------------------------ clip edges: start and end on a breath of silence
+
+EDGE_SNAP = True           # switch for the before/after measurement (tools/cutq)
+QUIET_DB = 18.0            # quieter than the speech level by this much counts as silence
+LEAD_S, TAIL_S = 0.12, 0.15    # silence kept before the first sound and after the last one
+EDGE_REACH_S = 0.6         # how far an edge may move to find its silence
+GAP_FRAMES = 6             # a quiet stretch must last 60 ms to count as a gap
+
+
+def snap_edges(src, start: float, end: float, words: list[dict] | None = None) -> tuple[float, float]:
+    """Move a clip's start to just before the sentence's first sound and its end to just after the last, inside silence. The word
+    times a transcript gives are good to about 0.1 s, so a cut placed on them clips the onset or the last syllable; the audio is
+    the truth. An edge with no silence within EDGE_REACH_S stays where it is."""
+    import numpy as np
+
+    lo = max(start - EDGE_REACH_S - 0.3, 0.0)
+    env = envelope(src, lo, end + EDGE_REACH_S + 0.3 - lo)
+    if env is None or len(env) < 100:
+        return start, end
+    loud = env[env > np.percentile(env, 40)]
+    if len(loud) < 50:
+        return start, end
+    quiet = env < float(np.percentile(loud, 50)) - QUIET_DB
+
+    def gap_end_before(i: int, reach: int):      # the nearest quiet gap at or before frame i: (gap start, first loud frame after it)
+        k = min(i, len(quiet) - 1)
+        while k >= max(i - reach, 0):
+            if quiet[k]:
+                j = k
+                while j > 0 and quiet[j - 1] and k - j < 400:
+                    j -= 1
+                if k - j + 1 >= GAP_FRAMES or j == 0:
+                    e = k + 1
+                    while e < len(quiet) and quiet[e]:
+                        e += 1
+                    return j, e
+                k = j - 1
+            else:
+                k -= 1
+        return None
+
+    def gap_start_after(i: int, reach: int):     # the nearest quiet gap at or after frame i: (last loud frame before it, gap end)
+        k = max(i, 0)
+        while k < min(i + reach, len(quiet)):
+            if quiet[k]:
+                j = k
+                while j < len(quiet) and quiet[j]:
+                    j += 1
+                if j - k >= GAP_FRAMES or j >= len(quiet):
+                    return k, j
+                k = j
+            else:
+                k += 1
+        return None
+
+    s_i, e_i = int(round((start - lo) * 100)), int(round((end - lo) * 100))
+    new_start, new_end = start, end
+    g = gap_end_before(s_i + 15, int(EDGE_REACH_S * 100) + 15)
+    if g:
+        onset = g[1]                              # first loud frame after the gap
+        if onset - g[0] > 0 and onset >= s_i - 5:
+            cand = max(lo + g[0] / 100, lo + onset / 100 - LEAD_S)
+            if not (words and any(w["start"] < cand - 0.02 and w["end"] > cand + 0.02 for w in words)):
+                new_start = cand
+    h = gap_start_after(e_i - 15, int(EDGE_REACH_S * 100) + 15)
+    if h:
+        cand = min(lo + h[0] / 100 + TAIL_S, lo + h[1] / 100)
+        last = max((w["end"] for w in words or [] if w["start"] < end), default=0.0)
+        if cand >= last - 0.02:
+            new_end = cand
+    # running speech has no silence at a sentence edge: take the quietest instant near it (the dip between two words)
+    sm = np.convolve(env, np.ones(3) / 3, mode="same")
+
+    def dip(t: float, a: float, b: float) -> float:
+        i0, i1 = max(int(round((t + a - lo) * 100)), 0), min(int(round((t + b - lo) * 100)), len(sm))
+        return lo + (i0 + int(sm[i0:i1].argmin()) + 0.5) / 100 if i1 > i0 else t
+
+    loud_now = lambda t: float(sm[min(max(int(round((t - lo) * 100)), 0), len(sm) - 1)]) > float(np.percentile(loud, 50)) - 10
+    if new_start == start and loud_now(start):
+        cand = dip(start, -0.25, 0.05)
+        if not (words and any(w["start"] < cand - 0.02 and w["end"] > cand + 0.02 for w in words)) or not loud_now(cand):
+            new_start = cand if not loud_now(cand) else start
+    if new_end == end and loud_now(end):
+        cand = dip(end, -0.05, 0.5)
+        last = max((w["end"] for w in words or [] if w["start"] < end), default=0.0)
+        if cand >= last - 0.02 and not loud_now(cand):
+            new_end = cand
+    return (new_start, new_end) if new_end - new_start > 5 else (start, end)
+
+
 # ------------------------------------------------------------------ the plan
 
 @dataclass

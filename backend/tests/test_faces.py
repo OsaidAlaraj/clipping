@@ -91,3 +91,30 @@ def test_the_real_onnx_model_scores_every_frame():
         pytest.skip("onnxruntime or the model is missing")
     out = sc.score(np.random.randint(0, 255, (60, 112, 112), dtype=np.uint8), np.random.randn(240, 13))
     assert out.shape == (60,) and ((out >= 0) & (out <= 1)).all()
+
+
+def test_shot_path_steps_on_a_source_cut_and_never_slides_across_the_picture():
+    pts = faces.shot_keyframes([0.2] * 6 + [0.8] * 6, 1 / 3, 0.316, [2.0])
+    assert (1.999, 0.2) in pts and (2.0, 0.8) in pts           # one frame between the two positions
+    assert all(not (0.2 < c < 0.8) for _, c in pts)           # no keyframe in between: nothing to glide through
+
+
+def test_shot_path_starts_a_shot_on_its_own_face_and_ignores_a_one_sample_blip():
+    pts = faces.shot_keyframes([0.3] * 4 + [0.8] + [0.3] * 7, 1 / 3, 0.316, [])
+    assert [c for _, c in pts] == [0.3, 0.3]                   # the blip at 0.8 never moves the camera
+    switched = faces.shot_keyframes([0.3] * 4 + [0.8] * 8, 1 / 3, 0.316, [])
+    assert any(c == 0.8 for _, c in switched)                  # a lasting speaker change does
+
+
+def test_snap_edges_moves_the_start_into_the_silence_before_the_first_word(tmp_path):
+    import numpy as np
+    from clipping import polish
+    rate = 16000
+    t = np.arange(rate * 10) / rate
+    tone = (0.3 * np.sin(2 * np.pi * 220 * t) * ((t > 2.0) & (t < 8.0))).astype(np.float32)      # speech from 2.0 to 8.0 s
+    wav = tmp_path / "a.wav"
+    import wave
+    with wave.open(str(wav), "wb") as f:
+        f.setnchannels(1); f.setsampwidth(2); f.setframerate(rate); f.writeframes((tone * 32767).astype(np.int16).tobytes())
+    start, end = polish.snap_edges(wav, 2.0, 8.0)           # a cut placed exactly on the first sound
+    assert start < 2.0 and start >= 1.8 and end >= 8.0

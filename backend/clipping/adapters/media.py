@@ -530,6 +530,19 @@ class FFmpegRender(Adapter):
         info = ffmpeg.probe(src_path)
         width, height = int(self.cfg.get("width", 1080)), int(self.cfg.get("height", 1920))
         start, end = float(clip["start_s"]), float(clip["end_s"])
+        if info["has_audio"] and self.force_crop is None and polish.EDGE_SNAP and tpl["tighten"]:
+            near = [w for w in words if w["end"] > start - 1 and w["start"] < end + 1]
+            new_start, new_end = polish.snap_edges(src_path, start, end, near)
+            story = clip.get("story")
+            if story and new_start != start:    # the Story Director's times count from the old start
+                shift = start - new_start
+                if story.get("cold_open"):
+                    story = {**story, "cold_open": {**story["cold_open"], "clip": [t + shift for t in story["cold_open"]["clip"]]}}
+                if story.get("rehook"):
+                    story = {**story, "rehook": {**story["rehook"], "at_s": story["rehook"]["at_s"] + shift}}
+                clip = {**clip, "story": story}
+            clip = {**clip, "start_s": new_start, "end_s": new_end}
+            start, end = new_start, new_end
         duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
         niche = NICHE_OF_CROP.get(style)
         wanted = tpl["layout"] if (isinstance(template, dict) and "layout" in template) else niche_defaults(niche).get("layout", "auto")
