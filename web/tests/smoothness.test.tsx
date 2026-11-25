@@ -222,9 +222,10 @@ describe("DW-7.2 optimistic actions", () => {
     render(<><Home /><ToastHost /></>);
     const first = await screen.findByTestId("campaign-card");
     swipe(first, [100, 300], [260, 300]);
-    expect(screen.getByTestId("campaign-card").textContent).toContain("approved"); // before the server has said anything
+    expect(screen.queryByTestId("campaign-card")).toBeNull(); // it left the decisions at once, before the server has said anything
+    expect(screen.getByTestId("campaign-row").textContent).toContain("Campaign p1");
     await screen.findByText("Hard-blocked.");
-    await waitFor(() => expect(screen.getByTestId("campaign-card").textContent).toContain("rules: pass"));
+    await waitFor(() => expect(screen.getByTestId("campaign-card").textContent).toContain("rules: pass")); // and is back, with the reason
   });
 
   it("Not for me leaves the page at once, can be undone, and the list is restored", async () => {

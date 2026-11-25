@@ -8,7 +8,8 @@ import { fetchData } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import { Card } from "./Home";
 import { AccountLook } from "./Look";
-import { AddCampaign, Connections } from "./More";
+import { Connections } from "./More";
+import { PageHead, UiIcon } from "./ui";
 
 // ---------------------------------------------------------------- New: add a campaign or a video
 
@@ -29,7 +30,8 @@ export function uploadProblem(file: File | null): { block: boolean; text: string
 
 export function UploadVideo({ campaigns, initialId }: { campaigns: Approved[]; initialId?: string }) {
   const [campaignId, setCampaignId] = useState(initialId ?? campaigns[0]?.id ?? "");
-  const [mode, setMode] = useState<"file" | "link">("file");
+  const { tr } = useLang();
+  const [mode, setMode] = useState<"file" | "link">("link");
   const [file, setFile] = useState<File | null>(null);
   const [link, setLink] = useState("");
   const [language, setLanguage] = useState("en");
@@ -85,7 +87,7 @@ export function UploadVideo({ campaigns, initialId }: { campaigns: Approved[]; i
       } else {
         await api(`/api/campaigns/${campaignId}/sources/link`, { body: { url: link.trim(), language, permission_ref: practice ? PRACTICE_PERMISSION : permission.trim(), youtube_permitted: youtubeOk } });
       }
-      setMessage(mode === "file" ? "Uploaded. Clips appear in Review when they are ready." : "Fetching the video. Clips appear in Review when they are ready.");
+      setMessage(mode === "file" ? tr("Uploaded. Clips appear in Review when they are ready.", "تم الرفع. تظهر المقاطع في المراجعة عندما تجهز.") : tr("Fetching the video. Clips appear in Review when they are ready.", "جارٍ جلب الفيديو. تظهر المقاطع في المراجعة عندما تجهز."));
       setDoneFor(campaignId);
       setFile(null); setLink(""); setProgress(null);
     } catch (e) {
@@ -94,35 +96,41 @@ export function UploadVideo({ campaigns, initialId }: { campaigns: Approved[]; i
     }
   };
 
-  if (campaigns.length === 0) return <p className="muted">Approve a campaign first. Footage is always added to an approved campaign.</p>;
+  if (campaigns.length === 0) return <p className="muted">{tr("Approve a campaign first. Footage is always added to an approved campaign.", "وافق على حملة أولاً. الفيديو يُضاف دائماً إلى حملة موافَق عليها.")}</p>;
 
   return (
     <div className="stack" style={{ gap: 14 }}>
       <div className="field">
-        <label htmlFor="v-campaign">Campaign</label>
-        <select id="v-campaign" className="input" value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>
-          {campaigns.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-        {practice && <span className="small muted">Practice: for trying the system. Nothing is posted and no money is involved.</span>}
+        <label id="v-campaign-l" htmlFor="v-campaign">{tr("Campaign", "الحملة")}</label>
+        {campaigns.length <= 4 ? (
+          <div className="pick" role="group" aria-labelledby="v-campaign-l">
+            {campaigns.map((c) => <button key={c.id} type="button" aria-pressed={c.id === campaignId} onClick={() => setCampaignId(c.id)}>{c.name}</button>)}
+          </div>
+        ) : (
+          <select id="v-campaign" className="input" value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>
+            {campaigns.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        )}
+        {practice && <span className="small muted">{tr("Practice: for trying the system. Nothing is posted and no money is involved.", "تجريبية: لتجربة النظام. لا نشر ولا مال.")}</span>}
       </div>
-      <div className="segmented" role="tablist" aria-label="Source">
-        <button role="tab" aria-selected={mode === "file"} onClick={() => setMode("file")}>From this device</button>
-        <button role="tab" aria-selected={mode === "link"} onClick={() => setMode("link")}>From a link</button>
+      <div className="seg" role="tablist" aria-label={tr("Source", "المصدر")}>
+        <button role="tab" aria-selected={mode === "link"} onClick={() => setMode("link")}>{tr("From a link", "من رابط")}</button>
+        <button role="tab" aria-selected={mode === "file"} onClick={() => setMode("file")}>{tr("From this device", "من هذا الجهاز")}</button>
       </div>
       {mode === "file" ? (
         <div className={`dropzone${over ? " over" : ""}`}
           onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)}
           onDrop={(e) => { e.preventDefault(); setOver(false); const f = e.dataTransfer.files?.[0]; if (f) setFile(f); }}>
           <input ref={input} id="v-file" type="file" accept="video/*" className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-          <p style={{ fontWeight: 600 }}>{file ? file.name : "Drop a video here"}</p>
-          <p className="small muted">{file ? `${(file.size / 1e6).toFixed(1)} MB` : "or choose one from your phone or computer"}</p>
-          <label htmlFor="v-file" className="btn" style={{ marginTop: 12 }}>Choose video</label>
+          <p style={{ fontWeight: 600 }}>{file ? file.name : tr("Drop a video here", "اسحب الفيديو إلى هنا")}</p>
+          <p className="small muted">{file ? `${(file.size / 1e6).toFixed(1)} MB` : tr("or choose one from your phone or computer", "أو اختره من جوالك أو حاسوبك")}</p>
+          <label htmlFor="v-file" className="btn" style={{ marginTop: 12 }}>{tr("Choose video", "اختر فيديو")}</label>
         </div>
       ) : (
         <div className="stack">
           <div className="field">
-            <label htmlFor="v-link">Video link</label>
-            <input id="v-link" className="input" inputMode="url" placeholder="Google Drive, Dropbox or a direct link" value={link} onChange={(e) => setLink(e.target.value)} />
+            <label htmlFor="v-link">{tr("Video link", "رابط الفيديو")}</label>
+            <input id="v-link" className="input" inputMode="url" placeholder={tr("Google Drive, Dropbox, YouTube or a direct link", "Google Drive أو Dropbox أو يوتيوب أو رابط مباشر")} value={link} onChange={(e) => setLink(e.target.value)} />
           </div>
           {isYoutube && (
             <div className="banner warn stack">
@@ -133,16 +141,16 @@ export function UploadVideo({ campaigns, initialId }: { campaigns: Approved[]; i
         </div>
       )}
       <div className="row wrap">
-        <div className="field grow">
-          <label htmlFor="v-lang">Language</label>
+        <div className="field" style={{ flex: "1 1 130px" }}>
+          <label htmlFor="v-lang">{tr("Language", "اللغة")}</label>
           <select id="v-lang" className="input" value={language} onChange={(e) => setLanguage(e.target.value)}>
-            <option value="en">English</option><option value="ar">Arabic</option>
+            <option value="en">{tr("English", "الإنجليزية")}</option><option value="ar">{tr("Arabic", "العربية")}</option>
           </select>
         </div>
         {!practice && (
           <div className="field" style={{ flex: "2 1 220px" }}>
-            <label htmlFor="v-perm">Permission or licence reference</label>
-            <input id="v-perm" className="input" placeholder="e.g. footage link from the brief" value={permission} onChange={(e) => setPermission(e.target.value)} />
+            <label htmlFor="v-perm">{tr("Permission or licence reference", "إثبات الإذن أو الترخيص")}</label>
+            <input id="v-perm" className="input" placeholder={tr("e.g. footage link from the brief", "مثلاً رابط الفيديو من البريف")} value={permission} onChange={(e) => setPermission(e.target.value)} />
           </div>
         )}
       </div>
@@ -152,10 +160,10 @@ export function UploadVideo({ campaigns, initialId }: { campaigns: Approved[]; i
       {message && (
         <div className="banner ok stack" role="status" style={{ gap: 8 }}>
           <span>{message}</span>
-          {doneFor && <Link className="btn" href={`/review?campaign=${doneFor}`}>Open Review</Link>}
+          {doneFor && <Link className="btn" href={`/review?campaign=${doneFor}`}>{tr("Open Review", "افتح المراجعة")}</Link>}
         </div>
       )}
-      <button className="btn primary block" disabled={!ready || progress !== null} onClick={submit}>{mode === "file" ? "Upload and start" : "Fetch and start"}</button>
+      <button className="btn primary block" disabled={!ready || progress !== null} onClick={submit}>{mode === "file" ? tr("Upload and start", "ارفع وابدأ") : tr("Fetch and start", "اجلب وابدأ")}</button>
     </div>
   );
 }
@@ -203,46 +211,6 @@ export function PracticeForm({ onCreated }: { onCreated: (campaign: Approved) =>
       </div>
       {error && <p className="error" role="alert">{error}</p>}
       <button className="btn primary block" disabled={busy || !name.trim()} onClick={create}>{busy ? "Creating…" : "Create practice campaign"}</button>
-    </div>
-  );
-}
-
-export function NewPlace() {
-  const { t } = useLang();
-  const [choice, setChoice] = useState<"campaign" | "video" | "practice">("campaign");
-  const [justMade, setJustMade] = useState<string | undefined>();
-  const [approved, setApproved] = useState<Approved[]>([]);
-  const [shared, setShared] = useState<{ name?: string; text?: string; url?: string } | null>(null);
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const text = p.get("text") ?? "", url = p.get("url") ?? "", title = p.get("title") ?? "";
-    const link = url || (text.match(/https?:\/\/\S+/)?.[0] ?? "");
-    setShared(text || url || title ? { name: title, text, url: link } : {});
-  }, []);
-  useEffect(() => {
-    fetchData<any>("/api/home").then((home) => {
-      const fetched: Approved[] = home.campaigns.filter((c: Card) => c.status === "approved")
-        .map((c: Card) => ({ id: c.id, name: c.name, practice: !!c.is_practice, language: c.language ?? null }));
-      // A practice campaign made a moment ago may not be in a slow answer yet: keep it.
-      setApproved((list) => [...list.filter((c) => !fetched.some((f) => f.id === c.id)), ...fetched]);
-    }).catch(() => undefined);
-  }, []);
-  const practiceCreated = (campaign: Approved) => {   // straight to the upload form, no waiting for a reload
-    setApproved((list) => [campaign, ...list.filter((c) => c.id !== campaign.id)]);
-    setJustMade(campaign.id);
-    setChoice("video");
-  };
-  return (
-    <div className="page" style={{ maxWidth: 720 }}>
-      <h1>{t("create")}</h1>
-      <div className="segmented" role="tablist" aria-label="What to add">
-        <button role="tab" aria-selected={choice === "campaign"} onClick={() => setChoice("campaign")}>{t("addCampaign")}</button>
-        <button role="tab" aria-selected={choice === "video"} onClick={() => setChoice("video")}>{t("addVideo")}</button>
-        <button role="tab" aria-selected={choice === "practice"} onClick={() => setChoice("practice")}>Practice</button>
-      </div>
-      {choice === "campaign" && shared && <AddCampaign key={JSON.stringify(shared)} embedded initial={shared} />}
-      {choice === "video" && <UploadVideo campaigns={approved} initialId={justMade} />}
-      {choice === "practice" && <PracticeForm onCreated={practiceCreated} />}
     </div>
   );
 }
@@ -351,16 +319,17 @@ function AccountCard({ account, onSaved }: { account: Account; onSaved: () => vo
 }
 
 export function Profile() {
-  const { t } = useLang();
+  const { t, tr } = useLang();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [form, setForm] = useState({ platform: "tiktok", handle: "", niche: "podcast", language: "" });
   const [error, setError] = useState("");
   const [net, setNet] = useState<any>(null);
+  const [loaded, setLoaded] = useState(false);
 
   // The first look reuses what the tab already fetched; after a change it asks the server again.
   const load = useCallback((force = true) => {
-    fetchData<any>("/api/reference", { force }).then((ref) => { setAccounts(ref.accounts); setCategories(ref.categories.map((c: any) => c.name)); }).catch(() => setError("Could not load."));
+    fetchData<any>("/api/reference", { force }).then((ref) => { setAccounts(ref.accounts); setCategories(ref.categories.map((c: any) => c.name)); setLoaded(true); }).catch(() => setError("Could not load."));
     fetchData<any>("/api/home", { force }).then((home) => setNet(home.net_per_hour)).catch(() => undefined);
   }, []);
   useEffect(() => { load(false); }, [load]);
@@ -380,24 +349,27 @@ export function Profile() {
 
   return (
     <div className="page" style={{ maxWidth: 820 }}>
-      <h1>{t("profile")}</h1>
+      <PageHead title={t("profile")} />
+      {!net && <i className="sk" style={{ height: 112, borderRadius: 18 }} aria-hidden="true" />}
       {net && (
-        <section className="card row wrap" aria-label="Your numbers" style={{ gap: 24 }}>
-          <div className="stack" style={{ gap: 0 }}><span className="big-num">{net.this_week.with_pending_per_hour === null ? "—" : money(net.this_week.with_pending_per_hour)}</span><span className="small muted">Net per hour this week</span></div>
-          <div className="stack" style={{ gap: 0 }}><span className="big-num">{money(net.month_to_date.paid_usd)}</span><span className="small muted">Paid this month</span></div>
-          <span className="badge">Confidence: {net.confidence}</span>
-        </section>
+        <Link className="group" href="/ledger" aria-label={tr("Your numbers", "أرقامك")} style={{ textDecoration: "none", color: "inherit" }}>
+          <div className="item" style={{ display: "grid", gap: 2 }}>
+            <span className="eyebrow">{tr("Net per hour this week", "صافي الساعة هذا الأسبوع")}</span>
+            <span className="money xl">{net.this_week.with_pending_per_hour === null ? "—" : money(net.this_week.with_pending_per_hour)}</span>
+            <span className="small muted">{tr("Paid this month", "المدفوع هذا الشهر")} {money(net.month_to_date.paid_usd)} · {tr("Confidence", "الثقة")}: {net.confidence}</span>
+          </div>
+        </Link>
       )}
-      <nav className="card" style={{ padding: 0 }} aria-label="Your places">
-        <Link className="list-link" href="/queue">Posting queue<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/review-later">{t("reviewLater")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/ledger">{t("ledger")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/alerts">{t("alerts")}<span aria-hidden="true">›</span></Link>
-        <Link className="list-link" href="/more/settings">{t("settings")}<span aria-hidden="true">›</span></Link>
+      <nav className="group" aria-label={tr("Your places", "أماكنك")}>
+        {([["/library", tr("Accepted clips", "المقاطع المقبولة")], ["/queue", tr("Posting queue", "قائمة النشر")], ["/review-later", t("reviewLater")],
+          ["/ledger", t("ledger")], ["/alerts", t("alerts")], ["/settings", t("settings")]] as const).map(([href, label]) => (
+          <Link key={href} className="item" href={href}><span className="grow title">{label}</span><span className="go flip">{UiIcon.chev}</span></Link>
+        ))}
       </nav>
       <Connections />
-      <section className="stack" aria-label="Your accounts">
-        <h2>Your accounts</h2>
+      {!loaded && <i className="sk" style={{ height: 260, borderRadius: 18 }} aria-hidden="true" />}
+      <section className="stack" aria-label="Your accounts" hidden={!loaded}>
+        <h2>{tr("Your accounts", "حساباتك")}</h2>
         <p className="small muted">One account per platform for each niche. The system never stores passwords, only the handle. Set the language each account posts in, and its US/UK/Canada/Australia audience share: many campaigns only pay for those views, and the ranking uses both. A screenshot of the platform's audience page is enough.</p>
         {Object.entries(byNiche).map(([niche, list]) => (
           <div key={niche} className="stack" style={{ gap: 8 }}>
@@ -406,7 +378,7 @@ export function Profile() {
           </div>
         ))}
         <div className="card stack">
-          <strong>Add an account</strong>
+          <strong>{tr("Add an account", "أضف حساباً")}</strong>
           <div className="row wrap">
             <div className="field grow"><label htmlFor="a-platform">Platform</label>
               <select id="a-platform" className="input" value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })}>

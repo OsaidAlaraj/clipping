@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import Feed from "@/components/Feed";
 import { flushOutbox, readOutbox } from "@/lib/api";
@@ -41,14 +41,24 @@ describe("feed card", () => {
     expect(screen.getByRole("progressbar")).toBeTruthy();
   });
 
-  it("has labelled rail buttons and starts muted until tapped", async () => {
+  it("has labelled rail buttons, starts with sound on (owner note 11), and a tap turns sound off and back on", async () => {
     const { card } = await open(feedRoutes(three()));
     for (const label of ["Accept", "Reject", "Hooks", "Edit", "Review later"]) expect(screen.getByRole("button", { name: label })).toBeTruthy();
     const video = card.querySelector("video")!;
-    expect(video.muted).toBe(true);
+    expect(video.muted).toBe(false);
     expect(video.hasAttribute("playsinline")).toBe(true);
     swipe(card, [150, 300], [151, 301]); // a tap
+    await waitFor(() => expect(card.querySelector("video")!.muted).toBe(true));
+    swipe(card, [150, 300], [151, 301]); // and back
     await waitFor(() => expect(card.querySelector("video")!.muted).toBe(false));
+  });
+
+  it("when the browser refuses sound, the clip plays muted and shows the tap instead of failing", async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementationOnce(() => Promise.reject(new DOMException("blocked", "NotAllowedError")));
+    const { card } = await open(feedRoutes(three()));
+    await waitFor(() => expect(card.querySelector("video")!.muted).toBe(true));
+    expect(screen.getByText("Tap for sound")).toBeTruthy();
+    play.mockRestore();
   });
 
   it("shows no likes, comments, follower counts or streaks, and hides pay on the card by default", async () => {
@@ -168,6 +178,51 @@ describe("hooks sheet and keyboard", () => {
     await waitFor(() => expect(mock.posts("/edit")).toHaveLength(1));
     expect(mock.posts("/edit")[0].body).toEqual({ hook_id: "c1-h2" });
     await screen.findByText(/Re-rendering as a new version/);
+  });
+
+  it("a thumb on a hook is sent and shows at once, a second tap on the same thumb clears it", async () => {
+    const { mock } = await open(feedRoutes(three(), { "POST /api/hooks/c1-h1/rating": { id: "c1-h1", rating: 1 } }));
+    fireEvent.click(screen.getByRole("button", { name: "Hooks" }));
+    const dialog = await screen.findByRole("dialog", { name: "Hooks" });
+    const up = within(dialog).getAllByRole("button", { name: "Good hook" })[0];
+    fireEvent.click(up);
+    await waitFor(() => expect(mock.posts("/hooks/c1-h1/rating")).toHaveLength(1));
+    expect(mock.posts("/hooks/c1-h1/rating")[0].body).toEqual({ value: "up" });
+    expect(up.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(up);
+    await waitFor(() => expect(mock.posts("/hooks/c1-h1/rating")).toHaveLength(2));
+    expect(mock.posts("/hooks/c1-h1/rating")[1].body).toEqual({ value: "none" });
+  });
+
+  it("Regenerate adds new hooks, and a failure is a plain sentence", async () => {
+    let fail = false;
+    const { mock } = await open(feedRoutes(three(), {
+      "POST /api/clips/c1/hooks/regenerate": () => fail
+        ? { __status: 502, body: { error: "Could not write new hooks right now. Try again in a moment." } }
+        : { hooks: [{ id: "n1", text: "Stop doing this", hook_type: "stakes", chosen: false, rank: 3, score: 0.7 }] },
+    }));
+    fireEvent.click(screen.getByRole("button", { name: "Hooks" }));
+    const dialog = await screen.findByRole("dialog", { name: "Hooks" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Regenerate hooks" }));
+    await within(dialog).findByText("Stop doing this");
+    fail = true;
+    fireEvent.click(within(dialog).getByRole("button", { name: "Regenerate hooks" }));
+    await within(dialog).findByText(/Could not write new hooks/);
+    expect(mock.posts("/hooks/regenerate")).toHaveLength(2);
+  });
+
+  it("the edit sheet changes start and length in 0.1 s steps with - and + buttons", async () => {
+    const { mock } = await open(feedRoutes(three(), { "POST /api/clips/c1/edit": { id: "c1v2", status: "rendering" } }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const dialog = await screen.findByRole("dialog", { name: "Edit clip" });
+    expect(within(dialog).queryByRole("textbox", { name: /Start/ })).toBeNull();
+    fireEvent.pointerDown(within(dialog).getByRole("button", { name: "Start plus 0.1" }));
+    fireEvent.pointerUp(within(dialog).getByRole("button", { name: "Start plus 0.1" }));
+    fireEvent.pointerDown(within(dialog).getByRole("button", { name: "Length minus 0.1" }));
+    fireEvent.pointerUp(within(dialog).getByRole("button", { name: "Length minus 0.1" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save as new version" }));
+    await waitFor(() => expect(mock.posts("/edit")).toHaveLength(1));
+    expect(mock.posts("/edit")[0].body).toEqual({ trim: { start_s: 5.1, end_s: 18.4 } });
   });
 
   it("desktop shortcuts: A accepts, R opens reasons, Esc closes, arrows move, U undoes", async () => {

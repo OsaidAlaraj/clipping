@@ -1,0 +1,318 @@
+{
+ "spec": {
+  "version": 1,
+  "items": [
+   {
+    "id": "3778dfac06",
+    "layer": "identity",
+    "key": "identity.name",
+    "value": "CSGOBIG [CS2]",
+    "source_quote": "CSGOBIG [CS2]",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "5763edf023",
+    "layer": "identity",
+    "key": "identity.campaign_url",
+    "value": "https://www.clipster.com/discover?openedCampaignId=cecab19f-9046-489d-a1e8-c856bae83352",
+    "source_quote": "CSGOBIG [CS2]",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "6814e56347",
+    "layer": "identity",
+    "key": "identity.marketplace",
+    "value": "clipster",
+    "source_quote": "CSGOBIG [CS2]",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "d438262306",
+    "layer": "payout",
+    "key": "payout.max_per_creator",
+    "value": 2500,
+    "source_quote": "💸 Max Payout Per Creator: $2,500",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "3719444001",
+    "layer": "payout",
+    "key": "payout.budget_total",
+    "value": 5000,
+    "source_quote": ":budget: Total Budget: $5,000",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "7fd319f97b",
+    "layer": "payout",
+    "key": "payout.budget_used_pct",
+    "value": 58,
+    "source_quote": "Completion: 58%",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "38e381f845",
+    "layer": "platforms",
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "source_quote": "📱 Platforms: TikTok / Instagram / YouTube",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "573aa6e226",
+    "layer": "audience",
+    "key": "audience.language",
+    "value": "en",
+    "source_quote": "POST ENGLISH CS2 CONTENT",
+    "confidence": 0.8,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "a85a18a0c0",
+    "layer": "content",
+    "key": "content.allowed_categories",
+    "value": [
+     "cs2"
+    ],
+    "source_quote": "POST ENGLISH CS2 CONTENT",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "6d130852a8",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "LOW QUALITY / SPAM",
+    "source_quote": "POST LOW QUALITY / SPAM",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "60f9573228",
+    "layer": "length",
+    "key": "length.min_s",
+    "value": 10,
+    "source_quote": "10s MINIMUM LENGTH",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "5b77508387",
+    "layer": "assets",
+    "key": "assets.logo",
+    "value": {
+     "requirement": "required",
+     "link": "https://drive.google.com/drive/folders/1-1zOqWB1egCnUBZa9kf1QUCT4OM_CiOO?usp=sharing"
+    },
+    "source_quote": "ADD PROVIDED LOGO -> LOGO",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "6145091325",
+    "layer": "assets",
+    "key": "assets.logo_guidelines",
+    "value": {
+     "link": "https://www.notion.so/Clipster-Logo-Guidelines-2e64a057b8c981a595a1c656a8194dc5?source=copy_link"
+    },
+    "source_quote": "FOLLOW CLIPSTER STANDARD -> LOGO GUIDELINES",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "579a68c166",
+    "layer": "account",
+    "key": "account.requirements",
+    "value": {
+     "type": "branded_page",
+     "detail": "CS2"
+    },
+    "source_quote": "CS2 BRANDED PAGES",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "5a1edc43ba",
+    "layer": "payout",
+    "key": "payout.model",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "02d7ba1018",
+    "layer": "payout",
+    "key": "payout.rate_per_1k",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "88541bb37c",
+    "layer": "captions",
+    "key": "captions.disclosure_policy",
+    "value": "unspecified",
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   }
+  ],
+  "links": [
+   {
+    "url": "https://www.clipster.com/discover?openedCampaignId=cecab19f-9046-489d-a1e8-c856bae83352",
+    "text": "CSGOBIG [CS2]",
+    "kind": "campaign_page",
+    "fetch": {
+     "status": "pending",
+     "note": ""
+    }
+   },
+   {
+    "url": "https://drive.google.com/drive/folders/1-1zOqWB1egCnUBZa9kf1QUCT4OM_CiOO?usp=sharing",
+    "text": "LOGO",
+    "kind": "logo_asset_folder",
+    "fetch": {
+     "status": "classified_only",
+     "note": "A shared folder: not downloaded. Add the logo file yourself."
+    }
+   },
+   {
+    "url": "https://www.notion.so/Clipster-Logo-Guidelines-2e64a057b8c981a595a1c656a8194dc5?source=copy_link",
+    "text": "LOGO GUIDELINES",
+    "kind": "guidelines_doc",
+    "fetch": {
+     "status": "pending",
+     "note": ""
+    }
+   }
+  ],
+  "warnings": [],
+  "blocking": [
+   "payout.model"
+  ]
+ },
+ "raw_items": 13,
+ "raw": {
+  "items": [
+   {
+    "key": "identity.marketplace",
+    "value": "clipster",
+    "quote": "[CSGOBIG [CS2]](https://www.clipster.com/discover?openedCampaignId=cecab19f-9046-489d-a1e8-c856bae83352)",
+    "confidence": 0.9
+   },
+   {
+    "key": "identity.name",
+    "value": "CSGOBIG [CS2]",
+    "quote": "[CSGOBIG [CS2]](https://www.clipster.com/discover?openedCampaignId=cecab19f-9046-489d-a1e8-c856bae83352)",
+    "confidence": 0.95
+   },
+   {
+    "key": "identity.campaign_url",
+    "value": "https://www.clipster.com/discover?openedCampaignId=cecab19f-9046-489d-a1e8-c856bae83352",
+    "quote": "[CSGOBIG [CS2]](https://www.clipster.com/discover?openedCampaignId=cecab19f-9046-489d-a1e8-c856bae83352)",
+    "confidence": 0.95
+   },
+   {
+    "key": "audience.language",
+    "value": "en",
+    "quote": "* POST ENGLISH CS2 CONTENT",
+    "confidence": 0.95
+   },
+   {
+    "key": "length.min_s",
+    "value": 10,
+    "quote": "* 10s MINIMUM LENGTH",
+    "confidence": 0.95
+   },
+   {
+    "key": "assets.logo",
+    "value": {
+     "requirement": "required",
+     "link": "https://drive.google.com/drive/folders/1-1zOqWB1egCnUBZa9kf1QUCT4OM_CiOO?usp=sharing"
+    },
+    "quote": "* ADD PROVIDED LOGO -> [LOGO](https://drive.google.com/drive/folders/1-1zOqWB1egCnUBZa9kf1QUCT4OM_CiOO?usp=sharing)",
+    "confidence": 0.95
+   },
+   {
+    "key": "assets.logo_guidelines",
+    "value": {
+     "link": "https://www.notion.so/Clipster-Logo-Guidelines-2e64a057b8c981a595a1c656a8194dc5?source=copy_link"
+    },
+    "quote": "* FOLLOW CLIPSTER STANDARD -> [LOGO GUIDELINES](https://www.notion.so/Clipster-Logo-Guidelines-2e64a057b8c981a595a1c656a8194dc5?source=copy_link)",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.allowed_categories",
+    "value": [
+     "CS2 BRANDED PAGES"
+    ],
+    "quote": "* CS2 BRANDED PAGES",
+    "confidence": 0.9
+   },
+   {
+    "key": "content.forbidden",
+    "value": "POST LOW QUALITY / SPAM",
+    "quote": "* POST LOW QUALITY / SPAM",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.max_per_creator",
+    "value": 2500,
+    "quote": "💸 Max Payout Per Creator: $2,500",
+    "confidence": 0.95
+   },
+   {
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "quote": "📱 Platforms: TikTok / Instagram / YouTube",
+    "confidence": 0.85
+   },
+   {
+    "key": "payout.budget_total",
+    "value": 5000,
+    "quote": ":budget: Total Budget: $5,000",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.budget_used_pct",
+    "value": 58,
+    "quote": "Completion: 58%",
+    "confidence": 0.95
+   }
+  ]
+ }
+}

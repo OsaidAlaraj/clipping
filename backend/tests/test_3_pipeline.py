@@ -109,7 +109,7 @@ def test_agent_b_drops_invented_quotes_and_bad_types():
                      {"text": "Plain hook", "type": "shock", "score": 0.7},
                      {"text": "Why does this fail?", "type": "question", "score": 0.6, "chosen": True}]}
     hooks = agent_b.validate(raw, "Most people think talent wins. That is completely wrong.")
-    assert [h["text"] for h in hooks] == ['He said "that is completely wrong"', "Why does this fail?"]
+    assert [h["text"] for h in hooks] == ["He said that is completely wrong", "Why does this fail?"]
     assert not any(h["chosen"] for h in hooks)
 
 

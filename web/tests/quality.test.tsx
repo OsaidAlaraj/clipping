@@ -280,6 +280,6 @@ describe("review and correction screens: stylesheet audit", () => {
 
   it("the page never scrolls sideways: only the intended strips scroll horizontally", () => {
     const scrolling = [...CSS.matchAll(/^[ \t]*([^{}\n]+)\{[^}]*overflow-x:\s*auto[^}]*\}/gm)].map((m) => m[1].trim());
-    expect(scrolling.sort()).toEqual([".segmented", ".stories", ".thumbs"].sort());
+    expect(scrolling.sort()).toEqual([".lib-chips", ".segmented", ".stories", ".thumbs"].sort()); // .lib-chips: the accepted-clips campaign chips (owner note 13)
   });
 });

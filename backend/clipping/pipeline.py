@@ -10,8 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import brand_checks, config, ffmpeg, language_check, music, packaging, quality_gate, signals, templates, transcripts
-from .adapters import media
+from . import ad_label, brand_checks, brief_wiring, config, ffmpeg, hook_patterns, hook_rules, job_progress, language_check, music, packaging, quality_gate, signals, templates, transcripts
 from .adapters import music as _music_adapters  # noqa: F401  (registers the music stage providers)
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
@@ -71,6 +70,14 @@ def disclosure_template(conn, category_id, language: str) -> dict | None:
            order by (category_id is null) limit 1""",
         (language, category_id),
     ).fetchone()
+
+
+def disclosure_for(conn, campaign: dict, version: dict, language: str) -> dict | None:
+    """The label a clip carries: the campaign's template, or the off label when the owner switched it off (ad_label.py).
+    None: the label is on but there is no template for this language."""
+    if ad_label.is_off(campaign):
+        return ad_label.off_label((version or {}).get("rules_json"))
+    return disclosure_template(conn, campaign["category_id"], language)
 
 
 def _source_ctx(conn, source_id) -> tuple[dict, dict, dict]:
@@ -287,6 +294,18 @@ def _portfolio_room(conn, owner, campaign_id, made: int, room: int, wanted: int)
     return room, None
 
 
+PORTFOLIO_MIN_WEEK = 8   # a share of fewer clips than this means nothing: 40 % of 1 clip is 0
+
+
+def portfolio_allowance(share: float, week: int, made: int, wanted: int, room: int, min_week: int = PORTFOLIO_MIN_WEEK) -> int:
+    """PROPOSED replacement for the share arithmetic in `_portfolio_room` (not wired in: the owner decides). Same maths, but the share
+    only limits a campaign once the week has `min_week` clips; before that the weekly cap alone applies, so a second campaign can
+    no longer squeeze a quiet week down to one clip. Never starves: with no history the answer is `room`."""
+    if share >= 1 or week + made < min_week:
+        return room
+    return min(room, max(int((share * week - made) // (1 - share)), 1 if made == 0 else 0))
+
+
 def add_manual_candidates(conn, actor, source_id, moments: list[dict]) -> int:
     """Manual selection (the A4 fallback): the owner gives start and end times."""
     source, campaign, version = _source_ctx(conn, source_id)
@@ -307,6 +326,10 @@ def _with_pattern_hook(conn, candidate: dict, source: dict, hooks: list[dict]) -
     from . import moment_rank
 
     text = candidate.get("hook_text")
+    if text:
+        text, bad = hook_rules.check(text)   # the engine's line follows the same rules as the agent's
+        if bad:
+            text = None
     if not text:
         return hooks
     row = conn.execute("select hook_type from hook_patterns where name = %s and language = %s",
@@ -319,6 +342,63 @@ def _with_pattern_hook(conn, candidate: dict, source: dict, hooks: list[dict]) -
     return merged
 
 
+def _hook_context(conn, source: dict) -> tuple[str | None, list[str]]:
+    """(niche, hook_constraints) of this source's campaign: the category name ("business", "gaming", "podcast" ...) and the campaign's
+    own hook rules when its approved version lists them (`rules_json["hook_constraints"]`, written by the brief extractor)."""
+    campaign = conn.execute("select category_id, approved_version_id from campaigns where id = %s", (source["campaign_id"],)).fetchone()
+    cat = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone() if campaign and campaign["category_id"] else None
+    version = conn.execute("select rules_json from campaign_versions where id = %s", (campaign["approved_version_id"],)).fetchone() if campaign else None
+    constraints = ((version or {}).get("rules_json") or {}).get("hook_constraints") or []
+    return (str(cat["name"]).lower() if cat else None), [str(c) for c in constraints if str(c).strip()]
+
+
+def _neighbour_formats(conn, source: dict, candidate: dict) -> list[str]:
+    """Formats the top hook of the nearest other moments of this source opened with, so two clips in a row never start alike."""
+    rows = conn.execute(
+        """select h.pattern from candidates c join hooks h on h.candidate_id = c.id and h.rank = 1
+           where c.source_id = %s and c.id <> %s and h.pattern is not null order by abs(c.start_s - %s) limit 2""",
+        (source["id"], candidate["id"], candidate["start_s"])).fetchall()
+    return [r["pattern"] for r in rows]
+
+
+def regenerate_hooks(conn, clip_id) -> list[dict]:
+    """New hook variants for a clip's moment (the hook editor's Regenerate button): never a text the moment already has, each
+    one passing hook_rules. They are added after the existing hooks; nothing is re-rendered until the owner picks one."""
+    import time
+
+    clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
+    if clip is None:
+        raise AppError("Clip not found.", "not_found")
+    candidate = conn.execute("select * from candidates where id = %s", (clip["candidate_id"],)).fetchone()
+    source, _campaign, _version = _source_ctx(conn, candidate["source_id"])
+    owner = source["owner_operator_id"]
+    words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
+    existing = conn.execute("select text, rank from hooks where candidate_id = %s", (candidate["id"],)).fetchall()
+    niche, constraints = _hook_context(conn, source)
+    picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, f"{clip_id}:{time.time()}", owner, niche or "general")
+    try:
+        fresh, _cost = agent_b.run(conn, registry, " ".join(w["text"] for w in words), source["language"], candidate["score"], owner,
+                                   avoid=[h["text"] for h in existing], patterns=[p["name"] for p in picked], niche=niche,
+                                   avoid_formats=_neighbour_formats(conn, source, candidate), hook_constraints=constraints)
+    except (ContentFiltered, AdapterPaused, KillSwitchOn):
+        raise
+    except AppError:
+        raise
+    except Exception as exc:   # a vendor or network failure: plain words for the owner, the cause goes to the server log
+        import logging
+
+        logging.getLogger("clipping").warning("hook regenerate failed: %r", exc)
+        raise AppError("Could not write new hooks right now. Try again in a moment.", "hooks_failed") from exc
+    top = max([h["rank"] for h in existing], default=0)
+    for offset, hook in enumerate(fresh, start=1):
+        conn.execute(
+            """insert into hooks (candidate_id, clip_id, owner_operator_id, text, hook_type, chosen, rank, score, pattern)
+               values (%s, %s, %s, %s, %s, false, %s, %s, %s)""",
+            (candidate["id"], clip["id"], owner, hook["text"], hook["hook_type"], top + offset, hook["score"], hook.get("pattern")))
+    return [dict(r) | {"id": str(r["id"])} for r in conn.execute(
+        "select id, text, hook_type, chosen, rank, score, rating from hooks where candidate_id = %s order by rank", (candidate["id"],)).fetchall()]
+
+
 def stage_hooks(conn, job: dict) -> Decimal:
     candidate = conn.execute("select * from candidates where id = %s", (job["payload"]["candidate_id"],)).fetchone()
     source, campaign, version = _source_ctx(conn, candidate["source_id"])
@@ -326,7 +406,10 @@ def stage_hooks(conn, job: dict) -> Decimal:
     words = [w for w in _words(conn, source) if w["start"] >= float(candidate["start_s"]) - 0.1 and w["end"] <= float(candidate["end_s"]) + 0.1]
     segment = " ".join(w["text"] for w in words)
     try:
-        hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner)
+        niche, constraints = _hook_context(conn, source)
+        picked = hook_patterns.pick(conn, source["language"], "default", agent_b.CANDIDATES, str(candidate["id"]), owner, niche or "general")
+        hooks, cost = agent_b.run(conn, registry, segment, source["language"], candidate["score"], owner, patterns=[p["name"] for p in picked],
+                                  niche=niche, avoid_formats=_neighbour_formats(conn, source, candidate), hook_constraints=constraints)
     except ContentFiltered as exc:
         # The AI safety filter refused this moment (e.g. graphic violence): not brand-safe either, so the moment is
         # set aside with its reason and the other moments carry on. Never retried, never a failed job.
@@ -387,7 +470,12 @@ def _render_request(conn, clip: dict, source: dict, platform: str | None, hook_t
     start, end = float(clip["start_s"]), float(clip["end_s"])
     request = {"start_s": start, "end_s": end, "language": clip["language"], "platform": platform, "crop": style.get("crop"),
                "audio": style.get("audio"), "hook_text": hook_text, "emphasis": [],
+               "hook_show_s": float(get_setting(conn, "hook_show_s") or 0) or None,      # the owner's own hook time; none = automatic
                "min_s": float(get_setting(conn, "clip_min_duration_s"))}      # tightening never takes the clip below the campaign minimum
+    try:
+        request["speaker_names"] = {str(k): str(v) for k, v in (transcripts.load(conn, source["id"]).get("speakers") or {}).items()}
+    except Exception:   # no transcript names: the label falls back to "Speaker N"
+        request["speaker_names"] = {}
     measured = signals.load(conn, source["id"])
     if measured:
         first, last = int(start), math.ceil(end)
@@ -426,16 +514,34 @@ def _pick_music(conn, clip: dict, campaign: dict, render_clip: dict, words: list
     return {"path": track["path"], "offset_s": decision["offset_s"], "gain_db": decision["gain_db"], "record": record, "profile": profile}
 
 
+def _story(conn, clip: dict, campaign: dict, version: dict, words: list[dict]) -> dict:
+    """The Story Director's edit plan for this clip, within the campaign's longest allowed length. A failure here never stops the
+    render: the clip is then cut as chosen."""
+    try:
+        from . import moment_rank as rank, story_director   # lazy: moment_rank reaches back into this module through moments_pilot
+        category = conn.execute("select name from categories where id = %s", (campaign["category_id"],)).fetchone()
+        high = float(get_setting(conn, "clip_max_duration_s"))
+        brief = rank.brief_terms(version.get("rules_json"), None)
+        if brief["length"] and brief["length"][1]:
+            high = min(high, float(brief["length"][1]))
+        planned = story_director.plan(words, float(clip["start_s"]), float(clip["end_s"]), clip["language"], (category or {}).get("name") or "general", high)
+        return planned if planned["techniques"] else {}
+    except Exception:
+        return {}
+
+
 def stage_render(conn, job: dict) -> Decimal:
     """The clip in one encode: reframe, captions, the disclosure label and the account's template (title card, progress bar,
     emphasis zooms), then its cover. The disclosure text is checked first: without it the clip is blocked."""
     clip, source, campaign, version = _clip_ctx(conn, job["payload"]["clip_id"])
     owner = clip["owner_operator_id"]
-    disclosure = disclosure_template(conn, campaign["category_id"], clip["language"])
+    disclosure = disclosure_for(conn, campaign, version, clip["language"])
     if disclosure is None:
         raise_alert(conn, owner, "disclosure_missing", "block", "clips", clip["id"],
                     f"{campaign['name']}: no disclosure template for language {clip['language']}. The clip is blocked.")
         raise AppError("Disclosure text is missing. The clip is blocked.", "disclosure_missing")   # S8
+    if disclosure.get("required"):
+        raise AppError("The brief requires the ad label, so it stays on for this campaign. The clip is not rendered.", "ad_label_required")
     account_id, platform = _assign_account(conn, clip, campaign, version)
     meta = dict(clip["render_meta"] or {})
     template = templates.pick(conn, account_id, meta.get("template_id"))
@@ -444,12 +550,19 @@ def stage_render(conn, job: dict) -> Decimal:
     out = storage.path(key)
     words = _words(conn, source)
     render_clip = _render_request(conn, clip, source, platform, meta.get("hook_text"))
+    render_clip["min_s"] = brief_wiring.min_clip_s(version["rules_json"], render_clip["min_s"])   # the brief's own minimum length (brief_spec)
+    account_row = conn.execute("select niche from accounts where id = %s", (account_id,)).fetchone() if account_id else None
+    meta["account_warnings"] = brief_wiring.account_warnings(version["rules_json"], account_row)   # shown to the owner before posting
+    story = _story(conn, clip, campaign, version, words)
+    if story:
+        render_clip["story"] = story
+    meta["story"] = story or None          # plain words for the review screen: "why this opening"
     bed = _pick_music(conn, clip, campaign, render_clip, words, platform)
     if bed and bed.get("path"):
         render_clip["music"] = bed
     result, cost = registry.call(conn, "render", "render_clip", {
         "src": str(storage.path(source["stored_path"])), "clip": render_clip,
-        "words": words, "template": template["spec"], "label": disclosure["overlay_text"], "out": str(out)}, owner)
+        "words": words, "template": template["spec"], "label": None if disclosure.get("label_off") else disclosure["overlay_text"], "out": str(out)}, owner)
     storage.put(key, str(out))
     cover_key = None
     if result.get("cover_path"):
@@ -461,7 +574,7 @@ def stage_render(conn, job: dict) -> Decimal:
         caption, hashtags, mentions = build_caption(disclosure["caption_text"], meta.get("hook_text") or "", version["rules_json"])
     try:   # the gate only reports: a failure here must never stop the render
         gate = quality_gate.run(Path(str(out)), words, float(clip["start_s"]), float(clip["end_s"]), language=clip["language"], caption=caption,
-                                disclosure=disclosure.get("caption_text"), niche=media.NICHE_OF_CROP.get(render_clip.get("crop")))
+                                disclosure=None if disclosure.get("label_off") else disclosure.get("caption_text"), niche=media.NICHE_OF_CROP.get(render_clip.get("crop")))
     except Exception:
         gate = None
     meta["gate"] = gate
@@ -473,7 +586,7 @@ def stage_render(conn, job: dict) -> Decimal:
     meta.update(template_id=template["id"], template_version=template["version"], encoder=result["encoder"], encodes=result["encodes"],
                 reframe=result["reframe"], loudness_normalised=result["loudness_normalised"], overlay_burned=True,
                 captions=result["captions"], zooms=result.get("zooms", 0), caption_language=clip["language"],
-                disclosure_template_id=str(disclosure["id"]), cover_key=cover_key)
+                disclosure_template_id=str(disclosure["id"]) if disclosure.get("id") else None, cover_key=cover_key)
     conn.execute(
         """update clips set file_path = %s, file_hash = %s, duration_s = %s, width = %s, height = %s, overlay_json = %s,
                caption_text = %s, hashtags = %s, mentions = %s, render_meta = %s, cover_path = %s where id = %s""",
@@ -495,9 +608,10 @@ def stage_captions(conn, job: dict) -> Decimal:
 
 
 def run_compliance(conn, clip: dict, campaign: dict, version: dict) -> tuple[dict, Decimal]:
-    template = disclosure_template(conn, campaign["category_id"], clip["language"]) or {}
+    template = disclosure_for(conn, campaign, version, clip["language"]) or {}
     category = conn.execute("select banned_words from categories where id = %s", (campaign["category_id"],)).fetchone()
-    limits = {"min_s": get_setting(conn, "clip_min_duration_s"), "max_s": get_setting(conn, "clip_max_duration_s")}
+    limits = {"min_s": brief_wiring.min_clip_s(version["rules_json"], get_setting(conn, "clip_min_duration_s")),
+              "max_s": get_setting(conn, "clip_max_duration_s")}
     report, cost = agent_c.run(conn, registry, clip, template, limits, (category or {}).get("banned_words") or [],
                                version["rules_json"].get("content_rules") or [],
                                (clip["render_meta"] or {}).get("hook_text") or "", clip["owner_operator_id"],
@@ -559,7 +673,7 @@ def _package_text(conn, clip_id, source: dict, campaign: dict, version: dict) ->
     """Caption lab, per-platform packaging and the originality record (packaging.py). The text is checked against the campaign's rules
     again: if the new caption fails compliance, the earlier one is put back. A failure here never stops the clip."""
     clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
-    disclosure = disclosure_template(conn, campaign["category_id"], clip["language"])
+    disclosure = disclosure_for(conn, campaign, version, clip["language"])
     if disclosure is None:
         return Decimal("0")
     before = {k: clip[k] for k in ("caption_text", "hashtags", "mentions", "render_meta")}
@@ -626,7 +740,8 @@ def process_one(db: Database) -> bool:
         with db.session(worker) as conn:
             if kill_switch_on(conn):
                 raise KillSwitchOn()
-            cost = HANDLERS[job["type"]](conn, job)
+            with job_progress.bind(db, job["id"]):
+                cost = HANDLERS[job["type"]](conn, job)
             finish_job(conn, job["id"], cost)
     except KillSwitchOn:
         with db.session(worker) as conn:

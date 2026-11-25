@@ -1,0 +1,24 @@
+{
+ "variant": "base",
+ "counts": {
+  "clips": 28,
+  "cold_open": 1,
+  "ending_trim": 0,
+  "rehook": 24
+ },
+ "cold_open_win_rate": 1.0,
+ "judged": 1,
+ "examples": [
+  {
+   "label": "local_ep377",
+   "start_s": 2922.755,
+   "teaser": "Disney plus added 12,000,000 last quarter.",
+   "opening_was": "There's some some rumors that governments might get involved and stop the acquisition as as being a antitrust. So we'll see if they even get",
+   "cold_open_score": 1.0,
+   "why": [
+    "Opens with the line \"Disney plus added 12,000,000 last quarter.\" from 30 s into the clip, then rewinds to the start: the real start is slower (opening strength 0.33, this line 0.58).",
+    "A small punch-in at 18 s re-hooks attention in the middle."
+   ]
+  }
+ ]
+}

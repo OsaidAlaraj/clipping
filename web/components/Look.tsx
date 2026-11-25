@@ -9,8 +9,9 @@ import { api, ApiError } from "@/lib/api";
 
 export type Spec = {
   font: string; primary: string; accent: string; caption_position: "lower" | "middle"; title_card: boolean; progress_bar: boolean;
-  zooms: boolean; font_size: number; cover: "band" | "outline";
+  zooms: boolean; font_size: number; cover: "band" | "outline"; caption_style?: string;
 };
+export type CaptionStyleInfo = { key: string; label: string; about: string };
 type Version = { version: number; note: string | null };
 export type Look = Spec & { template_id: string; name: string; active: boolean; version: number; versions: Version[] };
 type Preset = { name: string; spec: Spec };
@@ -35,10 +36,24 @@ const contrast = (hex: string) => {
   return 0.299 * r + 0.587 * g + 0.114 * b > 140 ? "#101010" : "#FFFFFF";
 };
 
+const SAMPLE = ["This", "is", "the", "one", "thing"];
+/** The sample caption of a named style, drawn the way the render draws it: words per line, which one is lit, case, weight. */
+function SampleCaption({ style, accent, size }: { style: string; accent: string; size: number }) {
+  const auto = style === "auto";
+  const key = auto ? "karaoke_clean" : style;
+  const word = (w: string, lit: boolean, i: number) => <span key={i} style={lit ? { color: accent } : undefined}>{w}{" "}</span>;
+  if (key === "bold_pop") return <span style={{ fontSize: size * 1.25, fontWeight: 800, textTransform: "uppercase" }}>{word("This", false, 0)}{word("is", true, 1)}</span>;
+  if (key === "emphasis") return <span style={{ fontSize: size }}>{word("only", false, 0)}{word("100", true, 1)}{word("dollars", false, 2)}</span>;
+  if (key === "stacked") return <span style={{ fontSize: size * 1.1 }}>{word("This", false, 0)}{word("is", false, 1)}<br />{word("the", true, 2)}{word("one", false, 3)}</span>;
+  if (key === "minimal") return <span style={{ fontSize: size * 0.85, fontWeight: 500 }}>{SAMPLE.map((w, i) => word(w, false, i))}</span>;
+  return <span style={{ fontSize: size }}>{SAMPLE.slice(0, 3).map((w, i) => word(w, i === 1, i))}</span>;
+}
+
 /** A small picture of the look: the label, the title card, one caption and the progress bar, drawn from the spec as it is edited. */
 export function LookPreview({ spec }: { spec: Spec }) {
   const height = 200;
   const caption = (spec.font_size / 100) * height;
+  const styleKey = spec.caption_style ?? "auto";
   return (
     <div role="img" aria-label="Preview of this look" dir="auto"
       style={{ width: 113, height, flex: "none", position: "relative", overflow: "hidden", borderRadius: 14, fontFamily: `"${spec.font}", sans-serif`,
@@ -48,9 +63,12 @@ export function LookPreview({ spec }: { spec: Spec }) {
         <span style={{ position: "absolute", insetInline: 12, top: "11%", textAlign: "center", background: spec.accent, color: contrast(spec.accent),
           fontSize: 9, fontWeight: 700, padding: "2px 4px", lineHeight: 1.25 }}>The hook line</span>
       )}
-      <span style={{ position: "absolute", insetInline: 8, textAlign: "center", fontWeight: 700, fontSize: caption, lineHeight: 1.15,
+      <span data-testid="sample-caption" data-style={styleKey} style={{ position: "absolute", insetInline: 8, textAlign: "center", fontWeight: 700, lineHeight: 1.15,
         textShadow: "0 0 2px #000, 0 0 2px #000, 0 1px 3px #000",
-        ...(spec.caption_position === "lower" ? { bottom: "16%" } : { top: "50%", transform: "translateY(-50%)" }) }}>Words as they are spoken</span>
+        ...(spec.caption_position === "lower" ? { bottom: "16%" } : { top: "50%", transform: "translateY(-50%)" }) }}>
+        {styleKey === "speaker_label" && <span style={{ display: "block", margin: "0 auto 3px", width: "fit-content", background: spec.accent, color: contrast(spec.accent), fontSize: 8, padding: "1px 5px", borderRadius: 3 }}>Sara</span>}
+        <SampleCaption style={styleKey === "speaker_label" ? "karaoke_clean" : styleKey} accent={spec.accent} size={caption} />
+      </span>
       {spec.progress_bar && <i style={{ position: "absolute", insetInlineStart: 0, bottom: 0, height: 3, width: "42%", background: spec.accent }} />}
     </div>
   );
@@ -69,6 +87,7 @@ export function AccountLook({ accountId }: { accountId: string }) {
   const [open, setOpen] = useState(false);
   const [looks, setLooks] = useState<Look[] | null>(null);
   const [presets, setPresets] = useState<Preset[]>([]);
+  const [styles, setStyles] = useState<CaptionStyleInfo[]>([]);
   const [persona, setPersona] = useState<Persona | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -82,7 +101,7 @@ export function AccountLook({ accountId }: { accountId: string }) {
     if (!quiet) setMessage("");   // a reload after a refused save keeps the refusal on screen
     try {
       const [lib, plan] = await Promise.all([api(`/api/accounts/${accountId}/templates`), api(`/api/accounts/${accountId}/persona`)]);
-      setLooks(lib.templates); setPresets(lib.presets); setPersona(plan);
+      setLooks(lib.templates); setPresets(lib.presets); setStyles(lib.styles ?? []); setPersona(plan);
       setSelected((now) => (lib.templates.some((l: Look) => l.template_id === now) ? now : (lib.templates.find((l: Look) => l.active) ?? lib.templates[0])?.template_id ?? null));
     } catch (e) { setLooks(null); fail(e); }
   }, [accountId]);
@@ -183,6 +202,29 @@ export function AccountLook({ accountId }: { accountId: string }) {
                         <option value="lower">Lower third</option><option value="middle">Middle</option>
                       </select></div>
                   </div>
+                  {styles.length > 0 && (
+                    <div className="stack" style={{ gap: 6 }} role="radiogroup" aria-label="Caption style">
+                      <span className="small muted">Caption style</span>
+                      <div className="row wrap" style={{ gap: 6 }}>
+                        {styles.map((st) => (
+                          <button key={st.key} type="button" role="radio" aria-checked={(current.caption_style ?? "auto") === st.key} title={st.about}
+                            className={`chip-pill${(current.caption_style ?? "auto") === st.key ? " on" : ""}`} onClick={() => change({ caption_style: st.key })}>{st.label}</button>
+                        ))}
+                      </div>
+                      <span className="small muted">{styles.find((st) => st.key === (current.caption_style ?? "auto"))?.about}</span>
+                      {looks.length > 1 && (
+                        <button type="button" className="btn" style={{ minHeight: 44, alignSelf: "flex-start" }}
+                          onClick={async () => {
+                            const key = current.caption_style ?? "auto";
+                            setState("saving");
+                            try {
+                              for (const l of looks) if ((l.caption_style ?? "auto") !== key) merge(await api(urlFor(l), { method: "PUT", body: { caption_style: key } }));
+                              setState("saved");
+                            } catch (e) { fail(e); load(true); }
+                          }}>Use this style for all of this account's looks</button>
+                      )}
+                    </div>
+                  )}
                   <div className="row wrap" style={{ gap: 10 }}>
                     <div className="field"><label htmlFor={`c1-${accountId}`}>Text colour</label>
                       <input id={`c1-${accountId}`} type="color" className="input" style={{ width: 74, padding: 4 }} value={current.primary} onChange={(e) => change({ primary: e.target.value.toUpperCase() }, SAVE_DELAY_MS)} /></div>

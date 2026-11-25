@@ -95,14 +95,19 @@ class Plan:
     keeps: list[tuple[float, float]]
     cuts: list[dict] = field(default_factory=list)    # {start, end, kind: pause|filler}
     dropped: set[int] = field(default_factory=set)     # indexes of the words removed with their filler cut
+    prefix: tuple[float, float] | None = None          # a cold open: this stretch of the clip plays first, then the clip from its start
 
     @property
     def removed(self) -> float:
         return sum(c["end"] - c["start"] for c in self.cuts)
 
     @property
+    def prefix_s(self) -> float:
+        return self.prefix[1] - self.prefix[0] if self.prefix else 0.0
+
+    @property
     def new_duration(self) -> float:
-        return self.duration - self.removed
+        return self.duration - self.removed + self.prefix_s
 
     def map(self, t: float) -> float:
         """A time of the original clip on the tightened timeline (a time inside a cut lands where the cut was)."""
@@ -111,19 +116,41 @@ class Plan:
             if t >= c["end"]:
                 gone += c["end"] - c["start"]
             elif t > c["start"]:
-                return c["start"] - gone
+                return c["start"] - gone + self.prefix_s
             else:
                 break
-        return t - gone
+        return t - gone + self.prefix_s
 
     def words(self, words: list[dict], clip_start: float, clip_end: float) -> list[dict]:
         """The clip's words on the tightened timeline, relative to 0, without the fillers that were cut."""
         out = []
+        if self.prefix:   # the cold open's own words, on the first seconds of the timeline
+            a, b = self.prefix
+            out += [{**w, "start": w["start"] - clip_start - a, "end": w["end"] - clip_start - a} for w in words
+                    if w["start"] - clip_start >= a - 0.05 and w["end"] - clip_start <= b + 0.05]
         for i, w in enumerate(words):
             if w["end"] <= clip_start or w["start"] >= clip_end or i in self.dropped:
                 continue
             out.append({**w, "start": self.map(w["start"] - clip_start), "end": self.map(w["end"] - clip_start)})
         return out
+
+
+def with_story(plan: Plan | None, duration: float, cold: tuple[float, float] | None = None, trim: float = 0.0) -> Plan | None:
+    """Add the Story Director's edits to the tightening plan (or to none): an ending trim (a last cut of the dead outro) and a cold
+    open (a stretch of the clip that plays first). Times are clip-relative. Returns `plan` unchanged when there is nothing to add."""
+    base = plan or Plan(duration, [(0.0, duration)], [])
+    keeps, cuts = list(base.keeps), list(base.cuts)
+    edge = duration - trim
+    if trim >= 0.3 and edge >= MIN_KEEP_S and all(c["end"] <= edge + 0.01 for c in cuts):
+        clipped = [(a, min(b, edge)) for a, b in keeps if a < edge - 0.05]
+        if clipped:
+            keeps = clipped
+            cuts.append({"start": round(edge, 3), "end": round(duration, 3), "kind": "outro"})
+    if cold:
+        keeps = [cold] + keeps
+    if keeps == base.keeps and not cold:
+        return plan
+    return Plan(duration, keeps, cuts, base.dropped, prefix=cold)
 
 
 def _grid(t: float, fps: float) -> float:
@@ -206,9 +233,9 @@ def plan_tighten(words: list[dict], clip_start: float, clip_end: float, language
 
 # ------------------------------------------------------------------ stress moments for the punch-in zooms
 
-ZOOM_DEPTH_MIN, ZOOM_DEPTH_MAX = 1.05, 1.10
-STRESS_GAP_S = 5.0
-STRESS_MAX = 5
+ZOOM_DEPTH_MIN, ZOOM_DEPTH_MAX = 1.03, 1.06   # subtle: a push you feel, not one you notice
+STRESS_GAP_S = 12.0   # at least 12 s between pushes: a zoom every few seconds reads as the picture breathing
+STRESS_MAX = 2
 
 
 def stress_moments(words: list[dict], clip_start: float, clip_end: float, env, plan: Plan | None = None) -> list[tuple[float, float]]:

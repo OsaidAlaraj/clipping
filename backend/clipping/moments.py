@@ -21,6 +21,7 @@ from .moment_engines import Source
 from .moment_learning import learn, weights_for  # noqa: F401  (learn is part of this module's interface)
 
 RATE_TOP = 12            # candidates the LLM rates one by one
+SCOUT_RATE = 8           # extra candidates the LLM rates when its own scout proposed them (heuristic features must not hide them)
 COMPARE_TOP = 8          # candidates compared head to head
 MAX_PAIRS = 12           # pairs per order
 FILTER_CALL_BUDGET = 6   # extra calls allowed to find which candidate a content filter refused
@@ -128,6 +129,7 @@ def _features(src: Source, live: list[dict], weights: dict) -> None:
     lo, hi = src.length
     for c in live:
         features, evidence = rank.window_features(src.ep, c["start_s"], c["end_s"], lo, hi)
+        c["proposed"] = c["score"]                     # the engine's own score for it, before the shared features replace it
         c["features"], c["evidence"] = features, evidence
         c["include"] = rank.term_hits(src.ep, c["start_s"], c["end_s"], src.brief["include"])
         c["signal"] = rank.adjust(rank.soft_score(features, weights), features, c["include"], src.profile, src.brief["wants_info"])
@@ -160,6 +162,7 @@ def _patterns_for(src: Source, count: int) -> list[dict]:
 def _rate(src: Source, live: list[dict], weights: dict) -> dict[str, str]:
     """The LLM's view of the top candidates, blended in. Returns {id: reason} for moments its safety filter refused."""
     top = sorted(live, key=lambda c: -c["signal"])[:RATE_TOP]
+    top += sorted((c for c in live if c.get("source") == "scout" and c not in top), key=lambda c: -c["proposed"])[:SCOUT_RATE]
     if not top:
         return {}
     patterns = _patterns_for(src, len(top))

@@ -16,7 +16,7 @@ import wave
 from decimal import Decimal
 from pathlib import Path
 
-from .. import config
+from .. import config, job_progress
 from .base import Adapter, AdapterError, check_response, http_client, register
 
 SENTENCE_END = ".?!؟"
@@ -244,7 +244,7 @@ class FasterWhisperTranscription(Adapter):
             return ["cuda", "cpu"], None
         return ["cpu"], "no usable GPU or CUDA libraries"
 
-    def _run(self, device: str, audio_path: str, language: str, keyterms: list[str]) -> dict:
+    def _run(self, device: str, audio_path: str, language: str, keyterms: list[str], duration_s: float = 0) -> dict:
         name = self.cfg.get("model", "large-v3-turbo")
         model = load_whisper_model(name, device, self.cfg.get("compute_type", "int8"), int(self.cfg.get("cpu_threads", 0)))
         prompt = ", ".join(keyterms)[:400] or None   # key terms bias the decoder toward the campaign's own words
@@ -253,6 +253,7 @@ class FasterWhisperTranscription(Adapter):
                                            beam_size=int(self.cfg.get("beam_size", 5)))
         words, utterances = [], []
         for segment in segments:   # a lazy generator: CUDA errors can surface here
+            job_progress.report(float(segment.end), duration_s, "seconds of audio")   # real: how far into the audio Whisper has got
             utterances.append({"start": float(segment.start), "end": float(segment.end), "speaker": None, "text": segment.text.strip()})
             words += [{"text": w.word.strip(), "start": float(w.start), "end": float(w.end),
                        "confidence": float(w.probability), "speaker": None}
@@ -269,7 +270,7 @@ class FasterWhisperTranscription(Adapter):
         devices, degraded = self._devices()
         for device in devices:
             try:
-                result = self._run(device, str(audio_path), language, terms)
+                result = self._run(device, str(audio_path), language, terms, duration_s)
             except AdapterError:
                 raise
             except Exception as exc:

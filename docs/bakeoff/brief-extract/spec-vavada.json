@@ -1,0 +1,404 @@
+{
+ "spec": {
+  "version": 1,
+  "items": [
+   {
+    "id": "355a32558e",
+    "layer": "identity",
+    "key": "identity.name",
+    "value": "VAVADA [GENERAL]",
+    "source_quote": "VAVADA [GENERAL]",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "79a490acc6",
+    "layer": "identity",
+    "key": "identity.campaign_url",
+    "value": "https://www.clipster.com/discover?openedCampaignId=7a0c3415-ae30-4d5a-9b76-8e1c81cd961b",
+    "source_quote": "VAVADA [GENERAL]",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "3ce19a44a3",
+    "layer": "identity",
+    "key": "identity.marketplace",
+    "value": "clipster",
+    "source_quote": "VAVADA [GENERAL]",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "a2a31ae986",
+    "layer": "payout",
+    "key": "payout.rate_per_1k",
+    "value": 0.2,
+    "source_quote": "💵 CPM (Pay Per 1,000 views)\n$0.2",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "83a01b1e3a",
+    "layer": "payout",
+    "key": "payout.model",
+    "value": "cpm",
+    "source_quote": "💵 CPM (Pay Per 1,000 views)\n$0.2",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "9047fc50c0",
+    "layer": "payout",
+    "key": "payout.max_per_creator",
+    "value": 15000,
+    "source_quote": "💸 Max Payout Per Creator: $15,000",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "d4c9b3c9c6",
+    "layer": "payout",
+    "key": "payout.budget_total",
+    "value": 30000,
+    "source_quote": ":budget: Total Budget: $30,000",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "35546fccf0",
+    "layer": "payout",
+    "key": "payout.budget_used_pct",
+    "value": 93,
+    "source_quote": "Completion: 93%",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "0de1d0855c",
+    "layer": "payout",
+    "key": "payout.payment_methods",
+    "value": [
+     "PayPal",
+     "Visa Prepaid",
+     "Gift cards",
+     "Bank transfer"
+    ],
+    "source_quote": "💳 Payment Methods\nPayPal · Visa Prepaid · Gift cards · Bank transfer",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "f9bfcac849",
+    "layer": "platforms",
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "source_quote": "📱 Platforms: TikTok / Instagram / YouTube",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "805fc6c1c4",
+    "layer": "audience",
+    "key": "audience.language",
+    "value": "en",
+    "source_quote": "POST ANY ENGLISH VIRAL CLIPS (SPORTS, MOVIES, STREAMERS, LUXURY, FIGHTING, GAMING ETC)",
+    "confidence": 0.8,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "8b70b28446",
+    "layer": "audience",
+    "key": "audience.forbidden_regions",
+    "value": [
+     "SEA",
+     "T3"
+    ],
+    "source_quote": "SEA FOCUSED CONTENT / T3 FOCUSED CONTENT",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "3b2163f32b",
+    "layer": "content",
+    "key": "content.allowed_categories",
+    "value": [
+     "sports",
+     "movies",
+     "streamers",
+     "luxury",
+     "fighting",
+     "gaming"
+    ],
+    "source_quote": "POST ANY ENGLISH VIRAL CLIPS (SPORTS, MOVIES, STREAMERS, LUXURY, FIGHTING, GAMING ETC)",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "a75bf3cfc7",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "SEA FOCUSED CONTENT / T3 FOCUSED CONTENT",
+    "source_quote": "SEA FOCUSED CONTENT / T3 FOCUSED CONTENT",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "d19f429c5f",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "LOW QUALITY / SPAM",
+    "source_quote": "POST LOW QUALITY / SPAM",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "f8030b3662",
+    "layer": "length",
+    "key": "length.min_s",
+    "value": 8,
+    "source_quote": "8s MINIMUM LENGTH! & 0.3% MINIMUM ENGAGEMENT",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "9db3c07071",
+    "layer": "performance",
+    "key": "performance.min_engagement_pct",
+    "value": 0.3,
+    "source_quote": "8s MINIMUM LENGTH! & 0.3% MINIMUM ENGAGEMENT",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "0d172b0e7c",
+    "layer": "assets",
+    "key": "assets.logo",
+    "value": {
+     "requirement": "required",
+     "link": "https://f.io/5jc4M546"
+    },
+    "source_quote": "ADD PROVIDED LOGO",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "2bf23a4388",
+    "layer": "assets",
+    "key": "assets.logo_placement",
+    "value": "top_half",
+    "source_quote": "LOGO ONLY ON THE TOP HALF OF SCREEN!",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "05dfa1d096",
+    "layer": "captions",
+    "key": "captions.disclosure_policy",
+    "value": "unspecified",
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   }
+  ],
+  "links": [
+   {
+    "url": "https://www.clipster.com/discover?openedCampaignId=7a0c3415-ae30-4d5a-9b76-8e1c81cd961b",
+    "text": "VAVADA [GENERAL]",
+    "kind": "campaign_page",
+    "fetch": {
+     "status": "pending",
+     "note": ""
+    }
+   },
+   {
+    "url": "https://f.io/5jc4M546",
+    "text": "LOGO",
+    "kind": "logo_asset_folder",
+    "fetch": {
+     "status": "classified_only",
+     "note": "A shared folder: not downloaded. Add the logo file yourself."
+    }
+   }
+  ],
+  "warnings": [],
+  "blocking": []
+ },
+ "raw_items": 21,
+ "raw": {
+  "items": [
+   {
+    "key": "identity.marketplace",
+    "value": "clipster",
+    "quote": "[VAVADA [GENERAL]](https://www.clipster.com/discover?openedCampaignId=7a0c3415-ae30-4d5a-9b76-8e1c81cd961b)",
+    "confidence": 0.9
+   },
+   {
+    "key": "identity.name",
+    "value": "VAVADA [GENERAL]",
+    "quote": "[VAVADA [GENERAL]](https://www.clipster.com/discover?openedCampaignId=7a0c3415-ae30-4d5a-9b76-8e1c81cd961b)",
+    "confidence": 0.95
+   },
+   {
+    "key": "identity.campaign_url",
+    "value": "https://www.clipster.com/discover?openedCampaignId=7a0c3415-ae30-4d5a-9b76-8e1c81cd961b",
+    "quote": "[VAVADA [GENERAL]](https://www.clipster.com/discover?openedCampaignId=7a0c3415-ae30-4d5a-9b76-8e1c81cd961b)",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.allowed_categories",
+    "value": [
+     "sports",
+     "movies",
+     "streamers",
+     "luxury",
+     "fighting",
+     "gaming"
+    ],
+    "quote": "* POST ANY ENGLISH VIRAL CLIPS (SPORTS, MOVIES, STREAMERS, LUXURY, FIGHTING, GAMING ETC)",
+    "confidence": 0.92
+   },
+   {
+    "key": "assets.logo",
+    "value": {
+     "requirement": "required",
+     "link": "https://f.io/5jc4M546"
+    },
+    "quote": "* ADD PROVIDED [LOGO](https://f.io/5jc4M546)",
+    "confidence": 0.95
+   },
+   {
+    "key": "assets.logo_placement",
+    "value": "top_half",
+    "quote": "* LOGO ONLY ON THE TOP HALF OF SCREEN!",
+    "confidence": 0.95
+   },
+   {
+    "key": "length.min_s",
+    "value": 8,
+    "quote": "* 8s MINIMUM LENGTH! & 0.3% MINIMUM ENGAGEMENT",
+    "confidence": 0.95
+   },
+   {
+    "key": "performance.min_engagement_pct",
+    "value": 0.3,
+    "quote": "* 8s MINIMUM LENGTH! & 0.3% MINIMUM ENGAGEMENT",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.forbidden",
+    "value": "SEA FOCUSED CONTENT",
+    "quote": "* SEA FOCUSED CONTENT / T3 FOCUSED CONTENT",
+    "confidence": 0.9
+   },
+   {
+    "key": "content.forbidden",
+    "value": "T3 FOCUSED CONTENT",
+    "quote": "* SEA FOCUSED CONTENT / T3 FOCUSED CONTENT",
+    "confidence": 0.9
+   },
+   {
+    "key": "content.forbidden",
+    "value": "POST LOW QUALITY",
+    "quote": "* POST LOW QUALITY / SPAM",
+    "confidence": 0.9
+   },
+   {
+    "key": "content.forbidden",
+    "value": "SPAM",
+    "quote": "* POST LOW QUALITY / SPAM",
+    "confidence": 0.9
+   },
+   {
+    "key": "payout.max_per_creator",
+    "value": 15000,
+    "quote": "💸 Max Payout Per Creator: $15,000",
+    "confidence": 0.96
+   },
+   {
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "quote": "📱 Platforms: TikTok / Instagram / YouTube",
+    "confidence": 0.9
+   },
+   {
+    "key": "payout.budget_total",
+    "value": 30000,
+    "quote": ":budget: Total Budget: $30,000",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.budget_used_pct",
+    "value": 93,
+    "quote": "Completion: 93%",
+    "confidence": 0.9
+   },
+   {
+    "key": "payout.model",
+    "value": "cpm",
+    "quote": "💵 CPM (Pay Per 1,000 views)",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.rate_per_1k",
+    "value": 0.2,
+    "quote": "$0.2",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.payment_methods",
+    "value": [
+     "PayPal",
+     "Visa Prepaid",
+     "Gift cards",
+     "Bank transfer"
+    ],
+    "quote": "PayPal · Visa Prepaid · Gift cards · Bank transfer",
+    "confidence": 0.95
+   },
+   {
+    "key": "audience.language",
+    "value": "en",
+    "quote": "* POST ANY ENGLISH VIRAL CLIPS (SPORTS, MOVIES, STREAMERS, LUXURY, FIGHTING, GAMING ETC)",
+    "confidence": 0.95
+   },
+   {
+    "key": "audience.forbidden_regions",
+    "value": [
+     "SEA",
+     "T3"
+    ],
+    "quote": "* SEA FOCUSED CONTENT / T3 FOCUSED CONTENT",
+    "confidence": 0.88
+   }
+  ]
+ }
+}

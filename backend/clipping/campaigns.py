@@ -8,7 +8,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import ffmpeg
+from . import ad_label, brief_spec, brief_wiring, ffmpeg
 from .agents import rules as agent_a
 from .alerts import raise_alert, registry
 from .core import AppError, GateError, audit, enqueue, get_setting, sha256_text
@@ -36,7 +36,7 @@ def fee_pct_from_marketplace(fee_rules: dict, model: str | None, budget_total) -
     return None
 
 
-def _write_version(conn, campaign: dict, marketplace: dict, brief_text: str, licence_ref: str | None) -> dict:
+def _write_version(conn, campaign: dict, marketplace: dict, brief_text: str, licence_ref: str | None, spec: dict | None = None) -> dict:
     version_no = conn.execute("select coalesce(max(version_no), 0) + 1 as n from campaign_versions where campaign_id = %s",
                               (campaign["id"],)).fetchone()["n"]
     read_at = dt.datetime.now(dt.timezone.utc)
@@ -46,6 +46,21 @@ def _write_version(conn, campaign: dict, marketplace: dict, brief_text: str, lic
         "max_accounts": int(get_setting(conn, "max_accounts_per_campaign_platform")),
     }, campaign["owner_operator_id"])
     rules = result["rules_json"]
+    if spec:   # the owner-confirmed spec (brief_spec.py) fills what the old reader missed and records its decisions
+        brief_wiring.apply(rules, spec)
+        gaps = {"payout.model": rules["payout"].get("model"), "payout.rate_per_1k": rules["payout"].get("rate_per_1k"),
+                "platforms_allowed": rules.get("platforms_allowed")}
+        result["unclear_fields"] = [f for f in result["unclear_fields"] if f not in gaps or not gaps[f]]
+        if any(d["id"] == "ad_label_off" for d in rules.get("spec_decisions", [])):
+            # The owner saw "the brief says never #ad, the label is off" on the review screen and confirmed it (owner decides, audit row 15).
+            # The old automatic block for a brief that forbids disclosure is lifted for this campaign and the decision stays visible.
+            kept = [b for b in result["hard_blocks"] if b["code"] != "disclosure_forbidden"]
+            if len(kept) != len(result["hard_blocks"]):
+                result["hard_blocks"], rules["hard_blocks"] = kept, kept
+                rules["spec_decisions"].append({"id": "disclosure_block_lifted", "quote": rules["disclosure"].get("quote"),
+                    "text": "The brief forbids disclosure, which the system normally blocks. You confirmed it, so the campaign goes on. "
+                            "Platforms or the law may still require disclosure: check before you post."})
+        result["compliance_status"] = ("blocked" if result["hard_blocks"] else "review" if result["unclear_fields"] else "pass")
     payout = rules["payout"]
     # Only platforms the marketplace tracks are offered (spec 9.7).
     rules["platforms_allowed"] = [p for p in rules["platforms_allowed"] if p in marketplace["platforms"]]
@@ -78,7 +93,7 @@ def _write_version(conn, campaign: dict, marketplace: dict, brief_text: str, lic
 
 def intake(conn, actor, marketplace_slug: str, name: str, brief_text: str, url: str | None = None,
            category: str = "podcast", deadline: str | None = None, licence_ref: str | None = None,
-           external_ref: str | None = None) -> dict:
+           external_ref: str | None = None, spec: dict | None = None) -> dict:
     """FR-01/02/04: store the raw snapshot, run Agent A, apply hard blocks. The result is a draft."""
     if not brief_text or not brief_text.strip():
         raise AppError("Paste the brief text.", "empty_brief")
@@ -93,7 +108,10 @@ def intake(conn, actor, marketplace_slug: str, name: str, brief_text: str, url: 
            values (%s, %s, %s, %s, %s, %s, 'reading', %s) returning *""",
         (actor.operator_id, marketplace["id"], external_ref, name.strip() or "Untitled campaign", url, category_row["id"], deadline),
     ).fetchone()
-    version = _write_version(conn, campaign, marketplace, brief_text, licence_ref)
+    if spec is not None:   # owner-confirmed spec: its shape is checked again here, and every blocking question must be answered
+        spec = brief_spec.validate_spec(spec)
+        brief_spec.require_answers(spec)
+    version = _write_version(conn, campaign, marketplace, brief_text, licence_ref, spec)
     extracted_deadline = version["rules_json"].get("deadline")
     blocked = version["compliance_status"] == "blocked"
     reason = "; ".join(b["reason"] for b in version["hard_blocks"]) if blocked else None
@@ -103,6 +121,9 @@ def intake(conn, actor, marketplace_slug: str, name: str, brief_text: str, url: 
            where id = %s returning *""",
         ("rejected" if blocked else "pending_approval", reason, version["id"], extracted_deadline, campaign["id"]),
     ).fetchone()
+    if any(d["id"] == "ad_label_off" for d in version["rules_json"].get("spec_decisions", [])):
+        campaign = conn.execute("update campaigns set ad_label = false where id = %s returning *", (campaign["id"],)).fetchone()
+        audit(conn, "campaign.ad_label", "campaigns", campaign["id"], {"on": False, "reason": "the brief forbids #ad"})
     if blocked:
         raise_alert(conn, campaign["owner_operator_id"], "hard_block", "warn", "campaigns", campaign["id"],
                     f"{campaign['name']} was blocked: {reason}")
@@ -146,6 +167,17 @@ def approve(conn, actor, campaign_id) -> dict:
                             (campaign_id,)).fetchone()
     audit(conn, "gate.campaign_approval", "campaigns", campaign_id,
           {"version_no": version["version_no"], "compliance_status": version["compliance_status"]}, rule_version_id=version["id"])
+    return campaign
+
+
+def set_ad_label(conn, actor, campaign_id, on: bool) -> dict:
+    """The ad-label switch (owner notes 2). Off is refused when the brief requires the label; compliance is the second check."""
+    campaign = get_campaign(conn, campaign_id)
+    version = conn.execute("select rules_json from campaign_versions where id = %s", (campaign["current_version_id"],)).fetchone()
+    if not on and ad_label.required_by_brief((version or {}).get("rules_json")):
+        raise AppError("The brief requires the ad label, so it stays on. Only the brief can change that.", "ad_label_required")
+    campaign = conn.execute("update campaigns set ad_label = %s where id = %s returning *", (bool(on), campaign_id)).fetchone()
+    audit(conn, "campaign.ad_label", "campaigns", campaign_id, {"on": bool(on)})
     return campaign
 
 

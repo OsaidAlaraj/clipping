@@ -367,3 +367,15 @@ def test_a_failing_model_leaves_the_render_caption_and_records_why(produced, foo
 def test_a_hashtag_is_not_repeated_in_another_letter_case():
     tags = _pack("tiktok", extra_tags=["#Launch", "#LAUNCH", "#launch"])["hashtags"]
     assert len({t.lower() for t in tags}) == len(tags)
+
+
+def test_unknown_speakers_never_get_a_placeholder_chip():
+    from clipping.adapters import caption_render as cr
+    assert [cr.real_name(x) for x in ("Speaker 1", "speaker 2", "المتحدث 1", "Host", "", None, "0", "Guest 3")] == [None] * 8
+    assert cr.real_name("Dr. Sara Haddad") == "Dr. Sara Haddad" and cr.real_name("Speaker One Hundred") == "Speaker One Hundred"
+    words = [{"text": "hi", "start": 0.0, "end": 0.4, "speaker": "0"}, {"text": "yes", "start": 3.0, "end": 3.4, "speaker": "1"}]
+    chunks = [{"start": 0.0, "end": 0.4, "words": [words[0]]}, {"start": 3.0, "end": 3.4, "words": [words[1]]}]
+    none_known = cr.speaker_events(chunks, 0.0, 1080, 1920, 70, 1400, {"0": "Speaker 1", "1": "Speaker 2"}, False, 40, 1040)
+    assert none_known == []
+    one_known = cr.speaker_events(chunks, 0.0, 1080, 1920, 70, 1400, {"0": "Speaker 1", "1": "Sara Haddad"}, False, 40, 1040)
+    assert len(one_known) == 1 and "Sara Haddad" in one_known[0]["text"]

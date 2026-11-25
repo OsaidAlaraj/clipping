@@ -4,6 +4,7 @@ YouTube's terms forbid downloads; it also needs the optional yt-dlp package."""
 from __future__ import annotations
 
 import ipaddress
+import logging
 import re
 import shutil
 import socket
@@ -12,10 +13,12 @@ from decimal import Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urljoin, urlparse
 
-from . import campaigns, config, ffmpeg, language_check, signals
+from . import brief_wiring, campaigns, config, ffmpeg, language_check, signals
 from .adapters import heatmap
 from .core import AppError, GateError, audit, enqueue
 from .db import Actor
+
+log = logging.getLogger(__name__)
 
 MAX_SOURCE_BYTES = 10 * 1024 ** 3   # 10 GB
 YOUTUBE_HOSTS = ("youtube.com", "youtu.be")
@@ -113,8 +116,10 @@ def save_upload(stream, filename: str | None) -> Path:
     return dest
 
 
-def register_upload(conn, actor, campaign_id, path: Path, language: str, permission_ref: str | None, filename: str | None) -> dict:
+def register_upload(conn, actor, campaign_id, path: Path, language: str, permission_ref: str | None, filename: str | None,
+                    override_whitelist: bool = False) -> dict:
     try:
+        whitelist_gate(conn, campaigns.get_campaign(conn, campaign_id), None, Path(filename or path.name).stem, override_whitelist)
         try:
             ffmpeg.probe(path)
         except Exception:
@@ -129,7 +134,20 @@ def register_upload(conn, actor, campaign_id, path: Path, language: str, permiss
         path.unlink(missing_ok=True)
 
 
-def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref: str | None, youtube_permitted: bool = False) -> dict:
+def whitelist_gate(conn, campaign: dict, url: str | None, title: str | None, override: bool) -> None:
+    """The brief's list of allowed footage (brief_wiring.source_refusal). The owner can override it knowingly; that is audited."""
+    version = conn.execute("select rules_json from campaign_versions where id = %s",
+                           (campaign.get("approved_version_id") or campaign.get("current_version_id"),)).fetchone()
+    refusal = brief_wiring.source_refusal((version or {}).get("rules_json"), url, title)
+    if refusal is None:
+        return
+    if not override:
+        raise AppError(refusal, "not_on_brief_list")
+    audit(conn, "source.whitelist_override", "campaigns", campaign["id"], {"url": url, "title": title, "reason": refusal})
+
+
+def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref: str | None, youtube_permitted: bool = False,
+               override_whitelist: bool = False, title: str | None = None) -> dict:
     campaign = campaigns.get_campaign(conn, campaign_id)
     if campaign["status"] != "approved":
         raise GateError("Only an approved campaign can take source footage.")
@@ -138,6 +156,7 @@ def queue_link(conn, actor, campaign_id, url: str, language: str, permission_ref
     if not (permission_ref and permission_ref.strip()):
         raise AppError("Permitted footage only: give a licence or written-permission reference.", "no_permission")
     check_public_https(url)
+    whitelist_gate(conn, campaign, url, title, override_whitelist)
     kind = link_kind(url)
     if kind == "youtube":
         if not youtube_permitted:
@@ -186,19 +205,43 @@ def download_to(url: str, dest: Path) -> Path:
         raise AppError("The link redirected too many times.", "fetch_failed")
 
 
+# Video AND audio merged into one mp4, at most 1080p (the clips are 1080x1920; a 4K AV1 stream is 4x the download and slow to decode).
+# Plain "best" can resolve to a video-only stream, which has no sound to transcribe.
+YOUTUBE_FORMAT = ("bv*[height<=1080][vcodec^=avc1]+ba[ext=m4a]/bv*[height<=1080]+ba/b[height<=1080]")
+
+
 def download_youtube(url: str, folder: Path, info_out: dict | None = None) -> Path:
     """Download one YouTube video. yt-dlp's metadata (the "most replayed" heatmap) is copied into `info_out` and the
     stream's live chat replay is saved beside the video when there is one; neither is needed for the download to work."""
     import yt_dlp
 
     folder.mkdir(parents=True, exist_ok=True)
-    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": "mp4/best", "quiet": True,
-               "writesubtitles": True, "subtitleslangs": ["live_chat"]}
-    with yt_dlp.YoutubeDL(options) as ydl:
-        info = ydl.extract_info(url, download=True)
-        if info_out is not None and isinstance(info, dict):
-            info_out.update({"heatmap": info.get("heatmap")})
-        return Path(ydl.prepare_filename(info))
+    options = {"outtmpl": str(folder / "%(id)s.%(ext)s"), "format": YOUTUBE_FORMAT, "merge_output_format": "mp4", "quiet": True, "no_warnings": True,
+               "writesubtitles": True, "subtitleslangs": ["live_chat"],
+               "js_runtimes": {"node": {}} if shutil.which("node") else {},
+               "ffmpeg_location": ffmpeg.exe()}   # merging video and sound needs ffmpeg; ours is bundled, not on PATH   # YouTube needs a JS runtime for every format
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(url, download=True)
+            if info_out is not None and isinstance(info, dict):
+                info_out.update({"heatmap": info.get("heatmap")})
+            return Path(ydl.prepare_filename(info))
+    except yt_dlp.utils.DownloadError as exc:   # yt-dlp's own text is technical; the owner gets a plain sentence and the cause stays in the log
+        log.warning("YouTube download failed: %s", exc)
+        raise AppError(_youtube_failure(str(exc)), "fetch_failed") from None
+
+
+def _youtube_failure(raw: str) -> str:
+    text = raw.lower()
+    if "private video" in text or "sign in" in text or "members-only" in text:
+        return "This YouTube video is private or needs a sign-in, so it cannot be downloaded."
+    if "unavailable" in text or "removed" in text or "does not exist" in text:
+        return "This YouTube video is unavailable or was removed."
+    if "429" in text or "too many requests" in text or "bot" in text:
+        return "YouTube is limiting downloads right now. Try again in a few minutes."
+    if "requested format is not available" in text:
+        return "YouTube did not offer a downloadable format for this video."
+    return "The YouTube download failed. Check the link and try again; the technical reason is in the server log."
 
 
 def youtube_signal_inputs(info: dict, folder: Path) -> tuple[list | None, list | None]:
@@ -218,6 +261,9 @@ def stage_fetch_source(conn, job: dict) -> Decimal:
             ffmpeg.probe(path)
         except Exception:
             raise AppError("The downloaded file is not a video the system can read.", "not_a_video") from None
+        if not ffmpeg.probe(path)["has_audio"]:
+            raise AppError("The downloaded video has no sound track, so it cannot be transcribed. Try the link again; if it keeps "
+                           "happening, download the video with sound and add it as a file.", "no_audio")
         source = campaigns.register_source(conn, Actor.worker(), payload["campaign_id"], str(path), payload["language"],
                                            permission_ref=payload["permission_ref"], origin_url=payload["url"])
         if payload["kind"] == "youtube":   # reached only after the owner confirmed the brief permits this video

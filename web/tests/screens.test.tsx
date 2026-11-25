@@ -36,16 +36,16 @@ describe("Home", () => {
     const story = await screen.findByRole("link", { name: /Founders Table: 80% budget left, 3 clips to review/ });
     expect(story.getAttribute("href")).toBe("/review?campaign=a");
     expect(screen.getByText("Hours today")).toBeTruthy();
-    expect(screen.getByText("Clips accepted")).toBeTruthy();
-    expect(screen.getByText("Posts done")).toBeTruthy();
-    expect(screen.getByText("Posts due")).toBeTruthy();
+    expect(screen.getByText("Accepted")).toBeTruthy();
+    expect(screen.getByText("Posted")).toBeTruthy();
     expect(screen.getByText("Confidence: low")).toBeTruthy();
-    expect(screen.getAllByText("$56.70")).toHaveLength(2);
+    expect(screen.getAllByText("$56.70")).toHaveLength(1); // this week, large; the month sits in its caption
     expect(screen.getByText("Founders Table: the brief changed.")).toBeTruthy();
-    expect(screen.getAllByTestId("campaign-card")).toHaveLength(2);
-    expect(screen.getAllByText("$1.50")).toHaveLength(2);
-    expect(screen.getAllByText("per 1,000 views")).toHaveLength(2);
-    expect(screen.getAllByText("20 h left")).toHaveLength(2);
+    expect(screen.getAllByTestId("campaign-card")).toHaveLength(1);   // campaigns waiting for a decision are cards ...
+    expect(screen.getAllByTestId("campaign-row")).toHaveLength(1);    // ... approved ones are rows
+    expect(screen.getAllByText("$1.50")).toHaveLength(1);
+    expect(screen.getAllByText("per 1,000 views")).toHaveLength(1);
+    expect(screen.getAllByText("20 h left")).toHaveLength(1);
     expect(view.container.textContent).not.toMatch(/Max \$|follower|likes|streak/i); // pay per clip is off the card by default
   });
 
@@ -205,6 +205,9 @@ describe("Review Later and Settings", () => {
     fireEvent.click(input.parentElement!.querySelector("button")!);
     await screen.findByText("setting session_length_min = 99 is outside 10 to 60");
     expect(screen.getByLabelText("Pay per clip display")).toBeTruthy();
+    expect(screen.queryByText(/never override the hard rules/i)).toBeNull();
+    expect(screen.getByText("Always blocked")).toBeTruthy();
+    expect(screen.getByText("Where the pay per clip is shown while you review.")).toBeTruthy();   // one line of help per control
     fireEvent.click(screen.getByRole("button", { name: "Switch on now" }));
     await waitFor(() => expect(mock.posts("/api/kill-switch")[0].body.active).toBe(true));
     fireEvent.click(screen.getByRole("button", { name: "العربية" }));

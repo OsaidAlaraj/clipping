@@ -14,7 +14,7 @@ import time
 from dataclasses import dataclass, field
 from decimal import Decimal
 
-from . import config, ffmpeg, moment_rank as rank, moments_pilot
+from . import config, ffmpeg, moment_rank as rank, moments_pilot, moments_scout
 from .alerts import registry
 from .core import AppError, KillSwitchOn
 from .router import register
@@ -213,6 +213,26 @@ class PilotEngine:
         source.cost += cost
         return [{"start_s": c["start_s"], "end_s": c["end_s"], "score": c["score"], "reasons": c["reasons"],
                  "source": c["source"], "hook": c.get("hook") or ""} for c in found]
+
+
+@register
+class ScoutEngine:
+    """The LLM reads the whole episode as numbered sentences and names the moments (moments_scout). About one call per ten minutes."""
+    name = "scout"
+
+    def available(self, conn) -> bool:
+        return True
+
+    def propose(self, source: Source, profile) -> list[dict]:
+        try:
+            found, cost = moments_scout.propose(source, profile)
+        except KillSwitchOn:
+            raise
+        except AppError as exc:
+            source.notes.append(f"The scout proposed nothing ({exc}).")
+            return []
+        source.cost += cost
+        return found
 
 
 @register

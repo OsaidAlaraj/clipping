@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { api, ApiError, money, PLATFORM_LABEL } from "@/lib/api";
 import { cachedKeys, mutate, peek, useData } from "@/lib/data";
 import { showToast } from "@/lib/toast";
+import { useLang } from "@/lib/i18n";
+import { Empty, PageHead, UiIcon } from "./ui";
 import { initials, tintFor } from "./Home";
 import { DetailSkeleton, ExploreSkeleton } from "./Skeleton";
 
@@ -174,6 +176,8 @@ export default function ExploreScreen() {
   const [sheet, setSheet] = useState(false);
   const [view, setView] = useState<"cards" | "table">("cards");
   const [note, setNote] = useState("");
+  const [tab, setTab] = useState<"market" | "inbox">("market");
+  const { tr } = useLang();
   const [limit, setLimit] = useState(PAGE);
   const meData = useData<{ niches: string[]; all_niches: string[] }>("/api/me");
   const me = meData.data ?? null;
@@ -255,13 +259,16 @@ export default function ExploreScreen() {
   if (!data && !result.error) return <ExploreSkeleton />;
   return (
     <div className="page">
-      <div className="row between wrap">
-        <h1>Explore</h1>
-        <div className="row small muted">
-          {data?.last_refresh && <span>Updated {new Date(data.last_refresh).toLocaleString()}</span>}
-          <button className="btn" onClick={refresh}>Check now</button>
-        </div>
+      <PageHead title={tr("Explore", "استكشاف")} sub={tr("Paid campaigns worth your time, ranked for you.", "حملات مدفوعة تستحق وقتك، مرتّبة لك.")} />
+      <div className="seg" role="tablist" aria-label={tr("Source", "المصدر")} style={{ maxWidth: 360 }}>
+        <button role="tab" aria-selected={tab === "market"} onClick={() => setTab("market")}>{tr("Marketplaces", "المنصّات")}</button>
+        <button role="tab" aria-selected={tab === "inbox"} onClick={() => setTab("inbox")}>{tr("Inbox", "الوارد")}</button>
       </div>
+      {tab === "inbox" && (
+        <Empty icon={UiIcon.inbox} title={tr("Your Discord inbox is coming", "وارد ديسكورد قادم")}
+          body={tr("Campaign announcements from the Discord servers you follow will land here, ready to add in one tap. It will use an official bot you invite, never your own account.", "ستصل هنا إعلانات الحملات من سيرفرات ديسكورد التي تتابعها، جاهزة للإضافة بضغطة. سيعمل ببوت رسمي تدعوه أنت، وليس بحسابك الشخصي أبداً.")} />
+      )}
+      {tab === "market" && <>
       {cpm && <p className="small muted">Typical pay across campaigns: ${Number(cpm.medianUsd).toFixed(2)} per 1,000 views (most pay ${Number(cpm.p25Usd).toFixed(2)} to ${Number(cpm.p75Usd).toFixed(2)}).</p>}
       {me && me.niches.length === 0 && (
         <section className="card stack" aria-label="Pick your niches">
@@ -279,9 +286,9 @@ export default function ExploreScreen() {
       <label className="row" style={{ background: "var(--surface)", borderRadius: 24, padding: "0 16px", minHeight: 48 }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
         <span className="sr-only">Search campaigns</span>
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search brands, campaigns, agencies"
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tr("Search brands, campaigns, agencies", "ابحث عن علامات أو حملات أو وكالات")}
           style={{ flex: 1, border: 0, outline: 0, background: "transparent", minHeight: 46 }} />
-        <button className="btn ghost" onClick={() => setSheet(true)} aria-label="Filters">Filters{active.length ? ` · ${active.length}` : ""}</button>
+        <button className="btn ghost" onClick={() => setSheet(true)} aria-label="Filters">{tr("Filters", "تصفية")}{active.length ? ` · ${active.length}` : ""}</button>
       </label>
       <div className="row wrap between">
         <div className="segmented" role="tablist" aria-label="Sort">
@@ -303,7 +310,9 @@ export default function ExploreScreen() {
       {data && filtered.length === 0 && <p className="muted">No campaigns match. Loosen a filter, or tap “Check now”.</p>}
       {view === "cards" ? <div className="masonry">{shown.map((l, i) => <ListingCard key={l.id} l={l} i={i} />)}</div> : <ListingTable rows={shown} />}
       {limit < filtered.length && <div ref={sentinel} className="more-sentinel" aria-hidden="true" />}
+      <div className="row between small muted">{data?.last_refresh ? <span>{tr("Updated", "آخر تحديث")} {new Date(data.last_refresh).toLocaleString()}</span> : <span />}<button className="btn" onClick={refresh}>{tr("Check now", "تحقّق الآن")}</button></div>
       <p className="small muted">Campaign data: ClippingAlpha (clippingalpha.com), CC BY 4.0. Each marketplace's own page is the source of truth. “Cautious $ / clip” is the 25th-percentile outcome for your best account, after fees, audience rules, minimums, approval and budget.</p>
+      </>}
       {sheet && me && <FilterSheet value={filters} allNiches={me.all_niches} onChange={setFilters} onClose={() => setSheet(false)} />}
     </div>
   );
@@ -340,6 +349,7 @@ function restoreToLists(removed: Removed) {
 
 export function ListingPage({ id }: { id: string }) {
   const router = useRouter();
+  const { tr } = useLang();
   const detail = useData<any>(`/api/listings/${id}`);
   const l = detail.data ?? null;
   const [tab, setTab] = useState<"rules" | "pay" | "why">("rules");
@@ -375,6 +385,7 @@ export function ListingPage({ id }: { id: string }) {
   const r: Rank = l.rank;
   return (
     <div className="page" style={{ maxWidth: 860 }}>
+      <PageHead title={tr("Campaign", "حملة")} back="/explore" />
       {l.feed_note && <div className="banner" role="status">{l.feed_note} Rules and minimums will show once the brief is read.</div>}
       <section className="card stack" style={{ gap: 14 }}>
         <div className="row">

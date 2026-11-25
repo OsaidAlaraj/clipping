@@ -11,7 +11,7 @@ import { mockApi } from "./helpers";
 
 const item = (extra: Partial<ProgressItem> = {}): ProgressItem => ({
   id: "s1", source_id: "s1", campaign_id: "c1", name: "Practice · My first video", video: "talk.mp4", is_practice: true, state: "active",
-  stage: "transcribing", clips_done: 0, clips_planned: 0, eta_s: 150, error: null, note: null, ...extra,
+  stage: "transcribing", clips_done: 0, clips_planned: 0, eta_s: 150, step_pct: null, detail: null, error: null, note: null, ...extra,
 });
 const data = (...items: ProgressItem[]): ProgressData => ({ items, active: items.some((i) => i.state === "active") });
 const home = () => ({
@@ -33,7 +33,7 @@ describe("progress cards", () => {
   it("shows the five steps with the current one highlighted and the earlier ones done", () => {
     render(<ProgressCards data={data(item({ stage: "moments", eta_s: 120 }))} />);
     const steps = within(screen.getByRole("list", { name: "Steps" })).getAllByRole("listitem");
-    expect(steps.map((s) => s.textContent)).toEqual(["Uploaded", "Transcribing", "Choosing moments", "Making clips", "Ready"]);
+    expect(steps.map((s) => s.textContent)).toEqual(["Video received", "Listening to the video", "Finding the best moments", "Making clips", "Ready"]);
     expect(steps.map((s) => s.className.replace("pg-step ", ""))).toEqual(["done", "done", "current", "todo", "todo"]);
     expect(steps[2].getAttribute("aria-current")).toBe("step");
     expect(screen.getByText("About 2 min left")).toBeTruthy();
@@ -41,10 +41,22 @@ describe("progress cards", () => {
   });
 
   it("shows how many clips are done of how many are planned, and a progress bar that follows them", () => {
-    render(<ProgressCards data={data(item({ stage: "clips", clips_done: 1, clips_planned: 4, eta_s: 90 }))} />);
+    render(<ProgressCards data={data(item({ stage: "clips", clips_done: 1, clips_planned: 4, eta_s: 90, step_pct: 40 }))} />);
     expect(screen.getByText("1 of 4 clips")).toBeTruthy();
-    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe(String(percent(item({ stage: "clips", clips_done: 1, clips_planned: 4 }))));
-    expect(Number(screen.getByRole("progressbar").getAttribute("aria-valuenow"))).toBeGreaterThan(50);
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("40");
+  });
+
+  it("draws no bar and no time when nothing is measured, only the stage name", () => {
+    render(<ProgressCards data={data(item({ stage: "moments", eta_s: null, step_pct: null }))} />);
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(screen.queryByText(/left$/)).toBeNull();
+    expect(percent(item({ step_pct: null }))).toBeNull();
+  });
+
+  it("shows what the measured numbers mean", () => {
+    render(<ProgressCards data={data(item({ step_pct: 50, eta_s: 120, detail: "5 of 10 min of the video heard" }))} />);
+    expect(screen.getByText("5 of 10 min of the video heard")).toBeTruthy();
+    expect(screen.getByText("About 2 min left")).toBeTruthy();
   });
 
   it("a finished card says Ready with its clip count and opens Review for its campaign", () => {
@@ -181,5 +193,27 @@ describe("Home", () => {
     render(<Home />);
     await screen.findByText("Net pay per hour");
     expect(screen.queryByTestId("progress-section")).toBeNull();
+  });
+});
+
+describe("Home primary action", () => {
+  it("offers one main action: review when clips are ready", async () => {
+    mockApi({ "GET /api/home": { ...home(), today: { ...home().today, to_review: 4 } }, "GET /api/progress": data() });
+    render(<Home />);
+    const card = await screen.findByTestId("primary-action");
+    expect(within(card).getByRole("link", { name: "Review 4 clips" }).getAttribute("href")).toBe("/review");
+  });
+
+  it("says post when only accepted clips are waiting", async () => {
+    mockApi({ "GET /api/home": { ...home(), today: { ...home().today, to_review: 0, posts_due: 2 } }, "GET /api/progress": data() });
+    const first = render(<Home />);
+    expect(within(await screen.findByTestId("primary-action")).getByRole("link", { name: "Post 2 clips" }).getAttribute("href")).toBe("/queue");
+    first.unmount();
+  });
+
+  it("says find a campaign when there is nothing yet", async () => {
+    mockApi({ "GET /api/home": { ...home(), today: { ...home().today, to_review: 0 } }, "GET /api/progress": data() });
+    render(<Home />);
+    expect(within(await screen.findByTestId("primary-action")).getByRole("link", { name: "Find a campaign" }).getAttribute("href")).toBe("/explore");
   });
 });

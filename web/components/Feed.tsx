@@ -28,6 +28,9 @@ export const REASONS: [string, string][] = [
 type Summary = { clips_reviewed: number; accepted: number; rejected: number; parked: number; posts_due: number; minutes_logged: number; hours_today: number; pay_per_clip?: { name: string; rate_per_1k: number | null; max_payout_per_clip: number | null }[] };
 type Sheet = null | "reject" | "hooks" | "edit" | "report" | "filtered";
 type Decision = "accept" | "reject" | "later";
+import { shuffleAhead } from "@/lib/shuffle";
+import { setSoundOn, useGesture, useSound } from "@/lib/sound";
+
 const SKIP_GAP = 5;        // a skipped clip returns after this many other clips
 const MAX_RETURNS = 2;     // it returns at most twice; the next skip moves it to Review Later
 /** The last decision, kept for Undo. `review` settles when the server (or the offline outbox) has recorded it. */
@@ -85,29 +88,88 @@ export function RejectSheet({ onSubmit, onClose }: { onSubmit: (reason: string, 
 
 function HooksSheet({ clip, onPick, onClose }: { clip: Clip; onPick: (hookId: string) => void; onClose: () => void }) {
   const current = String(clip.render_meta?.hook_id ?? "");
+  const [list, setList] = useState(clip.hooks);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const rate = async (hookId: string, value: "up" | "down" | "none") => {
+    const mark = value === "up" ? 1 : value === "down" ? -1 : null;
+    setList((rows) => rows.map((h) => (h.id === hookId ? { ...h, rating: mark } : h)));   // optimistic: the thumb answers at once
+    try {
+      await api(`/api/hooks/${hookId}/rating`, { body: { value } });
+    } catch {
+      setList((rows) => rows.map((h) => (h.id === hookId ? { ...h, rating: clip.hooks.find((x) => x.id === hookId)?.rating ?? null } : h)));
+    }
+  };
+  const regenerate = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const data = await api<{ hooks: Clip["hooks"] }>(`/api/clips/${clip.id}/hooks/regenerate`, { body: {} });
+      setList(data.hooks);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not write new hooks right now.");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <SheetFrame title="Hooks" onClose={onClose}>
       <p className="small muted">Tap a hook to use it. The clip is re-rendered as a new version and returns to the feed.</p>
-      <div className="choices">
-        {clip.hooks.map((hook) => (
-          <button key={hook.id} className="choice" aria-pressed={hook.id === current} onClick={() => (hook.id === current ? onClose() : onPick(hook.id))}>
-            <span dir="auto">{hook.text}</span>
-            <span className="badge">{hook.hook_type}</span>
-          </button>
+      <div className="stack">
+        {list.map((hook) => (
+          <div key={hook.id} className="hook-row">
+            <button className="choice" aria-pressed={hook.id === current} onClick={() => (hook.id === current ? onClose() : onPick(hook.id))}>
+              <span dir="auto">{hook.text}</span>
+              <span className="badge">{hook.hook_type}</span>
+            </button>
+            <button className="thumb" aria-label="Good hook" aria-pressed={hook.rating === 1} onClick={() => rate(hook.id, hook.rating === 1 ? "none" : "up")}>👍</button>
+            <button className="thumb" aria-label="Bad hook" aria-pressed={hook.rating === -1} onClick={() => rate(hook.id, hook.rating === -1 ? "none" : "down")}>👎</button>
+          </div>
         ))}
       </div>
+      {error && <p className="small" role="alert" style={{ color: "var(--danger, #c0392b)" }}>{error}</p>}
+      <button className="btn block" onClick={regenerate} disabled={busy} aria-busy={busy}>{busy ? "Writing new hooks…" : "Regenerate hooks"}</button>
     </SheetFrame>
+  );
+}
+
+const STEP = 0.1;
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
+/** A value changed only by the - and + buttons, 0.1 s a step (no free typing). Holding the button repeats. */
+export function Stepper({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const latest = useRef(value);
+  latest.current = value;
+  const nudge = (dir: number) => {
+    latest.current = Math.min(max, Math.max(min, round1(latest.current + dir * STEP)));
+    onChange(latest.current);
+  };
+  const stop = () => { if (timer.current) { clearInterval(timer.current); timer.current = null; } };
+  const hold = (dir: number) => { nudge(dir); stop(); timer.current = setInterval(() => nudge(dir), 160); };
+  useEffect(() => stop, []);
+  return (
+    <div className="field grow">
+      <span className="small muted" id={`step-${label}`}>{label}</span>
+      <div className="row between" role="group" aria-labelledby={`step-${label}`}>
+        <button className="btn" aria-label={`${label} minus 0.1`} disabled={value <= min} onPointerDown={() => hold(-1)} onPointerUp={stop} onPointerLeave={stop} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nudge(-1); } }}>−</button>
+        <output aria-live="polite" style={{ minWidth: "4ch", textAlign: "center", fontVariantNumeric: "tabular-nums" }}>{value.toFixed(1)} s</output>
+        <button className="btn" aria-label={`${label} plus 0.1`} disabled={value >= max} onPointerDown={() => hold(1)} onPointerUp={stop} onPointerLeave={stop} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nudge(1); } }}>+</button>
+      </div>
+    </div>
   );
 }
 
 function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Record<string, unknown>) => void; onClose: () => void }) {
   const [caption, setCaption] = useState(clip.caption_text ?? "");
-  const [start, setStart] = useState(String(clip.start_s));
-  const [end, setEnd] = useState(String(clip.end_s));
+  const startNow = Number(clip.start_s);
+  const [start, setStart] = useState(round1(startNow));
+  const [duration, setDuration] = useState(round1(Number(clip.end_s) - startNow));
+  const original = { start: round1(startNow), duration: round1(Number(clip.end_s) - startNow) };
   const save = () => {
     const body: Record<string, unknown> = {};
     if (caption !== (clip.caption_text ?? "")) body.caption = caption;
-    if (Number(start) !== Number(clip.start_s) || Number(end) !== Number(clip.end_s)) body.trim = { start_s: Number(start), end_s: Number(end) };
+    if (start !== original.start || duration !== original.duration) body.trim = { start_s: start, end_s: round1(start + duration) };
     if (Object.keys(body).length) onSave(body);
     else onClose();
   };
@@ -119,14 +181,8 @@ function EditSheet({ clip, onSave, onClose }: { clip: Clip; onSave: (body: Recor
         <textarea id="edit-caption" className="input" dir="auto" value={caption} onChange={(event) => setCaption(event.target.value)} />
       </div>
       <div className="row">
-        <div className="field grow">
-          <label htmlFor="edit-start">Start (s)</label>
-          <input id="edit-start" className="input" inputMode="decimal" value={start} onChange={(event) => setStart(event.target.value)} />
-        </div>
-        <div className="field grow">
-          <label htmlFor="edit-end">End (s)</label>
-          <input id="edit-end" className="input" inputMode="decimal" value={end} onChange={(event) => setEnd(event.target.value)} />
-        </div>
+        <Stepper label="Start" value={start} min={0} max={Math.max(start, 36000)} onChange={setStart} />
+        <Stepper label="Length" value={duration} min={1} max={180} onChange={setDuration} />
       </div>
       <button className="btn primary block" onClick={save}>Save as new version</button>
       {clip.source_id && <Link className="btn block" href={`/transcript?id=${clip.source_id}`}>Fix transcript</Link>}
@@ -262,31 +318,43 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
 }) {
   const { t, lang } = useLang();
   const video = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true); // iOS blocks sound autoplay: clips start muted, a tap turns sound on
+  // Owner note 11: sound is on by default and remembered for every player. The browser may refuse it until the person touches
+  // the page; then the clip plays muted and shows the tap, and it retries with sound on the first touch.
+  const soundOn = useSound();
+  const gesture = useGesture();
+  const [blocked, setBlocked] = useState(false);
+  const audible = soundOn && !blocked;
   const [progress, setProgress] = useState(0);
   const [textHidden, setTextHidden] = useState(false); // the caption block can be hidden to see the whole picture
-  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setMuted((value) => !value) } : {}, { tilt: true });
+  const { ref, intent, bind } = useSwipe(active ? { onRight: onSwipeRight, onLeft: onReject, onUp: onNext, onDown: onPrev, onTap: () => setSoundOn(!audible) } : {}, { tilt: true });
 
   // Only the clip on screen plays; the buffered ones wait and start from their first frame the moment they are shown.
   useEffect(() => {
     const el = video.current;
     if (!el) return;
-    if (active) el.play()?.catch?.(() => undefined);
-    else { el.pause(); setMuted(true); setProgress(0); }
-  }, [active]);
+    if (!active) { el.pause(); setProgress(0); return; }
+    el.muted = !soundOn;
+    setBlocked(false);
+    el.play()?.catch?.(() => {
+      // The browser refused sound: play muted, and show the tap.
+      el.muted = true;
+      setBlocked(true);
+      el.play()?.catch?.(() => undefined);
+    });
+  }, [active, soundOn, gesture]);
 
   /** Full screen with sound. iPhone Safari only supports its own player on a video element (webkitEnterFullscreen). */
   const fullScreen = () => {
     const el = video.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
     if (!el) return;
     el.muted = false;
-    setMuted(false);
+    setSoundOn(true);
     if (el.requestFullscreen) el.requestFullscreen().catch(() => el.webkitEnterFullscreen?.());
     else el.webkitEnterFullscreen?.();
   };
 
   const player = clip.video_url && (
-    <video ref={video} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={muted} autoPlay={active} loop playsInline preload={preload}
+    <video ref={video} src={clip.video_url} poster={clip.cover_url ?? undefined} muted={!audible} autoPlay={active} loop playsInline preload={preload}
       onTimeUpdate={active ? (event) => { const el = event.currentTarget; if (el.duration) setProgress((el.currentTime / el.duration) * 100); } : undefined} />
   );
   // The buffered card keeps the video in the same position as the visible one, so React reuses the element (and its loaded data) when the card becomes active.
@@ -300,7 +368,7 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
       {player}
       {intent === "right" && <div className="swipe-flag yes">{t("acceptPost")}</div>}
       {intent === "left" && <div className="swipe-flag no">{t("reject")}</div>}
-      {muted && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
+      {!audible && <div className="mute-hint"><span className="chip">{t("soundOn")}</span></div>}
       <div className={`bottom${textHidden ? " text-hidden" : ""}`} aria-hidden={textHidden || undefined}>
         <div className="line">
           <strong>{clip.account_handle ? `@${clip.account_handle}` : "No account"}</strong>
@@ -336,6 +404,7 @@ function ClipCard({ clip, active, preload, onAccept, onSwipeRight, onReject, onN
 
 export default function Feed({ campaignId, onExit }: { campaignId?: string; onExit?: () => void }) {
   const { t } = useLang();
+  const soundOn = useSound();
   const key = feedKey(campaignId);
   const cached = peek<FeedData>(key);
   // A feed seen a moment ago is on screen straight away; the fresh one replaces it while nothing has been decided yet.
@@ -633,8 +702,10 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
               <button className={`chip rules ${clip.compliance_status}`} onClick={() => setSheet("report")} aria-label={`Rules check: ${clip.compliance_status}`}>
                 {clip.compliance_status === "pass" ? "Rules OK" : clip.compliance_status === "fail" ? "Rules failed" : "Check rules"}
               </button>
+              <button className="chip" aria-pressed={soundOn} onClick={() => setSoundOn(!soundOn)}>{soundOn ? t("mute") : t("soundOn")}</button>
               <span className="chip" aria-label="Position in feed">{index + 1} of {clips.length}</span>
               {filtered.length > 0 && <button className="chip" onClick={() => setSheet("filtered")}>{t("filtered")} {filtered.length}</button>}
+              <button className="chip" onClick={() => setClips((list) => (list ? shuffleAhead(list, index) : list))}>{t("shuffle")}</button>
               <button className="chip" onClick={() => endSession()}>{t("stopHere")}</button>
             </span>
           </div>

@@ -187,7 +187,7 @@ def choose_variant(conn, actor, clip_id, kind: str) -> dict:
     from . import pipeline   # lazy: the pipeline imports this module
 
     campaign = conn.execute("select * from campaigns where id = %s", (clip["campaign_id"],)).fetchone()
-    tpl = pipeline.disclosure_template(conn, campaign["category_id"], clip["language"])
+    tpl = pipeline.disclosure_for(conn, campaign, version, clip["language"])
     if tpl is None:
         raise AppError("Disclosure text is missing for this language.", "disclosure_missing")
     cand = conn.execute("select source_id from candidates where id = %s", (clip["candidate_id"],)).fetchone()

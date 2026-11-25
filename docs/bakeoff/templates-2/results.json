@@ -1,0 +1,50 @@
+{
+ "score": {
+  "en": {
+   "bold_pop": 15.0,
+   "emphasis": 8.0,
+   "stacked": 10.0,
+   "karaoke_clean": 6.0,
+   "hype": 12.0,
+   "word_box": 12.0,
+   "dim_ahead": 7.0,
+   "minimal": 1.0,
+   "speaker_label": 1.0
+  },
+  "ar": {
+   "bold_pop": 13.0,
+   "karaoke_clean": 11.0,
+   "speaker_label": 8.0,
+   "hype": 14.0,
+   "word_box": 7.0,
+   "emphasis": 7.0,
+   "stacked": 6.0,
+   "dim_ahead": 6.0,
+   "minimal": 0.0
+  }
+ },
+ "games": {
+  "en": {
+   "karaoke_clean": 16,
+   "bold_pop": 16,
+   "emphasis": 16,
+   "stacked": 16,
+   "minimal": 16,
+   "speaker_label": 16,
+   "hype": 16,
+   "word_box": 16,
+   "dim_ahead": 16
+  },
+  "ar": {
+   "karaoke_clean": 16,
+   "bold_pop": 16,
+   "emphasis": 16,
+   "stacked": 16,
+   "minimal": 16,
+   "speaker_label": 16,
+   "hype": 16,
+   "word_box": 16,
+   "dim_ahead": 16
+  }
+ }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 import Feed from "@/components/Feed";
@@ -8,7 +8,8 @@ import { FeedSkeleton } from "@/components/Skeleton";
 
 function ReviewPage() {
   const campaign = useSearchParams().get("campaign") ?? undefined;
-  return <Feed key={campaign ?? "all"} campaignId={campaign} />;
+  const router = useRouter();
+  return <Feed key={campaign ?? "all"} campaignId={campaign} onExit={() => router.push("/")} />;
 }
 
 export default function Page() {

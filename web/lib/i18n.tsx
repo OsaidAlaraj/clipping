@@ -8,14 +8,14 @@ const LABELS = {
   en: {
     home: "Home", feed: "Feed", queue: "Queue", more: "More",
     accept: "Accept", reject: "Reject", hooks: "Hooks", edit: "Edit", later: "Review later",
-    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", accepted: "Accepted", fullScreen: "Full screen", hideText: "Hide text", showText: "Show text", parked: "Saved for later", stopHere: "Stop here", soundOn: "Tap for sound", muted: "Muted",
+    undo: "Undo", filtered: "Filtered", rescue: "Rescue", rejected: "Rejected", accepted: "Accepted", fullScreen: "Full screen", hideText: "Hide text", showText: "Show text", parked: "Saved for later", stopHere: "Stop here", shuffle: "Shuffle", libraryTitle: "Accepted clips", searchClips: "Search clips", sortBy: "Sort", sortNewest: "Newest", sortViews: "Most views", sortEarned: "Most earned", sortCampaign: "Campaign A to Z", campaigns: "Campaigns", allCampaigns: "All", libraryEmpty: "No accepted clips yet", libraryNoMatch: "No clips match", openPost: "Open the post", soundOn: "Tap for sound", mute: "Mute", muted: "Muted",
     reviewLater: "Review Later", ledger: "Ledger", alerts: "Alerts", settings: "Settings",
-    explore: "Explore", review: "Review", profile: "Profile", create: "New", addCampaign: "Add campaign", addVideo: "Add video",
+    explore: "Explore", review: "Review", profile: "Profile", create: "Add", addCampaign: "Add campaign", addVideo: "Add video",
     marketRejected: "The marketplace rejected this clip", marketReasonLabel: "What did the marketplace say?",
     marketReasonHint: "Paste its words. If it names a tag or a phrase, the brand's next clips are checked for it.",
     saveReason: "Save the reason", saving: "Saving…", brandSaved: "Saved. The brand's next clips will be checked:",
     brandReminder: "Saved as a reminder. It was too general to check, so it never blocks a clip.", reasonNeeded: "Write the reason the marketplace gave.",
-    brandNote: "Brand note", close: "Close",
+    brandNote: "Brand note", close: "Close", back: "Back",
     acceptPost: "Accept and post", swipePostsTo: "Swipe right posts to", postsTo: "Posts to", postNow: "now", postIn: "in", minShort: "min",
     manualReady: "Ready to post manually", copyCaption: "Copy caption", copied: "Copied", downloadVideo: "Download video",
     practiceNoPost: "Accepted. Practice clips are never posted.", noAccountsToPost: "Accepted. No account to post to.",
@@ -28,14 +28,14 @@ const LABELS = {
   ar: {
     home: "الرئيسية", feed: "المراجعة", queue: "قائمة النشر", more: "المزيد",
     accept: "قبول", reject: "رفض", hooks: "العناوين", edit: "تعديل", later: "مراجعة لاحقاً",
-    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", accepted: "تم القبول", fullScreen: "ملء الشاشة", hideText: "إخفاء النص", showText: "إظهار النص", parked: "حُفظ للمراجعة لاحقاً", stopHere: "توقف هنا", soundOn: "اضغط لتشغيل الصوت", muted: "صامت",
+    undo: "تراجع", filtered: "المستبعدة", rescue: "إنقاذ", rejected: "تم الرفض", accepted: "تم القبول", fullScreen: "ملء الشاشة", hideText: "إخفاء النص", showText: "إظهار النص", parked: "حُفظ للمراجعة لاحقاً", stopHere: "توقف هنا", shuffle: "اخلط", libraryTitle: "الكليبات المقبولة", searchClips: "ابحث في الكليبات", sortBy: "ترتيب", sortNewest: "الأحدث", sortViews: "الأكثر مشاهدات", sortEarned: "الأعلى ربحاً", sortCampaign: "الحملة أ إلى ي", campaigns: "الحملات", allCampaigns: "الكل", libraryEmpty: "ما في كليبات مقبولة بعد", libraryNoMatch: "ما في كليبات تطابق", openPost: "افتح البوست", soundOn: "اضغط لتشغيل الصوت", mute: "كتم", muted: "صامت",
     reviewLater: "للمراجعة لاحقاً", ledger: "السجل المالي", alerts: "التنبيهات", settings: "الإعدادات",
-    explore: "استكشاف", review: "المراجعة", profile: "ملفي", create: "جديد", addCampaign: "إضافة حملة", addVideo: "إضافة فيديو",
+    explore: "استكشاف", review: "المراجعة", profile: "ملفي", create: "إضافة", addCampaign: "إضافة حملة", addVideo: "إضافة فيديو",
     marketRejected: "المنصّة رفضت هذا المقطع", marketReasonLabel: "ماذا قالت المنصّة؟",
     marketReasonHint: "الصق كلامها. إذا ذكرت وسماً أو عبارة، تُفحص مقاطع هذه العلامة القادمة بحثاً عنها.",
     saveReason: "احفظ السبب", saving: "جارٍ الحفظ…", brandSaved: "تم الحفظ. ستُفحص مقاطع هذه العلامة القادمة:",
     brandReminder: "حُفظ كتذكير. السبب عام جداً للفحص، لذلك لا يمنع أي مقطع.", reasonNeeded: "اكتب السبب الذي ذكرته المنصّة.",
-    brandNote: "ملاحظة العلامة", close: "إغلاق",
+    brandNote: "ملاحظة العلامة", close: "إغلاق", back: "رجوع",
     acceptPost: "قبول ونشر", swipePostsTo: "السحب لليمين ينشر على", postsTo: "سيُنشر على", postNow: "الآن", postIn: "بعد", minShort: "دقيقة",
     manualReady: "جاهز للنشر يدوياً", copyCaption: "انسخ الوصف", copied: "تم النسخ", downloadVideo: "نزّل الفيديو",
     practiceNoPost: "تم القبول. مقاطع التجربة لا تُنشر أبداً.", noAccountsToPost: "تم القبول. لا يوجد حساب للنشر عليه.",
@@ -93,7 +93,11 @@ export function LangProvider({ children, initial }: { children: React.ReactNode;
 
 export function useLang() {
   const { lang, setLang } = useContext(LangContext);
-  return { lang, setLang, rtl: lang === "ar", t: (key: LabelKey) => LABELS[lang][key] };
+  return {
+    lang, setLang, rtl: lang === "ar", t: (key: LabelKey) => LABELS[lang][key],
+    /** Text that sits next to the code that shows it: tr("English", "العربية"). */
+    tr: (en: string, ar: string) => (lang === "ar" ? ar : en),
+  };
 }
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");

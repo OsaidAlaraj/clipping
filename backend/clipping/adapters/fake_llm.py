@@ -130,12 +130,12 @@ def extract_rules(payload: dict) -> dict:
 
 
 HOOK_TEMPLATES = {
-    "en": [("question", "What if {x}?"), ("contrarian", "Everyone gets this wrong: {x}"),
-           ("stakes", "Ignore this and it costs you: {x}"), ("number", "{n} things nobody says about this"),
-           ("story-open", "It started like this: {x}")],
-    "ar": [("question", "ماذا لو {x}؟"), ("contrarian", "الجميع يخطئ في هذا: {x}"),
-           ("stakes", "تجاهل هذا وسوف يكلفك: {x}"), ("number", "{n} أشياء لا يقولها أحد عن هذا"),
-           ("story-open", "بدأ الأمر هكذا: {x}")],
+    "en": [("question", "What if {x}?"), ("contrarian", "You are doing {x} wrong"),
+           ("stakes", "Skip this and {x} costs you"), ("number", "{n} things nobody says about this"),
+           ("story-open", "It all started with {x}")],
+    "ar": [("question", "شو لو {x}؟"), ("contrarian", "كلنا غلطانين في {x}"),
+           ("stakes", "تجاهل هاد وبتدفع ثمنه"), ("number", "{n} أشياء ما حدا بقولها"),
+           ("story-open", "كل شي بلش مع {x}")],
 }
 
 
@@ -143,8 +143,12 @@ def hooks(payload: dict) -> dict:
     language = payload.get("language", "en")
     text = payload.get("segment_text", "").strip()
     first = sentences(text)[0] if sentences(text) else text
-    gist = " ".join(first.rstrip(".?!؟").split()[:7]).lower() if language == "en" else " ".join(first.rstrip(".?!؟").split()[:7])
-    seed = sum(ord(c) for c in text) if text else 0
+    spoken = first.rstrip(".?!؟").split()
+    shift = len(payload.get("avoid") or [])
+    start = shift % max(len(spoken) - 2, 1)             # a regenerate looks at other words of the clip, so it is never the same text
+    gist = " ".join(spoken[start:start + 3])
+    gist = gist.lower() if language == "en" else gist
+    seed = (sum(ord(c) for c in text) if text else 0) + shift
     templates = HOOK_TEMPLATES.get(language, HOOK_TEMPLATES["en"])
     picks = [templates[(seed + i * 2) % len(templates)] for i in range(3)]
     out, seen = [], set()
@@ -207,7 +211,7 @@ def moments(payload: dict) -> dict:
 
 # The moment engine's two LLM tasks. Tests set "rate" / "compare" to a raw reply (or a function of the payload), "bias" to
 # "first" to simulate a model that always prefers the first of a pair, and read "calls" for every payload received.
-FAKE_MOMENT_LLM: dict = {"rate": None, "compare": None, "bias": None, "calls": []}
+FAKE_MOMENT_LLM: dict = {"rate": None, "compare": None, "scout": None, "bias": None, "calls": []}
 FUNNY = re.compile(r"\b(haha|lol|joke|funny|laugh\w*)\b|ههه|ضحك", re.I)
 HYPE = re.compile(r"\b(wow|insane|unbelievable|no way|crazy)\b|!|والله|مستحيل", re.I)
 
@@ -226,7 +230,7 @@ def _hook_from(pattern: dict | None, text: str) -> str:
     if not pattern:
         return ""
     last = (sentences(text) or [text])[-1].rstrip(".?!؟")
-    gist = " ".join(last.split()[:7])
+    gist = " ".join(last.split()[:3])
     return pattern["template"].replace("{x}", gist).replace("{n}", "3")[:140]
 
 
@@ -245,6 +249,27 @@ def moment_score(payload: dict) -> dict:
                         "overall": round(q, 2), "reason": f"A clear, self-contained stretch ({emotion}).",
                         "hook_text": _hook_from(item.get("pattern"), text)})
     return {"ratings": ratings}
+
+
+def moment_scout(payload: dict) -> dict:
+    """The scout's stand-in: groups of whole units that reach min_s, the best-looking ones first, never overlapping."""
+    FAKE_MOMENT_LLM["calls"].append(("scout", payload))
+    answer = FAKE_MOMENT_LLM["scout"]
+    if answer is not None:
+        return answer(payload) if callable(answer) else answer
+    units, groups, i = payload["units"], [], 0
+    while i < len(units):
+        j, seconds = i, 0.0
+        while j < len(units) and seconds < payload["min_s"]:
+            seconds += units[j][2] + units[j][5] / 10
+            j += 1
+        if seconds >= payload["min_s"] and seconds <= payload["max_s"]:
+            text = " ".join(u[4] for u in units[i:j])
+            groups.append((quality(text), units[i][0], units[j - 1][0], text))
+        i = max(j, i + 1)
+    best = sorted(groups, reverse=True)[:payload["max_moments"]]
+    return {"moments": [{"first": a, "last": b, "score": round(q, 2), "reason": "A self-contained stretch that builds to its point."}
+                        for q, a, b, _ in best]}
 
 
 def moment_compare(payload: dict) -> dict:
@@ -339,7 +364,54 @@ def commentary(payload: dict) -> dict:
     return {"commentary": text}
 
 
+def brief_spec(payload: dict) -> dict:
+    """Stand-in for the LLM's reading of a brief (the semantic layers). Section-aware and deterministic: a numbered section's
+    title says what its sentences are. It only returns text that is in the brief, with the sentence as the quote."""
+    import re
+
+    text = str(payload.get("brief_text") or "")
+    plain = re.sub(r"\[([^\]]*)\]\(https?://[^)\s]+\)", r"\1", text)
+    items: list[dict] = []
+
+    def add(key: str, value, quote: str, conf: float = 0.8) -> None:
+        items.append({"key": key, "value": value, "quote": quote.strip(), "confidence": conf})
+
+    def sentences(chunk: str) -> list[str]:
+        return [s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z$#\"])", chunk) if s.strip()]
+
+    heads = list(re.finditer(r"(?m)^(\d+)\s+([A-Z][^:\n]{3,60}):", plain))
+    for i, m in enumerate(heads):
+        title = m.group(2).lower()
+        end = heads[i + 1].start() if i + 1 < len(heads) else len(plain)
+        body = plain[m.end():end].strip()
+        first_line = body.split("\n")[0].strip()
+        if "clip the story" in title:
+            for s in sentences(body):
+                if re.search(r"\bnot\b|\bnever\b", s, re.I):
+                    add("hook.constraints", "Do not make the dollar value the headline" if "dollar" in s else s.rstrip("."), s)
+        elif "how to edit" in title:
+            for line in [ln.strip() for ln in body.split("\n") if ln.strip()]:
+                for part in re.split(r"\s*;\s*", line.rstrip(".")):
+                    if part.strip():
+                        add("edit_style.guidance", part.strip(), line)
+                hook = re.search(r"hook in (\d+) seconds?[^;]*", line, re.I)
+                if hook:
+                    add("hook.constraints", hook.group(0).strip(), line)
+        elif "content bank" in title:
+            for line in body.split("\n"):
+                for segment in re.split(r"\s{2,}", line.strip()):   # one pasted line can hold several lists
+                    marker = re.search(r"(?:NEW CONTENT[^:]*|[A-Za-z ]*(?:pulls|moments)[^:(]*(?:\([^)]*\))?):\s*([^\n]+)", segment)
+                    if marker:
+                        for chunk in re.split(r"\s*;\s*", marker.group(1)):
+                            name = chunk.replace("[...]", "").strip().rstrip(".")
+                            if len(name) > 3:
+                                add("sources.whitelist", {"title": name, "url": None}, segment.strip())
+    for m in re.finditer(r"Content must clearly convey[^.\n]*", plain):
+        add("content.allowed_categories", ["social media addiction awareness"], m.group(0).strip(), 0.7)
+    return {"items": items}
+
+
 def complete(task: str, payload: dict) -> dict:
     return {"rules": extract_rules, "hooks": hooks, "compliance": compliance, "moments": moments,
-            "moment_score": moment_score, "moment_compare": moment_compare, "caption_lab": caption_lab,
-            "caption_check": caption_check, "commentary": commentary}[task](payload)
+            "moment_score": moment_score, "moment_compare": moment_compare, "moment_scout": moment_scout, "caption_lab": caption_lab,
+            "caption_check": caption_check, "commentary": commentary, "brief_spec": brief_spec}[task](payload)

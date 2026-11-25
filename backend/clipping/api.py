@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Respon
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import alerts, auth, brand_checks, campaigns, config, connections, discovery, ledger, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
+from . import alerts, auth, brand_checks, brief_reader, campaigns, config, connections, discovery, ledger, library, moments, ops, originality, packaging, pipeline, profiles, progress, publish, ranking, review, sources, templates, transcripts
 from .adapters import vendors
 from .core import AppError, get_settings, kill_switch, set_kill_switch, set_setting
 from .db import Actor, get_db
@@ -124,6 +124,7 @@ class IntakeIn(BaseModel):
     category: str = "podcast"
     deadline: str | None = None
     licence_ref: str | None = None
+    spec: dict | None = None   # the owner-confirmed campaign spec from the review screen
 
 
 class PracticeIn(BaseModel):
@@ -134,6 +135,10 @@ class PracticeIn(BaseModel):
 
 class ReasonIn(BaseModel):
     reason: str | None = None
+
+
+class AdLabelIn(BaseModel):
+    on: bool
 
 
 class SourceIn(BaseModel):
@@ -171,6 +176,10 @@ class EditIn(BaseModel):
     trim: dict | None = None
     hook_id: str | None = None
     caption: str | None = None
+
+
+class HookRatingIn(BaseModel):
+    value: str
 
 
 class CaptionVariantIn(BaseModel):
@@ -265,6 +274,7 @@ class LinkIn(BaseModel):
     language: str = "en"
     permission_ref: str | None = None
     youtube_permitted: bool = False
+    override_whitelist: bool = False   # the owner knowingly adds footage that is not on the brief's list
 
 
 class AddListingIn(BaseModel):
@@ -349,7 +359,30 @@ def reference(actor: Actor = Depends(current_actor)):
 @app.post("/api/campaigns")
 def post_campaign(body: IntakeIn, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.intake, actor, body.marketplace, body.name, body.brief_text, body.url, body.category,
-               body.deadline, body.licence_ref)
+               body.deadline, body.licence_ref, spec=body.spec)
+
+
+class SpecIn(BaseModel):
+    brief_text: str
+    read_links: bool = True
+
+
+class SpecPasteIn(BaseModel):
+    spec: dict
+    url: str
+    text: str
+
+
+@app.post("/api/campaigns/spec")
+def read_brief_spec(body: SpecIn, actor: Actor = Depends(current_actor)):
+    """Brief text (Markdown with its links) to a typed spec for the review screen. Nothing is stored."""
+    return run(actor, brief_reader.read_brief, alerts.registry, body.brief_text, actor.operator_id, body.read_links)
+
+
+@app.post("/api/campaigns/spec/paste")
+def paste_link_text(body: SpecPasteIn, actor: Actor = Depends(current_actor)):
+    """The owner pasted the text of a link that needed it: its rules are merged into the spec."""
+    return run(actor, brief_reader.add_pasted_text, alerts.registry, body.spec, body.url, body.text, actor.operator_id)
 
 
 @app.post("/api/campaigns/practice")
@@ -378,6 +411,11 @@ def confirm_rules(campaign_id: str, actor: Actor = Depends(current_actor)):
 @app.post("/api/campaigns/{campaign_id}/approve")
 def approve_campaign(campaign_id: str, actor: Actor = Depends(current_actor)):
     return run(actor, campaigns.approve, actor, campaign_id)
+
+
+@app.post("/api/campaigns/{campaign_id}/ad-label")
+def set_ad_label(campaign_id: str, body: AdLabelIn, actor: Actor = Depends(current_actor)):
+    return run(actor, campaigns.set_ad_label, actor, campaign_id, body.on)
 
 
 @app.post("/api/campaigns/{campaign_id}/park")
@@ -703,7 +741,7 @@ def _template_view(conn, template: dict) -> dict:
 
 
 def _account_templates(conn, account_id: str) -> dict:
-    return {"templates": [_template_view(conn, t) for t in templates.ensure_set(conn, account_id)], "presets": templates.presets()}
+    return {"templates": [_template_view(conn, t) for t in templates.ensure_set(conn, account_id)], "presets": templates.presets(), "styles": templates.caption_styles()}
 
 
 @app.get("/api/accounts/{account_id}/template")
@@ -763,9 +801,10 @@ def get_persona(account_id: str, actor: Actor = Depends(current_actor)):
 
 @app.post("/api/campaigns/{campaign_id}/sources/upload")
 def upload_source(campaign_id: str, file: UploadFile = File(...), language: str = Form("en"), permission_ref: str = Form(""),
-                  actor: Actor = Depends(current_actor)):
+                  override_whitelist: bool = Form(False), actor: Actor = Depends(current_actor)):
     path = sources.save_upload(file.file, file.filename)
-    return run(actor, sources.register_upload, actor, campaign_id, path, language, permission_ref or None, file.filename)
+    return run(actor, sources.register_upload, actor, campaign_id, path, language, permission_ref or None, file.filename,
+               override_whitelist=override_whitelist)
 
 
 @app.post("/api/capture/screenshot")
@@ -789,7 +828,8 @@ def capture_screenshot(image: UploadFile = File(...), actor: Actor = Depends(cur
 
 @app.post("/api/campaigns/{campaign_id}/sources/link")
 def link_source(campaign_id: str, body: LinkIn, actor: Actor = Depends(current_actor)):
-    return run(actor, sources.queue_link, actor, campaign_id, body.url, body.language, body.permission_ref, body.youtube_permitted)
+    return run(actor, sources.queue_link, actor, campaign_id, body.url, body.language, body.permission_ref, body.youtube_permitted,
+               override_whitelist=body.override_whitelist)
 
 
 # ------------------------------------------------------------------ passkey sign-in
@@ -946,6 +986,18 @@ def edit(clip_id: str, body: EditIn, actor: Actor = Depends(current_actor)):
     return run(actor, review.edit, actor, clip_id, body.trim, body.hook_id, body.caption)
 
 
+@app.post("/api/clips/{clip_id}/hooks/regenerate")
+def regenerate_hooks(clip_id: str, actor: Actor = Depends(current_actor)):
+    """New hook variants for the editor; the owner's own words for any failure."""
+    return {"hooks": run(actor, pipeline.regenerate_hooks, clip_id)}
+
+
+@app.post("/api/hooks/{hook_id}/rating")
+def rate_hook(hook_id: str, body: HookRatingIn, actor: Actor = Depends(current_actor)):
+    """The owner's thumb up or down on a hook (value: up, down or none); it also re-weights the hook's format."""
+    return run(actor, review.rate_hook, hook_id, body.value)
+
+
 @app.post("/api/clips/{clip_id}/caption-variant")
 def caption_variant(clip_id: str, body: CaptionVariantIn, actor: Actor = Depends(current_actor)):
     """Choose the matched or the curiosity caption (only a variant that passed the match check)."""
@@ -1066,6 +1118,14 @@ def back_to_later(clip_id: str, body: ReasonIn, actor: Actor = Depends(current_a
 @app.post("/api/posts/{post_id}/views")
 def views(post_id: str, body: ViewsIn, actor: Actor = Depends(current_actor)):
     return run(actor, ledger.record_views, actor, post_id, body.window, body.views, body.watch_time_s, body.source)
+
+
+@app.get("/api/library")
+def get_library(campaign_ids: str | None = None, q: str = "", sort: str = "newest", actor: Actor = Depends(current_actor)):
+    """Accepted clips as a scroll of reels, with their collected numbers. `campaign_ids` is comma-separated."""
+    ids = [c for c in (campaign_ids or "").split(",") if c.strip()]
+    with get_db().session(actor) as conn:
+        return library.listing(conn, ids, q, sort)
 
 
 @app.get("/api/ledger")

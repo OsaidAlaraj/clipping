@@ -1,0 +1,762 @@
+{
+ "spec": {
+  "version": 1,
+  "items": [
+   {
+    "id": "3e24eb9745",
+    "layer": "payout",
+    "key": "payout.rate_per_1k",
+    "value": 1,
+    "source_quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "83ba56972e",
+    "layer": "payout",
+    "key": "payout.model",
+    "value": "cpm",
+    "source_quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "3cc0d71d8e",
+    "layer": "payout",
+    "key": "payout.max_per_clip",
+    "value": 400,
+    "source_quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "8daa37115b",
+    "layer": "payout",
+    "key": "payout.min_payout",
+    "value": 1,
+    "source_quote": "7 Payouts: $1.00 per 1,000 qualified views, $400 max per clip, $1 minimum; the account must show 40%+ US audience; every submission gets manual review.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "163257d035",
+    "layer": "platforms",
+    "key": "platforms.allowed",
+    "value": [
+     "tiktok",
+     "instagram",
+     "youtube_shorts"
+    ],
+    "source_quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "5a73f884c2",
+    "layer": "audience",
+    "key": "audience.min_share",
+    "value": {
+     "pct": 40,
+     "countries": [
+      "US"
+     ],
+     "label": null
+    },
+    "source_quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "25bfb00cca",
+    "layer": "captions",
+    "key": "captions.disclosure_policy",
+    "value": "forbidden",
+    "source_quote": "4 The Rules: NEVER PUT #ad ON A POST.",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "36005760c9",
+    "layer": "captions",
+    "key": "captions.copy_rules",
+    "value": "no required copy, hashtags or tags. Natural story-sounding captions. Tone: excitement, disbelief, FOMO, culture.",
+    "source_quote": "Captions: no required copy, hashtags or tags. Natural story-sounding captions. Tone: excitement, disbelief, FOMO, culture.",
+    "confidence": 0.8,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "0088c5facc",
+    "layer": "sources",
+    "key": "sources.forbidden_class",
+    "value": "broadcast",
+    "source_quote": "NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips).",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "4d8ac23723",
+    "layer": "account",
+    "key": "account.requirements",
+    "value": {
+     "type": "niche_page",
+     "detail": "Sports Card / Trading Card"
+    },
+    "source_quote": "1 Dedicated Card Pages / Sports World Pages: only dedicated pages in the Sports Card / Trading Card niche are accepted.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "4dd05e42f7",
+    "layer": "deadlines",
+    "key": "deadlines.deadline",
+    "value": {
+     "type": "content_type_stop",
+     "content_type": "skull edits",
+     "date_text": "8/4 12:59PM EST",
+     "timezone": "EST",
+     "at": "2027-08-04T12:59:00-05:00",
+     "year_inferred": true
+    },
+    "source_quote": "NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.85,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "645f45a31d",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "#ad or any sponsored-disclosure tag",
+    "source_quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "f7559412d6",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "ESPN/NBA/broadcast footage",
+    "source_quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;",
+    "confidence": 1.0,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "9fd9d71fbe",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "Topps-lane clips using footage from outside the content bank",
+    "source_quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "9fadd22ca8",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "clips where the price tag is the only hook",
+    "source_quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "c9879ebca2",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "no captions or weak/lazy editing",
+    "source_quote": "no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "19c8b5116d",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "slop reposting (same clip spammed with no variation)",
+    "source_quote": "no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "81f7e679b6",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "story boosting",
+    "source_quote": "no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "1b62f35fb7",
+    "layer": "rejection",
+    "key": "rejection.reasons",
+    "value": "fake-looking views or likes",
+    "source_quote": "no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "both"
+   },
+   {
+    "id": "6b91e7a362",
+    "layer": "priority",
+    "key": "priority.content",
+    "value": "NEW CONTENT (PRIORITIZE THIS)",
+    "source_quote": "NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]",
+    "confidence": 0.75,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "f80824526f",
+    "layer": "priority",
+    "key": "priority.content",
+    "value": "Hero drops get priority",
+    "source_quote": "Hero drops get priority: cut the new hero piece first.",
+    "confidence": 0.75,
+    "status": "stated",
+    "origin": "rule"
+   },
+   {
+    "id": "1bdd3a28ea",
+    "layer": "content",
+    "key": "content.allowed_categories",
+    "value": [
+     "Sports Card",
+     "Trading Card"
+    ],
+    "source_quote": "1 Dedicated Card Pages / Sports World Pages: only dedicated pages in the Sports Card / Trading Card niche are accepted.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "d63fc3b3c3",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "He Has Aaron Judge Cards You've Never Seen Before",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "2c12201c87",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "We Found The Best Becky Lynch Collection Ever",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "e8ec2838d3",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Ratatouille Auto 1/1",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "329f2c1ee0",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Captain Jack Sparrow",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "c453c809ad",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Trick (Fanatics Fest moment)",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "09435262ee",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "A-Rod (Fanatics Fest moment)",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "6efc545e0e",
+    "layer": "sources",
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Kevin O'Leary (Fanatics Fest moment)",
+     "url": null
+    },
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "97610da57d",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "#ad or any sponsored-disclosure tag",
+    "source_quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "38b88652bc",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "#sponsored or any ad-disclosure tags",
+    "source_quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.95,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "6317445a0c",
+    "layer": "content",
+    "key": "content.forbidden",
+    "value": "NO MORE SKULL EDITS AFTER 8/4 12:59PM EST",
+    "source_quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "2eec6945ce",
+    "layer": "hook",
+    "key": "hook.constraints",
+    "value": "hook in 2 seconds (reaction or reveal first, then rewind to the rip)",
+    "source_quote": "5 How To Edit: hook in 2 seconds (reaction or reveal first, then rewind to the rip); split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\");",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "99b91fb784",
+    "layer": "hook",
+    "key": "hook.constraints",
+    "value": "do not make the dollar value the headline; the person and the reaction, not the price",
+    "source_quote": "3 Clip the Story, Not the Price Tag: do not make the dollar value the headline (\"this card is worth $50K\" is empty calories). The person and the reaction, not the price. Hero drops get priority: cut the new hero piece first.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "151b23a7ad",
+    "layer": "edit_style",
+    "key": "edit_style.guidance",
+    "value": "split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\")",
+    "source_quote": "5 How To Edit: hook in 2 seconds (reaction or reveal first, then rewind to the rip); split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\");",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "0b9791e0f7",
+    "layer": "edit_style",
+    "key": "edit_style.guidance",
+    "value": "vertical 9:16, fast cuts, no dead air; make each clip different (no copy-paste spam)",
+    "source_quote": "5 How To Edit: hook in 2 seconds (reaction or reveal first, then rewind to the rip); split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\"); vertical 9:16, fast cuts, no dead air; make each clip different (no copy-paste spam).",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "6320ea1b92",
+    "layer": "edit_style",
+    "key": "edit_style.guidance",
+    "value": "story-first, not raw view-farming",
+    "source_quote": "THE MISSION: Make card collecting unavoidable. Story-first, not raw view-farming.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "70579304eb",
+    "layer": "captions",
+    "key": "captions.copy_rules",
+    "value": "no required copy, hashtags or tags; natural story-sounding captions; Tone: excitement, disbelief, FOMO, culture",
+    "source_quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST. Captions: no required copy, hashtags or tags. Natural story-sounding captions. Tone: excitement, disbelief, FOMO, culture.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "5317bebfc6",
+    "layer": "submission",
+    "key": "submission.duplicates_rejected",
+    "value": true,
+    "source_quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook; no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "07398ee4ca",
+    "layer": "priority",
+    "key": "priority.content",
+    "value": "Hero drops get priority: cut the new hero piece first",
+    "source_quote": "3 Clip the Story, Not the Price Tag: do not make the dollar value the headline (\"this card is worth $50K\" is empty calories). The person and the reaction, not the price. Hero drops get priority: cut the new hero piece first.",
+    "confidence": 0.9,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "097b1db7d9",
+    "layer": "priority",
+    "key": "priority.content",
+    "value": "NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before",
+    "source_quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...] Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...] Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.7,
+    "status": "stated",
+    "origin": "llm"
+   },
+   {
+    "id": "58b1998c22",
+    "layer": "payout",
+    "key": "payout.budget_total",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "0c7999bfa5",
+    "layer": "audience",
+    "key": "audience.language",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "7483ff2301",
+    "layer": "length",
+    "key": "length.min_s",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   },
+   {
+    "id": "c1f4278211",
+    "layer": "assets",
+    "key": "assets.logo",
+    "value": null,
+    "source_quote": null,
+    "confidence": 0.0,
+    "status": "unclear",
+    "origin": "rule"
+   }
+  ],
+  "links": [],
+  "warnings": [],
+  "blocking": []
+ },
+ "raw_items": 36,
+ "raw": {
+  "items": [
+   {
+    "key": "payout.model",
+    "value": "cpm",
+    "quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.9
+   },
+   {
+    "key": "payout.rate_per_1k",
+    "value": 1.0,
+    "quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.95
+   },
+   {
+    "key": "payout.max_per_clip",
+    "value": 400,
+    "quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.95
+   },
+   {
+    "key": "audience.min_share",
+    "value": {
+     "pct": 40,
+     "countries": [
+      "US"
+     ],
+     "label": "US"
+    },
+    "quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.9
+   },
+   {
+    "key": "platforms.allowed",
+    "value": [
+     "youtube_shorts",
+     "instagram",
+     "tiktok"
+    ],
+    "quote": "CPM $1.00 / 1K · MAX PER CLIP $400 · AUDIENCE 40%+ US · PLATFORMS YT · IG · TT",
+    "confidence": 0.85
+   },
+   {
+    "key": "content.allowed_categories",
+    "value": [
+     "Sports Card",
+     "Trading Card"
+    ],
+    "quote": "1 Dedicated Card Pages / Sports World Pages: only dedicated pages in the Sports Card / Trading Card niche are accepted.",
+    "confidence": 0.9
+   },
+   {
+    "key": "account.requirements",
+    "value": {
+     "type": "niche_page",
+     "detail": "only dedicated pages in the Sports Card / Trading Card niche are accepted"
+    },
+    "quote": "1 Dedicated Card Pages / Sports World Pages: only dedicated pages in the Sports Card / Trading Card niche are accepted.",
+    "confidence": 0.9
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "He Has Aaron Judge Cards You've Never Seen Before",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "We Found The Best Becky Lynch Collection Ever",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Ratatouille Auto 1/1",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Captain Jack Sparrow",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Trick (Fanatics Fest moment)",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "A-Rod (Fanatics Fest moment)",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "sources.whitelist",
+    "value": {
+     "title": "Kevin O'Leary (Fanatics Fest moment)",
+     "url": null
+    },
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.6
+   },
+   {
+    "key": "captions.disclosure_policy",
+    "value": "forbidden",
+    "quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.forbidden",
+    "value": "#ad or any sponsored-disclosure tag",
+    "quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.forbidden",
+    "value": "#sponsored or any ad-disclosure tags",
+    "quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.95
+   },
+   {
+    "key": "content.forbidden",
+    "value": "NO MORE SKULL EDITS AFTER 8/4 12:59PM EST",
+    "quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.9
+   },
+   {
+    "key": "sources.forbidden_class",
+    "value": "broadcast",
+    "quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.",
+    "confidence": 0.95
+   },
+   {
+    "key": "hook.constraints",
+    "value": "hook in 2 seconds (reaction or reveal first, then rewind to the rip)",
+    "quote": "5 How To Edit: hook in 2 seconds (reaction or reveal first, then rewind to the rip); split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\");",
+    "confidence": 0.9
+   },
+   {
+    "key": "hook.constraints",
+    "value": "do not make the dollar value the headline; the person and the reaction, not the price",
+    "quote": "3 Clip the Story, Not the Price Tag: do not make the dollar value the headline (\"this card is worth $50K\" is empty calories). The person and the reaction, not the price. Hero drops get priority: cut the new hero piece first.",
+    "confidence": 0.9
+   },
+   {
+    "key": "edit_style.guidance",
+    "value": "split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\")",
+    "quote": "5 How To Edit: hook in 2 seconds (reaction or reveal first, then rewind to the rip); split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\");",
+    "confidence": 0.9
+   },
+   {
+    "key": "edit_style.guidance",
+    "value": "vertical 9:16, fast cuts, no dead air; make each clip different (no copy-paste spam)",
+    "quote": "5 How To Edit: hook in 2 seconds (reaction or reveal first, then rewind to the rip); split screens and over-the-top reactions work; big captions naming the card and the moment (\"1/1 SUPERFRACTOR\");\n   vertical 9:16, fast cuts, no dead air; make each clip different (no copy-paste spam).",
+    "confidence": 0.9
+   },
+   {
+    "key": "edit_style.guidance",
+    "value": "story-first, not raw view-farming",
+    "quote": "THE MISSION: Make card collecting unavoidable. Story-first, not raw view-farming.",
+    "confidence": 0.9
+   },
+   {
+    "key": "captions.copy_rules",
+    "value": "no required copy, hashtags or tags; natural story-sounding captions; Tone: excitement, disbelief, FOMO, culture",
+    "quote": "4 The Rules: NEVER PUT #ad ON A POST. No #ad, no #sponsored, no ad-disclosure tags of any kind. NO BROADCAST FOOTAGE (ESPN, NBA, league/network clips). NO MORE SKULL EDITS AFTER 8/4 12:59PM EST.\n   Captions: no required copy, hashtags or tags. Natural story-sounding captions. Tone: excitement, disbelief, FOMO, culture.",
+    "confidence": 0.9
+   },
+   {
+    "key": "payout.min_payout",
+    "value": 1,
+    "quote": "7 Payouts: $1.00 per 1,000 qualified views, $400 max per clip, $1 minimum; the account must show 40%+ US audience; every submission gets manual review.",
+    "confidence": 0.95
+   },
+   {
+    "key": "submission.duplicates_rejected",
+    "value": true,
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "#ad or any sponsored-disclosure tag",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.95
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "ESPN/NBA/broadcast footage",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.95
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "Topps-lane clips using footage from outside the content bank",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "clips where the price tag is the only hook",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "no captions or weak/lazy editing",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "slop reposting (same clip spammed with no variation)",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.9
+   },
+   {
+    "key": "rejection.reasons",
+    "value": "fake-looking views or likes",
+    "quote": "8 Why Clips Get Rejected: #ad or any sponsored-disclosure tag; ESPN/NBA/broadcast footage; Topps-lane clips using footage from outside the content bank; clips where the price tag is the only hook;\n   no captions or weak/lazy editing; slop reposting (same clip spammed with no variation); story boosting; fake-looking views or likes.",
+    "confidence": 0.85
+   },
+   {
+    "key": "priority.content",
+    "value": "Hero drops get priority: cut the new hero piece first",
+    "quote": "3 Clip the Story, Not the Price Tag: do not make the dollar value the headline (\"this card is worth $50K\" is empty calories). The person and the reaction, not the price. Hero drops get priority: cut the new hero piece first.",
+    "confidence": 0.9
+   },
+   {
+    "key": "priority.content",
+    "value": "NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before",
+    "quote": "2 The Content Bank (Main Lane): clip from the links below. NEW CONTENT (PRIORITIZE THIS): He Has Aaron Judge Cards You've Never Seen Before; We Found The Best Becky Lynch Collection Ever; [...]\n   Huge pulls and UGC moments (Instagram): Ratatouille Auto 1/1; Captain Jack Sparrow; [...]   Fanatics Fest moments (Instagram): Trick; A-Rod; Kevin O'Leary",
+    "confidence": 0.7
+   }
+  ]
+ }
+}

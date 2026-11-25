@@ -38,6 +38,14 @@ def presets() -> list[dict]:
             for name, font, primary, accent, _ in LOOKS]
 
 
+def caption_styles() -> list[dict]:
+    """The named caption styles the owner can pick, in order: key, plain label and one line about it."""
+    from .adapters import caption_render
+
+    return [{"key": "auto", "label": "Automatic", "about": "Chosen for the niche: loud pop for gaming, speaker names for podcasts, key words for business."},
+            *({"key": k, "label": v["label"], "about": v["about"]} for k, v in caption_render.STYLES.items())]
+
+
 def starter_set(account_id) -> list[tuple[str, dict]]:
     """Three variations of one look, chosen by the account (so accounts differ): same font and main colour, a different accent,
     caption position and progress bar for each, which keeps the family recognisable while the clips vary."""
