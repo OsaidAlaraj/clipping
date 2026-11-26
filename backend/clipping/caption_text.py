@@ -90,3 +90,35 @@ def clip_to(text: str, limit: int) -> str:
         return text
     cut = text[:limit].rsplit(" ", 1)[0].rstrip(",;:-–—")
     return cut or text[:limit]
+
+
+# ------------------------------------------------------------------ stray tokens in a provider's words
+
+_PREFIX_ONLY = frozenset({"ال", "وال", "بال", "فال", "كال", "لل"})   # the article and its common joined forms: never a word alone
+STRAY_GAP_S = 0.6
+
+
+def repair_stray_tokens(words: list[dict]) -> list[dict]:
+    """Deepgram's Arabic words sometimes arrive as a lone punctuation mark (a "،" with its own time, which then takes a place in
+    a caption line and starts it early) or with the article cut off its noun ("ال" then "خبراء"). Punctuation joins the word
+    before it (it keeps that word's time), and an article joins the word after it. Nothing else changes. Pure: returns new dicts."""
+    out: list[dict] = []
+    open_prefix = False      # the last word kept is an article waiting for its noun
+    for word in words:
+        text = str(word.get("text") or "")
+        if not text.strip():
+            continue
+        if not re.search(r"\w", text, re.U):      # punctuation only
+            if out:
+                out[-1] = {**out[-1], "text": out[-1]["text"] + text.strip()}
+            continue
+        if (open_prefix and out and float(word["start"]) - float(out[-1]["end"]) <= STRAY_GAP_S
+                and out[-1].get("speaker") == word.get("speaker")):
+            prev = out[-1]
+            confs = [c for c in (prev.get("confidence"), word.get("confidence")) if c is not None]
+            out[-1] = {**word, "text": prev["text"] + text, "start": prev["start"], "confidence": min(confs) if confs else None}
+            open_prefix = False
+            continue
+        out.append(dict(word))
+        open_prefix = text in _PREFIX_ONLY
+    return out

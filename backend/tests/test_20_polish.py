@@ -16,6 +16,12 @@ CFG = {"width": 270, "height": 480, "preset": "ultrafast", "crf": 30, "encoder":
 PLAIN = {"zooms": False, "progress_bar": False, "title_card": False}
 
 
+@pytest.fixture(autouse=True)
+def _fixed_window(monkeypatch):
+    """These tests pin exact clip windows; the edge snap (its own test in test_faces) would move them into the silence."""
+    monkeypatch.setattr(polish, "EDGE_SNAP", False)
+
+
 def w(text, start, end):
     return {"text": text, "start": start, "end": end}
 

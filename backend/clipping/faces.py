@@ -22,6 +22,9 @@ DEAD_ZONE, ALPHA, HOLD_SAMPLES = 0.09, 0.12, 9   # the camera holds still while 
 MIN_SCORE = 0.6
 MAX_ASD_CLIP_S = 90          # longer clips use the YuNet-only path (the speaker model costs about 0.4 s per clip second on the CPU)
 TRACK_GAP, TRACK_IOU = 10, 0.3
+SHOT_AWARE = False           # per-shot camera (AutoFlip-style): one position per shot, a hard step on every source cut and on a lasting speaker change
+SHOT_SCENE = 0.30            # ffmpeg scene score above which two frames are a cut in the source edit
+SWITCH_PERSIST = 3           # a speaker change inside one shot must last this many samples (1 s) before the crop steps to it
 
 _detector = None
 
@@ -53,6 +56,71 @@ def smooth(centres: list[float | None]) -> list[float]:
             cur += ALPHA * (c - cur)
         out.append(cur)
     return out
+
+
+def shot_cuts(src: Path, start: float, end: float) -> list[float]:
+    """Clip-relative times of the cuts in the source edit (camera changes), from ffmpeg's scene score. [] when it cannot run."""
+    import re
+    import subprocess
+    from . import ffmpeg
+    try:
+        proc = subprocess.run([ffmpeg.exe(), "-nostdin", "-hide_banner", "-ss", f"{start:.3f}", "-t", f"{end - start:.3f}", "-i", str(src), "-an",
+                               "-vf", f"scale=320:-2,select='gt(scene,{SHOT_SCENE})',showinfo", "-f", "null", "-"], capture_output=True, text=True, timeout=300)
+        times = [float(m) for m in re.findall(r"pts_time:([0-9.]+)", proc.stderr)]
+    except Exception:
+        return []
+    return [round(t, 3) for t in times if 0.2 < t < end - start - 0.2]
+
+
+def shot_keyframes(centres: list[float | None], step: float, crop_share: float, cuts: list[float]) -> list[tuple[float, float]]:
+    """Camera path with one position per shot. Inside a shot the crop starts on the face the shot shows (the median of its first
+    samples, so it is right from the first frame), holds while the face stays inside the dead zone and glides otherwise. At every
+    source cut, and when the speaker changes for good inside a shot, the crop steps in one frame instead of sliding across the picture."""
+    import bisect
+    import statistics
+    lo, hi = crop_share / 2, 1 - crop_share / 2
+    cl = lambda c: round(min(max(c, lo), hi), 4)
+    n, cuts = len(centres), sorted(cuts)
+    shot_of = lambda i: bisect.bisect_right(cuts, i * step)
+    pts: list[tuple[float, float]] = []
+
+    def step_to(t: float, c: float) -> None:
+        if pts and abs(pts[-1][1] - c) >= 0.005:
+            pts.append((round(max(t - 0.001, pts[-1][0]), 3), pts[-1][1]))
+        pts.append((round(t, 3), c))
+
+    cur, miss, shot = 0.5, 0, -1
+    for i, c in enumerate(centres):
+        t, here = round(i * step, 3), shot_of(i)
+        if here != shot:                                    # a new shot: start on what it shows
+            first = [x for x in centres[i:] if x is not None][:4]
+            shot_start = cuts[here - 1] if here else 0.0
+            cur = statistics.median(first) if first else 0.5
+            miss = 0
+            if shot >= 0:
+                step_to(shot_start, cl(cur))
+            else:
+                pts.append((0.0, cl(cur)))
+            shot = here
+        elif c is None:
+            miss += 1
+            if miss > HOLD_SAMPLES and abs(cur - 0.5) > 0.005:
+                cur = 0.5
+                step_to(t, cl(cur))
+        else:
+            miss = 0
+            if abs(c - cur) > CUT_JUMP:                     # another face: only a lasting change moves the crop, and it steps
+                ahead = [x for x in centres[i:i + SWITCH_PERSIST] if x is not None]
+                if len(ahead) >= SWITCH_PERSIST and all(abs(x - c) < CUT_JUMP for x in ahead) and shot_of(i + SWITCH_PERSIST - 1) == here:
+                    cur = c
+                    step_to(t, cl(cur))
+            elif abs(c - cur) > DEAD_ZONE:
+                cur += ALPHA * (c - cur)
+                if not pts or abs(cl(cur) - pts[-1][1]) >= 0.01:
+                    pts.append((t, cl(cur)))
+    if pts and pts[-1][0] < (n - 1) * step:
+        pts.append((round((n - 1) * step, 3), pts[-1][1]))
+    return pts
 
 
 def keyframes(path: list[float], step: float, crop_share: float, min_move: float = 0.01) -> list[tuple[float, float]]:
@@ -165,8 +233,18 @@ def _track_speaker(src: Path, clip: dict, scorer, tracks_fn):
     seen = [c for c in centres if c is not None]
     if not seen:
         return None
+    return _finish(src, start, end, centres, SAMPLE_S), float(np.median(seen))
+
+
+def _finish(src: Path, start: float, end: float, centres: list[float | None], step: float) -> list[tuple[float, float]]:
+    """Per-sample face centres to the crop's keyframes: the per-shot path, or the old smoothed path when SHOT_AWARE is off."""
     crop_share = FRAME_H * 9 / 16 / FRAME_W
-    return keyframes(smooth(centres), SAMPLE_S, crop_share), float(np.median(seen))
+    if SHOT_AWARE:
+        try:
+            return shot_keyframes(centres, step, crop_share, shot_cuts(src, start, end))
+        except Exception:
+            pass
+    return keyframes(smooth(centres), step, crop_share)
 
 
 def _track_yunet(src: Path, clip: dict) -> tuple[list[tuple[float, float]], float] | None:
@@ -206,5 +284,4 @@ def _track_yunet(src: Path, clip: dict) -> tuple[list[tuple[float, float]], floa
     seen = [c for c in centres if c is not None]
     if not seen:
         return None
-    crop_share = FRAME_H * 9 / 16 / FRAME_W
-    return keyframes(smooth(centres), step, crop_share), float(np.median(seen))
+    return _finish(src, start, end, centres, step), float(np.median(seen))

@@ -10,6 +10,7 @@ format, CUDA library loading and the GPU to CPU fallback. Persistence belongs to
 from __future__ import annotations
 
 import importlib.util
+import re
 import os
 import sys
 import wave
@@ -27,6 +28,10 @@ ARABIC_CODES = frozenset({"ar", "ar-AE", "ar-SA", "ar-QA", "ar-KW", "ar-SY", "ar
 ENGLISH_CODES = frozenset({"en", "en-US", "en-GB", "en-AU", "en-IN", "en-NZ"})
 LANGUAGE_CODES = {"ar": ARABIC_CODES, "en": ENGLISH_CODES}
 
+_NAMED_DIALECTS = re.compile(r"(jordan\w*|levant\w*|shami|palestin\w*|leban\w*|syria\w*|egypt\w*|masri)", re.I)
+_NAMED_DIALECTS_CODE = {"jorda": "ar-JO", "levan": "ar-JO", "shami": "ar-JO", "pales": "ar-PS", "leban": "ar-LB", "syria": "ar-SY",
+                        "egypt": "ar-EG", "masri": "ar-EG"}
+
 DEFAULT_MAX_KEYTERMS = 50
 MAX_KEYTERM_CHARS = 100
 
@@ -38,6 +43,10 @@ def resolve_language_code(language: str, dialect: str | None) -> str:
     codes = LANGUAGE_CODES.get(language)
     if codes is None:
         raise ValueError("language must be en or ar")
+    if dialect and language == "ar":
+        named = _NAMED_DIALECTS.search(dialect)    # a label typed in words ("Jordanian", "Levantine") pins the region too
+        if named:
+            return _NAMED_DIALECTS_CODE[named.group(1).lower()[:5]]
     if dialect:
         head, _, tail = dialect.strip().partition("-")
         candidate = head.lower() + (f"-{tail.upper()}" if tail else "")
