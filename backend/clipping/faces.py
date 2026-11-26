@@ -22,7 +22,7 @@ DEAD_ZONE, ALPHA, HOLD_SAMPLES = 0.09, 0.12, 9   # the camera holds still while 
 MIN_SCORE = 0.6
 MAX_ASD_CLIP_S = 90          # longer clips use the YuNet-only path (the speaker model costs about 0.4 s per clip second on the CPU)
 TRACK_GAP, TRACK_IOU = 10, 0.3
-SHOT_AWARE = False           # per-shot camera (AutoFlip-style): one position per shot, a hard step on every source cut and on a lasting speaker change
+SHOT_AWARE = True            # per-shot camera (AutoFlip-style): one position per shot, a hard step on every source cut and on a lasting speaker change
 SHOT_SCENE = 0.30            # ffmpeg scene score above which two frames are a cut in the source edit
 SWITCH_PERSIST = 3           # a speaker change inside one shot must last this many samples (1 s) before the crop steps to it
 
