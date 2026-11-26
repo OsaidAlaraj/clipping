@@ -449,3 +449,12 @@ img, video { max-width: 100%; }
 .hook-edit .seg button[aria-checked="true"] { border: 2px solid var(--fg); font-weight: 600; }
 .pause-flag { position: absolute; top: 45%; left: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 50%; background: rgba(0, 0, 0, 0.5); color: #fff; display: grid; place-items: center; z-index: 3; pointer-events: none; }
 .pause-flag svg { width: 36px; height: 36px; margin-inline-start: 4px; }
+
+/* clip layout picker: five tiles with a 9:16 sketch, one tap makes one new version */
+.layout-pick { display: grid; gap: 8px; margin-block: 12px; }
+.layout-pick h3 { margin: 0; font-weight: 600; }
+.layout-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.layout-row button { min-height: 44px; padding: 6px 2px; display: grid; justify-items: center; gap: 4px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); font-size: 0.72rem; }
+.layout-row button[aria-checked="true"] { border: 2px solid var(--fg); font-weight: 600; }
+.layout-row button:disabled { opacity: 0.5; }
+

@@ -10,6 +10,7 @@ import { useSwipe } from "@/lib/useSwipe";
 import PostBar from "./PostBar";
 import { FeedSkeleton } from "./Skeleton";
 import { draftOf, HookControls, HookDraft, HookOverlay, setHookDraft } from "./HookEditor";
+import { Layout, LayoutPicker } from "./LayoutPicker";
 import { Icon } from "./Shell";
 
 export const REASONS: [string, string][] = [
@@ -87,7 +88,7 @@ export function RejectSheet({ onSubmit, onClose }: { onSubmit: (reason: string, 
   );
 }
 
-function HooksSheet({ clip, onPick, onApply, onClose }: { clip: Clip; onPick: (hookId: string) => void; onApply: (hook: HookDraft) => void; onClose: () => void }) {
+function HooksSheet({ clip, onPick, onApply, onLayout, onClose }: { clip: Clip; onPick: (hookId: string) => void; onApply: (hook: HookDraft) => void; onLayout: (layout: Layout) => void; onClose: () => void }) {
   const current = String(clip.render_meta?.hook_id ?? "");
   const [list, setList] = useState(clip.hooks);
   const [busy, setBusy] = useState(false);
@@ -120,6 +121,7 @@ function HooksSheet({ clip, onPick, onApply, onClose }: { clip: Clip; onPick: (h
   return (
     <SheetFrame title="Hooks" onClose={onClose} peek>
       <HookControls clip={clip} draft={draft} busy={false} onChange={change} onApply={() => onApply({ ...draft, text: draft.text.trim() })} />
+      <LayoutPicker clip={clip} busy={busy} onPick={onLayout} />
       <p className="small muted">Or tap a hook to use it. The clip is re-rendered as a new version and returns to the feed.</p>
       <div className="stack">
         {list.map((hook) => (
@@ -758,7 +760,7 @@ export default function Feed({ campaignId, onExit }: { campaignId?: string; onEx
       {bar && <PostBar key={bar.clip.id} result={bar.result} clip={bar.clip} seconds={config.undo} onUndo={undoSwipe} onClose={() => setBar(null)} />}
       {undo && <UndoToast seconds={config.undo} onUndo={doUndo} label={`${t(undo.kind === "accept" ? "accepted" : undo.kind === "reject" ? "rejected" : "parked")}${undo.queued ? " · saved" : ""}`} />}
       {sheet === "reject" && <RejectSheet onSubmit={reject} onClose={() => setSheet(null)} />}
-      {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} onApply={(hook) => saveEdit({ hook })} />}
+      {sheet === "hooks" && clip && <HooksSheet clip={clip} onClose={() => setSheet(null)} onPick={(hookId) => saveEdit({ hook_id: hookId })} onApply={(hook) => saveEdit({ hook })} onLayout={(layout) => saveEdit({ layout })} />}
       {sheet === "edit" && clip && <EditSheet clip={clip} onClose={() => setSheet(null)} onSave={saveEdit} />}
       {sheet === "filtered" && <FilteredSheet items={filtered} onRescue={rescue} onClose={() => setSheet(null)} />}
       {sheet === "report" && clip && <ComplianceSheet clip={clip} onClose={() => setSheet(null)} />}

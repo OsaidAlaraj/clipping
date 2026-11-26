@@ -10,7 +10,7 @@ import math
 import re
 from pathlib import Path
 
-from .. import faces, ffmpeg, gaming_layout, hook_rules, music, polish
+from .. import faces, ffmpeg, gaming_layout, hook_rules, layouts, music, polish
 from ..core import AppError
 from .base import Adapter, register
 
@@ -126,6 +126,8 @@ def layout_graph(style: str, src_w: int, src_h: int, out_w: int, out_h: int, foc
     if style == "gaming_stack" and stack and stack.get("layout") == "stack":
         from .. import gaming_layout
         return gaming_layout.stack_graph(stack, src_w, src_h, out_w, out_h, label)
+    if style in ("split", "reaction") and stack and stack.get("layout") == style:
+        return layouts.graph(stack, out_w, out_h, label, stack.get("feed_input", 1))
     if style == "blur_pad":
         return (f"[0:v]split=2[bga][fga];[bga]scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h},"
                 f"boxblur=luma_radius=30:luma_power=2,eq=brightness=-0.18[bg];[fga]scale={out_w}:{out_h}:force_original_aspect_ratio=decrease:flags=lanczos[fg];"
@@ -186,7 +188,7 @@ def zoom_graph(times: list[float], out_w: int, out_h: int, source: str = "lay", 
 
 
 ZOOM_IN_S, ZOOM_HOLD_S, ZOOM_OUT_S = 0.60, 0.90, 1.00     # punch-in: ease in, hold, ease back out
-ZOOM_FLAT_STYLES = ("facecam_over_game", "stacked_facecam_over_gameplay", "stacked")   # the gameplay half never zooms
+ZOOM_FLAT_STYLES = ("facecam_over_game", "stacked_facecam_over_gameplay", "stacked", "split", "reaction")   # the gameplay half never zooms
 
 
 def _smoother(x: str) -> str:
@@ -528,9 +530,29 @@ class FFmpegRender(Adapter):
         duration, style = end - start, self.force_crop or clip.get("crop") or "follow_speaker"
         niche = NICHE_OF_CROP.get(style)
         wanted = tpl["layout"] if (isinstance(template, dict) and "layout" in template) else niche_defaults(niche).get("layout", "auto")
+        # the layout of this clip: the owner's pick for it, else the suggestion when it is a split or a reaction, else the template's
+        override = clip.get("layout") if clip.get("layout") in layouts.KINDS else None
+        suggestion, seen, lay_note = None, None, {}
+        if self.force_crop is None and info["width"] > info["height"] and override is None:
+            seen = layouts.look(src_path, start, end)
+            suggestion = layouts.suggest(niche, info["width"], info["height"], seen, clip.get("layout_hints"), bool(clip.get("feed")))
+        want = override or (suggestion["layout"] if suggestion and suggestion["layout"] in ("split", "reaction") else None)
+        if self.force_crop is None and want == "single":
+            wanted = "auto"
+            if style in ("facecam_over_game", "gaming_stack", "blur_pad"):
+                style = "follow_speaker"
+        elif self.force_crop is None and want == "gaming":
+            wanted = "gaming_stack"
         if self.force_crop is None and wanted in ("blur_pad", "gaming_stack"):
             style = wanted
         stack = None
+        if self.force_crop is None and want in ("split", "reaction"):
+            stack = layouts.plan(want, src_path, clip, info["width"], info["height"], width, height, seen, clip.get("feed") if want == "split" else None)
+            if stack["layout"] == want:
+                style = want
+            else:
+                lay_note["fallback"] = stack.get("reason")
+                stack = None
         if style in ("gaming_stack", "facecam_over_game"):
             style = "gaming_stack"
             stack = gaming_layout.plan(src_path, clip, info["width"], info["height"], width, height)
@@ -538,6 +560,8 @@ class FFmpegRender(Adapter):
         cell = niche_defaults(niche, clip.get("language"))
         if not (isinstance(template, dict) and "caption_position" in template) and cell.get("caption_position") in CAPTION_POSITIONS:
             tpl["caption_position"] = cell["caption_position"]
+        if style == "split":
+            tpl["caption_position"], cell = "middle", {**cell, "caption_y": None}   # the captions sit on the seam between the two panels
         size = cell.get("caption_font_pct")
         if not (isinstance(template, dict) and "font_size" in template) and isinstance(size, (int, float)) and FONT_SIZE_RANGE[0] <= size <= FONT_SIZE_RANGE[1]:
             tpl["font_size"] = float(size)
@@ -581,6 +605,11 @@ class FFmpegRender(Adapter):
             hook_zoom = (story.get("rehook") or {}) if story else {}
             if hook_zoom and all(abs(hook_zoom["at_s"] - 0.3 - t) >= 4.0 for t, _ in moments):
                 moments = sorted(moments + [(round(hook_zoom["at_s"] - 0.3, 2), float(hook_zoom["depth"]))])
+        bed = clip.get("music") if has_audio else None      # {"path", "offset_s", "gain_db"}: the chosen, licence-checked bed
+        if bed and not Path(bed["path"]).is_file():
+            bed = None
+        if stack:
+            stack["feed_input"] = 2 if bed else 1          # the music is input 1 when there is a bed, the second feed comes after it
         graph = layout_graph(style, info["width"], info["height"], width, height, focus, path=path, stack=stack)
         graph += (";" + punch_graph(moments, width, height)) if moments else ""
         last = "zm" if moments else "lay"
@@ -588,17 +617,17 @@ class FFmpegRender(Adapter):
             graph += ";" + tighten_graphs(plan, last, has_audio, info.get("fps") or 30.0)
             last = "cutv"
         graph += f";[{last}]ass={ass_path.name},format=yuv420p[v]"   # the file name only: no user text in the graph
-        bed = clip.get("music") if has_audio else None      # {"path", "offset_s", "gain_db"}: the chosen, licence-checked bed
-        if bed and not Path(bed["path"]).is_file():
-            bed = None
         audio = music.audio_graph(bed, clip.get("platform"), clip.get("audio") == "natural", speech_in="cuta" if plan else "0:a:0", duration_s=c1 - c0) if has_audio else None
         if audio:
             graph += ";" + audio
 
         def args_for(encoder: str) -> list[str]:
             args = ["-ss", f"{start:.3f}", "-i", str(src_path)]
+            feed = stack.get("feed") if style == "split" and stack else None
             if bed:   # looped from the chosen bar line, so a track shorter than the clip still fills it
                 args += ["-stream_loop", "-1", "-ss", f"{float(bed['offset_s']):.3f}", "-i", str(Path(bed["path"]).resolve())]
+            if feed:   # the second feed loops from its own offset; its sound is never used
+                args += ["-stream_loop", "-1", "-ss", f"{float(feed['offset_s']):.3f}", "-i", str(Path(feed["path"]).resolve())]
             args += ["-t", f"{c1 - c0 + 0.05:.3f}", "-filter_complex", graph, "-map", "[v]"]
             if has_audio:
                 args += ["-map", "[a]", "-c:a", "aac", "-ar", "44100", "-b:a", "160k"]
@@ -611,6 +640,9 @@ class FFmpegRender(Adapter):
         return {"path": str(out_path), "ass_path": str(ass_path), "encodes": 1, "encoder": encoder, "cover_path": cover,
                 "duration_s": finished["duration_s"], "captions": len(events), "zooms": len(moments),
                 "tightened": {"removed_s": round(plan.removed, 2), "cuts": plan.cuts} if plan else None,
+                "layout": style if style in ("split", "reaction") else ("gaming" if style == "gaming_stack" else "single"),
+                "layout_suggested": suggestion, "layout_fallback": lay_note.get("fallback"),
+                "layout_problems": layouts.violations(stack, width, height) if stack else [],
                 "reframe": "face" if focus is not None else "centre_crop", "loudness_normalised": bool(info["has_audio"]),
                 "music": bed["record"] if bed and bed.get("record") else None, "loudness_target": music.target_loudness(clip.get("platform"))[0],
                 "overlay": {"text": label, "start_s": 0.0, "end_s": finished["duration_s"]}, "width": width, "height": height}
@@ -623,8 +655,10 @@ class FFmpegRender(Adapter):
             at = sharpest_time(src, cover_times(clip))
             ass_path = out.with_suffix(".ass")
             ass_path.write_text(build_cover_ass(width, height, clip.get("hook_text"), tpl), encoding="utf-8-sig")
-            graph = layout_graph(style, info["width"], info["height"], width, height, focus, stack=stack) + f";[lay]ass={ass_path.name}[v]"
-            ffmpeg.run(["-ss", f"{at:.3f}", "-i", str(src), "-filter_complex", graph, "-map", "[v]", "-frames:v", "1", str(out)], cwd=out.parent)
+            feed = stack.get("feed") if style == "split" and stack else None
+            graph = layout_graph(style, info["width"], info["height"], width, height, focus, stack={**stack, "feed_input": 1} if stack else None) + f";[lay]ass={ass_path.name}[v]"
+            extra = ["-ss", f"{float(feed['offset_s']):.3f}", "-i", str(feed["path"])] if feed else []
+            ffmpeg.run(["-ss", f"{at:.3f}", "-i", str(src), *extra, "-filter_complex", graph, "-map", "[v]", "-frames:v", "1", str(out)], cwd=out.parent)
         except Exception:
             return None
         return str(out)

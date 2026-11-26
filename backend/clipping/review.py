@@ -10,7 +10,7 @@ from statistics import NormalDist
 
 from psycopg.types.json import Jsonb
 
-from . import hook_rules, quality_gate, ranking
+from . import hook_rules, layouts, quality_gate, ranking
 from .alerts import registry
 from .core import AppError, GateError, audit, enqueue, get_setting, kill_switch_on
 
@@ -435,19 +435,21 @@ def apply_hook_settings(meta: dict, hook: dict, duration_s: float) -> bool:
     return changed
 
 
-def edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None, hook: dict | None = None) -> dict:
+def edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None, hook: dict | None = None, layout: str | None = None) -> dict:
     """A refused edit (for example one that drops the disclosure) is rolled back: the original clip stays as it was."""
     with conn.transaction():
-        return _edit(conn, actor, clip_id, trim, hook_id, caption, hook)
+        return _edit(conn, actor, clip_id, trim, hook_id, caption, hook, layout)
 
 
-def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None, hook: dict | None = None) -> dict:
+def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption: str | None = None, hook: dict | None = None, layout: str | None = None) -> dict:
     clip = conn.execute("select * from clips where id = %s", (clip_id,)).fetchone()
     if clip is None:
         raise AppError("Clip not found.", "not_found")
     if clip["status"] not in ("ready_for_review", "review_later"):
         raise AppError(f"A clip that is {clip['status']} cannot be edited.", "bad_status")
-    if not (trim or hook_id or hook or caption is not None):
+    if layout is not None and layout not in layouts.OVERRIDES:
+        raise AppError("The layout must be auto, single, gaming, split or reaction.", "bad_layout")
+    if not (trim or hook_id or hook or caption is not None or layout is not None):
         raise AppError("Nothing to change.", "no_change")
     meta = dict(clip["render_meta"] or {})
     start, end = float(clip["start_s"]), float(clip["end_s"])
@@ -464,7 +466,9 @@ def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption:
         hook_score = hook_row["score"]
         meta.pop("hook_custom", None)
     text_changed = apply_hook_settings(meta, hook, end - start) if hook else False
-    needs_render = bool(trim or hook_id or hook)
+    if layout is not None:
+        meta["layout"] = layout   # "auto" goes back to the suggestion
+    needs_render = bool(trim or hook_id or hook or layout is not None)
     if caption is not None:
         meta["caption_edited"] = True
     elif hook_id or text_changed:
@@ -485,7 +489,7 @@ def _edit(conn, actor, clip_id, trim: dict | None = None, hook_id=None, caption:
     ).fetchone()
     conn.execute("update clips set status = 'archived' where id = %s", (clip["id"],))
     audit(conn, "clip.edited", "clips", new["id"],
-          {"from_version": clip["version_no"], "trim": bool(trim), "hook": bool(hook_id or hook), "caption": caption is not None},
+          {"from_version": clip["version_no"], "trim": bool(trim), "hook": bool(hook_id or hook), "caption": caption is not None, "layout": layout},
           rule_version_id=clip["campaign_version_id"])
     if needs_render:
         source_id = conn.execute("select source_id from candidates where id = %s", (clip["candidate_id"],)).fetchone()["source_id"]

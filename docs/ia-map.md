@@ -16,6 +16,7 @@ Section A is the audit of the app **before** the redesign (branch tip 06cd35d). 
 | `/review`, `/feed` | Feed | the swipe review feed (the quality bar); `/feed` is an alias |
 | (sheet in Feed) | Hooks sheet (`HooksSheet` + `HookEditor.tsx`) | the one place to change a clip's hook: own text, show-from, show-for, position, with a live overlay on the playing video; one render on Apply (stored in `clips.render_meta`: hook_text, hook_from_s, hook_for_s, hook_position; overrides the global `hook_show_s`). Tap on the video pauses; Mute is the header chip |
 | `/profile` | Profile | numbers, 6 list links, accounts, add account |
+| (sheet in Feed) | Layout picker (`LayoutPicker.tsx`, inside the same Hooks sheet) | the one place to change a clip's layout: Auto, Single, Gaming, Split, Reaction; shows what auto suggested and why, and why a layout fell back. One tap = one new version (`render_meta.layout`). Rules in `docs/clip-layouts.md` |
 | `/library` | Library | accepted clips scroll |
 | `/queue` | Queue | posting queue + checklist |
 | `/campaign?id` | CampaignDetail | payout, rules, footage, ad label, **its own add-footage form** |

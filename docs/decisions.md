@@ -258,3 +258,9 @@ Evidence: `docs/viral-templates-research.md`, `docs/market-corpus.md`, `docs/bak
 - **Measured, no clear winner:** blind pairwise old vs new, 35 real moments, both orders. Round 1: new 55% (en 62%, ar 47%, podcast ar 36%); losses were POV/Nobody tags on serious interviews. Fix: tag formats only in light niches plus a mood rule in the prompt. Round 2 (same moments, so partly tuned on them): new 56% (en 64%, ar 47%, podcast ar 50%, business ar 38% of 4). Within noise of 50% for Arabic; English leans new. Same-family LLM judge, no gaming moments, no native Arabic panel. So the generator is kept for its rules and spread, NOT claimed to be better; the owner's thumbs decide.
 - **Captions:** blind stills round, 2 clips: bold_pop 88%, hype 81%, word_box 59%, karaoke_clean 53%, minimal 3%. Existing six kept, new three added as options; hype for comedy, karaoke_clean for movies.
 - **Market corpus is thin:** no auto-captions, no durations, no leaderboards (login walls), no Arabic sports/comedy/movies/general. See the doc before using it as evidence.
+
+## Decision 39 (2026-11-26): clip layouts (single, gaming, split, reaction)
+- **Built:** `layouts.py`, one place for the four looks, the safe areas, the suggestion and the filtergraph; still one encode. Per clip, auto or the owner's pick (`render_meta.layout`, editor: the Hooks sheet). Research and numbers: `docs/clip-layouts.md`.
+- **A plan that would put a face under the hook title, the captions, the label strip or the bottom controls is refused** and the clip renders as the single crop with the reason shown. Safer than a clip with a covered face.
+- **Auto is conservative:** split only for a clean two-shot (or one person plus a feed when the campaign asks for a split screen); reaction only when the campaign asks for it and the card fits. Everything else stays the single crop.
+- **Feeds:** a second feed for split comes from `.data/feeds/` (looped, muted); there is no upload screen yet.

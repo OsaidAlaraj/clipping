@@ -177,6 +177,7 @@ class EditIn(BaseModel):
     hook_id: str | None = None
     caption: str | None = None
     hook: dict | None = None   # the owner's own hook: {text, from_s, for_s, position}
+    layout: str | None = None  # this clip's layout: auto, single, gaming, split or reaction
 
 
 class HookRatingIn(BaseModel):
@@ -984,7 +985,7 @@ def undo(body: UndoIn, actor: Actor = Depends(current_actor)):
 
 @app.post("/api/clips/{clip_id}/edit")
 def edit(clip_id: str, body: EditIn, actor: Actor = Depends(current_actor)):
-    return run(actor, review.edit, actor, clip_id, body.trim, body.hook_id, body.caption, body.hook)
+    return run(actor, review.edit, actor, clip_id, body.trim, body.hook_id, body.caption, body.hook, body.layout)
 
 
 @app.post("/api/clips/{clip_id}/hooks/regenerate")

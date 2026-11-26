@@ -10,7 +10,7 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from . import ad_label, brand_checks, brief_wiring, config, ffmpeg, hook_patterns, hook_rules, job_progress, language_check, music, packaging, quality_gate, signals, templates, transcripts
+from . import ad_label, brand_checks, brief_wiring, config, ffmpeg, hook_patterns, hook_rules, job_progress, layouts, language_check, music, packaging, quality_gate, signals, templates, transcripts
 from .adapters import music as _music_adapters  # noqa: F401  (registers the music stage providers)
 from .adapters.base import AdapterPaused
 from .adapters.vendors import ContentFiltered
@@ -553,6 +553,10 @@ def stage_render(conn, job: dict) -> Decimal:
     words = _words(conn, source)
     render_clip = _render_request(conn, clip, source, platform, meta.get("hook_text"))
     render_clip["min_s"] = brief_wiring.min_clip_s(version["rules_json"], render_clip["min_s"])   # the brief's own minimum length (brief_spec)
+    if meta.get("layout") in layouts.KINDS:
+        render_clip["layout"] = meta["layout"]       # the owner's pick for this clip; without one the render suggests
+    render_clip["layout_hints"] = " ".join(brief_wiring.edit_style(version["rules_json"]))    # "split screens and over-the-top reactions work"
+    render_clip["feed"] = layouts.pick_feed(config.data_dir() / "feeds", str(clip["id"]))     # a second feed (gameplay, a reaction file) when the owner added one
     account_row = conn.execute("select niche from accounts where id = %s", (account_id,)).fetchone() if account_id else None
     meta["account_warnings"] = brief_wiring.account_warnings(version["rules_json"], account_row)   # shown to the owner before posting
     story = _story(conn, clip, campaign, version, words)
@@ -586,7 +590,8 @@ def stage_render(conn, job: dict) -> Decimal:
     meta["music"] = result.get("music") or ({"track_id": None, "skipped": bed.get("skipped")} if bed else None)
     meta.update(loudness_target_lufs=result.get("loudness_target"), music_credit_in_caption=bool(credit and credit in caption))
     meta.update(template_id=template["id"], template_version=template["version"], encoder=result["encoder"], encodes=result["encodes"],
-                reframe=result["reframe"], loudness_normalised=result["loudness_normalised"], overlay_burned=True,
+                reframe=result["reframe"], layout_used=result.get("layout"), layout_suggested=result.get("layout_suggested"),
+                layout_fallback=result.get("layout_fallback"), layout_problems=result.get("layout_problems"), loudness_normalised=result["loudness_normalised"], overlay_burned=True,
                 captions=result["captions"], zooms=result.get("zooms", 0), caption_language=clip["language"],
                 disclosure_template_id=str(disclosure["id"]) if disclosure.get("id") else None, cover_key=cover_key)
     conn.execute(
