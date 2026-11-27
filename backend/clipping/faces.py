@@ -22,6 +22,7 @@ DEAD_ZONE, ALPHA, HOLD_SAMPLES = 0.09, 0.12, 9   # the camera holds still while 
 MIN_SCORE = 0.6
 MAX_ASD_CLIP_S = 90          # longer clips use the YuNet-only path (the speaker model costs about 0.4 s per clip second on the CPU)
 TRACK_GAP, TRACK_IOU = 10, 0.3
+FILL_SHORT_TRACKS = True      # samples the speaker model has no face for take the biggest face of any short track
 SHOT_AWARE = True            # per-shot camera (AutoFlip-style): one position per shot, a hard step on every source cut and on a lasting speaker change
 SHOT_SCENE = 0.30            # ffmpeg scene score above which two frames are a cut in the source edit
 SWITCH_PERSIST = 3           # a speaker change inside one shot must last this many samples (1 s) before the crop steps to it
@@ -221,6 +222,7 @@ def _track_speaker(src: Path, clip: dict, scorer, tracks_fn):
         return None
     start, end = float(clip["start_s"]), float(clip["end_s"])
     tracks, ticks, _ = (tracks_fn or face_tracks)(src, start, end)
+    every_track = tracks                     # short tracks (a 1-2 s camera angle) are dropped from scoring but still say where a face is
     tracks = speaker.keep_main_tracks(tracks)
     if not tracks or ticks < 25:
         return None
@@ -230,6 +232,13 @@ def _track_speaker(src: Path, clip: dict, scorer, tracks_fn):
     scores = speaker.score_tracks(tracks, scorer, speaker.mfcc(audio))
     sample_ticks = [int(round(i * SAMPLE_S * 25)) for i in range(int(ticks / 25 / SAMPLE_S))]
     centres = speaker.pick(tracks, scores, sample_ticks)
+    if FILL_SHORT_TRACKS:
+        for k, t in enumerate(sample_ticks):
+            if centres[k] is None:
+                here = [(tr["area"], speaker.centre_at(tr, t, tol=3)) for tr in every_track]
+                here = [(a, c) for a, c in here if c is not None]
+                if here:
+                    centres[k] = max(here)[1]
     seen = [c for c in centres if c is not None]
     if not seen:
         return None

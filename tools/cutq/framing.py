@@ -5,6 +5,10 @@ from pathlib import Path
 import numpy as np, cv2
 sys.path.insert(0, r"L:\Projects\Clipping\.claude\worktrees\cut-quality-3d8a7d\backend")
 from clipping import faces
+import os
+if os.environ.get("CUTQ_OLD"):      # the tracker as it was before the per-shot path
+    faces.SHOT_AWARE = False; faces.FILL_SHORT_TRACKS = False
+only = set(os.environ.get("CUTQ_ONLY", "").split(",")) - {""}
 HERE = Path(__file__).parent; CACHE = Path(r"L:\Projects\Clipping\.data\tmp\cutq\facecache"); CACHE.mkdir(parents=True, exist_ok=True)
 STEP = 0.25
 
@@ -41,7 +45,7 @@ def evaluate(w, path, src_w=1920, src_h=1080):
 if __name__ == "__main__":
     spec = sys.argv[1] if len(sys.argv) > 1 else "clipping.faces:track"
     mod, fn = spec.split(":"); track = getattr(importlib.import_module(mod), fn)
-    wins = json.load(open(HERE / "windows.json", encoding="utf8")); rows = []
+    wins = [w for w in json.load(open(HERE / "windows.json", encoding="utf8")) if not only or w["id"].split("_")[0] in only or w["id"] in only]; rows = []
     for w in wins:
         got = track(Path(w["src"]), {"start_s": w["start_s"], "end_s": w["end_s"]})
         path = got[0] if got else None

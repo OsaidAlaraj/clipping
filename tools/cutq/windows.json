@@ -126,5 +126,53 @@
   "language": "en",
   "start_s": 2443.06,
   "end_s": 2484.555
+ },
+ {
+  "id": "gaming_0",
+  "src": "L:\\Projects\\Clipping\\.data\\benchmark\\shots\\en_gaming\\ep.mp4",
+  "transcript": "L:\\Projects\\Clipping\\.data\\tmp\\cutq\\tr\\gaming_0.json",
+  "language": "en",
+  "start_s": 312.91,
+  "end_s": 343.38
+ },
+ {
+  "id": "gaming_1",
+  "src": "L:\\Projects\\Clipping\\.data\\benchmark\\shots\\en_gaming\\ep.mp4",
+  "transcript": "L:\\Projects\\Clipping\\.data\\tmp\\cutq\\tr\\gaming_1.json",
+  "language": "en",
+  "start_s": 1523.14,
+  "end_s": 1554.41
+ },
+ {
+  "id": "stream_0",
+  "src": "L:\\Projects\\Clipping\\.data\\benchmark\\shots\\en_stream\\ep.mp4",
+  "transcript": "L:\\Projects\\Clipping\\.data\\tmp\\cutq\\tr\\stream_0.json",
+  "language": "en",
+  "start_s": 610.02,
+  "end_s": 647.43
+ },
+ {
+  "id": "comedy_0",
+  "src": "L:\\Projects\\Clipping\\.data\\storage\\sources\\02c0d28d77a2db874752578206dcdbc48278460d822b62d9a8ce6e917dfd3586.mp4",
+  "transcript": "L:\\Projects\\Clipping\\.data\\storage\\transcripts\\02c0d28d77a2db874752578206dcdbc48278460d822b62d9a8ce6e917dfd3586_ar_ar_deepgram.json",
+  "language": "ar",
+  "start_s": 429.89,
+  "end_s": 475.895
+ },
+ {
+  "id": "comedy_1",
+  "src": "L:\\Projects\\Clipping\\.data\\storage\\sources\\02c0d28d77a2db874752578206dcdbc48278460d822b62d9a8ce6e917dfd3586.mp4",
+  "transcript": "L:\\Projects\\Clipping\\.data\\storage\\transcripts\\02c0d28d77a2db874752578206dcdbc48278460d822b62d9a8ce6e917dfd3586_ar_ar_deepgram.json",
+  "language": "ar",
+  "start_s": 1319.925,
+  "end_s": 1360.35
+ },
+ {
+  "id": "comedy_3",
+  "src": "L:\\Projects\\Clipping\\.data\\storage\\sources\\02c0d28d77a2db874752578206dcdbc48278460d822b62d9a8ce6e917dfd3586.mp4",
+  "transcript": "L:\\Projects\\Clipping\\.data\\storage\\transcripts\\02c0d28d77a2db874752578206dcdbc48278460d822b62d9a8ce6e917dfd3586_ar_ar_deepgram.json",
+  "language": "ar",
+  "start_s": 3020.685,
+  "end_s": 3060.265
  }
 ]
